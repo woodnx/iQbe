@@ -1,0 +1,12 @@
+node_modules
+dist
+src/public
+
+# database info
+src/db-info.json
+
+# cors option
+src/allowed-server.ts
+
+# firebase-admin
+src/service-account.json
