@@ -1,4 +1,4 @@
-import express, { Router, Request, Response, NextFunction } from 'express'
+import express, { Router, Request } from 'express'
 import knex from '../knex'
 
 const router: Router = express.Router()
@@ -28,7 +28,7 @@ interface Quizzes {
   date: Date,
 }
 
-router.get('/:userId/:listName?', async (req: QuizRequest, res, next) => {
+router.get('/:userId/:listName?', async (req: QuizRequest, res) => {
   const page     = !!req.query.page     ? Number(req.query.page)    : 1
   const maxView  = !!req.query.perPage || Number(req.query.perPage) <= 100  ? Number(req.query.perPage) : 100
   const seed     = !!req.query.seed     ? Number(req.query.seed)    : undefined
@@ -86,7 +86,7 @@ router.get('/:userId/:listName?', async (req: QuizRequest, res, next) => {
       //   , [crctAnsRatio[0], crctAnsRatio[1]])
       // }
 
-      if (!!listName) {
+      if (!listName) {
         // 何もしない
       }else if (listName === 'favorite') {
         builder
@@ -96,7 +96,7 @@ router.get('/:userId/:listName?', async (req: QuizRequest, res, next) => {
       }else if (listName === 'history' && !!start && !!end) {
         builder.column(
           { judgement: 'histories.judgement' },
-          { practiced: 'histories.practiced' }
+          { practiced: 'histories.practiced' },
         )
         .innerJoin('histories', 'histories.quiz_id', 'quizzes.id')
         .where('histories.user_id', userId)
