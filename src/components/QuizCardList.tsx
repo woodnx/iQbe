@@ -26,6 +26,7 @@ export default function QuizCardList() {
     <>
       {quizList?.map(({question, answer}, idx) => (
         <QuizCard 
+          key={idx}
           index={idx+1}
           question={question}
           answer={answer}
