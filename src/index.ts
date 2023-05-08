@@ -7,8 +7,8 @@ import verifyAuthToken from './middleware/verifyAuthToken'
 import server from './allowed-server'
 import serviceAccount from './service-account.json'
 
-const app: express.Express = express() // expressをインスタンス化
-const port: number = 9000
+const app = express() // expressをインスタンス化
+const port = 9000
 
 const params = {
   type: serviceAccount.type,
@@ -37,10 +37,19 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public'))); 
 
 const filenames = fs.readdirSync(path.join(__dirname, 'routes'))
-
 filenames.forEach(filename => {
   const name = filename.replace('.js', '')
-  app.use(`/v2/${name}`, verifyAuthToken, require(`./routes/${name}`))
+  app.use(`/v2/${name}`, require(`./routes/${name}`))
+})
+
+app.get('/', (req, res) => {
+  res.redirect('/v2')
+})
+
+app.get('/v2', (req, res) => {
+  res.send({
+    message: "This is v2's index page'"
+  })
 })
 
 app.listen(port)
