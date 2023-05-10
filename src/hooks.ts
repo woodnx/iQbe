@@ -1,4 +1,4 @@
-import { useState } from "react"
+import React, { useState } from "react"
 
 export function fetcher(url: string) { 
   const baseUrl = 'http://localhost:9000/v2'
