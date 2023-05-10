@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom"
 import { auth } from "../firebase"
 import { signInWithEmailAndPassword } from "firebase/auth"
-import { Button, Paper, PasswordInput, TextInput } from "@mantine/core"
+import { Button, Center, Grid, Paper, PasswordInput, TextInput } from "@mantine/core"
 import { useInput } from "../hooks"
 import { useAtom } from "jotai"
 import { fireBaseUserAtom } from "../atoms"
@@ -27,28 +27,42 @@ export default function Login() {
   };
 
   return (
-    <>
-    <form onSubmit={submit}>
-      <Paper shadow="xs" p="md">
-        <TextInput 
-          {...emailProps}
-          placeholder="Your Email"
-          label="Email"
-          radius="xl"
-          size="md"
-        />
-        <PasswordInput
-          {...passwordProps}
-          placeholder="Your Password"
-          label="Password"
-          radius="xl"
-          size="md"
-        />
-        <Button fullWidth type="submit">
-          Login
-        </Button>
-      </Paper>
-    </form>
-    </>
+    <Paper shadow="md" p="35px" radius="lg">
+      <Grid>
+        <Grid.Col span={4}>
+          <Center>
+            <img src="../../public/iqbe-named.png" width={160}></img>
+          </Center> 
+        </Grid.Col>
+        <Grid.Col span={8}>
+          
+          <form onSubmit={submit}>
+            
+            <TextInput 
+              {...emailProps}
+              placeholder="Your Email"
+              label="Email"
+              radius="xl"
+              size="md"
+            />
+            <PasswordInput
+              {...passwordProps}
+              placeholder="Your Password"
+              label="Password"
+              radius="xl"
+              size="md"
+              mt="sm"
+            />
+            <Button 
+              fullWidth 
+              type="submit" 
+              mt="lg"
+            >
+              Login
+            </Button>
+          </form>
+        </Grid.Col>
+      </Grid>
+    </Paper>
   )
 }
