@@ -2,13 +2,13 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { BrowserRouter as Router } from 'react-router-dom'
 import { MantineProvider } from '@mantine/core'
-import Root from './root.tsx'
+import DetermineLayout from './determineLayout.tsx'
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
     <MantineProvider>
       <Router>
-        <Root />
+        <DetermineLayout />
       </Router>
     </MantineProvider>
   </React.StrictMode>,
