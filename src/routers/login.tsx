@@ -31,7 +31,7 @@ export default function Login() {
       <Grid>
         <Grid.Col span={4}>
           <Center>
-            <img src="../../public/iqbe-named.png" width={160}></img>
+            <img src="../../iqbe-named.png" width={160}></img>
           </Center> 
         </Grid.Col>
         <Grid.Col span={8}>
