@@ -13,6 +13,7 @@ import { useState } from "react"
 import { useMediaQuery } from "@mantine/hooks"
 import { useAtom } from "jotai"
 import { fireBaseUserAtom } from "../atoms"
+import { notifications } from "@mantine/notifications"
 
 export type LayoutProps = {
   children: ReactNode
@@ -63,11 +64,23 @@ export default function DefaultLayout({ children }: LayoutProps) {
   const [ , setFirebaseUser ] = useAtom(fireBaseUserAtom)
 
   useEffect(() => {
+    let ignore = false
     const authStateChanged = onAuthStateChanged(auth, (user) => {
-      if(!user) navigate('/login')
+      if (ignore) return
       setFirebaseUser(user)
+
+      if(!user) { 
+        navigate('/login') 
+        notifications.show({
+          title: 'Require Login',
+          message: 'Please login',
+          color: 'red',
+          withBorder: true,
+        }) 
+      }
     })
     return () => {
+      ignore = true
       authStateChanged()
     }
   }, [])
