@@ -1,6 +1,7 @@
-import useSWR from "swr"
-import { fetcher } from "../hooks"
 import QuizCard from "./QuizCard"
+import axios from "../axios"
+import { useEffect, useState } from "react"
+// import { useFetch } from "../hooks"
 
 interface Quizzes {
   id: number,
@@ -17,9 +18,15 @@ interface Quizzes {
 
 export default function QuizCardList() {
   const userId = 8
-  const { data: quizList, error } = useSWR<Quizzes[]>(`/quizzes/${userId}`, fetcher)
+  const [ quizList, setList ] = useState<Quizzes[]>()
+  // const { data: quizList } = useFetch<Quizzes[]>(`/quizzes/${userId}`)
 
-  if (error)     return <div>faild to load</div>
+  useEffect(() => {
+    axios.get<Quizzes[]>(`/quizzes/${userId}`)
+    .then(res => res.data)
+    .then(setList)
+  }, [])
+
   if (!quizList) return <div>loading</div>
 
   return (
