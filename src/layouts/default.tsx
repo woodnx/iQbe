@@ -1,19 +1,12 @@
-import { getAuth, onAuthStateChanged } from "firebase/auth"
+import { getAuth, getIdToken, onAuthStateChanged } from "firebase/auth"
 import { ReactNode, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import { AppShell, Group, NavLink, Navbar, ThemeIcon, createStyles } from "@mantine/core"
-import { 
-  IconActivity, 
-  IconHistory, 
-  IconSchool, 
-  IconSearch, 
-  IconStar 
-} from "@tabler/icons-react"
+import { IconActivity, IconHistory, IconSchool, IconSearch, IconStar } from "@tabler/icons-react"
 import { useState } from "react"
 import { useMediaQuery } from "@mantine/hooks"
-import { useAtom } from "jotai"
-import { fireBaseUserAtom } from "../atoms"
 import { notifications } from "@mantine/notifications"
+import useUserStore from "../store/user"
 
 export type LayoutProps = {
   children: ReactNode
@@ -57,27 +50,28 @@ const useStyles = createStyles((theme) => ({
 
 export default function DefaultLayout({ children }: LayoutProps) {
   const [ active, setActive ] = useState(0)
+  const setIdToken = useUserStore((state) => state.setIdToken)
   const { classes } = useStyles()
   const matches = useMediaQuery('(min-width: 48em)')
   const navigate = useNavigate()
   const auth = getAuth()
-  const [ , setFirebaseUser ] = useAtom(fireBaseUserAtom)
 
   useEffect(() => {
     let ignore = false
-    const authStateChanged = onAuthStateChanged(auth, (user) => {
+    const authStateChanged = onAuthStateChanged(auth, async (user) => {
       if (ignore) return
-      setFirebaseUser(user)
-
-      if(!user) { 
+      if (!user) { 
         navigate('/login') 
         notifications.show({
           title: 'Require Login',
           message: 'Please login',
           color: 'red',
           withBorder: true,
-        }) 
+        })
+        return 
       }
+      const idToken = await getIdToken(user, true)
+      setIdToken(idToken)
     })
     return () => {
       ignore = true

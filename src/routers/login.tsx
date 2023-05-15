@@ -3,22 +3,17 @@ import { auth } from "../firebase"
 import { signInWithEmailAndPassword } from "firebase/auth"
 import { Button, Center, Grid, Paper, PasswordInput, TextInput } from "@mantine/core"
 import { useInput } from "../hooks"
-import { useAtom } from "jotai"
-import { fireBaseUserAtom } from "../atoms"
 
 export default function Login() {
   const [ passwordProps, resetPassword ] = useInput('')
   const [ emailProps, resetEmail ] = useInput('')
   const navigate = useNavigate()
-  const [ , setFirebaseUser ] = useAtom(fireBaseUserAtom)
 
   const submit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     signInWithEmailAndPassword(auth, String(emailProps.value), String(passwordProps.value))
-    .then((userCredential) => {
-      const user = userCredential.user
-      setFirebaseUser(user)
+    .then(async (_userCredential) => {
       navigate('/')
     })
 
