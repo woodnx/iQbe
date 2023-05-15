@@ -7,14 +7,16 @@ export type UserState = {
   nickname: string,
   photoUrl: string,
   idToken: string,
-  getIdToken: () => void
+  setIdToken: (token?: string) => void
 }
 
 const useUserStore: UseBoundStore<StoreApi<UserState>> = create<UserState>((set) => ({
   nickname: '',
   photoUrl: '',
   idToken: '',
-  getIdToken: () => {
+  setIdToken: (token?: string) => {
+    if (!!token) set({ idToken: token })
+
     const auth = getAuth()
     onAuthStateChanged(auth, async (user) => {
       if (!user) return;
