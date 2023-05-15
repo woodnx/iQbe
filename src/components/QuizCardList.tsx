@@ -1,37 +1,23 @@
 import QuizCard from "./QuizCard"
-import axios from "../axios"
-import { useEffect, useState } from "react"
+import { useEffect } from "react"
+import useQuizzesStore from "../store/quiz"
 // import { useFetch } from "../hooks"
 
-interface Quizzes {
-  id: number,
-  question: string,
-  answer: string,
-  workbook: string,
-  level: string,
-  date: Date,
-  total: number,
-  right: number,
-  isFavorite: boolean,
-  registerdMylist: number[],
-}
-
 export default function QuizCardList() {
-  const userId = 8
-  const [ quizList, setList ] = useState<Quizzes[]>()
-  // const { data: quizList } = useFetch<Quizzes[]>(`/quizzes/${userId}`)
+  const quizzes = useQuizzesStore(state => state.quizzes)
+  const getQuizzes = useQuizzesStore(state => state.getQuiz)
 
   useEffect(() => {
-    axios.get<Quizzes[]>(`/quizzes/${userId}`)
-    .then(res => res.data)
-    .then(setList)
+    getQuizzes()
   }, [])
 
-  if (!quizList) return <div>loading</div>
+  if (!quizzes) { 
+    return <div>loading</div>
+  }
 
   return (
     <>
-      {quizList?.map(({question, answer}, idx) => (
+      {quizzes?.map(({question, answer}, idx) => (
         <QuizCard 
           key={idx}
           index={idx+1}
