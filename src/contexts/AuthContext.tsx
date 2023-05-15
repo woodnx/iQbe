@@ -1,8 +1,7 @@
 import { ReactNode, createContext, useContext, useEffect } from "react";
 import { getAuth, onAuthStateChanged } from "firebase/auth"
 import { useLocation, useNavigate,  } from "react-router-dom";
-import { useAtom } from "jotai";
-import { FirebaseUser, fireBaseUserAtom } from "../atoms";
+import useUserStore, { FirebaseUser } from "../store/user";
 
 export type AuthContextProps = {
   user: FirebaseUser
@@ -22,7 +21,7 @@ export const AuthProvider = ({ children }: AuthProps) => {
   const location = useLocation()
   const navigate = useNavigate()
   const auth = getAuth()
-  const [ firebaseUser, setFirebaseUser ] = useAtom(fireBaseUserAtom)
+  const getIdToken = useUserStore((state) => state.getIdToken)
 
   const requireLogin = 
     location.pathname === '/' ||
@@ -30,16 +29,17 @@ export const AuthProvider = ({ children }: AuthProps) => {
   
   useEffect(() => {
     const authStateChanged = onAuthStateChanged(auth, (user) => {
-      setFirebaseUser(user)
+      
       if (!user && requireLogin) navigate('/login')
     })
+    getIdToken()
     return () => {
       authStateChanged()
     }
   },[])
   
   return (
-    <AuthContext.Provider value={{user: firebaseUser}}>
+    <AuthContext.Provider value={{}}>
       {children}
     </AuthContext.Provider>
   )
