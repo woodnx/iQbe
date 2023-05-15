@@ -33,7 +33,7 @@ axios.interceptors.request.use((request) => {
 
     if (!idToken) return;
 
-    request.headers.common['Authorization'] = idToken
+    request.headers.Authorization = idToken
   })  
   return request
 },(error) => {
