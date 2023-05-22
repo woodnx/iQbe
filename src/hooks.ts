@@ -2,7 +2,7 @@ import { useEffect, useState } from "react"
 import useUserStore from "./store/user"
 import { useMediaQuery } from "@mantine/hooks"
 
-export type formInputProps = {
+export interface formInputProps {
   value: string,
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void
 }
