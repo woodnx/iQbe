@@ -1,7 +1,7 @@
 import { Badge, Card, DefaultProps, Flex, Group, MantineNumberSize, Selectors, Text, } from "@mantine/core";
 import QuizMylistButton from "./QuizMylistButton";
 import QuizFavoriteButton from "./QuizFavoriteButton";
-import useStyles, { QuizCardStylesParams } from "./QuizCard.styles";
+import useStyles, { QuizCardStylesParams } from "./styles/QuizCard.styles";
 
 // このtypeは，useStyleに定義されたすべてのselectorsを含む結合が存在する．
 // ここではroot | title | descriptionである．
