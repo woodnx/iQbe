@@ -1,10 +1,10 @@
 import QuizCardList from '../components/QuizCardList'
-import LogoutButtom from '../components/LogoutButton'
+import QuizFilteringModal from '../components/QuizFilteringModal'
 
 export default function Home() {
   return (
     <>
-      <LogoutButtom/>
+      <QuizFilteringModal/>
       <QuizCardList/>
     </>
   )
