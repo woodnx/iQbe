@@ -1,16 +1,21 @@
 import { useEffect, useState } from "react"
 import useUserStore from "./store/user"
+import { useMediaQuery } from "@mantine/hooks"
+
+export type formInputPropsType = {
+  value: string,
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void
+}
+
+export type formInputResetsType = () => void
 
 export const useInput = (
-  initialValue: number | string,
+  initialValue: string,
 ): [
-  {
-    value: number | string,
-    onChange: (e: React.ChangeEvent<HTMLInputElement>) => void
-  },
-  () => void,
+  formInputPropsType,
+  formInputResetsType
 ] => {
-  const [ value, setValue ] = useState<number | string>(initialValue)
+  const [ value, setValue ] = useState<string>(initialValue)
 
   const props = { 
     value, 
@@ -21,6 +26,11 @@ export const useInput = (
   return [
     props, resetValue
   ]
+}
+
+export const useIsMobile = () => {
+  const matches = useMediaQuery('(min-width: 48em)');
+  return !matches
 }
 
 export const useFetch = <T>(
