@@ -2,18 +2,18 @@ import { useEffect, useState } from "react"
 import useUserStore from "./store/user"
 import { useMediaQuery } from "@mantine/hooks"
 
-export type formInputPropsType = {
+export type formInputProps = {
   value: string,
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void
 }
 
-export type formInputResetsType = () => void
+export type formInputReset = () => void
 
 export const useInput = (
   initialValue: string,
 ): [
-  formInputPropsType,
-  formInputResetsType
+  formInputProps,
+  formInputReset
 ] => {
   const [ value, setValue ] = useState<string>(initialValue)
 
