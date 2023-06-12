@@ -6,6 +6,7 @@ import FilteringLevel from "./FilteringLevel"
 import { useInput, useIsMobile } from "../hooks"
 import FilteringWord from "./FilteringWord"
 import { IconFilter, IconSearch } from "@tabler/icons-react"
+import useQuizzesStore, { QuizRequestParams } from "../store/quiz"
 
 export type Level = {
   id: number,
@@ -20,6 +21,16 @@ export default function QuizFilteringModal() {
   const [ wordProps ] = useInput('')
   const [ wordOption, setWordOption ] = useState('0')
   const isMobile = useIsMobile()
+  const getQuiz = useQuizzesStore(state => state.getQuiz)
+
+  const filtering = async () => {
+    const params: QuizRequestParams = {
+      workbook: selectedWorkbook,
+      level: selectedLevel,
+    }
+    close()
+    await getQuiz(params)
+  }
 
   return (
     <>
@@ -50,6 +61,7 @@ export default function QuizFilteringModal() {
         <Group mt="xl" position="right">
           <Button 
             leftIcon={<IconSearch/>}
+            onClick={filtering}
           >Search</Button>
         </Group>
       </Modal>
