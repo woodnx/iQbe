@@ -1,16 +1,9 @@
 import QuizCard from "./QuizCard"
-import { useEffect } from "react"
 import useQuizzesStore from "../store/quiz"
 import { Center, Loader } from "@mantine/core"
-// import { useFetch } from "../hooks"
 
 export default function QuizCardList() {
   const quizzes = useQuizzesStore(state => state.quizzes)
-  const getQuizzes = useQuizzesStore(state => state.getQuiz)
-
-  useEffect(() => {
-    getQuizzes()
-  }, [])
 
   if (!quizzes) { 
     return (
