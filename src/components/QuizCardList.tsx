@@ -15,12 +15,10 @@ export default function QuizCardList() {
 
   return (
     <>
-      {quizzes?.map(({question, answer}, idx) => (
+      {quizzes?.map((quiz, idx) => (
         <QuizCard 
           key={idx}
-          index={idx+1}
-          question={question}
-          answer={answer}
+          quiz={quiz}
           styles={(theme) => ({
             root: {
               marginBottom: theme.spacing.xs
