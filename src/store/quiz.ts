@@ -1,6 +1,5 @@
 import { create } from 'zustand'
 import axios from '../axios'
-import { AxiosRequestConfig } from 'axios'
 
 export type Quiz = {
   id: number,
@@ -8,35 +7,36 @@ export type Quiz = {
   answer: string,
   workbook: string,
   level: string,
-  date: Date,
+  date: string,
   total: number,
   right: number,
   isFavorite: boolean,
   registerdMylist: number[],
 }
 
-export type QuizRequestParams = {
-  page: number,
-  maxView: number,
-  seed: number,
-  workbooks: number[],
-  levels: number[],
-  queWord: string,
-  ansWord: string,
-  start?: string,
-  end?: string,
-  judgement?: string,
+export interface QuizRequestParams {
+  page?: number,
+  maxView?: number,
+  seed?: number,
+  workbook?: string[],
+  level?: string[],
+  keyword?: string,
+  keywordOption?: string,
+  since?: string,
+  until?: string,
+  judgement?: number,
 }
 
 export type QuizState = {
   quizzes: Quiz[] | null,
-  getQuiz: (params?: AxiosRequestConfig<QuizRequestParams>) => void
+  getQuiz: (params?: QuizRequestParams) => void
 }
 
 const useQuizzesStore = create<QuizState>((set) => ({
   quizzes: null,
-  getQuiz: async (params) => {
-    const quizzes = await axios.get<Quiz[]>('/quizzes/8', params).then(res => res.data)
+  getQuiz: async (params?: QuizRequestParams) => {
+    console.log(params)
+    const quizzes = await axios.get<Quiz[]>('/quizzes/8', { params }).then(res => res.data)
     set({ quizzes })
   }
 }))

@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom"
-import { auth } from "../firebase"
+import { auth } from "../plugins/firebase"
 import { signInWithEmailAndPassword } from "firebase/auth"
 import { Button, Center, Grid, Paper, PasswordInput, TextInput } from "@mantine/core"
 import { useInput } from "../hooks"
