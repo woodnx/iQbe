@@ -18,8 +18,8 @@ export default function QuizFilteringModal() {
   const [ opened, { open, close } ] = useDisclosure(true)
   const [ selectedWorkbook, setSelectedWorkbook ] = useState<string[]>([])
   const [ selectedLevel, setSelectedLevel ] = useState<string[]>([])
-  const [ wordProps ] = useInput('')
-  const [ wordOption, setWordOption ] = useState('0')
+  const [ keywordProps ] = useInput('')
+  const [ keywordOption, setkeywordOption ] = useState('1')
   const isMobile = useIsMobile()
   const getQuiz = useQuizzesStore(state => state.getQuiz)
 
@@ -27,6 +27,8 @@ export default function QuizFilteringModal() {
     const params: QuizRequestParams = {
       workbook: selectedWorkbook,
       level: selectedLevel,
+      keyword: keywordProps.value,
+      keywordOption: keywordOption
     }
     close()
     await getQuiz(params)
@@ -51,10 +53,10 @@ export default function QuizFilteringModal() {
           mt="lg"
         />
         <FilteringWord 
-          wordInputProps={wordProps} 
+          wordInputProps={keywordProps} 
           wordSearchOption={{ 
-            value: wordOption, 
-            onChange: setWordOption 
+            value: keywordOption, 
+            onChange: setkeywordOption 
           }}
           mt="lg"
         />

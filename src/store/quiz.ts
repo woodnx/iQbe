@@ -7,7 +7,7 @@ export type Quiz = {
   answer: string,
   workbook: string,
   level: string,
-  date: Date,
+  date: string,
   total: number,
   right: number,
   isFavorite: boolean,
@@ -20,10 +20,10 @@ export interface QuizRequestParams {
   seed?: number,
   workbook?: string[],
   level?: string[],
-  queWord?: string,
-  ansWord?: string,
-  start?: string,
-  end?: string,
+  keyword?: string,
+  keywordOption?: string,
+  since?: string,
+  until?: string,
   judgement?: number,
 }
 
@@ -34,7 +34,7 @@ export type QuizState = {
 
 const useQuizzesStore = create<QuizState>((set) => ({
   quizzes: null,
-  getQuiz: async (params) => {
+  getQuiz: async (params?: QuizRequestParams) => {
     console.log(params)
     const quizzes = await axios.get<Quiz[]>('/quizzes/8', { params }).then(res => res.data)
     set({ quizzes })
