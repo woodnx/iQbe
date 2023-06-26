@@ -18,7 +18,8 @@ type QuizCardStylesNames = Selectors<typeof useStyles>
 
 interface QuizCardProps extends DefaultProps<QuizCardStylesNames, QuizCardStylesParams> {
   margin?: MantineNumberSize,
-  quiz: Quiz
+  index: number,
+  quiz: Quiz,
 }
 
 export default function QuizCard({
@@ -27,6 +28,7 @@ export default function QuizCard({
   unstyled,
   className,
   margin,
+  index,
   quiz,
 }: QuizCardProps) {
   const { classes, cx } = useStyles(
@@ -37,7 +39,7 @@ export default function QuizCard({
   return (
     <Card className={cx(classes.root, className)} withBorder>
       <Group position="apart">
-        <Text>No.{quiz.id}</Text>
+        <Text>No.{index}</Text>
         <QuizFavoriteButton/>
       </Group>
       <Text className={classes.text}>{quiz.question}</Text>

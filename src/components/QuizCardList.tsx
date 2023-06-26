@@ -17,7 +17,8 @@ export default function QuizCardList() {
     <>
       {quizzes?.map((quiz, idx) => (
         <QuizCard 
-          key={idx}
+          key={quiz.id}
+          index={idx + 1}
           quiz={quiz}
           styles={(theme) => ({
             root: {
