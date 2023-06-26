@@ -32,15 +32,15 @@ export default function FilteringWord({
       >
         <Group>
           <Radio 
-            value="0"
+            value="1"
             label="問題文と解答の両方"
           />
           <Radio 
-            value="1"
+            value="2"
             label="問題文のみ"
           />
           <Radio 
-            value="2"
+            value="3"
             label="解答のみ"
           />
         </Group>
