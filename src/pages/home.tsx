@@ -1,10 +1,10 @@
 import QuizCardList from '../components/QuizCardList'
-import QuizFilteringModal from '../components/QuizFilteringModal'
+import FilteringModal from '../components/FilteringModal'
 
 export default function Home() {
   return (
     <>
-      <QuizFilteringModal/>
+      <FilteringModal/>
       <QuizCardList/>
     </>
   )
