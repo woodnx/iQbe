@@ -3,6 +3,8 @@ import knex from '../knex'
 
 const router: Router = express.Router()
 
+type KeywordOption = "1" | "2" | "3" 
+
 interface QuizRequest extends Request { 
   query: {
     page?: string,
@@ -10,10 +12,10 @@ interface QuizRequest extends Request {
     seed?: string,
     workbook?: string[],
     level?: string[],
-    queWord?: string,
-    ansWord?: string,
+    keyword: string,
+    keywordOption: KeywordOption,
     crctAnsRatio?: [string, string],
-    startDate?: string,
+    sinceDate?: string,
     endDate?: string,
     judgement?: string[],
   }
@@ -25,7 +27,7 @@ interface Quizzes {
   answer: string,
   workbook: string,
   level: string,
-  date: Date,
+  date: string,
 }
 
 router.get('/:userId/:listName?', async (req: QuizRequest, res) => {
@@ -34,11 +36,11 @@ router.get('/:userId/:listName?', async (req: QuizRequest, res) => {
   const seed     = !!req.query.seed     ? Number(req.query.seed)    : undefined
   const workbook = !!req.query.workbook ? req.query.workbook.map(v => Number(v)) : undefined
   const level    = !!req.query.level    ? req.query.level.map(v => Number(v))    : undefined
-  const queWord  = req.query.queWord
-  const ansWord  = req.query.ansWord
+  const keyword  = req.query.keyword
+  const keywordOption = Number(req.query.keywordOption) || undefined
   const crctAnsRatio = req.query.crctAnsRatio
-  const start = req.query.startDate
-  const end = req.query.endDate
+  const since = req.query.sinceDate
+  const until = req.query.endDate
   const judgement = req.query.judgement
 
   const userId = req.params.userId
@@ -53,6 +55,7 @@ router.get('/:userId/:listName?', async (req: QuizRequest, res) => {
       { question: 'que' },
       { answer: 'ans' },
       { workbook: 'workbooks.name' }, 
+      { date: 'workbooks.date' },
       { level: 'levels.color' },
       // knex('histories')
       // .count('*')
@@ -75,9 +78,25 @@ router.get('/:userId/:listName?', async (req: QuizRequest, res) => {
     .modify(async (builder) => {
       if (!!workbook) builder.whereIn('workbook_id', workbook)
       if (!!level)    builder.whereIn('level_id', level)
-      if (!!queWord)  builder.whereILike('que', queWord)
-      if (!!ansWord)  builder.whereILike('ans', ansWord)
       if (!!seed)     builder.orderByRaw('RAND(?)', seed)
+
+      if (!!keyword && !!keywordOption) {
+        // const brackets = keyword.split(/\(\s\)/g)
+        // const ands = keyword.split(/\s+/g)
+        // const ors = keyword.split(/\++/g)
+        
+        if (keywordOption === 1) {
+          builder
+          .whereILike('que', `%${keyword}%`)
+          .orWhereILike('ans', `%${keyword}%`)
+        }
+        else if (keywordOption === 2) { 
+          builder.whereILike('que', `%${keyword}%`)
+        }
+        else { 
+          builder.whereILike('ans', `%${keyword}%`)
+        }
+      }
       // if (!!crctAnsRatio) {
       //   builder.whereRaw(
       //    `(SELECT COUNT(*) FROM histories WHERE histories.quiz_id = quizzes.id AND judgement = 1) / 
@@ -87,20 +106,20 @@ router.get('/:userId/:listName?', async (req: QuizRequest, res) => {
       // }
 
       if (!listName) {
-        // 何もしない
+        // Do Nothing
       }else if (listName === 'favorite') {
         builder
         .innerJoin('favorites', 'favorites.quiz_id', 'quizzes.id')
         .where('favorites.user_id', userId)
         .orderBy('favorites.registered', 'desc')
-      }else if (listName === 'history' && !!start && !!end) {
+      }else if (listName === 'history' && !!since && !!until) {
         builder.column(
           { judgement: 'histories.judgement' },
           { practiced: 'histories.practiced' },
         )
         .innerJoin('histories', 'histories.quiz_id', 'quizzes.id')
         .where('histories.user_id', userId)
-        .whereBetween('histories.practiced', [start, end])
+        .whereBetween('histories.practiced', [since, until])
 
         if (!!judgement) builder.whereIn('histories.judgement', judgement)
       }else {
@@ -108,6 +127,8 @@ router.get('/:userId/:listName?', async (req: QuizRequest, res) => {
         .innerJoin('mylists_quizzes', 'mylists_quizzes.quiz_id', 'quizzes.id')
         //.innerJoin('mylist_informations', 'mylist_informations.')
       }
+
+      //console.log(builder.toSQL())
     })
     .limit(maxView)
     .offset(maxView*(page - 1))
@@ -145,6 +166,8 @@ router.get('/:userId/:listName?', async (req: QuizRequest, res) => {
         }
       }
     ))
+
+    //console.log(data)
     
     res.send(data)
   } catch(e) {
