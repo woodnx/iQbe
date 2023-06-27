@@ -1,8 +1,8 @@
-import QuizCard from "./QuizCard"
+import QuizCard from "./Quiz"
 import useQuizzesStore from "../store/quiz"
 import { Center, Loader } from "@mantine/core"
 
-export default function QuizCardList() {
+export default function QuizList() {
   const quizzes = useQuizzesStore(state => state.quizzes)
 
   if (!quizzes) { 
