@@ -14,7 +14,7 @@ export type Level = {
   color: string,
 }
 
-export default function QuizFilteringModal() {
+export default function FilteringModal() {
   const [ opened, { open, close } ] = useDisclosure(true)
   const [ selectedWorkbook, setSelectedWorkbook ] = useState<string[]>([])
   const [ selectedLevel, setSelectedLevel ] = useState<string[]>([])

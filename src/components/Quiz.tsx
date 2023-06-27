@@ -22,7 +22,7 @@ interface QuizCardProps extends DefaultProps<QuizCardStylesNames, QuizCardStyles
   quiz: Quiz,
 }
 
-export default function QuizCard({
+export default function Quiz({
   classNames,
   styles,
   unstyled,
