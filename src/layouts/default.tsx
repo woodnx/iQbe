@@ -99,7 +99,11 @@ export default function DefaultLayout({ children }: LayoutProps) {
   })
 
   const navbar = (
-    <Navbar width={{xs: 250}} p="md" hidden={!matches}>
+    <Navbar 
+      p="md" 
+      width={{xs: 250}} 
+      hidden={!matches}
+    >
       <Navbar.Section >
         <Group position="apart">
           
@@ -112,6 +116,7 @@ export default function DefaultLayout({ children }: LayoutProps) {
   return (
     <AppShell
       padding="md"
+      layout="alt"
       navbar={navbar}
       navbarOffsetBreakpoint="sm"
     >

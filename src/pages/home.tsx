@@ -1,11 +1,11 @@
-import QuizCardList from '../components/QuizCardList'
-import QuizFilteringModal from '../components/QuizFilteringModal'
+import QuizList from '../components/QuizList'
+import QuizControllBar from '../components/QuizControllBar'
 
 export default function Home() {
   return (
     <>
-      <QuizFilteringModal/>
-      <QuizCardList/>
+      <QuizControllBar/>
+      <QuizList/>
     </>
   )
 }
