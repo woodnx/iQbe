@@ -1,16 +1,13 @@
-import { getAuth, getIdToken, onAuthStateChanged } from "firebase/auth"
-import { ReactNode, useEffect } from "react"
-import { useNavigate } from "react-router-dom"
-import { AppShell, Group, NavLink, Navbar, ThemeIcon, createStyles } from "@mantine/core"
+import { getAuth, onAuthStateChanged } from "firebase/auth"
+import { useLayoutEffect } from "react"
+import { Link, Outlet, useNavigate } from "react-router-dom"
+import { AppShell, Center, Group, Loader, NavLink, Navbar, ThemeIcon, createStyles } from "@mantine/core"
 import { IconActivity, IconHistory, IconSchool, IconSearch, IconStar } from "@tabler/icons-react"
 import { useState } from "react"
 import { useMediaQuery } from "@mantine/hooks"
 import { notifications } from "@mantine/notifications"
 import useUserStore from "../store/user"
-
-export type LayoutProps = {
-  children: ReactNode
-}
+import LogoutButton from "../components/LogoutButton"
 
 const mockdata = [
   { 
@@ -21,7 +18,7 @@ const mockdata = [
   {
     label: 'Search',
     icon: IconSearch,
-    link: '/',
+    link: '/search',
   },
   {
     label: 'Practice',
@@ -48,15 +45,16 @@ const useStyles = createStyles((theme) => ({
   }
 }))
 
-export default function DefaultLayout({ children }: LayoutProps) {
+export default function DefaultLayout() {
   const [ active, setActive ] = useState(0)
+  const [ loading, setLoading ] = useState(true)
   const setIdToken = useUserStore((state) => state.setIdToken)
   const { classes } = useStyles()
   const matches = useMediaQuery('(min-width: 48em)')
   const navigate = useNavigate()
   const auth = getAuth()
-
-  useEffect(() => {
+  
+  useLayoutEffect(() => {
     let ignore = false
     const authStateChanged = onAuthStateChanged(auth, async (user) => {
       if (ignore) return
@@ -70,8 +68,8 @@ export default function DefaultLayout({ children }: LayoutProps) {
         })
         return 
       }
-      const idToken = await getIdToken(user, true)
-      setIdToken(idToken)
+      await setIdToken()
+      setLoading(false)
     })
     return () => {
       ignore = true
@@ -88,13 +86,16 @@ export default function DefaultLayout({ children }: LayoutProps) {
 
     return (
       <NavLink
+        component={Link}
         classNames={{root: classes.link}}
         key={item.label}
         active={index === active}
         label={item.label}
         icon={icon}
+        to={item.link}
         onClick={() => setActive(index)}
-      />
+      >
+      </NavLink>
     )
   })
 
@@ -104,23 +105,35 @@ export default function DefaultLayout({ children }: LayoutProps) {
       width={{xs: 250}} 
       hidden={!matches}
     >
-      <Navbar.Section >
+      <Navbar.Section grow>
         <Group position="apart">
           
         </Group>
         {items}
       </Navbar.Section>
+      <Navbar.Section>
+        <LogoutButton/>
+      </Navbar.Section>
     </Navbar>
   )
 
   return (
-    <AppShell
-      padding="md"
-      layout="alt"
-      navbar={navbar}
-      navbarOffsetBreakpoint="sm"
-    >
-      {children}
-    </AppShell>
+    <>
+    {loading ? 
+      <Center h="100vh">
+        <Loader variant="dots"/>
+      </Center>
+    :
+      <AppShell
+        padding="md"
+        layout="alt"
+        navbar={navbar}
+        navbarOffsetBreakpoint="sm"
+      >
+        <Outlet/>
+      </AppShell>
+    }
+    </>
+    
   )
 }

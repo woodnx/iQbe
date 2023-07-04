@@ -9,7 +9,7 @@ export default function QuizList() {
   if (!quizzes) { 
     return (
       <Center>
-        <Loader/>
+        <Loader variant="dots"/>
       </Center>
     )
   }
