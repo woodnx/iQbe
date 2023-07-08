@@ -6,7 +6,8 @@ import FilteringLevel from "./FilteringLevel"
 import { useInput, useIsMobile } from "../hooks"
 import FilteringWord from "./FilteringWord"
 import { IconFilter, IconSearch } from "@tabler/icons-react"
-import useQuizzesStore, { QuizRequestParams } from "../store/quiz"
+import useQuizzesStore from "../store/quiz"
+import { QuizRequestParams } from "../types"
 
 export type Level = {
   id: number,
@@ -25,6 +26,8 @@ export default function FilteringModal() {
 
   const filtering = async () => {
     const params: QuizRequestParams = {
+      page: 1,
+      maxView: 100,
       workbook: selectedWorkbook,
       level: selectedLevel,
       keyword: keywordProps.value,
