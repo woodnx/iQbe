@@ -1,4 +1,4 @@
-import QuizCard from "./Quiz"
+import QuizCard from "./QuizCard"
 import useQuizzesStore from "../store/quiz"
 import { Center, Loader } from "@mantine/core"
 
