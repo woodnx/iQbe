@@ -1,6 +1,6 @@
 import { getAuth, onAuthStateChanged } from "firebase/auth"
 import { useLayoutEffect } from "react"
-import { Link, Outlet, useNavigate } from "react-router-dom"
+import { Link, Outlet, useLocation, useNavigate } from "react-router-dom"
 import { AppShell, Center, Group, Loader, NavLink, Navbar, ThemeIcon, createStyles } from "@mantine/core"
 import { IconActivity, IconHistory, IconSchool, IconSearch, IconStar } from "@tabler/icons-react"
 import { useState } from "react"
@@ -48,14 +48,17 @@ const useStyles = createStyles((theme) => ({
 export default function DefaultLayout() {
   const [ active, setActive ] = useState(0)
   const [ loading, setLoading ] = useState(true)
-  const setIdToken = useUserStore((state) => state.setIdToken)
   const { classes } = useStyles()
   const matches = useMediaQuery('(min-width: 48em)')
   const navigate = useNavigate()
+  const location = useLocation()
+  const setIdToken = useUserStore((state) => state.setIdToken)
   const auth = getAuth()
   
   useLayoutEffect(() => {
     let ignore = false
+    setActive(mockdata.findIndex((data) => data.link === location.pathname))
+
     const authStateChanged = onAuthStateChanged(auth, async (user) => {
       if (ignore) return
       if (!user) { 
