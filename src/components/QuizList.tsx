@@ -1,25 +1,17 @@
 import QuizCard from "./QuizCard"
-import useQuizzesStore from "../store/quiz"
-import { Center, Loader } from "@mantine/core"
+import { Quiz } from "../types"
 
-export default function QuizList() {
-  const quizzes = useQuizzesStore(state => state.quizzes)
-  const params = useQuizzesStore(state => state.params)
+interface QuizListProps {
+  quizzes: Quiz[]
+}
 
-  if (!quizzes) { 
-    return (
-      <Center>
-        <Loader variant="dots"/>
-      </Center>
-    )
-  }
-
+export default function QuizList(props: QuizListProps) {
   return (
     <>
-      {quizzes?.map((quiz, idx) => (
+      {props.quizzes?.map((quiz, idx) => (
         <QuizCard 
           key={quiz.id}
-          index={(params.page-1)*params.maxView + idx+1}
+          index={idx+1}
           quiz={quiz}
           styles={(theme) => ({
             root: {

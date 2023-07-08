@@ -1,19 +1,24 @@
 import { Center, Grid, Header, Text } from "@mantine/core";
-import FilteringModal from "./FilteringModal";
 import QuizPagination from "./QuizPagination";
 import useQuizzesStore from "../store/quiz";
+import { ReactNode } from "react";
 
-export default function QuizControllBar() {
+interface QuizControllBarProps {
+  height: number,
+  contents: ReactNode
+}
+
+export default function QuizControllBar({ height, contents }: QuizControllBarProps) {
   const quizzes = useQuizzesStore(state => state.quizzes)
   const total = !!quizzes ? quizzes[0].size : 0
   return (
     <Header
-      height={!!quizzes ? 105 : 60}
+      height={height}
       fixed
     >
       <Grid px={10} pt={10}>
         <Grid.Col span={10}>
-          <FilteringModal/>
+          { contents }
         </Grid.Col>
         <Grid.Col md={2}>
           <Text ta="right">総問題数: {total}</Text>
