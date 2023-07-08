@@ -16,7 +16,7 @@ export interface Quiz {
 
 export interface QuizRequestParams {
   page?: number,
-  maxView?: number,
+  perPage?: number,
   seed?: number,
   workbooks?: string[],
   levels?: string[],

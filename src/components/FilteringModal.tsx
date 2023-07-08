@@ -27,7 +27,7 @@ export default function FilteringModal() {
   const filtering = async () => {
     const params: QuizRequestParams = {
       page: 1,
-      maxView: 100,
+      perPage: 100,
       workbooks: selectedWorkbook,
       levels: selectedLevel,
       keyword: keywordProps.value,
