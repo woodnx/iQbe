@@ -9,12 +9,6 @@ import { IconFilter, IconSearch } from "@tabler/icons-react"
 import useQuizzesStore from "../store/quiz"
 import { KeywordOption, QuizRequestParams } from "../types"
 
-export type Level = {
-  id: number,
-  name: string,
-  color: string,
-}
-
 export default function FilteringModal() {
   const [ opened, { open, close } ] = useDisclosure(true)
   const [ selectedWorkbook, setSelectedWorkbook ] = useState<string[]>([])
