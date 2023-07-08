@@ -15,14 +15,16 @@ export interface Quiz {
 }
 
 export interface QuizRequestParams {
-  page: number,
-  maxView: number,
+  page?: number,
+  maxView?: number,
   seed?: number,
-  workbook?: string[],
-  level?: string[],
+  workbooks?: string[],
+  levels?: string[],
   keyword?: string,
-  keywordOption?: string,
+  keywordOption?: KeywordOption,
   since?: string,
   until?: string,
   judgement?: number,
 }
+
+export type KeywordOption = "1" | "2" | "3"
