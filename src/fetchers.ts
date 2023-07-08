@@ -1,3 +1,3 @@
-import axios from "./axios";
+import axios from "./plugins/axios";
 
-export const fetcher = (url: string) => axios.get(url).then(res => res.data);
+export const fetcher = (url: string, params?: any) => axios.get(url, { params }).then(res => res.data);
