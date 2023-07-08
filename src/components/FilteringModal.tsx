@@ -7,7 +7,7 @@ import { useInput, useIsMobile } from "../hooks"
 import FilteringWord from "./FilteringWord"
 import { IconFilter, IconSearch } from "@tabler/icons-react"
 import useQuizzesStore from "../store/quiz"
-import { QuizRequestParams } from "../types"
+import { KeywordOption, QuizRequestParams } from "../types"
 
 export type Level = {
   id: number,
@@ -20,7 +20,7 @@ export default function FilteringModal() {
   const [ selectedWorkbook, setSelectedWorkbook ] = useState<string[]>([])
   const [ selectedLevel, setSelectedLevel ] = useState<string[]>([])
   const [ keywordProps ] = useInput('')
-  const [ keywordOption, setkeywordOption ] = useState('1')
+  const [ keywordOption, setkeywordOption ] = useState<KeywordOption>('1')
   const isMobile = useIsMobile()
   const getQuiz = useQuizzesStore(state => state.getQuiz)
 
@@ -28,8 +28,8 @@ export default function FilteringModal() {
     const params: QuizRequestParams = {
       page: 1,
       maxView: 100,
-      workbook: selectedWorkbook,
-      level: selectedLevel,
+      workbooks: selectedWorkbook,
+      levels: selectedLevel,
       keyword: keywordProps.value,
       keywordOption: keywordOption
     }
