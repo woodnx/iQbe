@@ -1,15 +1,6 @@
 import _axios from "axios"
-// import useUserStore from "./store/user"
-import { Auth, User, getAuth, getIdToken, onAuthStateChanged } from "firebase/auth"
-
-const checkFirebaseAuth = (auth: Auth) => {
-  return new Promise<User | null>((resolve) => {
-    onAuthStateChanged(auth, (user) => {
-      // user オブジェクトを resolve
-      resolve(user);
-    });
-  });
-}
+import useUserStore from "../store/user"
+import { auth, checkFirebaseAuth } from "./firebase"
 
 const axios = _axios.create({
   baseURL: 'http://localhost:9000/v2',
@@ -23,12 +14,11 @@ const axios = _axios.create({
 
 axios.interceptors.request.use(async (request) => {
   //リクエスト前に毎回idTokenを取得する
-  const auth = getAuth()
+  const idToken = useUserStore.getState().idToken
   const user = await checkFirebaseAuth(auth)
 
   if (!user) return request;
-
-  const idToken = await getIdToken(user, true)
+  
   request.headers.Authorization = idToken
   
   return request

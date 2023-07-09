@@ -2,15 +2,7 @@ import { Badge, Card, DefaultProps, Flex, Group, MantineNumberSize, Selectors, T
 import QuizMylistButton from "./QuizMylistButton";
 import QuizFavoriteButton from "./QuizFavoriteButton";
 import useStyles, { QuizCardStylesParams } from "./styles/QuizCard.styles";
-
-export interface Quiz {
-  id: number,
-  question: string,
-  answer: string,
-  workbook: string,
-  level: string,
-  date: string,
-}
+import { Quiz } from "../types";
 
 // このtypeは，useStyleに定義されたすべてのselectorsを含む結合が存在する．
 // ここではroot | title | descriptionである．
@@ -22,7 +14,7 @@ interface QuizCardProps extends DefaultProps<QuizCardStylesNames, QuizCardStyles
   quiz: Quiz,
 }
 
-export default function Quiz({
+export default function QuizCard({
   classNames,
   styles,
   unstyled,
@@ -40,7 +32,10 @@ export default function Quiz({
     <Card className={cx(classes.root, className)} withBorder>
       <Group position="apart">
         <Text>No.{index}</Text>
-        <QuizFavoriteButton/>
+        <QuizFavoriteButton
+          isFavorite={quiz.isFavorite}
+          quizId={quiz.id}
+        />
       </Group>
       <Text className={classes.text}>{quiz.question}</Text>
       <Text align="right" className={classes.text}>

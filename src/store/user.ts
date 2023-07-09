@@ -1,5 +1,6 @@
 import { StoreApi, UseBoundStore, create } from "zustand";
-import { User, getAuth, getIdToken, onAuthStateChanged } from "firebase/auth"
+import { User, getIdToken, onAuthStateChanged } from "firebase/auth"
+import { auth } from "../plugins/firebase";
 
 export type FirebaseUser = User | null
 export type UserIdToken = string | null
@@ -17,7 +18,6 @@ const useUserStore: UseBoundStore<StoreApi<UserState>> = create<UserState>((set)
   setIdToken: (token?: string) => {
     if (!!token) set({ idToken: token })
 
-    const auth = getAuth()
     onAuthStateChanged(auth, async (user) => {
       if (!user) return;
 

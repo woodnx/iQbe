@@ -6,32 +6,30 @@ import FilteringLevel from "./FilteringLevel"
 import { useInput, useIsMobile } from "../hooks"
 import FilteringWord from "./FilteringWord"
 import { IconFilter, IconSearch } from "@tabler/icons-react"
-import useQuizzesStore, { QuizRequestParams } from "../store/quiz"
+import { KeywordOption } from "../types"
 
-export type Level = {
-  id: number,
-  name: string,
-  color: string,
+interface FilteringModalProps {
+  apply: (
+    workbooks?: string[],
+    levels?: string[],
+    keyword?: string,
+    keywordOption?: KeywordOption
+  ) => void,
 }
 
-export default function FilteringModal() {
+export default function FilteringModal(
+  props: FilteringModalProps
+) {
   const [ opened, { open, close } ] = useDisclosure(true)
-  const [ selectedWorkbook, setSelectedWorkbook ] = useState<string[]>([])
-  const [ selectedLevel, setSelectedLevel ] = useState<string[]>([])
+  const [ workbooks, setWorkbooks ] = useState<string[]>([])
+  const [ levels, setLevels ] = useState<string[]>([])
   const [ keywordProps ] = useInput('')
-  const [ keywordOption, setkeywordOption ] = useState('1')
+  const [ keywordOption, setkeywordOption ] = useState<KeywordOption>('1')
   const isMobile = useIsMobile()
-  const getQuiz = useQuizzesStore(state => state.getQuiz)
 
   const filtering = async () => {
-    const params: QuizRequestParams = {
-      workbook: selectedWorkbook,
-      level: selectedLevel,
-      keyword: keywordProps.value,
-      keywordOption: keywordOption
-    }
+    props.apply(workbooks, levels, keywordProps.value, keywordOption)
     close()
-    await getQuiz(params)
   }
 
   return (
@@ -44,12 +42,12 @@ export default function FilteringModal() {
         fullScreen={isMobile}
       >
         <FilteringWorkbook
-          value={selectedWorkbook} 
-          onChange={setSelectedWorkbook}
+          value={workbooks} 
+          onChange={setWorkbooks}
         />
         <FilteringLevel 
-          value={selectedLevel}
-          onChange={setSelectedLevel}
+          value={levels}
+          onChange={setLevels}
           mt="lg"
         />
         <FilteringWord 
