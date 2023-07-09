@@ -30,7 +30,7 @@ interface Quizzes {
   date: string,
 }
 
-router.get('/:userId/:listName?', async (req: QuizRequest, res) => {
+router.get('/:listName?', async (req: QuizRequest, res) => {
   const page     = !!req.query.page     ? Number(req.query.page)    : 1
   const maxView  = !!req.query.perPage || Number(req.query.perPage) <= 100  ? Number(req.query.perPage) : 100
   const seed     = !!req.query.seed     ? Number(req.query.seed)    : undefined
@@ -43,8 +43,10 @@ router.get('/:userId/:listName?', async (req: QuizRequest, res) => {
   const until = req.query.endDate
   const judgement = req.query.judgement
 
-  const userId = req.params.userId
+  const userId = req.userId
   const listName = req.params.listName
+
+  //console.log(req.query)
 
   try {
     const quizzesIdColumnIdentifier = knex.ref('quizzes.id');
