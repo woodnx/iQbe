@@ -32,7 +32,10 @@ export default function QuizCard({
     <Card className={cx(classes.root, className)} withBorder>
       <Group position="apart">
         <Text>No.{index}</Text>
-        <QuizFavoriteButton/>
+        <QuizFavoriteButton
+          isFavorite={quiz.isFavorite}
+          quizId={quiz.id}
+        />
       </Group>
       <Text className={classes.text}>{quiz.question}</Text>
       <Text align="right" className={classes.text}>
