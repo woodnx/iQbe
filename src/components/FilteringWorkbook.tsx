@@ -17,7 +17,7 @@ export interface Workbook {
 
 interface FilteringWorkbookProps extends DefaultProps {
   value: string[] | undefined,
-  onChange: React.Dispatch<React.SetStateAction<string[]>>
+  onChange: (value: string[]) => void
 }
 
 export default function FilteringWorkbook({ 

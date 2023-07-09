@@ -4,7 +4,7 @@ import { Checkbox, DefaultProps, Group } from "@mantine/core";
 
 interface FilteringLevelProps extends DefaultProps {
   value: string[] | undefined,
-  onChange: React.Dispatch<React.SetStateAction<string[]>>,
+  onChange: (value: string[]) => void,
 }
 
 export interface Level{

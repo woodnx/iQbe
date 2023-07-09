@@ -1,11 +1,11 @@
 import { AppShell } from "@mantine/core";
-import { LayoutProps } from "./default";
+import { Outlet } from "react-router-dom";
 
-export default function LoginLayout({ children }: LayoutProps) {
+export default function LoginLayout() {
   return (
     <>
       <AppShell pt="125px" px="200px">
-        {children}
+        <Outlet/>
       </AppShell>
     </>
   )
