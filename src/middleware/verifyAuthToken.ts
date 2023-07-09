@@ -14,12 +14,12 @@ export default async function (req: Request, res: Response, next: NextFunction) 
 
   try {
     // idTokenを検証
-    const decodedIdToken = await auth().verifyIdToken(idToken, true);
+    const decodedIdToken = await auth().verifyIdToken(idToken);
     req.user = decodedIdToken;
 
     const userId = await knex('users').select('id').where('uid', decodedIdToken.uid).first()
 
-    req.userId = userId
+    req.userId = userId.id
 
     next();
   } catch(e) {

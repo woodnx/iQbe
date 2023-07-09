@@ -5,7 +5,7 @@ import knex from '../knex'
 const router = express.Router()
 
 router.post('/', async (req, res) => {
-  const userId = req.body.userId
+  const userId = req.userId
   const quizId = req.body.quizId
   const now = dayjs().format('YYYY-MM-DD HH:mm:ss')
 
