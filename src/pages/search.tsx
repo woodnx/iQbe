@@ -6,6 +6,7 @@ import FilteringModal from '../components/FilteringModal'
 import { KeywordOption, QuizRequestParams } from '../types'
 import { useState } from 'react'
 import QuizPagination from '../components/QuizPagination'
+import QuizShuffleButton from '../components/QuizShuffleButton'
 
 export default function Search() {
   const [ params, setParams ] = useState<QuizRequestParams>({perPage: 100})
@@ -24,11 +25,23 @@ export default function Search() {
     setParams({ 
       ...params, 
       page: 1, 
+      seed: undefined,
       workbooks, 
       levels, 
       keyword, 
       keywordOption
-  })
+    })
+  }
+
+  const toShuffle = (
+    seed: number
+  ) => {
+    setPage(1)
+    setParams({
+      ...params,
+      page: 1,
+      seed
+    })
   }
 
   const changePage = (
@@ -41,12 +54,17 @@ export default function Search() {
   return (
     <>
       <QuizControllBar
-        height={100}
+        height={!!quizzes ? 110 : 60}
         total={size}
         buttons={
-          <FilteringModal
-            apply={toFilter}
-          />
+          <>
+            <FilteringModal
+              apply={toFilter}
+            />
+            <QuizShuffleButton
+              apply={toShuffle}
+            />
+          </>
         }
         pagination={
         <QuizPagination
