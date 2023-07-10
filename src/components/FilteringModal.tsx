@@ -20,7 +20,7 @@ interface FilteringModalProps {
 export default function FilteringModal(
   props: FilteringModalProps
 ) {
-  const [ opened, { open, close } ] = useDisclosure(true)
+  const [ opened, { open, close } ] = useDisclosure(false)
   const [ workbooks, setWorkbooks ] = useState<string[]>([])
   const [ levels, setLevels ] = useState<string[]>([])
   const [ keywordProps ] = useInput('')
