@@ -28,7 +28,7 @@ const mockdata = [
   {
     label: 'Favorite',
     icon: IconStar,
-    link: '/',
+    link: '/favorite',
   },
   {
     label: 'History',
