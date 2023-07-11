@@ -1,4 +1,4 @@
-import { Button, Group, Modal } from "@mantine/core"
+import { Button, DefaultProps, Group, Modal } from "@mantine/core"
 import { useDisclosure } from "@mantine/hooks"
 import { useState } from "react"
 import FilteringWorkbook from "./FilteringWorkbook"
@@ -8,7 +8,7 @@ import FilteringWord from "./FilteringWord"
 import { IconFilter, IconSearch } from "@tabler/icons-react"
 import { KeywordOption } from "../types"
 
-interface FilteringModalProps {
+interface FilteringModalProps extends DefaultProps {
   apply: (
     workbooks?: string[],
     levels?: string[],
@@ -17,9 +17,10 @@ interface FilteringModalProps {
   ) => void,
 }
 
-export default function FilteringModal(
-  props: FilteringModalProps
-) {
+export default function FilteringModal({
+  apply,
+  ...others
+}: FilteringModalProps) {
   const [ opened, { open, close } ] = useDisclosure(false)
   const [ workbooks, setWorkbooks ] = useState<string[]>([])
   const [ levels, setLevels ] = useState<string[]>([])
@@ -28,7 +29,7 @@ export default function FilteringModal(
   const isMobile = useIsMobile()
 
   const filtering = async () => {
-    props.apply(workbooks, levels, keywordProps.value, keywordOption)
+    apply(workbooks, levels, keywordProps.value, keywordOption)
     close()
   }
 
@@ -70,6 +71,7 @@ export default function FilteringModal(
         leftIcon={<IconFilter/>}
         variant="outline"
         color="orange"
+        { ...others }
       >Filtering</Button>
     </>
   )

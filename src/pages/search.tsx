@@ -63,6 +63,7 @@ export default function Search() {
             />
             <QuizShuffleButton
               apply={toShuffle}
+              ml={7}
             />
           </>
         }
