@@ -37,12 +37,13 @@ const createFilter = ({
 }
 
 const useQuizzes = (
-  params: QuizRequestParams
+  params: QuizRequestParams,
+  path = ''
 ) => {
   const filter = createFilter(params).toString()
   
   const { data: quizzes, isLoading, error } = useSWR(
-    ['/quizzes', filter ],
+    [`/quizzes${path}`, filter ],
     ([url, filter]) => fetcher(url, filter)
   )
   
