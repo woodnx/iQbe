@@ -10,8 +10,8 @@ import QuizShuffleButton from '../components/QuizShuffleButton'
 
 export default function Search() {
   const [ params, setParams ] = useState<QuizRequestParams>({perPage: 100})
-  const [activePage, setPage] = useState(1);
-  const { quizzes } = useQuizzes(params)
+  const [ activePage, setPage ] = useState(1);
+  const { quizzes } = useQuizzes(params, '/favorite')
 
   const size = !!quizzes ? quizzes[0].size : 0
 
@@ -63,16 +63,16 @@ export default function Search() {
             />
             <QuizShuffleButton
               apply={toShuffle}
-              ml={7}
             />
           </>
         }
         pagination={
-        <QuizPagination
-          page={activePage}
-          total={!!params.perPage ? size / params.perPage : 0}
-          setPage={changePage}
-        />}
+          <QuizPagination
+            page={activePage}
+            total={!!params.perPage ? size / params.perPage : 0}
+            setPage={changePage}
+          />
+        }
       />
       {!!quizzes ? 
         <QuizList
