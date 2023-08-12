@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import useUserStore from "../store/user"
-import { useMediaQuery } from "@mantine/hooks"
+import { useCounter, useMediaQuery } from "@mantine/hooks"
 
 export interface formInputProps {
   value: string,
@@ -31,6 +31,97 @@ export const useInput = (
 export const useIsMobile = () => {
   const matches = useMediaQuery('(min-width: 48em)');
   return !matches
+}
+
+export const useTypewriter = (
+  word: string,
+  typeSpeed: number
+): [
+  string,
+  {
+    start: () => void;
+    stop: () => void;
+    reset: () => void;
+  },
+  {
+    typing: boolean,
+    stopping: boolean,
+    done: boolean,
+  }
+] => {
+  const wordLength = word.length;
+  const [ typetext, setTypetext ] = useState('');
+  const [ textIdx, { increment, reset: resetCounter } ] = useCounter(0, { min:0, max: wordLength });
+  const [ intervalId, setIntervalId ] = useState<NodeJS.Timer | null>(null);
+  const [ typing, setTyping ] = useState(false);
+  const [ stopping, setStopping ] = useState(false);
+  const [ done, setDone ] = useState(false);
+
+  const typewriter = () => {
+    setTypetext(word.slice(0, textIdx));
+    increment();
+    if (textIdx >= wordLength){
+      if (!!intervalId) clearInterval(intervalId);
+    }
+  }
+
+  const typewriterRef = useRef<() => void>(typewriter);
+  
+  useEffect(() => {
+    typewriterRef.current = typewriter;
+  }, [typewriter]);
+
+  useEffect(() => {
+    if (typing) {
+      const tick = () => {typewriterRef.current()}
+      const id = setInterval(tick, typeSpeed);
+      setIntervalId(id);
+
+      return () => {
+        clearInterval(id);
+        setIntervalId(null);
+        setTyping(false);
+        setStopping(false);
+        setDone(true);
+      };
+    }
+  }, [typing]);
+
+  const start = () => {
+    setTyping(true);
+    setStopping(false);
+    setDone(false);
+  }
+
+  const stop = () => {
+    if (!!intervalId) clearInterval(intervalId);
+    setTyping(false);
+    setStopping(true);
+    setDone(false);
+  }
+
+  const reset = () => {
+    if (!!intervalId) clearInterval(intervalId);
+    setTyping(false);
+    setStopping(false);
+    setDone(false);
+    setTypetext('');
+    resetCounter();
+  }
+
+  return [
+    typetext,
+    { 
+      start,
+      stop,
+      reset,
+    },
+    {
+      typing,
+      stopping,
+      done,
+    }
+  ]
 }
 
 export const useFetch = <T>(
