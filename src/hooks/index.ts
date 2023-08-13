@@ -50,7 +50,7 @@ export const useTypewriter = (
   }
 ] => {
   const wordLength = word.length;
-  const [ typetext, setTypetext ] = useState('');
+  const [ text, setText ] = useState('');
   const [ textIdx, { increment, reset: resetCounter } ] = useCounter(0, { min:0, max: wordLength });
   const [ intervalId, setIntervalId ] = useState<NodeJS.Timer | null>(null);
   const [ typing, setTyping ] = useState(false);
@@ -58,7 +58,7 @@ export const useTypewriter = (
   const [ done, setDone ] = useState(false);
 
   const typewriter = () => {
-    setTypetext(word.slice(0, textIdx));
+    setText(word.slice(0, textIdx));
     increment();
     if (textIdx >= wordLength){
       if (!!intervalId) clearInterval(intervalId);
@@ -105,22 +105,26 @@ export const useTypewriter = (
     setTyping(false);
     setStopping(false);
     setDone(false);
-    setTypetext('');
+    setText('');
     resetCounter();
   }
 
+  const method = { 
+    start,
+    stop,
+    reset,
+  }
+
+  const status = {
+    typing,
+    stopping,
+    done,
+  }
+
   return [
-    typetext,
-    { 
-      start,
-      stop,
-      reset,
-    },
-    {
-      typing,
-      stopping,
-      done,
-    }
+    text,
+    method,
+    status,
   ]
 }
 
