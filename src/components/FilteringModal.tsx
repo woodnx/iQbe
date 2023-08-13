@@ -15,13 +15,15 @@ interface FilteringModalProps extends DefaultProps {
     keyword?: string,
     keywordOption?: KeywordOption
   ) => void,
+  initialState?: boolean
 }
 
 export default function FilteringModal({
   apply,
+  initialState,
   ...others
 }: FilteringModalProps) {
-  const [ opened, { open, close } ] = useDisclosure(false)
+  const [ opened, { open, close } ] = useDisclosure(initialState || false)
   const [ workbooks, setWorkbooks ] = useState<string[]>([])
   const [ levels, setLevels ] = useState<string[]>([])
   const [ keywordProps ] = useInput('')
