@@ -33,6 +33,7 @@ export default function Search() {
       keyword, 
       keywordOption
     })
+    close();
   }
 
   const toShuffle = (
