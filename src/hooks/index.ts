@@ -35,20 +35,18 @@ export const useIsMobile = () => {
 
 export const useTypewriter = (
   word: string,
-  typeSpeed: number
-): [
-  string,
-  {
-    start: () => void;
-    stop: () => void;
-    reset: () => void;
-  },
-  {
-    typing: boolean,
-    stopping: boolean,
-    done: boolean,
-  }
-] => {
+  typeSpeed: number,
+  afterCallback = () => {},
+): {
+  text: string,
+  set: (newtext: string) => void,
+  start: () => void,
+  stop: () => void,
+  reset: () => void,
+  typing: boolean,
+  stopping: boolean,
+  done: boolean,
+} => {
   const wordLength = word.length;
   const [ text, setText ] = useState('');
   const [ textIdx, { increment, reset: resetCounter } ] = useCounter(0, { min:0, max: wordLength });
@@ -62,6 +60,7 @@ export const useTypewriter = (
     increment();
     if (textIdx >= wordLength){
       if (!!intervalId) clearInterval(intervalId);
+      afterCallback();
     }
   }
 
@@ -73,7 +72,7 @@ export const useTypewriter = (
 
   useEffect(() => {
     if (typing) {
-      const tick = () => {typewriterRef.current()}
+      const tick = () => {typewriterRef.current()};
       const id = setInterval(tick, typeSpeed);
       setIntervalId(id);
 
@@ -86,6 +85,10 @@ export const useTypewriter = (
       };
     }
   }, [typing]);
+
+  const set = (newtext: string) => {
+    setText(newtext);
+  }
 
   const start = () => {
     setTyping(true);
@@ -109,23 +112,95 @@ export const useTypewriter = (
     resetCounter();
   }
 
-  const method = { 
+  return {
+    text,
+    set,
     start,
     stop,
     reset,
-  }
-
-  const status = {
     typing,
     stopping,
     done,
+  };
+}
+
+export const useTimer = (
+  initialTime: number,
+  interval: number,
+  afterCallback = () => {},
+): {
+  time: number,
+  start: () => void,
+  stop: () => void,
+  reset: () => void,
+  counting: boolean,
+  stopping: boolean,
+  done: boolean,
+} => {
+  const [ time, setTime ] = useState(initialTime);
+  const [ intervalId, setIntervalId ] = useState<NodeJS.Timer | null>(null);
+  const [ counting, setCounting ] = useState(false);
+  const [ stopping, setStopping ] = useState(false);
+  const [ done, setDone ] = useState(false);
+
+  const counter = () => {
+    setTime(time - interval);
+    if (time <= 0){
+      if (!!intervalId) clearInterval(intervalId);
+      afterCallback();
+    }
   }
 
-  return [
-    text,
-    method,
-    status,
-  ]
+  const counterRef = useRef<() => void>(counter);
+
+  useEffect(() => {
+    counterRef.current = counter;
+  }, [counter]);
+
+  useEffect(() => {
+    if (counting) {
+      const tick = () => {counterRef.current()};
+      const id = setInterval(tick, interval);
+      setIntervalId(id);
+
+      return () => {
+        clearInterval(id);
+        setIntervalId(null);
+        setCounting(false);
+      };
+    }
+  }, [counting]);
+
+  const start = () => {
+    setCounting(true);
+    setStopping(false);
+    setDone(false);
+  }
+
+  const stop = () => {
+    if (!!intervalId) clearInterval(intervalId);
+    setCounting(false);
+    setStopping(true);
+    setDone(false);
+  }
+
+  const reset = () => {
+    if (!!intervalId) clearInterval(intervalId);
+    setCounting(false);
+    setStopping(false);
+    setDone(false);
+    setTime(initialTime);
+  }
+
+  return {
+    time,
+    start,
+    stop,
+    reset,
+    counting,
+    stopping,
+    done,
+  };
 }
 
 export const useFetch = <T>(
