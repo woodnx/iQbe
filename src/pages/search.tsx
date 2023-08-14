@@ -63,9 +63,8 @@ export default function Search() {
             <FilteringModal
               apply={toFilter}
               opened={opened}
-              open={open}
-              close={close}
-
+              onOpen={open}
+              onClose={close}
             />
             <QuizShuffleButton
               apply={toShuffle}
