@@ -15,15 +15,15 @@ interface FilteringModalProps extends DefaultProps {
     keywordOption?: KeywordOption
   ) => void,
   opened: boolean,
-  open: () => void,
-  close: () => void,
+  onOpen: () => void,
+  onClose: () => void,
 }
 
 export default function FilteringModal({
   apply,
   opened,
-  open,
-  close,
+  onOpen,
+  onClose,
   ...others
 }: FilteringModalProps) {
   const [ workbooks, setWorkbooks ] = useState<string[]>([])
@@ -34,14 +34,14 @@ export default function FilteringModal({
 
   const filtering = async () => {
     apply(workbooks, levels, keywordProps.value, keywordOption)
-    close()
+    onClose()
   }
 
   return (
     <>
       <Modal 
         opened={opened} 
-        onClose={close} 
+        onClose={onClose} 
         title="Filtering Quiz"
         size="lg"
         fullScreen={isMobile}
@@ -71,7 +71,7 @@ export default function FilteringModal({
         </Group>
       </Modal>
       <Button 
-        onClick={open}
+        onClick={onOpen}
         leftIcon={<IconFilter/>}
         variant="outline"
         color="orange"
