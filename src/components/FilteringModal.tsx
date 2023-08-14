@@ -1,5 +1,4 @@
 import { Button, DefaultProps, Group, Modal } from "@mantine/core"
-import { useDisclosure } from "@mantine/hooks"
 import { useState } from "react"
 import FilteringWorkbook from "./FilteringWorkbook"
 import FilteringLevel from "./FilteringLevel"
@@ -15,15 +14,18 @@ interface FilteringModalProps extends DefaultProps {
     keyword?: string,
     keywordOption?: KeywordOption
   ) => void,
-  initialState?: boolean
+  opened: boolean,
+  open: () => void,
+  close: () => void,
 }
 
 export default function FilteringModal({
   apply,
-  initialState,
+  opened,
+  open,
+  close,
   ...others
 }: FilteringModalProps) {
-  const [ opened, { open, close } ] = useDisclosure(initialState || false)
   const [ workbooks, setWorkbooks ] = useState<string[]>([])
   const [ levels, setLevels ] = useState<string[]>([])
   const [ keywordProps ] = useInput('')
