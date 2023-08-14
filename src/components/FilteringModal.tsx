@@ -32,11 +32,6 @@ export default function FilteringModal({
   const [ keywordOption, setkeywordOption ] = useState<KeywordOption>('1')
   const isMobile = useIsMobile()
 
-  const filtering = async () => {
-    apply(workbooks, levels, keywordProps.value, keywordOption)
-    onClose()
-  }
-
   return (
     <>
       <Modal 
@@ -66,7 +61,7 @@ export default function FilteringModal({
         <Group mt="xl" position="right">
           <Button 
             leftIcon={<IconSearch/>}
-            onClick={filtering}
+            onClick={() => apply(workbooks, levels, keywordProps.value, keywordOption)}
           >Search</Button>
         </Group>
       </Modal>
