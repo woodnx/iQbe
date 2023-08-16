@@ -38,12 +38,13 @@ const createFilter = ({
 
 const useQuizzes = (
   params: QuizRequestParams,
-  path = ''
+  path = '',
+  shouldFetch = true,
 ) => {
   const filter = createFilter(params).toString()
   
   const { data: quizzes, isLoading, error } = useSWR(
-    [`/quizzes${path}`, filter ],
+    shouldFetch ? [`/quizzes${path}`, filter ] : null,
     ([url, filter]) => fetcher(url, filter)
   )
   
