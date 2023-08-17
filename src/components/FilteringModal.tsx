@@ -6,13 +6,15 @@ import { useInput, useIsMobile } from "../hooks"
 import FilteringWord from "./FilteringWord"
 import { IconFilter, IconSearch } from "@tabler/icons-react"
 import { KeywordOption } from "../types"
+import FilteringQuizNumber from "./FilteringQuizNumber"
 
 interface FilteringModalProps extends DefaultProps {
   apply: (
     workbooks?: string[],
     levels?: string[],
     keyword?: string,
-    keywordOption?: KeywordOption
+    keywordOption?: KeywordOption,
+    perPage?: number, 
   ) => void,
   opened: boolean,
   onOpen: () => void,
@@ -30,6 +32,7 @@ export default function FilteringModal({
   const [ levels, setLevels ] = useState<string[]>([])
   const [ keywordProps ] = useInput('')
   const [ keywordOption, setkeywordOption ] = useState<KeywordOption>('1')
+  const [ perPage, setPerPage ] = useState(100);
   const isMobile = useIsMobile()
 
   return (
@@ -58,10 +61,15 @@ export default function FilteringModal({
           }}
           mt="lg"
         />
+        <FilteringQuizNumber
+          value={perPage}
+          onChange={setPerPage}
+          mt="lg"
+        />
         <Group mt="xl" position="right">
           <Button 
             leftIcon={<IconSearch/>}
-            onClick={() => apply(workbooks, levels, keywordProps.value, keywordOption)}
+            onClick={() => apply(workbooks, levels, keywordProps.value, keywordOption, perPage)}
           >Search</Button>
         </Group>
       </Modal>
