@@ -19,7 +19,7 @@ const createFilter = ({
 
   if(!!page && !!perPage) {
     params.append('page', String(page))
-    params.append('maxView', String(perPage))
+    params.append('perPage', String(perPage))
   }
   if(!!seed) params.append('seed', String(seed))
 
