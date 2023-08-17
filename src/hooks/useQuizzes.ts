@@ -19,7 +19,7 @@ const createFilter = ({
 
   if(!!page && !!perPage) {
     params.append('page', String(page))
-    params.append('maxView', String(perPage))
+    params.append('perPage', String(perPage))
   }
   if(!!seed) params.append('seed', String(seed))
 
@@ -38,12 +38,13 @@ const createFilter = ({
 
 const useQuizzes = (
   params: QuizRequestParams,
-  path = ''
+  path = '',
+  shouldFetch = true,
 ) => {
   const filter = createFilter(params).toString()
   
   const { data: quizzes, isLoading, error } = useSWR(
-    [`/quizzes${path}`, filter ],
+    shouldFetch ? [`/quizzes${path}`, filter ] : null,
     ([url, filter]) => fetcher(url, filter)
   )
   

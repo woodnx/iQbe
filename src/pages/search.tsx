@@ -7,10 +7,12 @@ import { KeywordOption, QuizRequestParams } from '../types'
 import { useState } from 'react'
 import QuizPagination from '../components/QuizPagination'
 import QuizShuffleButton from '../components/QuizShuffleButton'
+import { useDisclosure } from '@mantine/hooks'
 
 export default function Search() {
   const [ params, setParams ] = useState<QuizRequestParams>({perPage: 100})
   const [activePage, setPage] = useState(1);
+  const [ opened, { open, close } ] = useDisclosure(false);
   const { quizzes } = useQuizzes(params)
 
   const size = !!quizzes ? quizzes[0].size : 0
@@ -19,18 +21,21 @@ export default function Search() {
     workbooks?: string[], 
     levels?: string[], 
     keyword?: string, 
-    keywordOption?: KeywordOption
+    keywordOption?: KeywordOption,
+    perPage?: number,
   ) => {
     setPage(1)
     setParams({ 
       ...params, 
       page: 1, 
       seed: undefined,
+      perPage,
       workbooks, 
       levels, 
       keyword, 
-      keywordOption
+      keywordOption,
     })
+    close();
   }
 
   const toShuffle = (
@@ -60,6 +65,9 @@ export default function Search() {
           <>
             <FilteringModal
               apply={toFilter}
+              opened={opened}
+              onOpen={open}
+              onClose={close}
             />
             <QuizShuffleButton
               apply={toShuffle}
@@ -70,7 +78,7 @@ export default function Search() {
         pagination={
         <QuizPagination
           page={activePage}
-          total={!!params.perPage ? size / params.perPage : 0}
+          total={!!params.perPage ? Math.ceil(size / params.perPage) : 0}
           setPage={changePage}
         />}
       />

@@ -23,7 +23,7 @@ const mockdata = [
   {
     label: 'Practice',
     icon: IconSchool,
-    link: '/',
+    link: '/practice',
   },
   {
     label: 'Favorite',
