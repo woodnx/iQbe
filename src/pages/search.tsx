@@ -21,17 +21,19 @@ export default function Search() {
     workbooks?: string[], 
     levels?: string[], 
     keyword?: string, 
-    keywordOption?: KeywordOption
+    keywordOption?: KeywordOption,
+    perPage?: number,
   ) => {
     setPage(1)
     setParams({ 
       ...params, 
       page: 1, 
       seed: undefined,
+      perPage,
       workbooks, 
       levels, 
       keyword, 
-      keywordOption
+      keywordOption,
     })
     close();
   }
@@ -76,7 +78,7 @@ export default function Search() {
         pagination={
         <QuizPagination
           page={activePage}
-          total={!!params.perPage ? size / params.perPage : 0}
+          total={!!params.perPage ? Math.ceil(size / params.perPage) : 0}
           setPage={changePage}
         />}
       />
