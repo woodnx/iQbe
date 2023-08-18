@@ -37,7 +37,6 @@ export default function Practice() {
   useEffect(() => {
     switch(scene) {
       case 0: 
-        setNowNumber(0);
         delay.reset();
         typewriter.reset();
         countdown.reset();
@@ -91,6 +90,7 @@ export default function Practice() {
     });
     filter.close();
     setShouldFetch(true);
+    setNowNumber(0);
     setScene(0);
   }
 
