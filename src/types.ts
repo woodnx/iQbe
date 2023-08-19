@@ -36,3 +36,10 @@ export interface UserStatus {
   through: number,
   wrong: number,
 }
+
+export interface Rank {
+  userId: number,
+  name: string,  
+  rank: number,
+  count: number,
+}
