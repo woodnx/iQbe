@@ -1,10 +1,10 @@
 import dayjs, { extend } from 'dayjs';
 import duration from 'dayjs/plugin/duration';
-import ja from 'dayjs/locale/ja';
+// import ja from 'dayjs/locale/ja';
 import type { ManipulateType } from 'dayjs';
 
 extend(duration);
-dayjs.locale(ja);
+// dayjs.locale(ja);
 
 export type Period = 'day' | 'week' | 'month';
 
