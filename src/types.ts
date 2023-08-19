@@ -27,4 +27,19 @@ export interface QuizRequestParams {
   judgement?: number,
 }
 
-export type KeywordOption = "1" | "2" | "3"
+export type KeywordOption = "1" | "2" | "3";
+
+export interface UserStatus {
+  start: string,
+  end: string,
+  right: number,
+  through: number,
+  wrong: number,
+}
+
+export interface Rank {
+  userId: number,
+  name: string,  
+  rank: number,
+  count: number,
+}
