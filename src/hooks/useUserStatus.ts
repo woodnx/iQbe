@@ -18,12 +18,11 @@ const defineLabel = (start: string, period: Period): string => {
   }
 }
 
-const useUserStatus = (date: string, period?: Period) => {
-  const p = period || 'day';
-  const { data, isLoading, error } = useSWR(`analysis/status/${date}/${p}`, fetcher);
+const useUserStatus = (date: string, period: Period) => {
+  const { data, isLoading, error } = useSWR(`analysis/status/${date}/${period}`, fetcher);
 
   const userStatus = data?.map(status => {
-    const label = defineLabel(status.start, p);
+    const label = defineLabel(status.start, period);
     const total = status.right + status.wrong + status.through;
     return {
       label,
