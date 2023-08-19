@@ -20,13 +20,7 @@ export default function ActivityStatus({
   
   return (
     <>
-      <Card 
-        ref={ref} 
-        style={{
-          borderRadius: '20px 20px 0 0'
-        }}
-        withBorder
-      >
+      <Card ref={ref} >
         <Group position="apart">
           <Title size="h2">Status</Title>
           <ActivitySelectRange
