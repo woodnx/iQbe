@@ -34,7 +34,7 @@ router.get('/', async (req, res) => {
 
 router.post('/', async (req, res) => {
   const quizId = req.body.quizId
-  const userId = req.body.userId
+  const userId = req.userId
   const length = req.body.length
 
   try {
