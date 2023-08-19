@@ -45,20 +45,16 @@ router.post('/', async (req, res) => {
   const judgement: number = req.body.judgement
   const practiced: string = dayjs().format('YYYY-MM-DD HH:mm:ss')
 
-  if (!quiz_id || !judgement) {
+  if (!quiz_id || judgement >= 3 || judgement < 0) {
     res.status(400).send('Undefined list name or judgement')
     return
   }
 
   try {
-    const uid = req.user.uid
+    const user_id = req.userId
 
     await knex.transaction(async trx => {
-      const user_id: number = await trx('users')
-      .select('id')
-      .where("uid", uid)
-      .first()
-
+      
       const data = {
         quiz_id,
         user_id,

@@ -28,7 +28,7 @@ router.post('/', async (req, res) => {
 })
 
 router.delete('/', async (req, res) => {
-  const userId = req.body.userId
+  const userId = req.userId
   const quizId = req.body.quizId
 
   try {
