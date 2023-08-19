@@ -8,7 +8,7 @@ const router = express.Router()
 router.get('/status/:date/:period', async (req, res) => {
   const userId = req.userId
   const date = req.params.date
-  const _period = req.query.period || 'day'
+  const _period = req.params.period
 
   const period: Period = (_period == 'week' || _period == 'month') ? _period : 'day'
 
@@ -23,19 +23,19 @@ router.get('/status/:date/:period', async (req, res) => {
         .count('quiz_id', {as: 'count'})
         .where('user_id', userId)
         .where('judgement', 1)
-        .whereBetween('practiced', [range[0], range[1]])),
+        .whereBetween('practiced', [range[0], range[1]]))[0].count,
 
         wrong: (await knex('histories')
         .count('quiz_id', {as: 'count'})
         .where('user_id', userId)
         .where('judgement', 0)
-        .whereBetween('practiced', [range[0], range[1]])),
+        .whereBetween('practiced', [range[0], range[1]]))[0].count,
 
         through: (await knex('histories')
         .count('quiz_id', {as: 'count'})
         .where('user_id', userId)
         .where('judgement', 2)
-        .whereBetween('practiced', [range[0], range[1]])),
+        .whereBetween('practiced', [range[0], range[1]]))[0].count,
       }))
     )
     res.send(results)
