@@ -33,7 +33,7 @@ const mockdata = [
   {
     label: 'History',
     icon: IconHistory,
-    link: '/',
+    link: '/history',
   },
 ]
 
