@@ -10,7 +10,7 @@ export default function QuizList(props: QuizListProps) {
     <>
       {props.quizzes?.map((quiz, idx) => (
         <QuizCard 
-          key={quiz.id}
+          key={idx}
           index={idx+1}
           quiz={quiz}
           styles={(theme) => ({
