@@ -1,36 +1,30 @@
-import { Card, DefaultProps, Flex, Group, MantineNumberSize, Selectors, Text, } from "@mantine/core";
+import { Card, DefaultProps, Flex, Group, Text, } from "@mantine/core";
 import QuizMylistButton from "./QuizMylistButton";
 import QuizFavoriteButton from "./QuizFavoriteButton";
-import useStyles, { QuizCardStylesParams } from "./styles/QuizCard.styles";
-import { Quiz } from "../types";
+import { Judgement, Quiz } from "../types";
 import { QuizWorkbookBadge } from "./QuizWorkbookBadge";
 
-// このtypeは，useStyleに定義されたすべてのselectorsを含む結合が存在する．
-// ここではroot | title | descriptionである．
-type QuizCardStylesNames = Selectors<typeof useStyles>
-
-interface QuizCardProps extends DefaultProps<QuizCardStylesNames, QuizCardStylesParams> {
-  margin?: MantineNumberSize,
+interface Props extends DefaultProps{
   index: number,
   quiz: Quiz,
+  coloring?: boolean,
+}
+
+const defineColor = (judgement: Judgement) => {
+  if (judgement == 0) return 'blue.1';
+  else if (judgement == 1) return 'red.1'
+  else return 'gray.1'
 }
 
 export default function QuizCard({
-  classNames,
-  styles,
-  unstyled,
-  className,
-  margin,
   index,
   quiz,
-}: QuizCardProps) {
-  const { classes, cx } = useStyles(
-    { margin },
-    { name: 'QuizCard', classNames, styles, unstyled }
-  )
-
+  coloring,
+  ...others
+}: Props) {
+  const color = coloring && quiz.judgement != null ? defineColor(quiz.judgement) : undefined;
   return (
-    <Card className={cx(classes.root, className)} withBorder>
+    <Card withBorder bg={color} {...others}>
       <Group position="apart">
         <Text>No.{index}</Text>
         <QuizFavoriteButton
@@ -38,8 +32,8 @@ export default function QuizCard({
           quizId={quiz.id}
         />
       </Group>
-      <Text className={classes.text}>{quiz.question}</Text>
-      <Text align="right" className={classes.text}>
+      <Text pt={10}>{quiz.question}</Text>
+      <Text align="right" pt={10}>
         {quiz.answer}
       </Text>
       <Flex
