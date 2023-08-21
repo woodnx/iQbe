@@ -174,7 +174,7 @@ router.get('/:listName?', async (req: QuizRequest, res) => {
 
     //console.log(data)
     
-    res.send(data)
+    res.status(200).send(data)
   } catch(e) {
     console.log('An Error Occurred')
     console.error(e)

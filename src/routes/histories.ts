@@ -31,7 +31,7 @@ router.get('/:since/:until', async (req, res) => {
       through: results[2] || 0,
     };
 
-    res.send(data);
+    res.status(200).send(data);
   } catch(e) {
     console.error(e)
   }

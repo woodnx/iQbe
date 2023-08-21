@@ -38,7 +38,7 @@ router.get('/status/:date/:period', async (req, res) => {
         .whereBetween('practiced', [range[0], range[1]]))[0].count,
       }))
     )
-    res.send(results)
+    res.status(200).send(results)
   } catch(e) {
     console.error(e)
     res.send('An Error Occured')
@@ -91,7 +91,7 @@ router.get('/ranking/all/:period', async (req, res) => {
       }
     })
 
-    res.send(ranking)
+    res.status(200).send(ranking)
   }catch(e) {
     console.error(e)
     res.send('An Error Occured')
@@ -151,7 +151,7 @@ router.get('/ranking/personal/:period', async (req, res) => {
       userId,
     }
 
-    res.send(ranking)
+    res.status(200).send(ranking)
   }catch(e){
     console.error(e)
     res.send('An Error Occured')
