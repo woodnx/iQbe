@@ -34,8 +34,8 @@ const createFilter = ({
   }
 
   if (!!since && !!until) { 
-    params.append("since", since);
-    params.append("until", until);
+    params.append("since", String(since));
+    params.append("until", String(until));
   }
 
   if (!!judgements) judgements.forEach(j => { params.append('judgement[]', String(j)) });
