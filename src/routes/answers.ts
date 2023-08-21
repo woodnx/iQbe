@@ -21,7 +21,7 @@ router.get('/', async (req, res) => {
     .where('quiz_id', quizId)
     .where('user_id', userId)
     
-    res.send({
+    res.status(200).send({
       fast,
       avg,
       myFast,

@@ -4,11 +4,12 @@ import dayjs from '../day'
 
 const router: Router = express.Router()
 
-router.get('/:userId', async (req, res) => {
+router.get('/', async (req, res) => {
+  const userId = req.userId;
   try {
     const all = await knex('mylist_informations')
     .select('name', 'id')
-    .where('user_id', req.query.userId)
+    .where('user_id', userId)
     
     res.status(200).send(all)
   } catch(e) {
