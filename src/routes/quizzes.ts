@@ -1,5 +1,6 @@
 import express, { Router, Request } from 'express'
 import knex from '../knex'
+import dayjs from 'dayjs'
 
 const router: Router = express.Router()
 
@@ -15,8 +16,8 @@ interface QuizRequest extends Request {
     keyword: string,
     keywordOption: KeywordOption,
     crctAnsRatio?: [string, string],
-    sinceDate?: string,
-    endDate?: string,
+    since?: string,
+    until?: string,
     judgement?: string[],
   }
 }
@@ -39,8 +40,8 @@ router.get('/:listName?', async (req: QuizRequest, res) => {
   const keyword  = req.query.keyword
   const keywordOption = Number(req.query.keywordOption) || undefined
   const crctAnsRatio = req.query.crctAnsRatio
-  const since = req.query.sinceDate
-  const until = req.query.endDate
+  const since = req.query.since
+  const until = req.query.until
   const judgement = req.query.judgement
 
   const userId = req.userId
@@ -115,13 +116,15 @@ router.get('/:listName?', async (req: QuizRequest, res) => {
         .where('favorites.user_id', userId)
         .orderBy('favorites.registered', 'desc')
       }else if (listName === 'history' && !!since && !!until) {
+        const s = dayjs(Number(since)).format('YYYY-MM-DD HH:mm:ss');
+        const u = dayjs(Number(until)).format('YYYY-MM-DD HH:mm:ss');
         builder.column(
           { judgement: 'histories.judgement' },
           { practiced: 'histories.practiced' },
         )
         .innerJoin('histories', 'histories.quiz_id', 'quizzes.id')
         .where('histories.user_id', userId)
-        .whereBetween('histories.practiced', [since, until])
+        .whereBetween('histories.practiced', [s, u])
 
         if (!!judgement) builder.whereIn('histories.judgement', judgement)
       }else {
