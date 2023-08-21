@@ -52,7 +52,7 @@ export const useTypewriter = (
   const wordLength = initialText.length;
   const [ text, setText ] = useState('');
   const [ textIdx, { increment, reset: resetCounter } ] = useCounter(0, { min:0, max: wordLength });
-  const [ intervalId, setIntervalId ] = useState<NodeJS.Timer | null>(null);
+  const [ intervalId, setIntervalId ] = useState<NodeJS.Timeout | null>(null);
   const [ typing, setTyping ] = useState(false);
   const [ pausing, setPausing ] = useState(false);
   const [ stopping, setStopping ] = useState(false);
@@ -159,7 +159,7 @@ export const useTimer = (
   done: boolean,
 } => {
   const [ time, setTime ] = useState(initialTime);
-  const [ intervalId, setIntervalId ] = useState<NodeJS.Timer | null>(null);
+  const [ intervalId, setIntervalId ] = useState<NodeJS.Timeout | null>(null);
   const [ counting, setCounting ] = useState(false);
   const [ pausing, setPausing ] = useState(false);
   const [ stopping, setStopping ] = useState(false);
