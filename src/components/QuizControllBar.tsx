@@ -1,4 +1,4 @@
-import { Center, Grid, Header, Text } from "@mantine/core";
+import { Grid, Group, Header, Text } from "@mantine/core";
 import { ReactNode } from "react";
 
 interface QuizControllBarProps {
@@ -20,17 +20,13 @@ export default function QuizControllBar({
       fixed
     >
       <Grid px={10} pt={10}>
-        <Grid.Col span={10}>
-          { buttons }
-        </Grid.Col>
-        <Grid.Col md={2}>
-          <Text ta="right">総問題数: {total}</Text>
-        </Grid.Col>
         <Grid.Col span={12}>
-          <Center>
-            { pagination }
-          </Center>
+          <Group position="apart">
+            <div>{ buttons }</div>
+            <Text ta="right">総問題数: {total}</Text>
+          </Group>
         </Grid.Col>
+        { pagination }
       </Grid>
     </Header>
   )

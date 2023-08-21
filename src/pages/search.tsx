@@ -1,7 +1,7 @@
 import QuizList from '../components/QuizList'
 import QuizControllBar from '../components/QuizControllBar'
 import useQuizzes from '../hooks/useQuizzes'
-import { Center, Loader } from '@mantine/core'
+import { Center, Grid, Loader } from '@mantine/core'
 import FilteringModal from '../components/FilteringModal'
 import { KeywordOption, QuizRequestParams } from '../types'
 import { useState } from 'react'
@@ -71,16 +71,21 @@ export default function Search() {
             />
             <QuizShuffleButton
               apply={toShuffle}
-              ml={7}
+              ml="xs"
             />
           </>
         }
         pagination={
-        <QuizPagination
-          page={activePage}
-          total={!!params.perPage ? Math.ceil(size / params.perPage) : 0}
-          setPage={changePage}
-        />}
+          <Grid.Col span={12}>
+            <Center>
+              <QuizPagination
+                page={activePage}
+                total={!!params.perPage ? Math.ceil(size / params.perPage) : 0}
+                setPage={changePage}
+              />
+            </Center>
+          </Grid.Col>
+        }
       />
       {!!quizzes ? 
         <QuizList
