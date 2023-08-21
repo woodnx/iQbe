@@ -14,6 +14,9 @@ const createFilter = ({
   levels,
   keyword,
   keywordOption,
+  since,
+  until,
+  judgements,
 } : QuizRequestParams) => {
   const params = new URLSearchParams();
 
@@ -27,8 +30,15 @@ const createFilter = ({
   if (!!levels    && levels.length !== 0)    levels.forEach(id => { params.append('level[]', id) })
   if (!!keyword   && keyword.trim().length !== 0 && !!keywordOption) { 
     params.append("keyword", keyword) 
-    params.append("keywordOption", keywordOption) 
+    params.append("keywordOption", keywordOption)
   }
+
+  if (!!since && !!until) { 
+    params.append("since", String(since));
+    params.append("until", String(until));
+  }
+
+  if (!!judgements) judgements.forEach(j => { params.append('judgement[]', String(j)) });
 
   // if (!(crctAnsRatio[0] == 0 && crctAnsRatio[1] == 100)) crctAnsRatio.forEach(ratio => { params.append('crctAnsRatio[]', ratio) }) 
   // params.append('userId', rootState.user.id)

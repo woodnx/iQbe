@@ -12,6 +12,7 @@ export interface Quiz {
   isFavorite: boolean,
   registerdMylist: number[],
   size: number,
+  judgement?: Judgement,
 }
 
 export interface QuizRequestParams {
@@ -22,9 +23,9 @@ export interface QuizRequestParams {
   levels?: string[],
   keyword?: string,
   keywordOption?: KeywordOption,
-  since?: string,
-  until?: string,
-  judgement?: number,
+  since?: number,
+  until?: number,
+  judgements?: Judgement[],
 }
 
 export type KeywordOption = "1" | "2" | "3";
@@ -43,3 +44,5 @@ export interface Rank {
   rank: number,
   count: number,
 }
+
+export type Judgement = 0 | 1 | 2
