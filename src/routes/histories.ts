@@ -10,31 +10,28 @@ interface SendData {
 
 const router: Router = express.Router()
 
-router.get('/:user_id/:start/:end', async (req, res) => {
-  const start   = `${req.params.start} 00:00:00`
-  const end     = `${req.params.end} 23:59:59`
-  const user_id = Number(req.params.user_id)
+router.get('/:since/:until', async (req, res) => {
+  const since = dayjs(Number(req.params.since)).format('YYYY-MM-DD HH:mm:ss');
+  const until = dayjs(Number(req.params.until)).format('YYYY-MM-DD HH:mm:ss');
+  const user_id = req.userId;
 
   try {
     const results = await Promise.all(
-      [0, 1, 2].map(async i => {
-        const r = await knex('histories')
+      [0, 1, 2].map(async i => (await knex('histories')
         .count('quiz_id', {as: 'count'})
         .where('user_id', user_id)
         .andWhere('judgement', i)
-        .andWhereBetween('practiced', [ start, end ])
-        .first()
-        
-        return !!r ? r.count : 0 
-      }))
+        .andWhereBetween('practiced', [ since, until ])
+        .first())?.count
+    ));
     
     const data: SendData = {
-      right: results[1],
-      wrong: results[0],
-      through: results[2],
-    }
+      right: results[1] || 0,
+      wrong: results[0] || 0,
+      through: results[2] || 0,
+    };
 
-    res.send(data)
+    res.send(data);
   } catch(e) {
     console.error(e)
   }
