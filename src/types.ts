@@ -23,8 +23,8 @@ export interface QuizRequestParams {
   levels?: string[],
   keyword?: string,
   keywordOption?: KeywordOption,
-  since?: string,
-  until?: string,
+  since?: number,
+  until?: number,
   judgements?: Judgement[],
 }
 
