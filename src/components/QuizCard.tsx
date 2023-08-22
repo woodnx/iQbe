@@ -40,7 +40,10 @@ export default function QuizCard({
         justify="space-between"
         align="center"
       >
-        <QuizMylistButton/>
+        <QuizMylistButton 
+          quizId={quiz.id}
+          registerdMylistId={quiz.registerdMylist}
+        />
         <QuizWorkbookBadge
           workbookName={quiz.workbook}
           levelColor={quiz.level}
