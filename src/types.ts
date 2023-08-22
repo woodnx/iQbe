@@ -45,4 +45,9 @@ export interface Rank {
   count: number,
 }
 
-export type Judgement = 0 | 1 | 2
+export type Judgement = 0 | 1 | 2;
+
+export interface MylistInformation {
+  id: number,
+  name: string,
+}
