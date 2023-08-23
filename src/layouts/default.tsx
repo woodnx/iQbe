@@ -2,12 +2,13 @@ import { getAuth, onAuthStateChanged } from "firebase/auth"
 import { useLayoutEffect } from "react"
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom"
 import { AppShell, Center, Group, Loader, NavLink, Navbar, ThemeIcon, createStyles } from "@mantine/core"
-import { IconActivity, IconHistory, IconSchool, IconSearch, IconStar } from "@tabler/icons-react"
+import { IconActivity, IconHistory, IconList, IconSchool, IconSearch, IconStar } from "@tabler/icons-react"
 import { useState } from "react"
 import { useMediaQuery } from "@mantine/hooks"
 import { notifications } from "@mantine/notifications"
 import useUserStore from "../store/user"
 import LogoutButton from "../components/LogoutButton"
+import { useMylistInfomations } from "../hooks/useMylists"
 
 const mockdata = [
   { 
@@ -46,18 +47,19 @@ const useStyles = createStyles((theme) => ({
 }))
 
 export default function DefaultLayout() {
-  const [ active, setActive ] = useState(0)
-  const [ loading, setLoading ] = useState(true)
-  const { classes } = useStyles()
-  const matches = useMediaQuery('(min-width: 48em)')
-  const navigate = useNavigate()
-  const location = useLocation()
-  const setIdToken = useUserStore((state) => state.setIdToken)
-  const auth = getAuth()
+  const [ active, setActive ] = useState(0);
+  const [ loading, setLoading ] = useState(true);
+  const { classes } = useStyles();
+  const matches = useMediaQuery('(min-width: 48em)');
+  const navigate = useNavigate();
+  const location = useLocation();
+  const setIdToken = useUserStore((state) => state.setIdToken);
+  const { mylists } = useMylistInfomations();
+  const auth = getAuth();
   
   useLayoutEffect(() => {
-    let ignore = false
-    setActive(mockdata.findIndex((data) => data.link === location.pathname))
+    let ignore = false;
+    setActive(mockdata.findIndex((data) => data.link === location.pathname));
 
     const authStateChanged = onAuthStateChanged(auth, async (user) => {
       if (ignore) return
@@ -102,6 +104,21 @@ export default function DefaultLayout() {
     )
   })
 
+  const mylistLinks = mylists?.map((mylist, idx) => {
+    return (
+      <NavLink
+        component={Link}
+        classNames={{root: classes.link}}
+        key={mylist.id}
+        active={idx + mockdata.length === active}
+        label={mylist.name}
+        icon={<IconList/>}
+        to={`mylist/${mylist.id}`}
+        onClick={() => setActive(idx + mockdata.length)}
+      />
+    )
+  })
+
   const navbar = (
     <Navbar 
       p="md" 
@@ -113,6 +130,7 @@ export default function DefaultLayout() {
           
         </Group>
         {items}
+        {mylistLinks}
       </Navbar.Section>
       <Navbar.Section>
         <LogoutButton/>
