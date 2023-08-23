@@ -34,6 +34,7 @@ export default function FilteringWorkbook({
     <div ref={ref} {...others}>
       <Group noWrap>
         <Badge
+          variant="dot"
           size="lg" 
           radius="sm" 
           color={color}

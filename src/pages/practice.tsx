@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Card, Group, Loader, Overlay, Text } from "@mantine/core";
 import PracticeTypewriteQuiz from "../components/PracticeTypewriteQuiz";
 import useQuizzes from "../hooks/useQuizzes";
-import { KeywordOption, QuizRequestParams } from "../types";
+import { KeywordOption, Quiz, QuizRequestParams } from "../types";
 import FilteringModal from "../components/FilteringModal";
 import { useTimer, useTypewriter } from "../hooks";
 import { useDisclosure } from "@mantine/hooks";
@@ -13,6 +13,20 @@ import axios from "../plugins/axios";
 import PracticeQuitModal from "../components/PracticeQuitModal";
 import { useNavigate } from "react-router-dom";
 import PracticeResultModal  from "../components/PracticeResultModal";
+
+const initialQuiz: Quiz = {
+  id: 0,
+  question: "",
+  answer: "",
+  date: "",
+  registerdMylist: [],
+  isFavorite: false,
+  level: 'dark',
+  workbook: "",
+  total: 0,
+  right: 0,
+  size: 0,
+}
 
 export default function Practice() {
   const [ params, setParams ] = useState<QuizRequestParams>({perPage: 100});
@@ -176,12 +190,7 @@ export default function Practice() {
           countlimit={4000}
         />
         <PracticeQuizInfo 
-          quizId={quiz?.id || 0}
-          answer={quiz?.answer || ""}
-          workbookName={quiz?.workbook || ""}
-          levelColor={quiz?.level || ""}
-          date={quiz?.date || ""}
-          isFavorite={quiz?.isFavorite || false}
+          quiz={quiz || initialQuiz}
           visible={scene >= 4}
         />
       </Card>

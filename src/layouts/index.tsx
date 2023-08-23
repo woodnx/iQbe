@@ -7,6 +7,7 @@ import Favorite from "../pages/favorite"
 import DefaultLayout from "./default"
 import DraftLayout from "./draft"
 import History from "../pages/history"
+import Mylist from "../pages/mylists"
 
 export default function Root() {
   const location = useLocation()
@@ -22,6 +23,7 @@ export default function Root() {
         <Route path="/practice" element={<Practice />}/>
         <Route path="/favorite" element={<Favorite />}/>
         <Route path="/history" element={<History />}/>
+        <Route path="/mylist/:mylistId" element={<Mylist />}/>
         <Route path="/login" element={<Login />}/>
       </Route>
     </Routes>
