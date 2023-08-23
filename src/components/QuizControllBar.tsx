@@ -1,4 +1,5 @@
 import { Grid, Group, Header, Text } from "@mantine/core";
+import { useElementSize } from "@mantine/hooks";
 import { ReactNode } from "react";
 
 interface QuizControllBarProps {
@@ -6,20 +7,23 @@ interface QuizControllBarProps {
   total: number,
   buttons: ReactNode,
   pagination: ReactNode,
+  header?: ReactNode,
 }
 
 export default function QuizControllBar({ 
-  height, 
   total, 
   buttons, 
-  pagination 
+  pagination,
+  header = <></>
 }: QuizControllBarProps) {
+  const { ref, height } = useElementSize();
   return (
     <Header
       height={height}
       fixed
     >
-      <Grid px={10} pt={10}>
+      <Grid px={10} pt={10} ref={ref}>
+        { header }
         <Grid.Col span={12}>
           <Group position="apart">
             <div>{ buttons }</div>

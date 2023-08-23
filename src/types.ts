@@ -26,6 +26,7 @@ export interface QuizRequestParams {
   since?: number,
   until?: number,
   judgements?: Judgement[],
+  mylistId?: string,
 }
 
 export type KeywordOption = "1" | "2" | "3";
@@ -45,4 +46,9 @@ export interface Rank {
   count: number,
 }
 
-export type Judgement = 0 | 1 | 2
+export type Judgement = 0 | 1 | 2;
+
+export interface MylistInformation {
+  id: number,
+  name: string,
+}
