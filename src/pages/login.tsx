@@ -3,6 +3,7 @@ import { auth } from "../plugins/firebase"
 import { signInWithEmailAndPassword } from "firebase/auth"
 import { Button, Center, Grid, Paper, PasswordInput, TextInput } from "@mantine/core"
 import { useInput } from "../hooks"
+import Logo from "../components/Logo"
 
 export default function Login() {
   const [ passwordProps, resetPassword ] = useInput('')
@@ -26,7 +27,7 @@ export default function Login() {
       <Grid>
         <Grid.Col span={4}>
           <Center>
-            <img src="../../iqbe-named.png" width={160}></img>
+            <Logo width={160} />
           </Center> 
         </Grid.Col>
         <Grid.Col span={8}>
