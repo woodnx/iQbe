@@ -1,14 +1,14 @@
-import { getAuth, onAuthStateChanged } from "firebase/auth"
-import { useLayoutEffect } from "react"
-import { Link, Outlet, useLocation, useNavigate } from "react-router-dom"
-import { AppShell, Center, Group, Loader, NavLink, Navbar, ThemeIcon, createStyles } from "@mantine/core"
-import { IconActivity, IconHistory, IconList, IconSchool, IconSearch, IconStar } from "@tabler/icons-react"
-import { useState } from "react"
-import { useMediaQuery } from "@mantine/hooks"
-import { notifications } from "@mantine/notifications"
-import useUserStore from "../store/user"
-import LogoutButton from "../components/LogoutButton"
-import { useMylistInfomations } from "../hooks/useMylists"
+import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { useLayoutEffect } from "react";
+import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
+import { AppShell, Center, Group, Loader, NavLink, Navbar, ThemeIcon, createStyles } from "@mantine/core";
+import { IconActivity, IconHistory, IconList, IconSchool, IconSearch, IconStar } from "@tabler/icons-react";
+import { useState } from "react";
+import { useMediaQuery } from "@mantine/hooks";
+import { notifications } from "@mantine/notifications";
+import useUserStore from "../store/user";
+import LogoutButton from "../components/LogoutButton";
+import { useMylistInfomations } from "../hooks/useMylists";
 
 const mockdata = [
   { 
@@ -36,7 +36,7 @@ const mockdata = [
     icon: IconHistory,
     link: '/history',
   },
-]
+];
 
 const useStyles = createStyles((theme) => ({
   link: {
@@ -44,7 +44,7 @@ const useStyles = createStyles((theme) => ({
     padding: `${theme.spacing.xs} ${theme.spacing.sm}`,
     borderRadius: theme.radius.sm,
   }
-}))
+}));
 
 export default function DefaultLayout() {
   const [ active, setActive ] = useState(0);
@@ -62,7 +62,7 @@ export default function DefaultLayout() {
     setActive(mockdata.findIndex((data) => data.link === location.pathname));
 
     const authStateChanged = onAuthStateChanged(auth, async (user) => {
-      if (ignore) return
+      if (ignore) return;
       if (!user) { 
         navigate('/login') 
         notifications.show({
@@ -70,24 +70,24 @@ export default function DefaultLayout() {
           message: 'Please login',
           color: 'red',
           withBorder: true,
-        })
-        return 
+        });
+        return; 
       }
-      await setIdToken()
-      setLoading(false)
-    })
+      await setIdToken();
+      setLoading(false);
+    });
     return () => {
       ignore = true
       authStateChanged()
     }
-  }, [])
+  }, []);
 
   const items = mockdata.map((item, index) => {
     const icon = (
       <ThemeIcon variant="light">
         <item.icon size="1rem" stroke={1.5} />
       </ThemeIcon>
-    )
+    );
 
     return (
       <NavLink
@@ -101,8 +101,8 @@ export default function DefaultLayout() {
         onClick={() => setActive(index)}
       >
       </NavLink>
-    )
-  })
+    );
+  });
 
   const mylistLinks = mylists?.map((mylist, idx) => {
     return (
@@ -116,8 +116,8 @@ export default function DefaultLayout() {
         to={`mylist/${mylist.id}`}
         onClick={() => setActive(idx + mockdata.length)}
       />
-    )
-  })
+    );
+  });
 
   const navbar = (
     <Navbar 
@@ -136,7 +136,7 @@ export default function DefaultLayout() {
         <LogoutButton/>
       </Navbar.Section>
     </Navbar>
-  )
+  );
 
   return (
     <>
@@ -155,6 +155,5 @@ export default function DefaultLayout() {
       </AppShell>
     }
     </>
-    
-  )
+  );
 }
