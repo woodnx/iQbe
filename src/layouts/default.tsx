@@ -9,6 +9,7 @@ import { notifications } from "@mantine/notifications";
 import useUserStore from "../store/user";
 import LogoutButton from "../components/LogoutButton";
 import { useMylistInfomations } from "../hooks/useMylists";
+import Logo from "../components/Logo";
 
 const mockdata = [
   { 
@@ -127,7 +128,7 @@ export default function DefaultLayout() {
     >
       <Navbar.Section grow>
         <Group position="apart">
-          
+          <Logo horizonal width={100} mb="xs"/>
         </Group>
         {items}
         {mylistLinks}
