@@ -1,7 +1,7 @@
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { useLayoutEffect } from "react";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
-import { AppShell, Center, Group, Loader, NavLink, Navbar, ThemeIcon, createStyles } from "@mantine/core";
+import { AppShell, Center, Container, Group, Loader, NavLink, Navbar, ThemeIcon, createStyles } from "@mantine/core";
 import { IconActivity, IconHistory, IconList, IconSchool, IconSearch, IconStar } from "@tabler/icons-react";
 import { useState } from "react";
 import { useMediaQuery } from "@mantine/hooks";
@@ -152,7 +152,9 @@ export default function DefaultLayout() {
         navbar={navbar}
         navbarOffsetBreakpoint="sm"
       >
-        <Outlet/>
+        <Container size="lg">
+          <Outlet/>
+        </Container>
       </AppShell>
     }
     </>

@@ -130,7 +130,7 @@ export default function History() {
                 />
               </Center>
             </Grid.Col>
-            <Grid.Col span={12}>
+            <Grid.Col span={12} mb={5}>
               <Center>
                 <QuizPagination
                   page={activePage}
