@@ -76,7 +76,7 @@ export default function Search() {
           </>
         }
         pagination={
-          <Grid.Col span={12}>
+          <Grid.Col mb={5}>
             <Center>
               <QuizPagination
                 page={activePage}
