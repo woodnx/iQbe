@@ -1,19 +1,34 @@
-import { Route, Routes, useLocation } from "react-router-dom"
-import Home from "../pages/home"
-import Login from "../pages/login"
-import Search from "../pages/search"
-import Practice from "../pages/practice"
-import Favorite from "../pages/favorite"
-import DefaultLayout from "./default"
-import DraftLayout from "./draft"
-import History from "../pages/history"
-import Mylist from "../pages/mylists"
+import { Route, Routes, useLocation } from "react-router-dom";
+import Home from "../pages/home";
+import Login from "../pages/login";
+import Search from "../pages/search";
+import Practice from "../pages/practice";
+import Favorite from "../pages/favorite";
+import DefaultLayout from "./default";
+import DraftLayout from "./draft";
+import History from "../pages/history";
+import Mylist from "../pages/mylists";
+import { useEffect } from "react";
+
+const defineTitle = (pathname: string) => {
+  if (pathname === '/') return 'Home';
+  else if (pathname === '/search') return 'Search';
+  else if (pathname === '/practice') return 'Practice';
+  else if (pathname === '/favorite') return 'Favorite';
+  else if (pathname === '/history') return 'History';
+  else if (pathname.includes('mylist')) return 'Mylist';
+  else return '';
+}
 
 export default function Root() {
-  const location = useLocation()
-  const requiredLogin = location.pathname !== '/login'
+  const location = useLocation();
+  const requiredLogin = location.pathname !== '/login';
 
-  const Layout = requiredLogin ? DefaultLayout : DraftLayout
+  const Layout = requiredLogin ? DefaultLayout : DraftLayout;
+
+  useEffect(() => {
+    document.title = `${defineTitle(location.pathname)} | iQbe`;
+  }, [location]);
 
   return (
     <Routes>
@@ -27,5 +42,5 @@ export default function Root() {
         <Route path="/login" element={<Login />}/>
       </Route>
     </Routes>
-  )
+  );
 }
