@@ -78,8 +78,8 @@ export default function DefaultLayout() {
       setLoading(false);
     });
     return () => {
-      ignore = true
-      authStateChanged()
+      ignore = true;
+      authStateChanged();
     }
   }, []);
 
