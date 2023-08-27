@@ -12,5 +12,5 @@ export const useMylistInfomations = () => {
     isLoading,
     error,
     mutate
-  }
-}
+  };
+};
