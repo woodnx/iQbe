@@ -9,9 +9,9 @@ router.get('/', async (req, res) => {
   try {
     const all = await knex('mylist_informations')
     .select('name', 'id')
-    .where('user_id', userId)
+    .where('user_id', userId);
     
-    res.status(200).send(all)
+    res.status(200).send(all);
   } catch(e) {
     console.error(e)
   }
@@ -19,6 +19,7 @@ router.get('/', async (req, res) => {
 
 router.post('/', async (req, res) => {
   const listName = req.body.listName
+  const userId = req.userId
   const now = dayjs().format('YYYY-MM-DD HH:mm:ss')
 
   if (!listName) {
@@ -27,25 +28,20 @@ router.post('/', async (req, res) => {
   }
     
   try {
-    const uid = req.user.uid
 
     await knex.transaction(async trx => {
-      const user_id: number = await trx('users')
-      .select('id')
-      .where("uid", uid)
-      .first()
-
       const data = {
-        user_id,
+        user_id: userId,
         name: listName,
         created: now,
         attr: 100
-      }
+      };
 
-      const inserts = await trx('mylist_informations').insert(data)
-      const message = `${inserts.length} new mylists saved (user: ${user_id})`
+      const inserts = await trx('mylist_informations').insert(data);
+      const newList = await trx('mylist_informations').select().where('name', listName).first();
+      const message = `${inserts.length} new mylists saved (user: ${userId})`;
       
-      res.status(201).send(message)
+      res.status(201).send(newList);
       console.log(message)
     })
   } catch(e) {
@@ -85,7 +81,7 @@ router.put('/quiz', async (req, res) => {
 
 router.put('/rename', async (req, res) => {
   const mylistId = req.body.mylistId
-  const userId = req.body.userId
+  const userId = req.userId
   const newName = req.body.newName
 
   if (!userId || !mylistId || !newName) {
@@ -132,8 +128,7 @@ router.delete('/quiz', async (req, res) => {
 
 router.delete('/list', async (req, res) => {
   const mylistId = req.body.mylistId
-  const userId = req.body.userId
-
+  const userId = req.userId
   
   try {
     await knex.transaction(async trx => {
@@ -143,7 +138,7 @@ router.delete('/list', async (req, res) => {
 
       await trx('mylist_informations')
       .del()
-      .where('mylist_id', mylistId)
+      .where('id', mylistId)
 
       const allList = await trx('mylist_informations')
       .select('name', 'id')
