@@ -1,6 +1,7 @@
-import { Button, Center, DefaultProps, Modal, Space, Stack, Title } from "@mantine/core";
+import { ActionIcon, Button, Center, DefaultProps, Modal, Space, Stack, Title } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { IconPlayerPauseFilled } from "@tabler/icons-react";
+import { useIsMobile } from "../hooks";
 
 interface Props extends DefaultProps {
   onJudge: (judgement: number) => void,
@@ -10,14 +11,44 @@ export default function PracticePauseModal({
   onJudge,
 }: Props) {
   const [ opened, { open, close } ] = useDisclosure(false);
+  const isMobile = useIsMobile();
   const judge = (judgement: number) => {
     onJudge(judgement);
     close();
   }
 
+  const defaultButton = (
+    <Button
+      variant="outline"
+      onClick={open}
+      leftIcon={<IconPlayerPauseFilled/>}
+      color="dark"
+    >
+      Pause
+    </Button>
+  );
+
+  const mobileButton = (
+    <ActionIcon
+      onClick={open}
+      size="lg" 
+      radius="xl" 
+      variant="outline"
+      color="dark"
+    >
+      <IconPlayerPauseFilled/>
+    </ActionIcon>
+  )
+
   return (
     <>
-      <Modal opened={opened} onClose={() => close()}>
+      <Modal 
+        opened={opened} 
+        onClose={() => close()}
+        size={ isMobile ? 'xs' : 'md' }
+        pos="absolute"
+        left="-5%"
+      >
         <Center>
           <Title>Pause</Title>
         </Center>
@@ -29,14 +60,7 @@ export default function PracticePauseModal({
           <Button size="lg" variant="outline" color="gray" onClick={close}>クイズに戻る</Button>
         </Stack>
       </Modal>
-      <Button
-        variant="outline"
-        onClick={() => open()}
-        leftIcon={<IconPlayerPauseFilled/>}
-        color="dark"
-      >
-        Pause
-      </Button>
+      { isMobile ? mobileButton : defaultButton }
     </>
   )
 }

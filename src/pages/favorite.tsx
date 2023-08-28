@@ -1,7 +1,7 @@
 import QuizList from '../components/QuizList'
 import QuizControllBar from '../components/QuizControllBar'
 import useQuizzes from '../hooks/useQuizzes'
-import { Center, Grid, Loader } from '@mantine/core'
+import { Center, Grid, Group, Loader } from '@mantine/core'
 import FilteringModal from '../components/FilteringModal'
 import { KeywordOption, QuizRequestParams } from '../types'
 import { useState } from 'react'
@@ -62,7 +62,7 @@ export default function Search() {
         height={!!quizzes ? 110 : 60}
         total={size}
         buttons={
-          <>
+          <Group>
             <FilteringModal
               apply={toFilter}
               opened={opened}
@@ -71,9 +71,8 @@ export default function Search() {
             />
             <QuizShuffleButton
               apply={toShuffle}
-              ml="xs"
             />
-          </>
+          </Group>
         }
         pagination={
           <Grid.Col mb={5}>

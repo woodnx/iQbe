@@ -1,6 +1,7 @@
-import { Button, DefaultProps, Group, Modal, Selectors, Text, createStyles } from "@mantine/core";
+import { ActionIcon, Button, DefaultProps, Group, Modal, Selectors, Text, createStyles } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { IconTrash } from "@tabler/icons-react";
+import { useIsMobile } from "../hooks";
 
 const useStyles = createStyles((theme) => ({
   button: {
@@ -10,7 +11,14 @@ const useStyles = createStyles((theme) => ({
     '&:hover': {
       backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[5] : theme.colors.gray[0],
     },
-  }
+  },
+  mobileButton: {
+    ...theme.fn.focusStyles(),
+    backgroundColor: "#fff",
+    '&:hover': {
+      backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[5] : theme.colors.gray[0],
+    },
+  },
 }));
 
 type MylistDeleteModalStyleNames = Selectors<typeof useStyles>;
@@ -26,6 +34,7 @@ export default function MylistDeleteModal({
   onDelete,
 }: Props){
   const [ opened, { open, close } ] = useDisclosure();
+  const isMobile = useIsMobile();
   const icon = <IconTrash/>;
   // @ts-ignore
   const { classes } = useStyles({}, { name: 'MylistDeleteModal', classNames, styles, unstyled });
@@ -35,12 +44,37 @@ export default function MylistDeleteModal({
     close();
   }
 
+  const defaultButton = (
+    <Button 
+      className={classes.button}
+      variant="outline" 
+      radius="xl" 
+      leftIcon={icon}
+      onClick={open}
+    >Delete</Button>
+  );
+
+  const mobileButton = (
+    <ActionIcon
+      className={classes.mobileButton}
+      size="lg" 
+      color="blue"
+      variant="subtle"
+      onClick={open}
+    >
+      { icon }
+    </ActionIcon>
+  );
+
   return (
     <>
       <Modal 
         opened={opened} 
         onClose={close}
         title={<Text weight={500} size="xl">Delete Mylist</Text>}
+        size={ isMobile ? 'xs' : 'md' }
+        pos="absolute"
+        left="-5%"
         centered
       >
         <Text>マイリストを削除しますか？</Text>
@@ -58,15 +92,7 @@ export default function MylistDeleteModal({
           >Delete</Button>
         </Group>
       </Modal>
-      <Button 
-        className={classes.button}
-        variant="outline" 
-        radius="xl" 
-        leftIcon={icon}
-        onClick={open}
-      >
-        Delete
-      </Button>
+      { isMobile ? mobileButton : defaultButton }
     </>
   )
 }

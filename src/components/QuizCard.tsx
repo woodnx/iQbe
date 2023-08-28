@@ -48,7 +48,6 @@ export default function QuizCard({
           workbookName={quiz.workbook}
           levelColor={quiz.level}
           date={quiz.date}
-          size="lg"
         />
       </Flex>
     </Card>

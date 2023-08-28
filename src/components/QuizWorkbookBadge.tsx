@@ -1,4 +1,5 @@
 import { Badge, BadgeProps } from "@mantine/core";
+import { useIsMobile } from "../hooks";
 
 interface Props extends BadgeProps {
   workbookName: string,
@@ -12,8 +13,15 @@ export function QuizWorkbookBadge({
   date,
   ...other
 }: Props) {
+  const isMobile = useIsMobile();
+
   return (
-    <Badge color={levelColor} radius="sm" {...other}>
+    <Badge 
+      color={levelColor} 
+      radius="sm"
+      size={ isMobile ? "md" : "lg" }
+      {...other}
+    >
       {workbookName}({date.slice(0, 4)})
     </Badge>
   )

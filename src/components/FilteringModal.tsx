@@ -1,4 +1,4 @@
-import { Button, DefaultProps, Group, Modal } from "@mantine/core";
+import { ActionIcon, Button, DefaultProps, Group, Modal } from "@mantine/core";
 import { useState } from "react";
 import FilteringWorkbook from "./FilteringWorkbook";
 import FilteringLevel from "./FilteringLevel";
@@ -35,6 +35,28 @@ export default function FilteringModal({
   const [ perPage, setPerPage ] = useState(100);
   const isMobile = useIsMobile();
 
+  const defaultButton = (
+    <Button 
+      onClick={onOpen}
+      leftIcon={<IconFilter/>}
+      variant="outline"
+      color="orange"
+      { ...others }
+    >Filtering</Button>
+  );
+
+  const mobileButton = (
+    <ActionIcon 
+      onClick={onOpen}
+      color="orange" 
+      size="lg" 
+      radius="xl" 
+      variant="outline"
+    >
+      <IconFilter/>
+    </ActionIcon>
+  )
+
   return (
     <>
       <Modal 
@@ -43,6 +65,8 @@ export default function FilteringModal({
         title="Filtering Quiz"
         size="lg"
         fullScreen={isMobile}
+        left={-0.5}
+        pos="absolute"
       >
         <FilteringWorkbook
           value={workbooks} 
@@ -73,13 +97,7 @@ export default function FilteringModal({
           >Search</Button>
         </Group>
       </Modal>
-      <Button 
-        onClick={onOpen}
-        leftIcon={<IconFilter/>}
-        variant="outline"
-        color="orange"
-        { ...others }
-      >Filtering</Button>
+      { isMobile ? mobileButton : defaultButton }
     </>
   );
 }

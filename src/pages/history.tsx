@@ -7,7 +7,7 @@ import FilteringModal from "../components/FilteringModal";
 import QuizShuffleButton from "../components/QuizShuffleButton";
 import QuizPagination from "../components/QuizPagination";
 import QuizList from "../components/QuizList";
-import { Center, Grid, Loader } from "@mantine/core";
+import { Center, Grid, Group, Loader } from "@mantine/core";
 import HistorySelectJudgement from "../components/HistorySelectJudgement";
 import HistoryDateRange from "../components/HistoryDateRange";
 import dayjs from "../plugins/dayjs";
@@ -96,7 +96,7 @@ export default function History() {
         height={!!quizzes && quizzes.length != 0 ? 180 : 140}
         total={size}
         buttons={
-          <>
+          <Group>
             <FilteringModal
               apply={toFilter}
               opened={opened}
@@ -105,9 +105,8 @@ export default function History() {
             />
             <QuizShuffleButton
               apply={toShuffle}
-              ml={7}
             />
-          </>
+          </Group>
         }
         pagination={
           <>
