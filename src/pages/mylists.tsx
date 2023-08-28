@@ -7,7 +7,6 @@ import QuizPagination from "../components/QuizPagination";
 import QuizList from "../components/QuizList";
 import { KeywordOption, MylistInformation, QuizRequestParams } from "../types";
 import { useEffect, useState } from "react";
-import { useDisclosure } from "@mantine/hooks";
 import useQuizzes from "../hooks/useQuizzes";
 import { useMylistInfomations } from "../hooks/useMylists";
 import MylistDeleteModal from "../components/MylistDeleteModal";
@@ -21,7 +20,6 @@ export default function Mylist(){
   const mylistId = pageParams.mylistId;
   const [ params, setParams ] = useState<QuizRequestParams>({ perPage: 100, mylistId: mylistId });
   const [ activePage, setPage ] = useState(1);
-  const [ opened, { open, close } ] = useDisclosure(false);
   const { quizzes } = useQuizzes(params, `/mylist`);
   const { mylists, mutate } = useMylistInfomations();
 
@@ -55,7 +53,6 @@ export default function Mylist(){
       keyword, 
       keywordOption,
     })
-    close();
   }
 
   const toShuffle = (
@@ -129,9 +126,6 @@ export default function Mylist(){
           <Group>
             <FilteringModal
               apply={toFilter}
-              opened={opened}
-              onOpen={open}
-              onClose={close}
             />
             <QuizShuffleButton
               apply={toShuffle}
