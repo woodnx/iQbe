@@ -10,31 +10,28 @@ interface SendData {
 
 const router: Router = express.Router()
 
-router.get('/:user_id/:start/:end', async (req, res) => {
-  const start   = `${req.params.start} 00:00:00`
-  const end     = `${req.params.end} 23:59:59`
-  const user_id = Number(req.params.user_id)
+router.get('/:since/:until', async (req, res) => {
+  const since = dayjs(Number(req.params.since)).format('YYYY-MM-DD HH:mm:ss');
+  const until = dayjs(Number(req.params.until)).format('YYYY-MM-DD HH:mm:ss');
+  const user_id = req.userId;
 
   try {
     const results = await Promise.all(
-      [0, 1, 2].map(async i => {
-        const r = await knex('histories')
+      [0, 1, 2].map(async i => (await knex('histories')
         .count('quiz_id', {as: 'count'})
         .where('user_id', user_id)
         .andWhere('judgement', i)
-        .andWhereBetween('practiced', [ start, end ])
-        .first()
-        
-        return !!r ? r.count : 0 
-      }))
+        .andWhereBetween('practiced', [ since, until ])
+        .first())?.count
+    ));
     
     const data: SendData = {
-      right: results[1],
-      wrong: results[0],
-      through: results[2],
-    }
+      right: results[1] || 0,
+      wrong: results[0] || 0,
+      through: results[2] || 0,
+    };
 
-    res.send(data)
+    res.status(200).send(data);
   } catch(e) {
     console.error(e)
   }
@@ -45,20 +42,16 @@ router.post('/', async (req, res) => {
   const judgement: number = req.body.judgement
   const practiced: string = dayjs().format('YYYY-MM-DD HH:mm:ss')
 
-  if (!quiz_id || !judgement) {
+  if (!quiz_id || judgement >= 3 || judgement < 0) {
     res.status(400).send('Undefined list name or judgement')
     return
   }
 
   try {
-    const uid = req.user.uid
+    const user_id = req.userId
 
     await knex.transaction(async trx => {
-      const user_id: number = await trx('users')
-      .select('id')
-      .where("uid", uid)
-      .first()
-
+      
       const data = {
         quiz_id,
         user_id,

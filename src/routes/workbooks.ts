@@ -6,7 +6,7 @@ const router: Router = express.Router()
 router.get('/', async (req, res) => {
   try {
     const results = await knex('workbooks').select('*')
-    res.send(results)
+    res.status(200).send(results)
   } catch(err) {
     console.error(err)
   } 
@@ -22,7 +22,7 @@ router.get('/color', async (req, res) => {
     )
     .innerJoin('levels', 'workbooks.level_id', 'levels.id')
 
-    res.send(results)
+    res.status(200).send(results)
   } catch(err) {
     console.error(err)
   } 

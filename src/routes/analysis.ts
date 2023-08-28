@@ -8,7 +8,7 @@ const router = express.Router()
 router.get('/status/:date/:period', async (req, res) => {
   const userId = req.userId
   const date = req.params.date
-  const _period = req.query.period || 'day'
+  const _period = req.params.period
 
   const period: Period = (_period == 'week' || _period == 'month') ? _period : 'day'
 
@@ -23,32 +23,32 @@ router.get('/status/:date/:period', async (req, res) => {
         .count('quiz_id', {as: 'count'})
         .where('user_id', userId)
         .where('judgement', 1)
-        .whereBetween('practiced', [range[0], range[1]])),
+        .whereBetween('practiced', [range[0], range[1]]))[0].count,
 
         wrong: (await knex('histories')
         .count('quiz_id', {as: 'count'})
         .where('user_id', userId)
         .where('judgement', 0)
-        .whereBetween('practiced', [range[0], range[1]])),
+        .whereBetween('practiced', [range[0], range[1]]))[0].count,
 
         through: (await knex('histories')
         .count('quiz_id', {as: 'count'})
         .where('user_id', userId)
         .where('judgement', 2)
-        .whereBetween('practiced', [range[0], range[1]])),
+        .whereBetween('practiced', [range[0], range[1]]))[0].count,
       }))
     )
-    res.send(results)
+    res.status(200).send(results)
   } catch(e) {
     console.error(e)
     res.send('An Error Occured')
   }
 })
 
-router.get('/ranking/all', async (req, res) => {
-  const _period = req.query.period　|| 'day'
-  const limit = (!!req.query.limit || Number(req.query.limit) > 6) ? Number(req.query.limit) : 6
-  const now = dayjs().format('YYYY-MM-DD HH:mm:ss')
+router.get('/ranking/all/:period', async (req, res) => {
+  const _period = req.params.period;
+  const limit = (!!req.query.limit || Number(req.query.limit) > 5) ? Number(req.query.limit) : 5
+  const now = dayjs().format()
 
   const period: Period = (_period == 'week' || _period == 'month') ? _period : 'day'
 
@@ -63,7 +63,7 @@ router.get('/ranking/all', async (req, res) => {
       count: knex.raw('COUNT(quiz_id)')
     })
     .innerJoin('users', 'user_id', 'users.id')
-    .whereBetween('practiced', [ ranges[6][0], ranges[6][1] ])
+    .whereBetween('practiced', [ ranges[0][0], ranges[0][1] ])
     .groupBy('user_id')
     .orderBy('rank')
     .limit(limit)
@@ -91,7 +91,7 @@ router.get('/ranking/all', async (req, res) => {
       }
     })
 
-    res.send(ranking)
+    res.status(200).send(ranking)
   }catch(e) {
     console.error(e)
     res.send('An Error Occured')
@@ -99,8 +99,8 @@ router.get('/ranking/all', async (req, res) => {
   
 })
 
-router.get('/ranking/account/', async (req, res) => {
-  const _period = req.query.period
+router.get('/ranking/personal/:period', async (req, res) => {
+  const _period = req.params.period
   const userId = req.userId
   const now = dayjs().format('YYYY-MM-DD HH:mm:ss')
 
@@ -147,10 +147,11 @@ router.get('/ranking/account/', async (req, res) => {
       rank: nowRank.length,
       name: isNodata ? '' : nowRank[0].name,
       count: isNodata ? 0 : nowRank[0].count,
-      compare: nowRank.length - prevRank.length
+      compare: nowRank.length - prevRank.length,
+      userId,
     }
 
-    res.send(ranking)
+    res.status(200).send(ranking)
   }catch(e){
     console.error(e)
     res.send('An Error Occured')
