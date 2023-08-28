@@ -4,6 +4,7 @@ import { QuizWorkbookBadge } from "./QuizWorkbookBadge";
 import QuizMylistButton from "./QuizMylistButton";
 import { Quiz } from "../types";
 import { useIsMobile } from "../hooks";
+import { useMylistInfomations } from "../hooks/useMylists";
 
 interface Props extends DefaultProps {
   quiz: Quiz
@@ -16,6 +17,7 @@ export function PracticeQuizInfo({
   ...other
 }: Props) {
   const isMobile = useIsMobile();
+  const { mylists } = useMylistInfomations();
 
   return (
     <Card p="sm" radius="sm" { ...other }>
@@ -33,6 +35,8 @@ export function PracticeQuizInfo({
         <QuizMylistButton
           quizId={quiz.id}
           registerdMylistId={quiz.registerdMylist}
+          isMobile={isMobile}
+          mylists={mylists || []}
         />
         <QuizWorkbookBadge
           workbookName={quiz.workbook}
