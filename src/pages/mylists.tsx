@@ -112,25 +112,21 @@ export default function Mylist(){
           >
             <Group position="apart">
               <Text weight={700} size={25}>{ mylistName }</Text>
-              <div>
+              <Group spacing="md">
                 <MylistEditModal
                   newNameProps={newNameProps}
                   onSave={toEdit}
-                  styles={(theme) => ({
-                    button: {
-                      marginRight: theme.spacing.xs
-                    }
-                  })}
                 />
                 <MylistDeleteModal
                   onDelete={toDelete}
                 />
-              </div>
+              </Group>
+                
             </Group>
           </Card>
         }
         buttons={
-          <>
+          <Group>
             <FilteringModal
               apply={toFilter}
               opened={opened}
@@ -139,9 +135,8 @@ export default function Mylist(){
             />
             <QuizShuffleButton
               apply={toShuffle}
-              ml="xs"
             />
-          </>
+          </Group>
         }
         pagination={
           <Grid.Col span={12} mb="xs">

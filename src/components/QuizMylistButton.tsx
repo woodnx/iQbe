@@ -1,4 +1,4 @@
-import { Button, Center, Checkbox, DefaultProps, Divider, Loader, Menu, createStyles } from "@mantine/core";
+import { ActionIcon, Button, Center, Checkbox, DefaultProps, Divider, Loader, Menu, createStyles } from "@mantine/core";
 import { IconPlaylistAdd, IconPlus } from "@tabler/icons-react";
 import { useDisclosure } from "@mantine/hooks";
 import MylistCreateModal from "./MylistCreateModal";
@@ -6,6 +6,7 @@ import axios from "../plugins/axios";
 import { MylistInformation } from "../types";
 import { useEffect, useState } from "react";
 import { useMylistInfomations } from "../hooks/useMylists";
+import { useIsMobile } from "../hooks";
 
 const useStyle = createStyles((theme) => ({
   button: {
@@ -27,6 +28,7 @@ export default function QuizMylistButton({
   registerdMylistId,
 }: Props) {
   const [ creating, create ] = useDisclosure(false);
+  const isMobile = useIsMobile();
   const { classes } = useStyle();
   const { mylists } = useMylistInfomations();
   const [ selectedMyListIdx, setSelectedMylistIdx ] = useState<(number | undefined)[]>([]);
@@ -61,8 +63,27 @@ export default function QuizMylistButton({
       }});
       setSelectedMylistIdx(selectedMyListIdx.filter(idx => idx != arrayIdx));
     }
-    
   }
+
+  const defaultButton = (
+    <Button
+      classNames={{root: classes.button}}
+      leftIcon={<IconPlaylistAdd />}
+      variant="outline"
+      size="xs"
+      bg="#fff"
+    >Save</Button>
+  );
+
+  const mobileButton = (
+    <ActionIcon
+      size="md" 
+      color="blue"
+      variant="light"
+    >
+      <IconPlaylistAdd/>
+    </ActionIcon>
+  );
 
   return (
     <>
@@ -80,14 +101,7 @@ export default function QuizMylistButton({
         closeOnItemClick={false}
       >
         <Menu.Target>
-          <Button
-            classNames={{root: classes.button}}
-            leftIcon={<IconPlaylistAdd />}
-            variant="outline"
-            size="xs"
-            bg="#fff"
-          >Save
-          </Button>
+          { isMobile ? mobileButton : defaultButton }
         </Menu.Target>
         <Menu.Dropdown>
           {

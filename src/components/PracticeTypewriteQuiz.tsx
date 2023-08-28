@@ -1,6 +1,7 @@
 import { Card, DefaultProps, Overlay, Progress, Text } from "@mantine/core";
 import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
 import 'react-circular-progressbar/dist/styles.css';
+import { useIsMobile } from "../hooks";
 
 interface Props extends DefaultProps {
   question: string,
@@ -19,6 +20,7 @@ export default function PracticeTypewriteQuiz({
   count,
   countlimit = 5000,
 }: Props) {
+  const isMobile = useIsMobile();
   const throughval = 100 - (timelimit - time) / timelimit * 100;
   const countval = 100 - (countlimit - count) / countlimit * 100;
 
@@ -26,7 +28,7 @@ export default function PracticeTypewriteQuiz({
     <>
       <Progress value={throughval} radius="xs" size="lg" bg="blue.1" striped />
       <Card p="sm" radius="sm" bg="gray.1" mih="7em">
-        <Text>
+        <Text fz={ isMobile ? 15 : 16 }>
           {question}
         </Text>
         {!visible && 
@@ -45,6 +47,5 @@ export default function PracticeTypewriteQuiz({
         }
       </Card>
     </>
-   
   );
 }

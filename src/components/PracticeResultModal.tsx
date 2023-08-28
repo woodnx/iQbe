@@ -1,4 +1,5 @@
 import { Button, Center, Modal, ModalProps, Space, Stack, Title } from "@mantine/core";
+import { useIsMobile } from "../hooks";
 
 interface Props extends ModalProps {
   rightTotal: number,
@@ -26,38 +27,52 @@ export default function PracticeResultModal({
   onQuit,
   ...others
 }: Props) {
+  const isMobile = useIsMobile();
   const rate = rightTotal / quizzesTotal;
   const message = defineMessage(rate);
 
   return (
-    <Modal opened={opened} onClose={onClose} withCloseButton={false} {...others}>
+    <Modal
+      opened={opened}
+      onClose={onClose}
+      withCloseButton={false}
+      closeOnClickOutside={false}
+      size={isMobile ? 'xs' : 'md'}
+      pos="absolute"
+      left="-5%"
+      {...others}
+    >
       <Center>
         <Title>{ message }</Title>
       </Center>
       <Space h="md"/>
-      <Stack spacing="md" h={300} sx={(theme) => ({ backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[8] : theme.colors.gray[0] })}>
-        <Button 
-          size="lg" 
-          color="blue.9" 
-          onClick={() => { 
-            onRetry(); 
+      <Stack
+        spacing="md"
+        h={300}
+        sx={(theme) => ({ backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[8] : theme.colors.gray[0] })}
+      >
+        <Button
+          size="lg"
+          color="blue.9"
+          onClick={() => {
+            onRetry();
             onClose();
           }}
         >やりなおす</Button>
-        <Button 
-          size="lg" 
-          color="blue.4" 
-          onClick={() => { 
-            onTry(); 
-            onClose(); 
+        <Button
+          size="lg"
+          color="blue.4"
+          onClick={() => {
+            onTry();
+            onClose();
           }}>違う問題をする</Button>
         {/* <Button size="lg" color="green">Searchに戻る</Button> */}
-        <Button 
-          size="lg" 
-          variant="outline" 
-          color="red" 
-          onClick={() => { 
-            onQuit(); 
+        <Button
+          size="lg"
+          variant="outline"
+          color="red"
+          onClick={() => {
+            onQuit();
             onClose();
           }}>クイズをやめる</Button>
       </Stack>

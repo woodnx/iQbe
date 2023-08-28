@@ -1,7 +1,7 @@
-import { Button, DefaultProps, Group, Modal, Selectors, Text, TextInput, createStyles } from "@mantine/core";
+import { ActionIcon, Button, DefaultProps, Group, Modal, Selectors, Text, TextInput, createStyles } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { IconPencil } from "@tabler/icons-react";
-import { formInputProps } from "../hooks";
+import { formInputProps, useIsMobile } from "../hooks";
 
 const useStyles = createStyles((theme) => ({
   button: {
@@ -11,7 +11,14 @@ const useStyles = createStyles((theme) => ({
     '&:hover': {
       backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[5] : theme.colors.gray[0],
     },
-  }
+  },
+  mobileButton: {
+    ...theme.fn.focusStyles(),
+    backgroundColor: "#fff",
+    '&:hover': {
+      backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[5] : theme.colors.gray[0],
+    },
+  },
 }));
 
 type MylistEditModalStylesNames = Selectors<typeof useStyles>;
@@ -29,6 +36,7 @@ export default function MylistEditModal({
   onSave,
 }: Props){
   const [ opened, { open, close } ] = useDisclosure();
+  const isMobile = useIsMobile();
   const icon = <IconPencil/>;
   // @ts-ignore
   const { classes } = useStyles({}, { name: 'MylistEditModal', classNames, styles, unstyled });
@@ -38,12 +46,37 @@ export default function MylistEditModal({
     close();
   }
 
+  const defaultButton = (
+    <Button 
+      className={classes.button}
+      variant="outline" 
+      radius="xl" 
+      leftIcon={icon}
+      onClick={open}
+    >Edit</Button>
+  );
+
+  const mobileButton = (
+    <ActionIcon
+      className={classes.mobileButton}
+      size="lg" 
+      color="blue"
+      variant="subtle"
+      onClick={open}
+    >
+      { icon }
+    </ActionIcon>
+  );
+
   return (
     <>
       <Modal 
         opened={opened} 
         onClose={close}
         title={<Text weight={500} size="xl">Edit Mylist</Text>}
+        size={ isMobile ? 'xs' : 'md' }
+        pos="absolute"
+        left="-5%"
         centered
       >
         <TextInput
@@ -61,15 +94,7 @@ export default function MylistEditModal({
           >Save</Button>
         </Group>
       </Modal>
-      <Button 
-        className={classes.button}
-        variant="outline" 
-        radius="xl" 
-        leftIcon={icon}
-        onClick={open}
-      >
-        Edit
-      </Button>
+      { isMobile ? mobileButton : defaultButton }
     </>
   )
 }
