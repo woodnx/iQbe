@@ -182,7 +182,10 @@ export default function DefaultLayout() {
           size={70} 
           radius="xl"
           variant="light"
-          onClick={() => navigate('/')}
+          onClick={() => {
+            setActive(0); 
+            navigate('/');
+          }}
         >
           <IconHome size="2rem"/>
         </ActionIcon>
@@ -190,7 +193,10 @@ export default function DefaultLayout() {
           size={70} 
           radius="xl"
           variant="light"
-          onClick={() => navigate('/search')}
+          onClick={() => {
+            setActive(1); 
+            navigate('/search');
+          }}
         >
           <IconSearch size="2rem"/>
         </ActionIcon>
@@ -198,7 +204,10 @@ export default function DefaultLayout() {
           size={70} 
           radius="xl"
           variant="light"
-          onClick={() => navigate('/practice')}
+          onClick={() => {
+            setActive(2); 
+            navigate('/practice');
+          }}
         >
           <IconSchool size="2rem"/>
         </ActionIcon>
