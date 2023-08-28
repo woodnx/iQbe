@@ -1,4 +1,4 @@
-import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { onAuthStateChanged } from "firebase/auth";
 import { useLayoutEffect } from "react";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { AppShell, Center, Container, Group, Loader, NavLink, Navbar, ThemeIcon, createStyles } from "@mantine/core";
@@ -10,6 +10,7 @@ import useUserStore from "../store/user";
 import LogoutButton from "../components/LogoutButton";
 import { useMylistInfomations } from "../hooks/useMylists";
 import Logo from "../components/Logo";
+import { auth } from "../plugins/firebase";
 
 const mockdata = [
   { 
@@ -55,8 +56,8 @@ export default function DefaultLayout() {
   const navigate = useNavigate();
   const location = useLocation();
   const setIdToken = useUserStore((state) => state.setIdToken);
-  const { mylists } = useMylistInfomations();
-  const auth = getAuth();
+  const idToken = useUserStore((state) => state.idToken);
+  const { mylists } = useMylistInfomations(!loading);
   
   useLayoutEffect(() => {
     let ignore = false;
@@ -74,12 +75,12 @@ export default function DefaultLayout() {
         });
         return; 
       }
-      await setIdToken();
+      if (!idToken) await setIdToken();
       setLoading(false);
     });
     return () => {
-      ignore = true
-      authStateChanged()
+      ignore = true;
+      authStateChanged();
     }
   }, []);
 

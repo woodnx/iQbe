@@ -47,7 +47,7 @@ export default function QuizMylistButton({
   }
 
   const saveToList = async (mylistId: number, arrayIdx: number) => {
-    if (!selectedMyListIdx.includes(mylistId)) { // add to mylist
+    if (!selectedMyListIdx.includes(arrayIdx)) { // add to mylist
       await axios.put('/mylists/quiz', {
         quizId,
         mylistId: mylistId,
