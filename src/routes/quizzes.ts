@@ -19,6 +19,7 @@ interface QuizRequest extends Request {
     since?: string,
     until?: string,
     judgement?: string[],
+    mylistId?: string,
   }
 }
 
@@ -43,6 +44,7 @@ router.get('/:listName?', async (req: QuizRequest, res) => {
   const since = req.query.since
   const until = req.query.until
   const judgement = req.query.judgement
+  const mylistId = req.query.mylistId
 
   const userId = req.userId
   const listName = req.params.listName
@@ -125,12 +127,15 @@ router.get('/:listName?', async (req: QuizRequest, res) => {
         .innerJoin('histories', 'histories.quiz_id', 'quizzes.id')
         .where('histories.user_id', userId)
         .whereBetween('histories.practiced', [s, u])
+        .orderBy('histories.practiced', 'desc')
 
         if (!!judgement) builder.whereIn('histories.judgement', judgement)
-      }else {
+      }else if (listName === 'mylist') {
         builder
         .innerJoin('mylists_quizzes', 'mylists_quizzes.quiz_id', 'quizzes.id')
-        //.innerJoin('mylist_informations', 'mylist_informations.')
+        .innerJoin('mylist_informations', 'mylist_informations.id', 'mylists_quizzes.mylist_id')
+        .where('mylist_informations.id', mylistId)
+        .orderBy('mylists_quizzes.registered', 'desc');
       }
 
       //console.log(builder.toSQL())
