@@ -3,12 +3,13 @@ import { DefaultProps, Grid, MantineNumberSize, SimpleGrid } from "@mantine/core
 interface Props extends DefaultProps{
   width?: MantineNumberSize,
   horizonal?: boolean,
-  onlyname?: boolean,
+  withname?: boolean,
 }
 
 export default function Logo({
   width = "md",
   horizonal = false,
+  withname = true,
   ...others
 }: Props) {  
   const HorizonalLogo = (
@@ -31,7 +32,10 @@ export default function Logo({
 
   return (
     <>
-    {horizonal ?  HorizonalLogo : NamedLogo}
+    {
+    !withname ?
+    <img src="../../iqbe.png" width={width} />
+    : horizonal ?  HorizonalLogo : NamedLogo}
     </>
   );
 }
