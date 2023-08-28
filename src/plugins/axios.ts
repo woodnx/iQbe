@@ -18,8 +18,19 @@ axios.interceptors.request.use(async (request) => {
   request.headers.Authorization = idToken;
   
   return request;
-},(error) => {
+},
+(error) => {
   // リクエスト エラーの処理
+  return Promise.reject(error);
+});
+
+axios.interceptors.response.use((responce) => {
+  return responce;
+},
+(error) => {
+  if (error.errorInfo.code === 'auth/id-token-expired')
+    useUserStore.getState().setIdToken();
+
   return Promise.reject(error);
 });
 
