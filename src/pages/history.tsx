@@ -1,6 +1,5 @@
 import { useState } from "react"
 import { Judgement, KeywordOption, QuizRequestParams } from "../types"
-import { useDisclosure } from "@mantine/hooks";
 import useQuizzes from "../hooks/useQuizzes";
 import QuizControllBar from "../components/QuizControllBar";
 import FilteringModal from "../components/FilteringModal";
@@ -21,7 +20,6 @@ export default function History() {
     dayjs().endOf('day').valueOf(),
   ]);
   const [ params, setParams ] = useState<QuizRequestParams>({ perPage: 100, since: dates[0], until: dates[1] });
-  const [ opened, { open, close } ] = useDisclosure(false);
   const { quizzes } = useQuizzes(params, '/history');
   const { histories } = useHistories(dates[0], dates[1]);
 
@@ -48,7 +46,6 @@ export default function History() {
       keyword, 
       keywordOption,
     });
-    close();
   }
 
   const toShuffle = (
@@ -99,9 +96,6 @@ export default function History() {
           <Group>
             <FilteringModal
               apply={toFilter}
-              opened={opened}
-              onOpen={open}
-              onClose={close}
             />
             <QuizShuffleButton
               apply={toShuffle}

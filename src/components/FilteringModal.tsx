@@ -7,6 +7,7 @@ import FilteringWord from "./FilteringWord";
 import { IconFilter, IconSearch } from "@tabler/icons-react";
 import { KeywordOption } from "../types";
 import FilteringQuizNumber from "./FilteringQuizNumber";
+import { useDisclosure } from "@mantine/hooks";
 
 interface FilteringModalProps extends DefaultProps {
   apply: (
@@ -16,14 +17,15 @@ interface FilteringModalProps extends DefaultProps {
     keywordOption?: KeywordOption,
     perPage?: number, 
   ) => void,
-  opened: boolean,
-  onOpen: () => void,
-  onClose: () => void,
+  initalState?: boolean,
+  opened?: boolean,
+  onOpen?: () => void,
+  onClose?: () => void,
 };
 
 export default function FilteringModal({
   apply,
-  opened,
+  opened: outerOpened,
   onOpen,
   onClose,
   ...others
@@ -33,11 +35,16 @@ export default function FilteringModal({
   const [ keywordProps ] = useInput('');
   const [ keywordOption, setkeywordOption ] = useState<KeywordOption>('1')
   const [ perPage, setPerPage ] = useState(100);
+  const [ opened, { open, close } ] = useDisclosure();
   const isMobile = useIsMobile();
+
+  const innerOpened = outerOpened || opened;
+  const innerOnOpen = onOpen || open;
+  const innerOnClose = onClose || close;
 
   const defaultButton = (
     <Button 
-      onClick={onOpen}
+      onClick={innerOnOpen}
       leftIcon={<IconFilter/>}
       variant="outline"
       color="orange"
@@ -47,7 +54,7 @@ export default function FilteringModal({
 
   const mobileButton = (
     <ActionIcon 
-      onClick={onOpen}
+      onClick={innerOnOpen}
       color="orange" 
       size="lg" 
       radius="xl" 
@@ -60,8 +67,8 @@ export default function FilteringModal({
   return (
     <>
       <Modal 
-        opened={opened} 
-        onClose={onClose} 
+        opened={innerOpened} 
+        onClose={innerOnClose}
         title="Filtering Quiz"
         size="lg"
         fullScreen={isMobile}
@@ -93,7 +100,10 @@ export default function FilteringModal({
         <Group mt="xl" position="right">
           <Button 
             leftIcon={<IconSearch/>}
-            onClick={() => apply(workbooks, levels, keywordProps.value, keywordOption, perPage)}
+            onClick={() => { 
+              apply(workbooks, levels, keywordProps.value, keywordOption, perPage);
+              innerOnClose();
+            }}
           >Search</Button>
         </Group>
       </Modal>
