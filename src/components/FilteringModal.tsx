@@ -1,12 +1,12 @@
-import { Button, DefaultProps, Group, Modal } from "@mantine/core"
-import { useState } from "react"
-import FilteringWorkbook from "./FilteringWorkbook"
-import FilteringLevel from "./FilteringLevel"
-import { useInput, useIsMobile } from "../hooks"
-import FilteringWord from "./FilteringWord"
-import { IconFilter, IconSearch } from "@tabler/icons-react"
-import { KeywordOption } from "../types"
-import FilteringQuizNumber from "./FilteringQuizNumber"
+import { Button, DefaultProps, Group, Modal } from "@mantine/core";
+import { useState } from "react";
+import FilteringWorkbook from "./FilteringWorkbook";
+import FilteringLevel from "./FilteringLevel";
+import { useInput, useIsMobile } from "../hooks";
+import FilteringWord from "./FilteringWord";
+import { IconFilter, IconSearch } from "@tabler/icons-react";
+import { KeywordOption } from "../types";
+import FilteringQuizNumber from "./FilteringQuizNumber";
 
 interface FilteringModalProps extends DefaultProps {
   apply: (
@@ -19,7 +19,7 @@ interface FilteringModalProps extends DefaultProps {
   opened: boolean,
   onOpen: () => void,
   onClose: () => void,
-}
+};
 
 export default function FilteringModal({
   apply,
@@ -28,12 +28,12 @@ export default function FilteringModal({
   onClose,
   ...others
 }: FilteringModalProps) {
-  const [ workbooks, setWorkbooks ] = useState<string[]>([])
-  const [ levels, setLevels ] = useState<string[]>([])
-  const [ keywordProps ] = useInput('')
+  const [ workbooks, setWorkbooks ] = useState<string[]>([]);
+  const [ levels, setLevels ] = useState<string[]>([]);
+  const [ keywordProps ] = useInput('');
   const [ keywordOption, setkeywordOption ] = useState<KeywordOption>('1')
   const [ perPage, setPerPage ] = useState(100);
-  const isMobile = useIsMobile()
+  const isMobile = useIsMobile();
 
   return (
     <>
@@ -81,5 +81,5 @@ export default function FilteringModal({
         { ...others }
       >Filtering</Button>
     </>
-  )
+  );
 }
