@@ -16,8 +16,7 @@ function generateRange(basicDate: string, period: ManipulateType){
     const start: string = date.subtract(idx, period).startOf(period).format('YYYY-MM-DD HH:mm:ss')
     return [ start, end ]
   })
-
-  console.log(ranges)
+  
   return ranges
 }
 
