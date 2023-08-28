@@ -76,7 +76,7 @@ export default function Practice() {
       case 5:
         result.open();
     }
-  }, [scene])
+  }, [scene]);
   
   useEffect(() => {
     filter.open();
