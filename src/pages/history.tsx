@@ -1,13 +1,12 @@
 import { useState } from "react"
 import { Judgement, KeywordOption, QuizRequestParams } from "../types"
-import { useDisclosure } from "@mantine/hooks";
 import useQuizzes from "../hooks/useQuizzes";
 import QuizControllBar from "../components/QuizControllBar";
 import FilteringModal from "../components/FilteringModal";
 import QuizShuffleButton from "../components/QuizShuffleButton";
 import QuizPagination from "../components/QuizPagination";
 import QuizList from "../components/QuizList";
-import { Center, Grid, Loader } from "@mantine/core";
+import { Center, Grid, Group, Loader } from "@mantine/core";
 import HistorySelectJudgement from "../components/HistorySelectJudgement";
 import HistoryDateRange from "../components/HistoryDateRange";
 import dayjs from "../plugins/dayjs";
@@ -21,7 +20,6 @@ export default function History() {
     dayjs().endOf('day').valueOf(),
   ]);
   const [ params, setParams ] = useState<QuizRequestParams>({ perPage: 100, since: dates[0], until: dates[1] });
-  const [ opened, { open, close } ] = useDisclosure(false);
   const { quizzes } = useQuizzes(params, '/history');
   const { histories } = useHistories(dates[0], dates[1]);
 
@@ -48,7 +46,6 @@ export default function History() {
       keyword, 
       keywordOption,
     });
-    close();
   }
 
   const toShuffle = (
@@ -96,18 +93,14 @@ export default function History() {
         height={!!quizzes && quizzes.length != 0 ? 180 : 140}
         total={size}
         buttons={
-          <>
+          <Group>
             <FilteringModal
               apply={toFilter}
-              opened={opened}
-              onOpen={open}
-              onClose={close}
             />
             <QuizShuffleButton
               apply={toShuffle}
-              ml={7}
             />
-          </>
+          </Group>
         }
         pagination={
           <>

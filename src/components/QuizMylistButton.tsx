@@ -1,11 +1,10 @@
-import { Button, Center, Checkbox, DefaultProps, Divider, Loader, Menu, createStyles } from "@mantine/core";
+import { ActionIcon, Button, Checkbox, DefaultProps, Divider, Menu, createStyles } from "@mantine/core";
 import { IconPlaylistAdd, IconPlus } from "@tabler/icons-react";
 import { useDisclosure } from "@mantine/hooks";
 import MylistCreateModal from "./MylistCreateModal";
 import axios from "../plugins/axios";
 import { MylistInformation } from "../types";
 import { useEffect, useState } from "react";
-import { useMylistInfomations } from "../hooks/useMylists";
 
 const useStyle = createStyles((theme) => ({
   button: {
@@ -20,15 +19,18 @@ const useStyle = createStyles((theme) => ({
 interface Props extends DefaultProps {
   quizId: number,
   registerdMylistId: number[],
+  mylists: MylistInformation[],
+  isMobile?: boolean,
 }
 
 export default function QuizMylistButton({
   quizId,
   registerdMylistId,
+  mylists,
+  isMobile = false,
 }: Props) {
   const [ creating, create ] = useDisclosure(false);
   const { classes } = useStyle();
-  const { mylists } = useMylistInfomations();
   const [ selectedMyListIdx, setSelectedMylistIdx ] = useState<(number | undefined)[]>([]);
 
   useEffect(() => {
@@ -61,8 +63,27 @@ export default function QuizMylistButton({
       }});
       setSelectedMylistIdx(selectedMyListIdx.filter(idx => idx != arrayIdx));
     }
-    
   }
+
+  const defaultButton = (
+    <Button
+      classNames={{root: classes.button}}
+      leftIcon={<IconPlaylistAdd />}
+      variant="outline"
+      size="xs"
+      bg="#fff"
+    >Save</Button>
+  );
+
+  const mobileButton = (
+    <ActionIcon
+      size="md" 
+      color="blue"
+      variant="light"
+    >
+      <IconPlaylistAdd/>
+    </ActionIcon>
+  );
 
   return (
     <>
@@ -80,19 +101,11 @@ export default function QuizMylistButton({
         closeOnItemClick={false}
       >
         <Menu.Target>
-          <Button
-            classNames={{root: classes.button}}
-            leftIcon={<IconPlaylistAdd />}
-            variant="outline"
-            size="xs"
-            bg="#fff"
-          >Save
-          </Button>
+          { isMobile ? mobileButton : defaultButton }
         </Menu.Target>
         <Menu.Dropdown>
           {
-            !!mylists ? 
-            mylists.map((m, idx) => 
+            mylists?.map((m, idx) => 
               <Menu.Item 
                 key={m.id}
               >
@@ -103,8 +116,6 @@ export default function QuizMylistButton({
                 />
               </Menu.Item>
             )
-            : 
-            <Center><Loader/></Center>
           }
           <Divider/>
           <Menu.Item 

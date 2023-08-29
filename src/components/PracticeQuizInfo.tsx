@@ -3,6 +3,8 @@ import QuizFavoriteButton from "./QuizFavoriteButton";
 import { QuizWorkbookBadge } from "./QuizWorkbookBadge";
 import QuizMylistButton from "./QuizMylistButton";
 import { Quiz } from "../types";
+import { useIsMobile } from "../hooks";
+import { useMylistInfomations } from "../hooks/useMylists";
 
 interface Props extends DefaultProps {
   quiz: Quiz
@@ -14,10 +16,16 @@ export function PracticeQuizInfo({
   visible,
   ...other
 }: Props) {
+  const isMobile = useIsMobile();
+  const { mylists } = useMylistInfomations();
+
   return (
     <Card p="sm" radius="sm" { ...other }>
       <Group position="apart">
-        <Text fz="xl" fw="bold">{quiz.answer}</Text>
+        <Text 
+          fz={ isMobile ? "lg" : "xl" }
+          fw="bold"
+        >{quiz.answer}</Text>
         <QuizFavoriteButton 
           quizId={quiz.id}
           isFavorite={quiz.isFavorite}
@@ -27,15 +35,16 @@ export function PracticeQuizInfo({
         <QuizMylistButton
           quizId={quiz.id}
           registerdMylistId={quiz.registerdMylist}
+          isMobile={isMobile}
+          mylists={mylists || []}
         />
         <QuizWorkbookBadge
           workbookName={quiz.workbook}
           levelColor={quiz.level}
           date={quiz.date}
-          size="lg"
         />
       </Group>
       { !visible ? <Overlay blur={50} color="#fff" zIndex={100}/> : null }
     </Card>
-  )
+  );
 }
