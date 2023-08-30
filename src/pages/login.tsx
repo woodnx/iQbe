@@ -1,39 +1,48 @@
-import { useNavigate } from "react-router-dom"
-import { auth } from "../plugins/firebase"
-import { signInWithEmailAndPassword } from "firebase/auth"
-import { Button, Center, Grid, Paper, PasswordInput, TextInput } from "@mantine/core"
-import { useInput } from "../hooks"
-import Logo from "../components/Logo"
+import { useNavigate } from "react-router-dom";
+import { auth } from "../plugins/firebase";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { Button, Center, Grid, Paper, PasswordInput, TextInput } from "@mantine/core";
+import { useInput, useIsMobile } from "../hooks";
+import Logo from "../components/Logo";
+import { notifications } from "@mantine/notifications";
 
 export default function Login() {
-  const [ passwordProps, resetPassword ] = useInput('')
-  const [ emailProps, resetEmail ] = useInput('')
-  const navigate = useNavigate()
+  const [ passwordProps, resetPassword ] = useInput('');
+  const [ emailProps, resetEmail ] = useInput('');
+  const isMobile = useIsMobile();
+  const navigate = useNavigate();
 
-  const submit = (e: React.FormEvent<HTMLFormElement>) => {
+  const submit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    signInWithEmailAndPassword(auth, String(emailProps.value), String(passwordProps.value))
-    .then(async (_userCredential) => {
-      navigate('/')
-    })
-
-    resetPassword()
-    resetEmail()
+    try { 
+      await signInWithEmailAndPassword(auth, String(emailProps.value), String(passwordProps.value))
+      .then(async (_userCredential) => {
+        navigate('/');
+      });
+  
+      resetPassword();
+      resetEmail();
+    } catch {
+      notifications.show({
+        title: 'Login Error',
+        message: 'Wrong e-mail or password',
+        color: 'red',
+        withBorder: true,
+      });
+    }
   };
 
   return (
     <Paper shadow="md" p="35px" radius="lg">
       <Grid>
-        <Grid.Col span={4}>
+        <Grid.Col span={isMobile ? 12 : 4}>
           <Center>
             <Logo width={160} />
           </Center> 
         </Grid.Col>
-        <Grid.Col span={8}>
-          
+        <Grid.Col span={isMobile ? 12 : 8}>
           <form onSubmit={submit}>
-            
             <TextInput 
               {...emailProps}
               placeholder="Your Email"
@@ -60,5 +69,5 @@ export default function Login() {
         </Grid.Col>
       </Grid>
     </Paper>
-  )
+  );
 }
