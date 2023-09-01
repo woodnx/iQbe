@@ -9,6 +9,7 @@ import DraftLayout from "./draft";
 import History from "../pages/history";
 import Mylist from "../pages/mylists";
 import { useEffect } from "react";
+import Error from "../pages/error";
 
 const defineTitle = (pathname: string) => {
   if (pathname === '/') return 'Home';
@@ -40,6 +41,7 @@ export default function Root() {
         <Route path="/history" element={<History />}/>
         <Route path="/mylist/:mylistId" element={<Mylist />}/>
         <Route path="/login" element={<Login />}/>
+        <Route path="*" element={<Error />} />
       </Route>
     </Routes>
   );
