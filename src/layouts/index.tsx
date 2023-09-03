@@ -18,6 +18,7 @@ const defineTitle = (pathname: string) => {
   else if (pathname === '/favorite') return 'Favorite';
   else if (pathname === '/history') return 'History';
   else if (pathname.includes('mylist')) return 'Mylist';
+  else if (pathname === '/login') return 'Login';
   else return '';
 }
 

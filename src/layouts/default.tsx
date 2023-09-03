@@ -164,7 +164,11 @@ export default function DefaultLayout() {
 
   const footer = (
   <>
-    <Footer height={100}>
+    <Footer 
+      height={100}
+      withBorder={false}
+      left={-1}
+    >
       <Group 
         p="sm"
         position="apart" 
@@ -228,6 +232,7 @@ export default function DefaultLayout() {
         layout="alt"
         navbar={navbar}
         footer={!matches ? footer : <></>}
+        navbarOffsetBreakpoint="sm"
       >
         <Drawer 
           opened={opened} 
