@@ -17,10 +17,12 @@ export default defineConfig({
         'favicon.ico',
         'iqbe-icon.png',
       ],
+      devOptions: {
+        enabled: true,
+      },
       manifest: {
         theme_color: "#339AF0",
         background_color: "#ffffff",
-        display: "browser",
         scope: "/",
         start_url: "/",
         name: "iQbe",
@@ -39,7 +41,7 @@ export default defineConfig({
           {
             src: "/icon-384x384.png",
             sizes: "384x384",
-            type: "image/png"
+            type: "image/png",
           },
           {
             src: "/icon-512x512.png",
