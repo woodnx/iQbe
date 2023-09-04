@@ -4,7 +4,7 @@
   "scope": "/",
   "start_url": "/",
   "name": "iQbe",
-  "short_name": "iqbe",
+  "short_name": "iQbe",
   "display": "standalone",
   "icons": [
     {
@@ -25,8 +25,7 @@
     {
       "src": "/icon-512x512.png",
       "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
+      "type": "image/png"
     }
   ]
 }
