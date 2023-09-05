@@ -133,8 +133,9 @@ router.get('/:listName?', async (req: QuizRequest, res) => {
       }else if (listName === 'mylist') {
         builder
         .innerJoin('mylists_quizzes', 'mylists_quizzes.quiz_id', 'quizzes.id')
-        .innerJoin('mylist_informations', 'mylist_informations.id', 'mylists_quizzes.mylist_id')
-        .where('mylist_informations.id', mylistId)
+        .innerJoin('mylists', 'mylists.id', 'mylists_quizzes.mylist_id')
+        .where('mylists.id', mylistId)
+        .where('mylists.user_id', userId)
         .orderBy('mylists_quizzes.registered', 'desc');
       }
 
@@ -150,8 +151,8 @@ router.get('/:listName?', async (req: QuizRequest, res) => {
 
     const mylists = await knex('mylists_quizzes')
     .select('quiz_id', 'mylist_id')
-    .innerJoin('mylist_informations', 'mylists_quizzes.mylist_id', 'mylist_informations.id')
-    .where('mylist_informations.user_id', userId)
+    .innerJoin('mylists', 'mylists_quizzes.mylist_id', 'mylists.id')
+    .where('mylists.user_id', userId)
 
     const data = await Promise.all(
       quizzes.map(async quiz => {
