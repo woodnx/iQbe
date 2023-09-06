@@ -13,7 +13,7 @@ export default function Search() {
   const [ activePage, setPage ] = useState(1);
   const { quizzes } = useQuizzes(params, '/favorite')
 
-  const size = !!quizzes ? quizzes[0].size : 0
+  const size = !!quizzes && !!quizzes.length ? quizzes[0].size : 0
 
   const toFilter = (
     workbooks?: string[], 
@@ -81,9 +81,12 @@ export default function Search() {
         }
       />
       {!!quizzes ? 
+        quizzes.length !== 0 ? 
         <QuizList
           quizzes={quizzes}
-        /> 
+        />
+        :
+        <Center>No data</Center>  
       : 
         <Center>
           <Loader variant="dots"/>
