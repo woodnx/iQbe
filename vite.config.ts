@@ -7,8 +7,12 @@ import myManifest from './manifest.json';
 export default defineConfig({
   server: {
 		proxy: {
-			"^/api/.*": "http://localhost:4000",
-		},
+      '/api': {
+        target: 'http://localhost:9000/v2',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, ''),
+      },
+    }
 	},
   plugins: [
     react(),
