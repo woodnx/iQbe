@@ -6,7 +6,7 @@ const axios = _axios.create({
   headers: {
     'Content-Type': 'application/json',
     'X-Requested-With': 'XMLHttpRequest',
-    // 'Authorization': `Bearer ${idToken}`,
+    "Access-Control-Allow-Origin": "*",
   },
   responseType: 'json',
 });
