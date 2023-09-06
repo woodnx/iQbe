@@ -2,7 +2,7 @@ import _axios from "axios";
 import useUserStore from "../store/user";
 
 const axios = _axios.create({
-  baseURL: 'http://localhost:9000/v2',
+  baseURL: 'api',
   headers: {
     'Content-Type': 'application/json',
     'X-Requested-With': 'XMLHttpRequest',
