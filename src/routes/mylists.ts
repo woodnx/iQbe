@@ -7,7 +7,7 @@ const router: Router = express.Router()
 router.get('/', async (req, res) => {
   const userId = req.userId;
   try {
-    const all = await knex('mylist_informations')
+    const all = await knex('mylists')
     .select('name', 'id')
     .where('user_id', userId);
     
@@ -37,8 +37,8 @@ router.post('/', async (req, res) => {
         attr: 100
       };
 
-      const inserts = await trx('mylist_informations').insert(data);
-      const newList = await trx('mylist_informations').select().where('name', listName).first();
+      const inserts = await trx('mylists').insert(data);
+      const newList = await trx('mylists').select().where('name', listName).first();
       const message = `${inserts.length} new mylists saved (user: ${userId})`;
       
       res.status(201).send(newList);
@@ -91,11 +91,11 @@ router.put('/rename', async (req, res) => {
 
   try {
     await knex.transaction(async trx => {
-      const inserts = await trx('mylist_informations')
+      const inserts = await trx('mylists')
       .update('name', newName)
       .where('id', mylistId)
 
-      const allList = await trx('mylist_informations')
+      const allList = await trx('mylists')
       .select('name', 'id')
       .where('user_id', userId)
 
@@ -136,11 +136,11 @@ router.delete('/list', async (req, res) => {
       .del()
       .where('mylist_id', mylistId)
 
-      await trx('mylist_informations')
+      await trx('mylists')
       .del()
       .where('id', mylistId)
 
-      const allList = await trx('mylist_informations')
+      const allList = await trx('mylists')
       .select('name', 'id')
       .where('user_id', userId)
 
