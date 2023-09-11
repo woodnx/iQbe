@@ -72,7 +72,6 @@ export default function FilteringModal({
         title="Filtering Quiz"
         size="lg"
         fullScreen={isMobile}
-        left={-0.5}
         pos="absolute"
       >
         <FilteringWorkbook
