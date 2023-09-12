@@ -68,7 +68,7 @@ export default function FilteringModal({
     <>
       <Modal 
         opened={innerOpened} 
-        onClose={innerOnClose}
+        onClose={() => innerOnClose()}
         title="Filtering Quiz"
         size="lg"
         fullScreen={isMobile}
