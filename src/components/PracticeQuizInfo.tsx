@@ -2,17 +2,28 @@ import { Card, DefaultProps, Group, Overlay, Text } from "@mantine/core";
 import QuizFavoriteButton from "./QuizFavoriteButton";
 import { QuizWorkbookBadge } from "./QuizWorkbookBadge";
 import QuizMylistButton from "./QuizMylistButton";
-import { Quiz } from "../types";
 import { useIsMobile } from "../hooks";
 import { useMylistInfomations } from "../hooks/useMylists";
 
 interface Props extends DefaultProps {
-  quiz: Quiz
+  quizId?: number,
+  answer?: string,
+  workbook?: string,
+  level?: string,
+  date?: string,
+  isFavorite?: boolean,
+  registeredMylist?: number[],
   visible: boolean,
 }
 
 export function PracticeQuizInfo({
-  quiz,
+  quizId = 0,
+  answer = "",
+  workbook = "",
+  level = "",
+  date = "",
+  isFavorite = false,
+  registeredMylist = [],
   visible,
   ...other
 }: Props) {
@@ -25,23 +36,23 @@ export function PracticeQuizInfo({
         <Text 
           fz={ isMobile ? "lg" : "xl" }
           fw="bold"
-        >{quiz.answer}</Text>
+        >{answer}</Text>
         <QuizFavoriteButton 
-          quizId={quiz.id}
-          isFavorite={quiz.isFavorite}
+          quizId={quizId}
+          isFavorite={isFavorite}
         />
       </Group>
       <Group position="apart" m={0} mt="sm">
         <QuizMylistButton
-          quizId={quiz.id}
-          registerdMylistId={quiz.registerdMylist}
+          quizId={quizId}
+          registerdMylistId={registeredMylist}
           isMobile={isMobile}
           mylists={mylists || []}
         />
         <QuizWorkbookBadge
-          workbookName={quiz.workbook}
-          levelColor={quiz.level}
-          date={quiz.date}
+          workbookName={workbook}
+          levelColor={level}
+          date={date}
         />
       </Group>
       { !visible ? <Overlay blur={50} color="#fff" zIndex={100}/> : null }

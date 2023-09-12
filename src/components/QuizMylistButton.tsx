@@ -35,7 +35,7 @@ export default function QuizMylistButton({
 
   useEffect(() => {
     setSelectedMylistIdx(registerdMylistId.map(id => mylists?.findIndex(list => list.id == id)));
-  }, [mylists]);
+  }, [mylists, registerdMylistId]);
 
   const createMylist = async (mylistname: string) => {
     const newMyList = await axios.post<MylistInformation>('/mylists', {
