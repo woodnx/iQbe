@@ -37,9 +37,12 @@ export default function PracticeTypewriteQuiz({
               <CircularProgressbar 
                 value={countval} 
                 text={`${Math.floor(count/1000) + 1}`} 
-                strokeWidth={15}
+                strokeWidth={14}
                 styles={buildStyles({
-                  textSize: "30px"
+                  textSize: "30px",
+                  textColor: "#228BE6",
+                  pathColor: "#228BE6",
+                  trailColor: "#ADB5BD",
                 })}
               />
             </div>
