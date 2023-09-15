@@ -16,7 +16,7 @@ export default function QuizFavoriteButton({
 
   useEffect(() => {
     setFavorite(innerIsFavorite)
-  }, [innerIsFavorite]);
+  }, [quizId]);
 
   const addFavoriteList = async () => {
     if (isFavorite) {
