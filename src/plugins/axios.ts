@@ -1,4 +1,4 @@
-import _axios from "axios";
+import _axios, { AxiosError } from "axios";
 import useUserStore from "../store/user";
 
 const axios = _axios.create({
@@ -27,9 +27,11 @@ axios.interceptors.request.use(async (request) => {
 axios.interceptors.response.use((responce) => {
   return responce;
 },
-(error) => {
-  if (error.errorInfo.code === 'auth/id-token-expired')
+(error: AxiosError) => {
+  // @ts-ignore
+  if (error.response?.data.message === 'invalid authorization'){
     useUserStore.getState().setIdToken();
+  }
 
   return Promise.reject(error);
 });
