@@ -2,7 +2,7 @@ import _axios, { AxiosError } from "axios";
 import useUserStore from "../store/user";
 
 const axios = _axios.create({
-  baseURL: 'api',
+  baseURL: '/api',
   headers: {
     'Content-Type': 'application/json',
     'X-Requested-With': 'XMLHttpRequest',
