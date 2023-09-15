@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Card, Group, Loader, Overlay, Text } from "@mantine/core";
 import PracticeTypewriteQuiz from "../components/PracticeTypewriteQuiz";
 import useQuizzes from "../hooks/useQuizzes";
-import { KeywordOption, Quiz, QuizRequestParams } from "../types";
+import { KeywordOption, QuizRequestParams } from "../types";
 import FilteringModal from "../components/FilteringModal";
 import { useTimer, useTypewriter } from "../hooks";
 import { useDisclosure } from "@mantine/hooks";
@@ -14,28 +14,14 @@ import PracticeQuitModal from "../components/PracticeQuitModal";
 import { useNavigate } from "react-router-dom";
 import PracticeResultModal  from "../components/PracticeResultModal";
 
-const initialQuiz: Quiz = {
-  id: 0,
-  question: "",
-  answer: "",
-  date: "",
-  registerdMylist: [],
-  isFavorite: false,
-  level: 'dark',
-  workbook: "",
-  total: 0,
-  right: 0,
-  size: 0,
-}
-
 export default function Practice() {
-  const [ params, setParams ] = useState<QuizRequestParams>({perPage: 100});
+  const [ params, setParams ] = useState<QuizRequestParams | null>(null);
   const [ nowNumber, setNowNumber ] = useState(0);
   const [ shouldFetch, setShouldFetch ] = useState(false);
   const [ scene, setScene ] = useState(0);
   const [ filtering, filter ] = useDisclosure(false);
   const [ resulted, result ] = useDisclosure(false);
-  const { quizzes } = useQuizzes(params, '', shouldFetch);
+  const { quizzes } = useQuizzes(params || {}, '', shouldFetch);
   const [ rightList, setRightList ] = useState<number[]>([]);
   const [ pressedWord, setPressedWord ] = useState(0);
   const navigator = useNavigate();
@@ -146,8 +132,8 @@ export default function Practice() {
         scene == 0 ? 
           <Overlay fixed center>
             { 
-              !quizzes ? 
-                <Loader/> 
+              !quiz ? 
+                <Loader variant="dots"/> 
               : 
                 <PracticeQuizIntro 
                   ta="center"
@@ -171,7 +157,7 @@ export default function Practice() {
           apply={toFilter}
           opened={filtering}
           onOpen={filter.open}
-          onClose={toFilter}
+          onClose={!!params ? filter.close : toFilter}
         />
         <PracticeQuitModal
           onJudge={(j) => stopQuiz(j)}
@@ -190,7 +176,13 @@ export default function Practice() {
           countlimit={4000}
         />
         <PracticeQuizInfo 
-          quiz={quiz || initialQuiz}
+          quizId={quiz?.id}
+          answer={quiz?.answer}
+          workbook={quiz?.workbook }
+          level={quiz?.level}
+          date={quiz?.date}
+          isFavorite={quiz?.isFavorite}
+          registeredMylist={quiz?.registerdMylist}
           visible={scene >= 4}
         />
       </Card>
