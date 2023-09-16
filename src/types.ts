@@ -52,3 +52,8 @@ export interface MylistInformation {
   id: number,
   name: string,
 }
+
+export interface UserData {
+  id: number,
+  nickname: string,
+}
