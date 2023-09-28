@@ -134,11 +134,11 @@ export default function DefaultLayout() {
       <NavLink
         component={Link}
         classNames={{root: classes.link}}
-        key={mylist.id}
+        key={mylist.mid}
         active={idx + mockdata.length === active}
         label={mylist.name}
         icon={<IconList/>}
-        to={`mylist/${mylist.id}`}
+        to={`mylist/${mylist.mid}`}
         onClick={() => { 
           setActive(idx + mockdata.length);
           close();
