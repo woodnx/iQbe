@@ -5,6 +5,9 @@ import MylistCreateModal from "./MylistCreateModal";
 import axios from "../plugins/axios";
 import { MylistInformation } from "../types";
 import { useEffect, useState } from "react";
+import Sqids from "sqids";
+import dayjs from "dayjs";
+import useUserStore from "../store/user";
 
 const useStyle = createStyles((theme) => ({
   button: {
@@ -32,14 +35,20 @@ export default function QuizMylistButton({
   const [ creating, create ] = useDisclosure(false);
   const { classes } = useStyle();
   const [ selectedMyListIdx, setSelectedMylistIdx ] = useState<(number | undefined)[]>([]);
+  const userId = useUserStore((state) => state.userId);
 
   useEffect(() => {
     setSelectedMylistIdx(registerdMylistId.map(id => mylists?.findIndex(list => list.id == id)));
   }, [mylists, quizId]);
 
   const createMylist = async (mylistname: string) => {
+    const sqids = new Sqids({ minLength: 10, alphabet: mylistname });
+    const now = dayjs().unix();
+    const mid = sqids.encode([ userId, now ]);
+
     const newMyList = await axios.post<MylistInformation>('/mylists', {
       listName: mylistname,
+      mid,
     }).then(res => res.data);
 
     await axios.put('/mylists/quiz', {

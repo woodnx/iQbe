@@ -1,17 +1,24 @@
 import { StoreApi, UseBoundStore, create } from "zustand";
 import { User, getIdToken } from "firebase/auth"
 import { auth, checkFirebaseAuth } from "../plugins/firebase";
+import { UserData } from "../types";
 
 export type FirebaseUser = User | null;
 export type UserIdToken = string | null;
 export type UserState = {
+  userId: number,
   nickname: string,
   photoUrl: string,
   idToken: string | null,
-  setIdToken: () => void
+  setIdToken: () => void,
+  setUserData: ({
+    id, 
+    nickname
+  }: UserData) => void,
 };
 
 const useUserStore: UseBoundStore<StoreApi<UserState>> = create<UserState>((set) => ({
+  userId: 0,
   nickname: '',
   photoUrl: '',
   idToken: null,
@@ -25,6 +32,12 @@ const useUserStore: UseBoundStore<StoreApi<UserState>> = create<UserState>((set)
     const idToken = await getIdToken(user, true);
     set({ idToken });
   },
+  setUserData: ({
+    id, 
+    nickname
+  }) => {
+    set({ userId: id, nickname });
+  }
 }));
 
 export default useUserStore;

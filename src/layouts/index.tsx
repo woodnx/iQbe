@@ -40,7 +40,7 @@ export default function Root() {
         <Route path="/practice" element={<Practice />}/>
         <Route path="/favorite" element={<Favorite />}/>
         <Route path="/history" element={<History />}/>
-        <Route path="/mylist/:mylistId" element={<Mylist />}/>
+        <Route path="/mylist/:mid" element={<Mylist />}/>
         <Route path="/login" element={<Login />}/>
         <Route path="*" element={<Error />} />
       </Route>
