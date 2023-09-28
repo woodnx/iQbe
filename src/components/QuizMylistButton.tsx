@@ -42,7 +42,7 @@ export default function QuizMylistButton({
   }, [mylists, quizId]);
 
   const createMylist = async (mylistname: string) => {
-    const sqids = new Sqids({ minLength: 10 });
+    const sqids = new Sqids({ minLength: 10, alphabet: mylistname });
     const now = dayjs().unix();
     const mid = sqids.encode([ userId, now ]);
 
