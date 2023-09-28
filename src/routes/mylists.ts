@@ -8,7 +8,7 @@ router.get('/', async (req, res) => {
   const userId = req.userId;
   try {
     const all = await knex('mylists')
-    .select('name', 'id')
+    .select('name', 'id', 'mid')
     .where('user_id', userId);
     
     res.status(200).send(all);
@@ -19,6 +19,7 @@ router.get('/', async (req, res) => {
 
 router.post('/', async (req, res) => {
   const listName = req.body.listName
+  const mid = req.body.mid
   const userId = req.userId
   const now = dayjs().format('YYYY-MM-DD HH:mm:ss')
 
@@ -34,7 +35,8 @@ router.post('/', async (req, res) => {
         user_id: userId,
         name: listName,
         created: now,
-        attr: 100
+        attr: 100,
+        mid,
       };
 
       const inserts = await trx('mylists').insert(data);
@@ -103,6 +105,18 @@ router.put('/rename', async (req, res) => {
     })
   } catch(e) {
     res.status(400).send('An Error Occurd')
+    console.error(e)
+  }
+})
+
+router.put('/mid',async (req, res) => {
+  const mid = req.body.mid
+  const mylistId = req.body.mylistId
+
+  try {
+    await knex('mylists').update('mid', mid).where('id', mylistId);
+  } catch(e) {
+    res.status(400).send('An Error Occured')
     console.error(e)
   }
 })
