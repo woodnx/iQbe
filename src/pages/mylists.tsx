@@ -17,23 +17,23 @@ import axios from "../plugins/axios";
 export default function Mylist(){
   const pageParams = useParams();
   const navigator = useNavigate();
-  const mylistId = pageParams.mylistId;
-  const [ params, setParams ] = useState<QuizRequestParams>({ perPage: 100, mylistId: mylistId });
+  const mid = pageParams.mid;
+  const [ params, setParams ] = useState<QuizRequestParams>({ perPage: 100, mid: mid });
   const [ activePage, setPage ] = useState(1);
   const { quizzes } = useQuizzes(params, `/mylist`);
   const { mylists, mutate } = useMylistInfomations();
 
   const size = !!quizzes && quizzes.length !== 0 ? quizzes[0].size : 0;
-  const mylistName = mylists?.find(list => list.id == Number(mylistId))?.name;
+  const mylistName = mylists?.find(list => list.mid == mid)?.name;
 
   const [ newNameProps ] = useInput(mylistName || '');
 
   useEffect(() => {
     setParams({
       ...params,
-      mylistId
+      mid
     })
-  }, [mylistId]);
+  }, [mid]);
 
   const toFilter = (
     workbooks?: string[], 
@@ -75,7 +75,7 @@ export default function Mylist(){
 
   const toEdit = async () => {
     const newlist = await axios.put<MylistInformation[]>('/mylists/rename', {
-      mylistId,
+      mid,
       newName: newNameProps.value,
     }).then(res => res.data);
     console.log(newlist)
@@ -85,7 +85,7 @@ export default function Mylist(){
   const toDelete = async () => {
     const newlist = await axios.delete<MylistInformation[]>('/mylists/list', {
       data: {
-        mylistId
+        mid
       }
     }).then(res => res.data);
     navigator('/');

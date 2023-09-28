@@ -11,6 +11,8 @@ import LogoutButton from "../components/LogoutButton";
 import { useMylistInfomations } from "../hooks/useMylists";
 import Logo from "../components/Logo";
 import { auth } from "../plugins/firebase";
+import axios from "../plugins/axios";
+import { UserData } from "../types";
 
 const mockdata = [
   { 
@@ -70,8 +72,9 @@ export default function DefaultLayout() {
   const [opened, { open, close }] = useDisclosure(false);
   const navigate = useNavigate();
   const location = useLocation();
-  const setIdToken = useUserStore((state) => state.setIdToken);
   const idToken = useUserStore((state) => state.idToken);
+  const setIdToken = useUserStore((state) => state.setIdToken);
+  const setUserData = useUserStore((state) => state.setUserData);
   const { mylists } = useMylistInfomations(!loading);
   
   useLayoutEffect(() => {
@@ -91,7 +94,9 @@ export default function DefaultLayout() {
         return; 
       }
       if (!idToken) await setIdToken();
+      const userData = await axios.put<UserData>('/users/login').then(res => res.data);
       setLoading(false);
+      setUserData(userData);
     });
     return () => {
       ignore = true;
@@ -129,11 +134,11 @@ export default function DefaultLayout() {
       <NavLink
         component={Link}
         classNames={{root: classes.link}}
-        key={mylist.id}
+        key={mylist.mid}
         active={idx + mockdata.length === active}
         label={mylist.name}
         icon={<IconList/>}
-        to={`mylist/${mylist.id}`}
+        to={`mylist/${mylist.mid}`}
         onClick={() => { 
           setActive(idx + mockdata.length);
           close();
