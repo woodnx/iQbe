@@ -51,6 +51,7 @@ export type Judgement = 0 | 1 | 2;
 export interface MylistInformation {
   id: number,
   name: string,
+  mid: string,
 }
 
 export interface UserData {
