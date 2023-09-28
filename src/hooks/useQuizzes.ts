@@ -17,7 +17,7 @@ const createFilter = ({
   since,
   until,
   judgements,
-  mylistId,
+  mid,
 } : QuizRequestParams) => {
   const params = new URLSearchParams();
 
@@ -41,7 +41,7 @@ const createFilter = ({
 
   if (!!judgements) judgements.forEach(j => { params.append('judgement[]', String(j)) });
 
-  if (!!mylistId) params.append('mylistId', mylistId);
+  if (!!mid) params.append('mylistId', mid);
 
   // if (!(crctAnsRatio[0] == 0 && crctAnsRatio[1] == 100)) crctAnsRatio.forEach(ratio => { params.append('crctAnsRatio[]', ratio) }) 
   // params.append('userId', rootState.user.id)
