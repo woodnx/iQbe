@@ -134,7 +134,7 @@ router.get('/:listName?', async (req: QuizRequest, res) => {
         builder
         .innerJoin('mylists_quizzes', 'mylists_quizzes.quiz_id', 'quizzes.id')
         .innerJoin('mylists', 'mylists.id', 'mylists_quizzes.mylist_id')
-        .where('mylists.id', mylistId)
+        .where('mylists.mid', mylistId)
         .where('mylists.user_id', userId)
         .orderBy('mylists_quizzes.registered', 'desc');
       }
