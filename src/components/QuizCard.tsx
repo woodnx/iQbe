@@ -1,8 +1,9 @@
-import { Card, DefaultProps, Flex, Group, Text, } from "@mantine/core";
+import { Button, Card, DefaultProps, Flex, Group, Text, } from "@mantine/core";
 import QuizMylistButton from "./QuizMylistButton";
 import QuizFavoriteButton from "./QuizFavoriteButton";
 import { Judgement, MylistInformation, Quiz } from "../types";
 import { QuizWorkbookBadge } from "./QuizWorkbookBadge";
+import { useState } from "react";
 
 interface Props extends DefaultProps{
   index: number,
@@ -10,6 +11,7 @@ interface Props extends DefaultProps{
   mylists: MylistInformation[],
   coloring?: boolean,
   isMobile?: boolean,
+  isHidden?: boolean,
 }
 
 const defineColor = (judgement: Judgement) => {
@@ -24,9 +26,22 @@ export default function QuizCard({
   mylists,
   coloring,
   isMobile = false,
+  isHidden = false,
   ...others
 }: Props) {
+  const [ innerIsHidden, setInnerIsHidden ] = useState(isHidden);
   const color = coloring && quiz.judgement != null ? defineColor(quiz.judgement) : undefined;
+
+  const hiddenButton = (
+    <Button 
+      size="xs" 
+      color="violet.4"
+      compact 
+      onClick={() => setInnerIsHidden(false)}
+    >
+      Show answer
+    </Button>
+  )
 
   return (
     <Card withBorder bg={color} {...others}>
@@ -39,7 +54,9 @@ export default function QuizCard({
       </Group>
       <Text pt={10}>{quiz.question}</Text>
       <Text align="right" pt={10}>
-        {quiz.answer}
+        {
+          innerIsHidden ? hiddenButton : quiz.answer
+        }
       </Text>
       <Flex
         justify="space-between"

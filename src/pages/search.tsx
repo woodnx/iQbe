@@ -7,10 +7,12 @@ import { KeywordOption, QuizRequestParams } from '../types'
 import { useState } from 'react'
 import QuizPagination from '../components/QuizPagination'
 import QuizShuffleButton from '../components/QuizShuffleButton'
+import QuizHiddenAnswerButton from '../components/QuizHiddenAnswerButton'
 
 export default function Search() {
   const [ params, setParams ] = useState<QuizRequestParams>({perPage: 100})
   const [activePage, setPage] = useState(1);
+  const [ isHidden, setIsHidden ] = useState(false);
   const { quizzes } = useQuizzes(params)
 
   const size = !!quizzes && !!quizzes.length ? quizzes[0].size : 0
@@ -66,6 +68,10 @@ export default function Search() {
             <QuizShuffleButton
               apply={toShuffle}
             />
+            <QuizHiddenAnswerButton
+              isHidden={isHidden}
+              onToggle={setIsHidden}
+            />
           </Group>
         }
         pagination={
@@ -84,6 +90,7 @@ export default function Search() {
         <>
           <QuizList
             quizzes={quizzes}
+            isHidden={isHidden}
           /> 
           { quizzes.length == 0 ? <Center>No data</Center> : null }
         </>
