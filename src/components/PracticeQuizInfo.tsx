@@ -2,8 +2,8 @@ import { Card, DefaultProps, Group, Overlay, Text } from "@mantine/core";
 import QuizFavoriteButton from "./QuizFavoriteButton";
 import { QuizWorkbookBadge } from "./QuizWorkbookBadge";
 import QuizMylistButton from "./QuizMylistButton";
-import { useIsMobile } from "../hooks";
 import { useMylistInfomations } from "../hooks/useMylists";
+import { useIsMobile } from "../contexts/isMobile";
 
 interface Props extends DefaultProps {
   quizId?: number,

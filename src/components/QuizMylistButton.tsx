@@ -8,6 +8,7 @@ import { useState } from "react";
 import Sqids from "sqids";
 import dayjs from "dayjs";
 import useUserStore from "../store/user";
+import { useIsMobile } from "../contexts/isMobile";
 
 const useStyle = createStyles((theme) => ({
   button: {
@@ -23,19 +24,18 @@ interface Props extends DefaultProps {
   quizId: number,
   registerdMylistId: number[],
   mylists: MylistInformation[],
-  isMobile?: boolean,
 }
 
 export default function QuizMylistButton({
   quizId,
   registerdMylistId,
   mylists,
-  isMobile = false,
 }: Props) {
   const [ creating, create ] = useDisclosure(false);
   const { classes } = useStyle();
   const [ selectedMyListIdx, setSelectedMylistIdx ] = useState(registerdMylistId.map(id => mylists?.findIndex(list => list.id == id)));
   const userId = useUserStore((state) => state.userId);
+  const isMobile = useIsMobile();
 
   const createMylist = async (mylistname: string) => {
     const sqids = new Sqids({ minLength: 10, alphabet: mylistname });
