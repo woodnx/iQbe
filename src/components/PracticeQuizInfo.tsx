@@ -40,6 +40,7 @@ export function PracticeQuizInfo({
         <QuizFavoriteButton 
           quizId={quizId}
           isFavorite={isFavorite}
+          key={quizId}
         />
       </Group>
       <Group position="apart" m={0} mt="sm">
@@ -48,6 +49,7 @@ export function PracticeQuizInfo({
           registerdMylistId={registeredMylist}
           isMobile={isMobile}
           mylists={mylists || []}
+          key={quizId}
         />
         <QuizWorkbookBadge
           workbookName={workbook}
