@@ -10,7 +10,6 @@ interface Props extends DefaultProps{
   quiz: Quiz,
   mylists: MylistInformation[],
   coloring?: boolean,
-  isMobile?: boolean,
   isHidden?: boolean,
 }
 
@@ -25,7 +24,6 @@ export default function QuizCard({
   quiz,
   mylists,
   coloring,
-  isMobile = false,
   isHidden = false,
   ...others
 }: Props) {
@@ -66,13 +64,11 @@ export default function QuizCard({
           quizId={quiz.id}
           registerdMylistId={quiz.registerdMylist}
           mylists={mylists}
-          isMobile={isMobile}
         />
         <QuizWorkbookBadge
           workbookName={quiz.workbook}
           levelColor={quiz.level}
           date={quiz.date}
-          isMobile={isMobile}
         />
       </Flex>
     </Card>

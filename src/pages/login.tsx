@@ -2,9 +2,10 @@ import { useNavigate } from "react-router-dom";
 import { auth } from "../plugins/firebase";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { Button, Center, Grid, Paper, PasswordInput, TextInput } from "@mantine/core";
-import { useInput, useIsMobile } from "../hooks";
+import { useInput } from "../hooks";
 import Logo from "../components/Logo";
 import { notifications } from "@mantine/notifications";
+import { useIsMobile } from "../contexts/isMobile";
 
 export default function Login() {
   const [ passwordProps, resetPassword ] = useInput('');

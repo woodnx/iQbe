@@ -1,7 +1,7 @@
 import { ActionIcon, Button, Center, DefaultProps, Modal, Space, Stack, Title } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { IconPlayerPauseFilled } from "@tabler/icons-react";
-import { useIsMobile } from "../hooks";
+import { useIsMobile } from "../contexts/isMobile";
 
 interface Props extends DefaultProps {
   onJudge: (judgement: number) => void,
