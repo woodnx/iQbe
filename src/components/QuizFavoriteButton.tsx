@@ -1,6 +1,6 @@
 import { ActionIcon } from "@mantine/core";
 import { IconStar, IconStarFilled } from "@tabler/icons-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import axios from "../plugins/axios";
 
 interface QuizFavoriteButtonProps {
@@ -13,10 +13,6 @@ export default function QuizFavoriteButton({
   quizId 
 }: QuizFavoriteButtonProps) {
   const [ isFavorite, setFavorite ] = useState(innerIsFavorite)
-
-  useEffect(() => {
-    setFavorite(innerIsFavorite)
-  }, [quizId]);
 
   const addFavoriteList = async () => {
     if (isFavorite) {

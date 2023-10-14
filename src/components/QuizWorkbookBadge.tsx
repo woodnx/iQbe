@@ -1,19 +1,19 @@
 import { Badge, BadgeProps } from "@mantine/core";
+import { useIsMobile } from "../contexts/isMobile";
 
 interface Props extends BadgeProps {
   workbookName: string,
   levelColor: string,
   date: string,
-  isMobile?: boolean,
 }
 
 export function QuizWorkbookBadge({
   workbookName,
   levelColor,
   date,
-  isMobile = false,
   ...other
 }: Props) {
+  const isMobile = useIsMobile();
 
   return (
     <Badge 
