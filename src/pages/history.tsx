@@ -11,6 +11,7 @@ import HistorySelectJudgement from "../components/HistorySelectJudgement";
 import HistoryDateRange from "../components/HistoryDateRange";
 import dayjs from "../plugins/dayjs";
 import { useHistories } from "../hooks/useHistories";
+import QuizHiddenAnswerButton from "../components/QuizHiddenAnswerButton";
  
 export default function History() {
   const [ activePage, setPage ] = useState(1);
@@ -22,7 +23,7 @@ export default function History() {
   const [ params, setParams ] = useState<QuizRequestParams>({ perPage: 100, since: dates[0], until: dates[1] });
   const { quizzes } = useQuizzes(params, '/history');
   const { histories } = useHistories(dates[0], dates[1]);
-
+  const [ isHidden, setIsHidden ] = useState(false);
   const size = !!quizzes && quizzes.length !== 0 ? quizzes[0].size : 0;
   const right = !!histories ? Number(histories.right) : 0;
   const wrong = !!histories ? Number(histories.wrong) : 0;
@@ -100,6 +101,10 @@ export default function History() {
             <QuizShuffleButton
               apply={toShuffle}
             />
+            <QuizHiddenAnswerButton
+              isHidden={isHidden}
+              onToggle={setIsHidden}
+            />
           </Group>
         }
         pagination={
@@ -139,6 +144,7 @@ export default function History() {
         <>
           <QuizList
             quizzes={quizzes}
+            isHidden={isHidden}
             coloring
           />
           { quizzes.length == 0 ? <Center>No data</Center> : null }

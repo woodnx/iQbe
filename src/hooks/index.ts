@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react"
 import useUserStore from "../store/user"
-import { useCounter, useMediaQuery } from "@mantine/hooks"
+import { useCounter } from "@mantine/hooks"
 
 export interface formInputProps {
   value: string,
@@ -26,11 +26,6 @@ export const useInput = (
   return [
     props, resetValue
   ]
-}
-
-export const useIsMobile = () => {
-  const matches = useMediaQuery('(min-width: 48em)');
-  return !matches
 }
 
 export const useTypewriter = (

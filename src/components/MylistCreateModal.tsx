@@ -1,5 +1,6 @@
 import { Button, Group, Modal, ModalProps, TextInput } from "@mantine/core";
-import { useInput, useIsMobile } from "../hooks";
+import { useInput } from "../hooks";
+import { useIsMobile } from "../contexts/isMobile";
 
 interface Props extends ModalProps {
   onCreate?: (mylistName: string) => void,
