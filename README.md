@@ -1,11 +1,6 @@
-<div style="
-    display: flex; 
-    justify-content: center; 
-    align-items:center
-  "
->
-	<img src="./public/iqbe.png" alt="iQbe logo" width="100"/>
-	<img src="./public/iqbe-name.png" alt="iQbe logo" width="100"/>
+<div align="center">
+  <img src="./public/iqbe.png" alt="iQbe logo" width="100" align="middle"/>
+  <img src="./public/iqbe-name.png" alt="iQbe logo" width="100" align="middle"/>	
 </div>
 
 <h4 align="center">
