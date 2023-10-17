@@ -1,6 +1,6 @@
 <div align="center">
-  <img src="./public/iqbe.png" alt="iQbe logo" width="100" align="middle"/>
-  <img src="./public/iqbe-name.png" alt="iQbe logo" width="100" align="middle"/>	
+  <img src="./assets/iqbe.png" alt="iQbe logo" width="100" align="middle"/>
+  <img src="./assets/iqbe-name.png" alt="iQbe logo" width="100" align="middle"/>	
 </div>
 
 <h4 align="center">
