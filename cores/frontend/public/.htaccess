@@ -1,0 +1,16 @@
+# ProxyPreserveHost On
+# ProxyRequests  Off
+# ProxyPass ^/api/(.*) http://localhost:9000/v2/(.*)
+# ProxyPassReverse ^/api/(.*) http://localhost:9000/v2/(.*)
+
+# Options -MultiViews
+# RewriteEngine On
+# RewriteCond %{REQUEST_FILENAME} !-f
+# RewriteCond %{REQUEST_FILENAME} ^/api/(.*)
+# RewriteRule /api/ http://localhost:9000/v2/$1 [P,L]
+
+Options -MultiViews
+RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} !-f
+# RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(?!.*api).*$ index.html [QSA,L]
