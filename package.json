@@ -1,0 +1,19 @@
+{
+  "name": "iqbe",
+  "version": "2.0.0",
+  "description": "A powerful tool to enhance your quiz skills more fun and effective. ",
+  "workspaces": [
+		"packages/frontend",
+		"packages/backend"
+	],
+  "private": true,
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/woodnext/iqbe-dev.git"
+  },
+  "author": "woodnext",
+  "license": "ISC"
+}
