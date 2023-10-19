@@ -47,7 +47,6 @@ export function PracticeQuizInfo({
         <QuizMylistButton
           quizId={quizId}
           registerdMylistId={registeredMylist}
-          isMobile={isMobile}
           mylists={mylists || []}
           key={quizId}
         />
