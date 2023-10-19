@@ -10,7 +10,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "node ./scripts/dev.mjs",
-    "migrate:dev": "npx -w packages/backend prisma migrate dev --name ${npm_config_name}"
+    "migrate:dev": "cd packages/backend && npm run migrate:dev",
+    "migrate:status": "cd packages/backend && npm run migrate:status"
   },
   "repository": {
     "type": "git",
