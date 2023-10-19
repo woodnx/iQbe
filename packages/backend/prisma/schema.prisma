@@ -1,0 +1,229 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model SequelizeMeta {
+  name String @id @unique(map: "name") @db.VarChar(255)
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model answer_logs {
+  quiz_id        BigInt
+  user_id        BigInt @db.UnsignedBigInt
+  pressed_length Int
+  users          users  @relation(fields: [user_id], references: [id], onUpdate: Restrict, map: "answer_logs_ibfk_2")
+
+  @@index([quiz_id], map: "quiz_id")
+  @@index([user_id], map: "user_id")
+  @@ignore
+}
+
+model categories {
+  id                 BigInt               @id @default(autoincrement())
+  name               String?              @db.VarChar(125)
+  description        String?              @db.VarChar(256)
+  quizzes_categories quizzes_categories[]
+  sub_categories     sub_categories[]
+}
+
+model favorites {
+  user_id    BigInt   @db.UnsignedBigInt
+  quiz_id    BigInt   @db.UnsignedBigInt
+  registered DateTime @db.DateTime(0)
+  users      users    @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Restrict, map: "favorites_ibfk_1")
+  quizzes    quizzes  @relation(fields: [quiz_id], references: [id], onDelete: Cascade, onUpdate: Restrict, map: "favorites_ibfk_2")
+
+  @@id([user_id, quiz_id])
+  @@index([quiz_id], map: "quiz_id")
+}
+
+model histories {
+  user_id      BigInt   @db.UnsignedBigInt
+  quiz_id      BigInt   @db.UnsignedBigInt
+  practiced    DateTime @db.DateTime(0)
+  judgement    Int      @db.TinyInt
+  pressed_word Int?     @default(-1)
+  users        users    @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Restrict, map: "histories_ibfk_1")
+  quizzes      quizzes  @relation(fields: [quiz_id], references: [id], onDelete: Cascade, onUpdate: Restrict, map: "histories_ibfk_2")
+
+  @@id([user_id, quiz_id, practiced])
+  @@index([quiz_id], map: "quiz_id")
+}
+
+model levels {
+  id        Int         @id @default(autoincrement())
+  name      String      @db.VarChar(16)
+  value     String      @db.VarChar(16)
+  color     String      @db.VarChar(16)
+  workbooks workbooks[]
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model levels_staging {
+  name  String @db.VarChar(16)
+  value String @db.VarChar(16)
+  color String @db.VarChar(16)
+
+  @@ignore
+}
+
+model mylists {
+  id              BigInt            @id @default(autoincrement()) @db.UnsignedBigInt
+  user_id         BigInt            @db.UnsignedBigInt
+  name            String            @default("") @db.VarChar(128)
+  created         DateTime          @db.DateTime(0)
+  attr            Int
+  hash_ids        String?           @db.VarChar(20)
+  users           users             @relation(fields: [user_id], references: [id], onUpdate: Restrict, map: "mylists_ibfk_1")
+  mylists_quizzes mylists_quizzes[]
+
+  @@index([user_id], map: "user_id")
+}
+
+model mylists_quizzes {
+  mylist_id  BigInt   @db.UnsignedBigInt
+  quiz_id    BigInt   @db.UnsignedBigInt
+  registered DateTime @db.DateTime(0)
+  mylists    mylists  @relation(fields: [mylist_id], references: [id], onUpdate: Restrict, map: "mylists_quizzes_ibfk_1")
+  quizzes    quizzes  @relation(fields: [quiz_id], references: [id], onUpdate: Restrict, map: "mylists_quizzes_ibfk_2")
+
+  @@id([mylist_id, quiz_id])
+  @@index([mylist_id], map: "mylist_id")
+  @@index([quiz_id], map: "quiz_id")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model questions_staging {
+  workbook_id    Int?
+  que            String  @db.VarChar(2048)
+  ans            String  @db.VarChar(256)
+  anoans         String? @db.VarChar(256)
+  attribute      String? @db.VarChar(32)
+  total_crct_ans Int?
+  total_wrng_ans Int?
+
+  @@ignore
+}
+
+model quiz_reports {
+  quiz_id    BigInt    @id
+  user_id    BigInt    @db.UnsignedBigInt
+  reason     String?   @default("") @db.VarChar(64)
+  registered DateTime? @db.DateTime(0)
+  users      users     @relation(fields: [user_id], references: [id], onUpdate: Restrict, map: "quiz_reports_ibfk_2")
+
+  @@index([user_id], map: "user_id")
+}
+
+model quizzes {
+  id                BigInt            @id @default(autoincrement()) @db.UnsignedBigInt
+  workbook_id       Int?
+  que               String            @db.VarChar(2048)
+  ans               String            @db.VarChar(256)
+  anoans            String?           @db.VarChar(256)
+  attribute         String?           @db.VarChar(32)
+  total_crct_ans    Int?
+  total_wrng_ans    Int?
+  total_through_ans Int?
+  favorites         favorites[]
+  histories         histories[]
+  mylists_quizzes   mylists_quizzes[]
+}
+
+model quizzes_categories {
+  quiz_id         BigInt         @id
+  category_id     BigInt
+  sub_category_id BigInt
+  user_id         BigInt
+  categories      categories     @relation(fields: [category_id], references: [id], onUpdate: Restrict, map: "quizzes_categories_ibfk_1")
+  sub_categories  sub_categories @relation(fields: [sub_category_id], references: [id], onUpdate: Restrict, map: "quizzes_categories_ibfk_2")
+
+  @@index([category_id], map: "category_id")
+  @@index([sub_category_id], map: "sub_category_id")
+}
+
+model sub_categories {
+  id                 BigInt               @id @default(autoincrement())
+  parent_id          BigInt
+  name               String?              @db.VarChar(125)
+  description        String?              @db.VarChar(256)
+  quizzes_categories quizzes_categories[]
+  categories         categories           @relation(fields: [parent_id], references: [id], onUpdate: Restrict, map: "sub_categories_ibfk_1")
+
+  @@index([parent_id], map: "parent_id")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model test_durations {
+  quiz_id  Int
+  duration Decimal @db.Decimal(10, 6)
+
+  @@ignore
+}
+
+model test_quizzes {
+  id               Int    @id @default(autoincrement())
+  original_quiz_id BigInt
+  test_id          Int
+
+  @@index([original_quiz_id], map: "original_quiz_id")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model tests_results {
+  test_id      Int
+  quiz_id      Int
+  user_id      BigInt   @db.UnsignedBigInt
+  judgement    Int      @db.TinyInt
+  tested       DateTime @db.DateTime(0)
+  pressed_time Decimal? @db.Decimal(10, 6)
+  users        users    @relation(fields: [user_id], references: [id], onUpdate: Restrict, map: "tests_results_ibfk_2")
+
+  @@index([quiz_id], map: "quiz_id")
+  @@index([user_id], map: "user_id")
+  @@ignore
+}
+
+model users {
+  id             BigInt           @id @default(autoincrement()) @db.UnsignedBigInt
+  uid            String           @unique(map: "uid") @default("") @db.VarChar(255)
+  nickname       String           @default("") @db.VarChar(255)
+  modified       DateTime         @db.DateTime(0)
+  created        DateTime?        @db.DateTime(0)
+  answer_logs    answer_logs[]    @ignore
+  favorites      favorites[]
+  histories      histories[]
+  mylists        mylists[]
+  quiz_reports   quiz_reports[]
+  tests_results  tests_results[]  @ignore
+  users_settings users_settings[] @ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model users_settings {
+  user_id     BigInt   @db.UnsignedBigInt
+  setting_id  BigInt
+  max_view    Int?     @default(100)
+  is_shuffle  Boolean? @default(false)
+  throw_count Int?     @default(3)
+  ans_count   Int?     @default(5)
+  users       users    @relation(fields: [user_id], references: [id], onUpdate: Restrict, map: "users_settings_ibfk_1")
+
+  @@index([user_id], map: "user_id")
+  @@ignore
+}
+
+model workbooks {
+  id       Int       @id @default(autoincrement())
+  name     String?   @db.VarChar(255)
+  date     DateTime? @db.DateTime(0)
+  level_id Int?
+  levels   levels?   @relation(fields: [level_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "workbooks_ibfk_1")
+
+  @@index([level_id], map: "level_id")
+}
