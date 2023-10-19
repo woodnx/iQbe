@@ -2,6 +2,9 @@ import { execSync, spawnSync } from 'child_process';
 import fs from 'fs';
 
 try {
+  //clean dist
+  spawnSync('npm', [ 'run', 'clean' ], { stdio: 'inherit' });
+
   // build frontend
   spawnSync('npm', [ 'run', 'build', '-w', 'packages/frontend' ], { stdio: 'inherit' });
 
