@@ -10,3 +10,5 @@ src/allowed-server.ts
 
 # firebase-admin
 src/service-account.json
+
+.env
