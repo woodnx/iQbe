@@ -3,9 +3,9 @@
   <img src="./assets/iqbe-name.png" alt="iQbe logo" width="100" align="middle"/>	
 </div>
 
-<h4 align="center">
-  iQbe ― A powerful tool to enhance your quiz skills more fun and effective.
-</h4>
+<div align="center">
+  <strong>iQbe ― A powerful tool to enhance your quiz skills more fun and effective.</strong>
+</div>
 
 ## Features
 - INPUT
@@ -16,7 +16,7 @@
 - OUTPUT
   - Exercises based on real competition scenarios
 
-- CREATE *Now Creating
+- CREATE *now developing
   - Easier to create questions than with Excel
   - Easily record words of interest in a memo
   - Import from Excel file
