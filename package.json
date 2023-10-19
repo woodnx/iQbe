@@ -11,6 +11,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "node ./scripts/build.mjs",
     "start": "cd packages/backend/dist && node index.js",
+    "clean": "node ./scripts/clean.mjs",
     "dev": "node ./scripts/dev.mjs",
     "migrate:dev": "cd packages/backend && npm run migrate:dev",
     "migrate:status": "cd packages/backend && npm run migrate:status"
