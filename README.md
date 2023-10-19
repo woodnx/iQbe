@@ -16,7 +16,7 @@
 - OUTPUT
   - Exercises based on real competition scenarios
 
-- CREATE
+- CREATE *Now Creating
   - Easier to create questions than with Excel
   - Easily record words of interest in a memo
   - Import from Excel file
