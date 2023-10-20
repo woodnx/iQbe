@@ -21,5 +21,8 @@
     "url": "git+ssh://git@github.com/woodnext/iqbe-dev.git"
   },
   "author": "woodnext",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "ps-tree": "^1.2.0"
+  }
 }
