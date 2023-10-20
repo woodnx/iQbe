@@ -35,23 +35,22 @@ app.use(cors({
 }))
 app.use(express.json()); 
 app.use(express.static(path.join(__dirname, 'public'))); 
+app.use(express.static(path.join(__dirname, 'web'))); 
 
 const filenames = fs.readdirSync(path.join(__dirname, 'routes'))
 filenames.forEach(filename => {
   const name = filename.replace('.js', '')
-  app.use(`/v2/${name}`, verifyAuthToken, require(`./routes/${name}`))
+  app.use(`/api/${name}`, verifyAuthToken, require(`./routes/${name}`))
 })
 
-app.get('/', (req, res) => {
-  res.redirect('/v2')
-})
+app.get('/api/*', (req, res) => {
+  res.send('Undefined api root');
+});
 
-app.get('/v2', (req, res) => {
-  res.send({
-    message: "This is v2's index page'"
-  })
-})
+app.get('/*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'web', 'index.html'));
+});
 
 app.listen(port)
 
-console.log(`Opened http://localhost:${port}/v2`)
+console.log(`Opened http://localhost:${port}/`)
