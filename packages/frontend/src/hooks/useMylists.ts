@@ -15,7 +15,7 @@ export const useMylistInfomations = (shouldFetch = true) => {
 
   mylists?.forEach(async m => {
     if (!m.mid) {
-      const sqids = new Sqids({ minLength: 10, alphabet: m.name });
+      const sqids = new Sqids({ minLength: 10 });
       const now = dayjs().valueOf();
       const mid = sqids.encode([ userId, now ]);
 
