@@ -193,6 +193,7 @@ model users {
   id             BigInt           @id @default(autoincrement()) @db.UnsignedBigInt
   uid            String           @unique(map: "uid") @default("") @db.VarChar(255)
   nickname       String           @default("") @db.VarChar(255)
+  passwd         String           @default("") @db.Char(60) 
   modified       DateTime         @db.DateTime(0)
   created        DateTime?        @db.DateTime(0)
   answer_logs    answer_logs[]    @ignore
