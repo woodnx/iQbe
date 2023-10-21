@@ -13,7 +13,8 @@
     "start": "cd packages/backend/dist && node index.js",
     "clean": "node ./scripts/clean.mjs",
     "dev": "node ./scripts/dev.mjs",
-    "migrate:dev": "cd packages/backend && npm run migrate:dev",
+    "migrate:create": "cd packages/backend && npm run migrate:create",
+    "migrate:exe": "cd packages/backend && npm run migrate:exe",
     "migrate:status": "cd packages/backend && npm run migrate:status"
   },
   "repository": {
