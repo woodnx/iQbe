@@ -1,5 +1,5 @@
 import express, { Router, Request } from 'express'
-import knex from '../knex'
+import knex from '../plugins/knex'
 import dayjs from 'dayjs'
 
 const router: Router = express.Router()

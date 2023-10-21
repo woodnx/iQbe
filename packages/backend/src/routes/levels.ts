@@ -1,5 +1,5 @@
 import express, { Router } from 'express'
-import knex from '../knex'
+import knex from '../plugins/knex'
 
 const router: Router = express.Router()
 

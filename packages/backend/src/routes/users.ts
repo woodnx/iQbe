@@ -1,8 +1,8 @@
 import express, { Router } from 'express'
 import { writeFileSync } from 'fs'
 import path from 'path'
-import knex from '../knex'
-import dayjs from '../day'
+import knex from '../plugins/knex'
+import dayjs from '../plugins/day'
 
 const router: Router = express.Router()
 
