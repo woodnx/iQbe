@@ -1,6 +1,6 @@
 import express from 'express'
-import dayjs from '../day'
-import knex from '../knex'
+import dayjs from '../plugins/day'
+import knex from '../plugins/knex'
 
 const router = express.Router()
 

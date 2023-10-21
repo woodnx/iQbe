@@ -1,6 +1,6 @@
 import type { Request, Response, NextFunction } from 'express';
 import { auth } from 'firebase-admin';
-import knex from '../knex';
+import knex from '../plugins/knex';
 
 // ユーザ認証ミドルウェア
 export default async function (req: Request, res: Response, next: NextFunction) {
