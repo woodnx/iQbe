@@ -7,7 +7,8 @@
     "build": "tsc -p ./tsconfig.json",
     "test": "echo \"Error: no test specified\" && exit 1",
     "watch": "tsc-watch --noClear --onSuccess \"node ./dist/index.js\"",
-    "migrate:dev": "npx prisma migrate dev",
+    "migrate:create": "npx prisma migrate dev --create-only",
+    "migrate:exe": "npx prisma migrate dev",
     "migrate:status": "npx prisma migrate status"
   },
   "author": "",
