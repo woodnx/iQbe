@@ -3,34 +3,12 @@ import fs from 'fs';
 import path from 'path';
 import cors from 'cors';
 import admin from 'firebase-admin';
-import passport from 'passport';
-import passportLocal from 'passport-local';
-import session from 'express-session';
 import verifyAuthToken from './middleware/verifyAuthToken';
 import server from './allowed-server';
 import serviceAccount from './service-account.json';
 
 const app = express(); // expressをインスタンス化
-const LocalStrategy = passportLocal.Strategy;
 const port = 9000;
-
-// test users
-const users: {
-  username?: string,
-  password?: string,
-  age?: number,
-}[] = [
-  { username: 'alice', password: 'alice', age: 22 },
-  { username: 'bob', password: 'bob', age: 21 },
-  { username: 'carol', password: 'carol', age: 30 }
-]
-
-// test Users class
-const User = {
-  findOne({ username }: { username: string }) {
-    return users.find(user => user.username === username) || null
-  }
-}
 
 const params = {
   type: serviceAccount.type,
@@ -50,36 +28,12 @@ admin.initializeApp({
   projectId: 'web-quiz-collections'
 });
 
-passport.use(new LocalStrategy((username, password, done) => {
-  try {
-    const user = User.findOne({ username });
-    if (user == null) {
-      return done(null, false);
-    }
-    if (user.password !== password) {
-      return done(null, false);
-    }
-    delete user.password;
-
-    return done(null, user);
-  } catch(e) {
-    done(e);
-  }
-}));
-
 // middleware
 app.use(cors({
   origin: server, 
   credentials: true, //レスポンスヘッダーにAccess-Control-Allow-Credentials追加
   optionsSuccessStatus: 200 //レスポンスstatusを200に設定
 }));
-app.use(session({
-  secret: "cats",
-  resave: false,
-  saveUninitialized: false
-}));
-app.use(passport.initialize());
-app.use(passport.session());
 app.use(express.json()); 
 app.use(express.static(path.join(__dirname, 'public'))); 
 app.use(express.static(path.join(__dirname, 'web'))); 
