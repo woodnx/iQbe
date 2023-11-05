@@ -1,6 +1,7 @@
 import type { Request, Response, NextFunction } from 'express';
-import { auth } from 'firebase-admin';
-import knex from '../plugins/knex';
+import jwt from 'jsonwebtoken';
+
+const jwtSecret = process.env.JWT_SECRET || "";
 
 // ユーザ認証ミドルウェア
 export default async function (req: Request, res: Response, next: NextFunction) {
@@ -13,13 +14,24 @@ export default async function (req: Request, res: Response, next: NextFunction) 
   }
 
   try {
+    const bearer = idToken.split(" ");
+    const token = bearer[1];
+
     // idTokenを検証
-    const decodedIdToken = await auth().verifyIdToken(idToken);
-    req.user = decodedIdToken;
+    jwt.verify(token, jwtSecret, (error, _user) => {
+      if (error) {
+        res.status(401).send('invalid authorization');
+        return;
+      }
 
-    const userId = await knex('users').select('id').where('uid', decodedIdToken.uid).first()
+      if (!_user) {
+        res.status(401).send('No such user');
+        return;
+      }
 
-    req.userId = userId.id
+      const user = JSON.parse(String(_user));
+      req.userId = user.uid
+    });
 
     next();
   } catch(e) {
