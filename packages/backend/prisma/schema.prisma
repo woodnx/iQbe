@@ -147,6 +147,13 @@ model quizzes_categories {
   @@index([sub_category_id], map: "sub_category_id")
 }
 
+model refresh_tokens {
+  user_id BigInt    @id 
+  token   Bytes     @db.Binary(16)
+  expDate DateTime
+  users   users     @relation(fields: [user_id], references: [id], onUpdate: Restrict, map: "refresh_tokens_ibfk_1")
+}
+
 model sub_categories {
   id                 BigInt               @id @default(autoincrement())
   parent_id          BigInt
@@ -193,6 +200,8 @@ model users {
   id             BigInt           @id @default(autoincrement()) @db.UnsignedBigInt
   uid            String           @unique(map: "uid") @default("") @db.VarChar(255)
   nickname       String           @default("") @db.VarChar(255)
+  username       String           @default("") @db.VarChar(255)
+  email          String           @default("") @db.VarChar(255)
   passwd         String           @default("") @db.Char(60) 
   modified       DateTime         @db.DateTime(0)
   created        DateTime?        @db.DateTime(0)
@@ -201,6 +210,7 @@ model users {
   histories      histories[]
   mylists        mylists[]
   quiz_reports   quiz_reports[]
+  refresh_tokens refresh_tokens[]
   tests_results  tests_results[]  @ignore
   users_settings users_settings[] @ignore
 }
