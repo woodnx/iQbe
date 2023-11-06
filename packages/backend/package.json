@@ -34,7 +34,7 @@
     "@types/express": "^4.17.17",
     "@types/jsonwebtoken": "^9.0.4",
     "@types/node": "^20.5.8",
-    "prisma": "^5.4.2",
+    "prisma": "^5.5.2",
     "prisma-kysely": "^1.7.1",
     "tsc-alias": "^1.8.8",
     "tsc-watch": "^6.0.4",
