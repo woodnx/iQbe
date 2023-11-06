@@ -40,7 +40,11 @@ app.use(express.static(path.join(__dirname, 'web')));
 const filenames = fs.readdirSync(path.join(__dirname, 'routes'))
 filenames.forEach(filename => {
   const name = filename.replace('.js', '')
-  app.use(`/api/${name}`, verifyAuthToken, require(`./routes/${name}`))
+  app.use(
+    `/api/${name}`, 
+    verifyAuthToken,
+    require(`./routes/${name}`)
+  );
 })
 
 app.get('/api/*', (req, res) => {

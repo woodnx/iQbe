@@ -1,5 +1,10 @@
 generator client {
-  provider = "prisma-client-js"
+  // provider = "prisma-client-js"
+  provider = "prisma-kysely"
+
+  output = "../src/db"
+  fileName = "types.ts"
+  enumFileName = "enums.ts"
 }
 
 datasource db {
@@ -89,8 +94,8 @@ model mylists_quizzes {
   mylist_id  BigInt   @db.UnsignedBigInt
   quiz_id    BigInt   @db.UnsignedBigInt
   registered DateTime @db.DateTime(0)
-  mylists    mylists  @relation(fields: [mylist_id], references: [id], onUpdate: Restrict, map: "mylists_quizzes_ibfk_1")
-  quizzes    quizzes  @relation(fields: [quiz_id], references: [id], onUpdate: Restrict, map: "mylists_quizzes_ibfk_2")
+  mylists    mylists  @relation(fields: [mylist_id], references: [id], onDelete: Cascade, onUpdate: Restrict, map: "mylists_quizzes_ibfk_1")
+  quizzes    quizzes  @relation(fields: [quiz_id], references: [id], onDelete: Cascade, onUpdate: Restrict, map: "mylists_quizzes_ibfk_2")
 
   @@id([mylist_id, quiz_id])
   @@index([mylist_id], map: "mylist_id")

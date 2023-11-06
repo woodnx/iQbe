@@ -11,9 +11,9 @@ type Period = 'day' | 'week' | 'month'
 function generateRange(basicDate: string, period: ManipulateType){
   const date = dayjs(basicDate)
 
-  const ranges: string[][] = Array(7).fill([]).map((_, idx) => {
-    const end: string = date.subtract(idx, period).endOf(period).format('YYYY-MM-DD HH:mm:ss')
-    const start: string = date.subtract(idx, period).startOf(period).format('YYYY-MM-DD HH:mm:ss')
+  const ranges = Array(7).fill([]).map((_, idx) => {
+    const end = date.subtract(idx, period).endOf(period).toDate()
+    const start = date.subtract(idx, period).startOf(period).toDate()
     return [ start, end ]
   })
   
