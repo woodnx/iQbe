@@ -1,6 +1,9 @@
 import express, { Router, Request } from 'express'
-import knex from '../plugins/knex'
-import dayjs from 'dayjs'
+import { sql } from 'kysely';
+import knex from '../plugins/knex';
+import dayjs from 'dayjs';
+import { db } from '../database';
+import { Timestamp } from '../db/types';
 
 const router: Router = express.Router()
 
@@ -49,19 +52,20 @@ router.get('/:listName?', async (req: QuizRequest, res) => {
   const userId = req.userId
   const listName = req.params.listName
 
-  //console.log(req.query)
-
   try {
-    const quizzesIdColumnIdentifier = knex.ref('quizzes.id');
-
-    const quizzes: Array<Quizzes> = await knex('quizzes')
-    .select(
-      { id: 'quizzes.id' },
-      { question: 'que' },
-      { answer: 'ans' },
-      { workbook: 'workbooks.name' }, 
-      { date: 'workbooks.date' },
-      { level: 'levels.color' },
+    let query = db.selectFrom('quizzes')
+    .innerJoin('workbooks', 'quizzes.workbook_id', 'workbooks.id')
+    .innerJoin('levels', 'workbooks.level_id', 'levels.id')
+    //.leftJoin('histories', 'histories.quiz_id', 'quizzes.id')
+    .select(({ fn, val, ref }) => [
+      'quizzes.id as id',
+      'quizzes.que as question',
+      'quizzes.ans as answer',
+      'workbooks.name as workbook', 
+      'workbooks.date as date',
+      'levels.color as level',
+      fn.countAll<number>().over().as('size'),
+    ]
       // knex('histories')
       // .count('*')
       // .where('histories.quiz_id', quizzesIdColumnIdentifier)
@@ -74,76 +78,69 @@ router.get('/:listName?', async (req: QuizRequest, res) => {
       // .as('rights'),
 
       //{ total: knex.raw('quizzes.total_crct_ans + quizzes.total_wrng_ans + quizzes.total_through_ans')},
-
-      knex.raw('COUNT(*) OVER() as size')
     )
-    .innerJoin('workbooks', 'quizzes.workbook_id', 'workbooks.id')
-    .innerJoin('levels', 'workbooks.level_id', 'levels.id')
-    //.leftJoin('histories', 'histories.quiz_id', 'quizzes.id')
-    .modify(async (builder) => {
-      if (!!workbook) builder.whereIn('workbook_id', workbook)
-      if (!!level)    builder.whereIn('level_id', level)
-      if (!!seed)     builder.orderByRaw('RAND(?)', seed)
 
-      if (!!keyword && !!keywordOption) {
-        // const brackets = keyword.split(/\(\s\)/g)
-        // const ands = keyword.split(/\s+/g)
-        // const ors = keyword.split(/\++/g)
-        
-        if (keywordOption === 1) {
-          builder
-          .whereILike('que', `%${keyword}%`)
-          .orWhereILike('ans', `%${keyword}%`)
-        }
-        else if (keywordOption === 2) { 
-          builder.whereILike('que', `%${keyword}%`)
-        }
-        else { 
-          builder.whereILike('ans', `%${keyword}%`)
-        }
+    if (!!workbook) query = query.where('workbooks.id', 'in', workbook);
+    if (!!level)    query = query.where('levels.id', 'in', level);
+    if (!!seed)     query = query.orderBy(sql`RAND(${seed})`);
+    if (!!keyword && !!keywordOption) {
+      // const brackets = keyword.split(/\(\s\)/g)
+      // const ands = keyword.split(/\s+/g)
+      // const ors = keyword.split(/\++/g)
+      
+      if (keywordOption === 1) {
+        query = query.where((eb) => eb.or([
+          eb('quizzes.que', 'ilike', `%${keyword}%`),
+          eb('quizzes.ans', 'ilike', `%${keyword}%`)
+        ]));
       }
-      // if (!!crctAnsRatio) {
-      //   builder.whereRaw(
-      //    `(SELECT COUNT(*) FROM histories WHERE histories.quiz_id = quizzes.id AND judgement = 1) / 
-      //     (SELECT COUNT(*) FROM histories WHERE histories.quiz_id = quizzes.id) * 100
-      //     BETWEEN ? AND ?`
-      //   , [crctAnsRatio[0], crctAnsRatio[1]])
-      // }
-
-      if (!listName) {
-        // Do Nothing
-      }else if (listName === 'favorite') {
-        builder
-        .innerJoin('favorites', 'favorites.quiz_id', 'quizzes.id')
-        .where('favorites.user_id', userId)
-        .orderBy('favorites.registered', 'desc')
-      }else if (listName === 'history' && !!since && !!until) {
-        const s = dayjs(Number(since)).format('YYYY-MM-DD HH:mm:ss');
-        const u = dayjs(Number(until)).format('YYYY-MM-DD HH:mm:ss');
-        builder.column(
-          { judgement: 'histories.judgement' },
-          { practiced: 'histories.practiced' },
-        )
-        .innerJoin('histories', 'histories.quiz_id', 'quizzes.id')
-        .where('histories.user_id', userId)
-        .whereBetween('histories.practiced', [s, u])
-        .orderBy('histories.practiced', 'desc')
-
-        if (!!judgement) builder.whereIn('histories.judgement', judgement)
-      }else if (listName === 'mylist') {
-        builder
-        .innerJoin('mylists_quizzes', 'mylists_quizzes.quiz_id', 'quizzes.id')
-        .innerJoin('mylists', 'mylists.id', 'mylists_quizzes.mylist_id')
-        .where('mylists.mid', mylistId)
-        .where('mylists.user_id', userId)
-        .orderBy('mylists_quizzes.registered', 'desc');
+      else if (keywordOption === 2) { 
+        query = query.where('quizzes.que', 'ilike', `%${keyword}%`);
       }
-
-      //console.log(builder.toSQL())
-    })
+      else { 
+        query = query.where('quizzes.ans', 'ilike', `%${keyword}%`)
+      }
+    }
+    // if (!!crctAnsRatio) {
+    //   builder.whereRaw(
+    //    `(SELECT COUNT(*) FROM histories WHERE histories.quiz_id = quizzes.id AND judgement = 1) / 
+    //     (SELECT COUNT(*) FROM histories WHERE histories.quiz_id = quizzes.id) * 100
+    //     BETWEEN ? AND ?`
+    //   , [crctAnsRatio[0], crctAnsRatio[1]])
+    // }
+    if (listName === 'favorite') {
+      query = query
+      .innerJoin('favorites', 'favorites.quiz_id', 'quizzes.id')
+      .where('favorites.user_id', '=', userId)
+      .orderBy('favorites.registered desc'); 
+    } 
+    else if (listName === 'history' && !!since && !!until) {
+      const s = dayjs(Number(since)).toDate();
+      const u = dayjs(Number(until)).toDate();
+      
+      query = query
+      .innerJoin('histories', 'histories.quiz_id', 'quizzes.id')
+      .select([
+        'histories.judgement as judgement',
+        'histories.practiced as practiced',
+      ])
+      .where('histories.user_id', '=', userId)
+      .where(({ between }) => between('histories.practiced', s, u));
+    } 
+    else if (listName === 'mylist') {
+      query = query
+      .innerJoin('mylists_quizzes', 'mylists_quizzes.quiz_id', 'quizzes.id')
+      .innerJoin('mylists', 'mylists.id', 'mylists_quizzes.mylist_id')
+      .where('mylists.mid', '=', mylistId || "")
+      .where('mylists.user_id', '=',userId)
+      .orderBy('mylists_quizzes.registered desc');
+    }
+    
+    // execute
+    const quizzes = await query
     .limit(maxView)
     .offset(maxView*(page - 1))
-    //.groupBy('quizzes.id')
+    .execute();
 
     const favorites = await knex('favorites')
     .select('quiz_id')
