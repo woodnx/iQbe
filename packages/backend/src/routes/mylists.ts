@@ -1,17 +1,21 @@
 import express, { Router } from 'express'
 import knex from '../plugins/knex'
 import dayjs from '../plugins/day'
+import { db } from '../database'
+import e from 'express'
 
 const router: Router = express.Router()
 
 router.get('/', async (req, res) => {
   const userId = req.userId;
+
   try {
-    const all = await knex('mylists')
-    .select('name', 'id', 'mid')
-    .where('user_id', userId);
+    const mylists = await db.selectFrom('mylists')
+    .select(['name', 'id', 'mid'])
+    .where('user_id', '=', userId)
+    .execute();
     
-    res.status(200).send(all);
+    res.status(200).send(mylists);
   } catch(e) {
     console.error(e)
   }
@@ -29,8 +33,7 @@ router.post('/', async (req, res) => {
   }
     
   try {
-
-    await knex.transaction(async trx => {
+    await db.transaction().execute(async trx => {
       const data = {
         user_id: userId,
         name: listName,
@@ -39,12 +42,20 @@ router.post('/', async (req, res) => {
         mid,
       };
 
-      const inserts = await trx('mylists').insert(data);
-      const newList = await trx('mylists').select().where('name', listName).first();
+      const inserts = await trx
+        .insertInto('mylists')
+        .values(data)
+        .execute();
+      const newList = await trx
+        .selectFrom('mylists')
+        .selectAll()
+        .where('name', '=', listName)
+        .execute();
+      
       const message = `${inserts.length} new mylists saved (user: ${userId})`;
       
       res.status(201).send(newList);
-      console.log(message)
+      console.log(message);
     })
   } catch(e) {
     res.status(400).send('An Error Occured')
@@ -53,28 +64,31 @@ router.post('/', async (req, res) => {
 })
 
 router.put('/quiz', async (req, res) => {
-  const quiz_id = req.body.quizId
-  const mylist_id = req.body.mylistId
-  const registered = dayjs().format('YYYY-MM-DD HH:mm:ss')
+  const quiz_id = req.body.quizId;
+  const mylist_id = req.body.mylistId;
+  const registered = dayjs().format('YYYY-MM-DD HH:mm:ss');
   
   if (!quiz_id || !mylist_id) {
-    res.status(400).send('Undefined quiz id or mylist id')
-    return
+    res.status(400).send('Undefined quiz id or mylist id');
+    return;
   }
 
   const data = {
     quiz_id,
     mylist_id,
     registered
-  }
+  };
 
   try {
-    await knex.transaction(async trx => {
-      const inserts = await trx('mylists_quizzes').insert(data)
+    const inserts =await db.transaction().execute(async trx => {
+      return await trx
+        .insertInto('mylists_quizzes')
+        .values(data)
+        .execute();
+    });
 
-      const message = `${inserts.length} new quizzes saved into mylist (mylist: ${mylist_id})`
-      res.status(201).send(message)
-    })
+    const message = `${inserts.length} new quizzes saved into mylist (mylist: ${mylist_id})`;
+    res.status(201).send(message);
   } catch(e) {
     res.status(400).send('An Error Occurd')
     console.error(e)
@@ -92,17 +106,19 @@ router.put('/rename', async (req, res) => {
   }
 
   try {
-    await knex.transaction(async trx => {
-      const inserts = await trx('mylists')
-      .update('name', newName)
-      .where('id', mylistId)
+    const newList = await db.transaction().execute(async trx => {
+      const updates = await trx.updateTable('mylists')
+      .set({ name: newName })
+      .where('id', '=', mylistId)
+      .execute();
 
-      const allList = await trx('mylists')
-      .select('name', 'id')
-      .where('user_id', userId)
+      return await trx.selectFrom('mylists')
+      .select([ 'name', 'id', 'mid' ])
+      .where('user_id', '=', userId)
+      .execute();
+    });
 
-      res.status(200).send(allList)
-    })
+    res.status(200).send(newList)
   } catch(e) {
     res.status(400).send('An Error Occurd')
     console.error(e)
@@ -114,7 +130,13 @@ router.put('/mid',async (req, res) => {
   const mylistId = req.body.mylistId
 
   try {
-    await knex('mylists').update('mid', mid).where('id', mylistId);
+    await db.transaction().execute(async (trx) => {
+      trx
+      .updateTable('mylists')
+      .set({ mid: mid })
+      .where('id', '=', mylistId)
+      .execute();
+    });
   } catch(e) {
     res.status(400).send('An Error Occured')
     console.error(e)
@@ -126,40 +148,41 @@ router.delete('/quiz', async (req, res) => {
   const mylistId = req.body.mylistId
 
   try {
-    await knex.transaction(async trx => {
-      const deletes = await trx('mylists_quizzes').del()
-      .where('mylist_id', mylistId)
-      .where('quiz_id', quizId)
+    await db.transaction().execute(async trx => {
+      const deletes = await trx.deleteFrom('mylists_quizzes')
+      .where(({ and, eb }) => and([
+        eb('mylist_id', '=', mylistId),
+        eb('quiz_id', '=', quizId)
+      ]))
+      .executeTakeFirst();
+    });
 
-      res.status(204).send()
-    })
-
-  }catch(e) {
+    res.status(204).send();
+  } catch(e) {
     res.status(400).send('An Error Occured')
     console.error(e)
   }
 })
 
 router.delete('/list', async (req, res) => {
-  const mylistId = req.body.mylistId
+  const mid = req.body.mid
   const userId = req.userId
   
   try {
-    await knex.transaction(async trx => {
-      await trx('mylists_quizzes')
-      .del()
-      .where('mylist_id', mylistId)
+    const allList = await db.transaction().execute(async trx => {
+      await trx
+      .deleteFrom('mylists')
+      .where('mid', '=', mid)
+      .executeTakeFirst();
 
-      await trx('mylists')
-      .del()
-      .where('id', mylistId)
+      return await trx
+      .selectFrom('mylists')
+      .select([ 'name', 'id', 'mid' ])
+      .where('user_id', '=', userId)
+      .execute();
+    });
 
-      const allList = await trx('mylists')
-      .select('name', 'id')
-      .where('user_id', userId)
-
-      res.status(200).send(allList)
-    })
+    res.status(200).send(allList);
   }catch(e) {
     console.log(e)
     res.status(400).send('An Error Occured')
