@@ -1,12 +1,13 @@
 import express, { Router } from 'express'
 import knex from '../knex'
+import { db } from '../database'
 
 const router: Router = express.Router()
 
 router.get('/', async (req, res) => {
   try {
-    const results = await knex('workbooks').select('*')
-    res.status(200).send(results)
+    const workbooks = await db.selectFrom('workbooks').selectAll().execute();
+    res.status(200).send(workbooks)
   } catch(err) {
     console.error(err)
   } 
@@ -14,15 +15,16 @@ router.get('/', async (req, res) => {
 
 router.get('/color', async (req, res) => {
   try {
-    const results = await knex('workbooks')
-    .select(
-      { id: 'workbooks.id' },
-      { label: 'workbooks.name' }, 
-      { color: 'levels.color' }
-    )
+    const workbooks = await db.selectFrom('workbooks')
     .innerJoin('levels', 'workbooks.level_id', 'levels.id')
+    .select([
+      'workbooks.id as id',
+      'workbooks.name as label',
+      'levels.color as color',
+    ])
+    .execute();
 
-    res.status(200).send(results)
+    res.status(200).send(workbooks)
   } catch(err) {
     console.error(err)
   } 
