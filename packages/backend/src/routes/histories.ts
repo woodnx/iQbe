@@ -1,31 +1,30 @@
 import express, { Router } from 'express'
-import knex from '../knex'
 import dayjs from '../day'
+import { db } from '../database';
 
-interface SendData {
-  right: number | string;
-  wrong: number | string;
-  through: number | string;
-}
-
-const router: Router = express.Router()
+const router: Router = express.Router();
 
 router.get('/:since/:until', async (req, res) => {
-  const since = dayjs(Number(req.params.since)).format('YYYY-MM-DD HH:mm:ss');
-  const until = dayjs(Number(req.params.until)).format('YYYY-MM-DD HH:mm:ss');
+  const since = dayjs(Number(req.params.since)).toDate();
+  const until = dayjs(Number(req.params.until)).toDate();
   const user_id = req.userId;
 
   try {
     const results = await Promise.all(
-      [0, 1, 2].map(async i => (await knex('histories')
-        .count('quiz_id', {as: 'count'})
-        .where('user_id', user_id)
-        .andWhere('judgement', i)
-        .andWhereBetween('practiced', [ since, until ])
-        .first())?.count
+      [0, 1, 2].map(async i => (
+        await db.selectFrom('histories')
+        .select(({ fn }) => [
+          fn.count('quiz_id').as('count')
+        ])
+        .where(({ eb, and, between }) => and([
+          eb('user_id', '=', user_id),
+          eb('judgement', '=', i),
+          between('practiced', since, until)
+        ]))
+        .executeTakeFirst())?.count
     ));
     
-    const data: SendData = {
+    const data = {
       right: results[1] || 0,
       wrong: results[0] || 0,
       through: results[2] || 0,
@@ -50,21 +49,19 @@ router.post('/', async (req, res) => {
   try {
     const user_id = req.userId
 
-    await knex.transaction(async trx => {
-      
+    await db.transaction().execute(async trx => {
       const data = {
         quiz_id,
         user_id,
         practiced,
-        judgement
-      }
+        judgement,
+      };
 
-      const inserts = await trx('histories').insert(data)
-
-      const message = `${inserts.length} new histories saved`
+      const inserts = await trx.insertInto('histories').values(data).execute();
+      const message = `${inserts.length} new histories saved`;
       
-      res.status(201).send(message)
-      console.log(message)
+      res.status(201).send(message);
+      console.log(message);
     })
   } catch(e) {
     console.error(e)
