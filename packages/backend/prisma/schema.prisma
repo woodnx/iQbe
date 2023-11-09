@@ -153,10 +153,10 @@ model quizzes_categories {
 }
 
 model refresh_tokens {
-  user_id BigInt    @id 
+  user_id BigInt    @id @db.UnsignedBigInt
   token   Bytes     @db.Binary(16)
   expDate DateTime
-  users   users     @relation(fields: [user_id], references: [id], onUpdate: Restrict, map: "refresh_tokens_ibfk_1")
+  users   users     @relation(fields: [user_id], references: [id], onUpdate: Restrict)
 }
 
 model sub_categories {

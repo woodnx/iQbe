@@ -63,6 +63,11 @@ export type quizzes_categories = {
     sub_category_id: number;
     user_id: number;
 };
+export type refresh_tokens = {
+    user_id: number;
+    token: Buffer;
+    expDate: Timestamp;
+};
 export type SequelizeMeta = {
     name: string;
 };
@@ -81,6 +86,9 @@ export type users = {
     id: Generated<number>;
     uid: Generated<string>;
     nickname: Generated<string>;
+    username: Generated<string>;
+    email: Generated<string>;
+    passwd: Generated<string>;
     modified: Timestamp;
     created: Timestamp | null;
 };
@@ -100,6 +108,7 @@ export type DB = {
     quiz_reports: quiz_reports;
     quizzes: quizzes;
     quizzes_categories: quizzes_categories;
+    refresh_tokens: refresh_tokens;
     SequelizeMeta: SequelizeMeta;
     sub_categories: sub_categories;
     test_quizzes: test_quizzes;

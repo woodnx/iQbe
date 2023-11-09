@@ -55,6 +55,6 @@ export interface MylistInformation {
 }
 
 export interface UserData {
-  id: number,
-  nickname: string,
+  uid: string,
+  username: string,
 }
