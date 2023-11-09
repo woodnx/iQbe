@@ -1,7 +1,5 @@
 import type { Request, Response, NextFunction } from 'express';
-import jwt from 'jsonwebtoken';
-
-const jwtSecret = process.env.JWT_SECRET || "";
+import { verifyAccessToken } from '../plugins/jsonwebtoken';
 
 // ユーザ認証ミドルウェア
 export default async function (req: Request, res: Response, next: NextFunction) {
@@ -14,24 +12,8 @@ export default async function (req: Request, res: Response, next: NextFunction) 
   }
 
   try {
-    const bearer = idToken.split(" ");
-    const token = bearer[1];
-
     // idTokenを検証
-    jwt.verify(token, jwtSecret, (error, _user) => {
-      if (error) {
-        res.status(401).send('invalid authorization');
-        return;
-      }
-
-      if (!_user) {
-        res.status(401).send('No such user');
-        return;
-      }
-
-      const user = JSON.parse(String(_user));
-      req.userId = user.uid
-    });
+    await verifyAccessToken(idToken);
 
     next();
   } catch(e) {

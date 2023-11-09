@@ -1,8 +1,11 @@
 import { randomUUID } from 'crypto';
+import dotenv from 'dotenv';
 import jwt, { Secret, SignOptions } from 'jsonwebtoken';
 
+dotenv.config();
+
 /* 定数設定 */
-const jwtSecret: Secret = process.env.JWT_SECRET || "";
+const jwtSecret: Secret = process.env.JWT_SECRET_KEY || "";
 const jwtOptions: SignOptions = {
   algorithm: 'HS256',
   expiresIn: process.env.ACCESS_TOKEN_DURATION_MINUTE + 'm'
@@ -44,7 +47,9 @@ const generateRefreshToken = (user: User) => {
 const verifyAccessToken = (token: string) => {
   return new Promise((resolve, reject) => {
     jwt.verify(token, jwtSecret, (error, user) => {
-      if (error) reject(error);
+      if (error) {
+        reject(error); 
+      }
       resolve(user);
     });
   });

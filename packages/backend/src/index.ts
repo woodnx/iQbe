@@ -2,31 +2,11 @@ import express from 'express';
 import fs from 'fs';
 import path from 'path';
 import cors from 'cors';
-import admin from 'firebase-admin';
 import verifyAuthToken from './middleware/verifyAuthToken';
 import server from './allowed-server';
-import serviceAccount from './service-account.json';
 
 const app = express(); // expressをインスタンス化
 const port = 9000;
-
-const params = {
-  type: serviceAccount.type,
-  projectId: serviceAccount.project_id,
-  privateKeyId: serviceAccount.private_key_id,
-  privateKey: serviceAccount.private_key,
-  clientEmail: serviceAccount.client_email,
-  clientId: serviceAccount.client_id,
-  authUri: serviceAccount.auth_uri,
-  tokenUri: serviceAccount.token_uri,
-  authProviderX509CertUrl: serviceAccount.auth_provider_x509_cert_url,
-  clientC509CertUrl: serviceAccount.client_x509_cert_url
-};
-
-admin.initializeApp({
-  credential: admin.credential.cert(params),
-  projectId: 'web-quiz-collections'
-});
 
 // middleware
 app.use(cors({
@@ -40,9 +20,14 @@ app.use(express.static(path.join(__dirname, 'web')));
 
 // router import
 const filenames = fs.readdirSync(path.join(__dirname, 'routes'));
+const nonVerifyRoutes = [
+  'auth',
+];
+
 filenames.forEach(filename => {
   const name = filename.replace('.js', '');
-  app.use(`/api/${name}`, verifyAuthToken, require(`./routes/${name}`));
+  if (nonVerifyRoutes.includes(name)) app.use(`/api/${name}`, require(`./routes/${name}`));
+  else app.use(`/api/${name}`, verifyAuthToken, require(`./routes/${name}`));
 });
 
 
