@@ -6,7 +6,7 @@ import { useState } from "react";
 import { useDisclosure, useMediaQuery } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
 import useUserStore from "../store/user";
-import LogoutButton from "../components/LogoutButton";
+import UserLogoutButton from "../components/UserLogoutButton";
 import { useMylistInfomations } from "../hooks/useMylists";
 import Logo from "../components/Logo";
 import { checkAuth } from "../plugins/auth";
@@ -156,7 +156,7 @@ export default function DefaultLayout() {
         {mylistLinks}
       </Navbar.Section>
       <Navbar.Section>
-        <LogoutButton/>
+        <UserLogoutButton/>
       </Navbar.Section>
     </Navbar>
   );
@@ -252,7 +252,7 @@ export default function DefaultLayout() {
                 {mylistLinks}
               </Navbar.Section>
               <Navbar.Section>
-                <LogoutButton/>
+                <UserLogoutButton/>
               </Navbar.Section>
             </Navbar>
           </Drawer.Body>

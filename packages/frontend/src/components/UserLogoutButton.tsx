@@ -1,13 +1,12 @@
 import { Button } from "@mantine/core";
-import { signOut } from "firebase/auth";
-import { auth } from "../plugins/firebase";
+import { logoutUser } from "../plugins/auth";
 
 export default function LogoutButton() {
   return (
     <Button
       fullWidth
       uppercase
-      onClick={() => signOut(auth)}
+      onClick={() => logoutUser()}
     >
       Logout
     </Button>
