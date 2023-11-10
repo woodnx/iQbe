@@ -24,25 +24,6 @@ export function loginWithUsername(username: string, password: string) {
   });
 }
 
-export function loginWithEmail(username: string, email: string, password: string) {
-  return new Promise<User>((resolve, reject) => {
-    axios.post('/auth/old', {
-      email,
-      username,
-      password,
-    })
-    .then(res => res.data)
-    .then(({ accessToken, refreshToken, user }) => {
-      localStorage.setItem('refreshToken', refreshToken);
-      localStorage.setItem('accessToken', accessToken);
-      localStorage.setItem('uid', user.uid);
-
-      resolve(user);
-    })
-    .catch((e) => reject(e));
-  });
-}
-
 export function signupUser(username: string, password: string) {
   return new Promise<User>((resolve, reject) => {
     axios.post('/auth/signup', {
@@ -110,4 +91,11 @@ export function getIdToken() {
     })
     .catch(e => reject(e));
   });
+}
+
+export function logoutUser() {
+  localStorage.setItem('refreshToken', '');
+  localStorage.setItem('accessToken', '');
+  localStorage.setItem('uid', '');
+  location.reload();
 }
