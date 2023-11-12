@@ -1,20 +1,9 @@
 import { useNavigate } from "react-router-dom";
 import { Button, Paper, PasswordInput, TextInput } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
-import { loginOldUser, loginWithUsername } from "../plugins/auth";
+import { loginWithUsername } from "../plugins/auth";
 import { useForm } from "@mantine/form";
 import { useReducer } from "react";
-
-interface SubmitValue {
-  username: string,
-  password: string
-}
-
-interface OldSubmitValue {
-  username: string,
-  password: string,
-  email: string,
-}
 
 export function UserLoginModal() {
   const navigate = useNavigate();
@@ -28,15 +17,16 @@ export function UserLoginModal() {
     }
   })
 
-  const submit = async (values: SubmitValue) => {
+  const submit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
     try { 
-      await loginWithUsername(values.username, values.password)
+      await loginWithUsername(form.values.username, form.values.password)
       .then(async (_user) => {
         if (_user == 'please do re-registration') {
           toggle();
-          const email = form.values.username;
-          form.reset();
-          form.setFieldValue('email', email);
+          form.setFieldValue('email', form.values.username);
+          form.setFieldValue('username', '')
           return;
         }
         navigate('/');
@@ -52,26 +42,9 @@ export function UserLoginModal() {
     }
   };
 
-  const isOldSubmit = async (values: OldSubmitValue) => {
-    try { 
-      await loginOldUser(values.username, values.email, values.password)
-      .then(async (_user) => {
-        navigate('/');
-        form.reset();
-      });
-    } catch {
-      notifications.show({
-        title: 'Login Error',
-        message: 'Faild Registering',
-        color: 'red',
-        withBorder: true,
-      });
-    }
-  }
-
   return (
     <Paper>
-      <form onSubmit={form.onSubmit(v => isOld ? isOldSubmit(v) : submit(v))}>
+      <form onSubmit={submit}>
         <TextInput 
           {...form.getInputProps('username')}
           placeholder={isOld ? 'Username' : 'Username or email'}
