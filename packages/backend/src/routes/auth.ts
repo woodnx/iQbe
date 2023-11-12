@@ -20,20 +20,38 @@ router.post('/login', async (req, res) => {
   const password: string | undefined = req.body.password;
   const errorMes = 'No user with such a user name and password';
 
-  if (!username || !password) {
+  if (!username) {
     res.status(401).send('Undefined username or password');
     return;
   }
 
   try {
-    const { id, ...user } = await db
+    let user = await db
     .selectFrom('users')
     .selectAll()
-    .where('username', '=', username )
-    .executeTakeFirstOrThrow();
+    .where('username', '=', username)
+    .executeTakeFirst();
 
     if (!user) {
-      res.status(401).send(errorMes);
+      const emailUser = await db
+      .selectFrom('users')
+      .selectAll()
+      .where('email', '=', username)
+      .executeTakeFirstOrThrow();
+
+      if (!!emailUser && !emailUser.passwd) {
+        res.status(200).send('please do re-registration');
+        return;
+      } else if (!emailUser){
+        res.status(401).send(errorMes);
+        return;
+      }
+
+      user = emailUser;
+    }
+
+    if (!password) {
+      res.status(401).send('Undefined username or password');
       return;
     }
 
@@ -64,7 +82,7 @@ router.post('/login', async (req, res) => {
         sql`SUBSTRING(HEX(token), 21, 12)`,
       ]).as('token'),
     ])
-    .where('user_id', '=', id)
+    .where('user_id', '=', user.id)
     .executeTakeFirst())?.token;
 
     if(!refreshToken) {
@@ -72,7 +90,8 @@ router.post('/login', async (req, res) => {
       return;
     }
 
-    return res.status(200).json({ accessToken, refreshToken, user });
+    const { id, passwd, ...sendUser } = user;
+    return res.status(200).json({ accessToken, refreshToken, user: sendUser });
   } catch(e) {
     res.status(400).json({ error: 'failed login' });
   }
@@ -204,7 +223,7 @@ router.post('/token', async (req, res) => {
   }
 });
 
-router.post('/old', async (req, res) => {
+router.post('/reregister', async (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
   const username = req.body.username;
@@ -217,7 +236,7 @@ router.post('/old', async (req, res) => {
   }
   
   try {
-    const user = db.selectFrom('users')
+    const user = await db.selectFrom('users')
     .selectAll()
     .where('email', '=', email)
     .executeTakeFirst();
@@ -227,30 +246,33 @@ router.post('/old', async (req, res) => {
       return;
     }
     
-    const userIds = await db.selectFrom('users').select('id').execute();
-    const lastUser = userIds[userIds.length - 1].id;
-    const newUserId = [ ...Array(lastUser + 1).keys() ];
+    const userId = user.id;
+    const newUserId = [ ...Array(userId).keys() ];
 
     const uid = hashids.encode(newUserId);
     const passwd = bcrypt.hashSync(password, 10);
 
     const userData = await db.transaction().execute(async (trx) => {
-      const { id, ...user } = await trx
-      .insertInto('users')
-      .values({
+      await trx
+      .updateTable('users')
+      .set({
         uid,
-        nickname: username,
         username,
         passwd,
         modified: created,
-        created,
       })
-      .returningAll()
+      .where('id', '=', userId)
+      .executeTakeFirstOrThrow();
+      
+      const updatedUser = await trx
+      .selectFrom('users')
+      .select(['id', 'uid', 'username', 'email', 'created', 'modified', 'nickname'])
+      .where('uid', '=', uid)
       .executeTakeFirstOrThrow();
 
       const genTokenUser = {
-        uid: user.uid,
-        username: user.username
+        uid: updatedUser.uid,
+        username: updatedUser.username
       }
   
       const refreshToken = await generateRefreshToken(genTokenUser);
@@ -259,19 +281,34 @@ router.post('/old', async (req, res) => {
       await trx
       .insertInto('refresh_tokens')
       .values(() => { return { 
-        user_id: id,
+        user_id: userId,
         token: sql<Buffer>`UNHEX(REPLACE(${refreshToken}, '-', ''))`,
         expDate
       }})
-      .returning('token')
       .executeTakeFirstOrThrow();
 
-      return { accessToken, refreshToken, user };
+      return { accessToken, refreshToken, user: updatedUser };
     });
     
     return res.status(200).json(userData);
   } catch(e) {
+    console.error(e);
+  }
+});
 
+router.post('/available', async (req, res) => {
+  const username = String(req.body.username);
+
+  try {
+    const user = await db
+    .selectFrom('users')
+    .select('uid')
+    .where('username', '=', username)
+    .executeTakeFirst();
+
+    res.status(200).json({ available: !user });
+  } catch(e) {
+    console.error(e);
   }
 });
 

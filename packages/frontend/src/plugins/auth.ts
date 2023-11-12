@@ -7,13 +7,18 @@ export interface User {
 }
 
 export function loginWithUsername(username: string, password: string) {
-  return new Promise<User>((resolve, reject) => {
+  return new Promise<User | string>((resolve, reject) => {
     axios.post('/auth/login', {
       username,
       password
     })
     .then(res => res.data)
-    .then(({ accessToken, refreshToken, user }) => {
+    .then((data) => {
+      if (data == 'please do re-registration') {
+        resolve('please do re-registration');
+        return;
+      }
+      const { accessToken, refreshToken, user } = data;
       localStorage.setItem('refreshToken', refreshToken);
       localStorage.setItem('accessToken', accessToken);
       localStorage.setItem('uid', user.uid);
@@ -22,6 +27,25 @@ export function loginWithUsername(username: string, password: string) {
     })
     .catch((e) => reject(e));
   });
+}
+
+export function loginOldUser(username: string, email: string, password: string) {
+  return new Promise((resolve, reject) => {
+    axios.post('/auth/reregister', {
+      username, 
+      email, 
+      password,
+    }).then(res => res.data)
+    .then((data) => {
+      const { accessToken, refreshToken, user } = data;
+      localStorage.setItem('refreshToken', refreshToken);
+      localStorage.setItem('accessToken', accessToken);
+      localStorage.setItem('uid', user.uid);
+
+      resolve(user);
+    })
+    .catch((e) => reject(e));
+  })
 }
 
 export function signupUser(username: string, password: string) {
