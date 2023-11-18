@@ -48,11 +48,13 @@ export function loginOldUser(username: string, email: string, password: string) 
   })
 }
 
-export function signupUser(username: string, password: string) {
+export function signupUser(username: string, password: string, requiredInviteCode?: boolean, inviteCode?: string) {
   return new Promise<User>((resolve, reject) => {
     axios.post('/auth/signup', {
       username,
       password,
+      requiredInviteCode,
+      inviteCode,
     })
     .then(res => res.data)
     .then(({ accessToken, refreshToken, user }) => {
@@ -71,7 +73,14 @@ export function checkAuth() {
     const refreshToken = localStorage.getItem('refreshToken');
     const uid = localStorage.getItem('uid');
     
-    if (!refreshToken || refreshToken == 'undefined' || !uid) {
+    if (
+      !refreshToken || 
+      !uid || 
+      refreshToken === 'undefined' || 
+      uid === 'undefined' ||
+      refreshToken == '' ||
+      uid == ''
+    ) {
       resolve(undefined);
       return;
     }

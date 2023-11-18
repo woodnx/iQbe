@@ -60,6 +60,12 @@ model histories {
   @@index([quiz_id], map: "quiz_id")
 }
 
+model invite_codes {
+  id      BigInt   @id @default(autoincrement())
+  code    String   @db.VarChar(32)
+  used    Boolean  @default(false)
+}
+
 model levels {
   id        Int         @id @default(autoincrement())
   name      String      @db.VarChar(16)
@@ -156,7 +162,7 @@ model refresh_tokens {
   user_id BigInt    @id @db.UnsignedBigInt
   token   Bytes     @db.Binary(16)
   expDate DateTime
-  users   users     @relation(fields: [user_id], references: [id], onUpdate: Restrict)
+  users   users     @relation(fields: [user_id], references: [id], onUpdate: Cascade, onDelete: Cascade)
 }
 
 model sub_categories {
