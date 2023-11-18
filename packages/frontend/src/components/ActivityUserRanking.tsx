@@ -1,9 +1,9 @@
-import { Card, Center, Divider, Group, Loader, Paper, Text, Title } from "@mantine/core";
-import ActivitySelectRange from "./ActivitySelectRange";
-import { Period } from "../plugins/dayjs";
 import { useState } from "react";
-import { useAllUserRanking } from "../hooks/useUserRanking";
+import { Card, Center, Divider, Group, Loader, Paper, Text, Title } from "@mantine/core";
+import { Period } from "@/plugins/dayjs";
+import { useAllUserRanking } from "@/hooks/useUserRanking";
 import ActivityRank from "./ActivityRank";
+import ActivitySelectRange from "./ActivitySelectRange";
 
 export default function ActivityUserRanking(){
   const [ period, setPeriod ] = useState<Period>('day');

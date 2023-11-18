@@ -1,10 +1,10 @@
-import { Card, Center, DefaultProps, Divider, Group, Loader, Title } from "@mantine/core";
-import { Bar, BarChart, LabelList, Tooltip, XAxis, YAxis } from "recharts";
-import useUserStatus from "../hooks/useUserStatus";
-import dayjs, { Period } from '../plugins/dayjs';
 import { useState } from "react";
-import ActivitySelectRange from "./ActivitySelectRange";
+import { Card, Center, DefaultProps, Divider, Group, Loader, Title } from "@mantine/core";
 import { useElementSize } from "@mantine/hooks";
+import { Bar, BarChart, LabelList, Tooltip, XAxis, YAxis } from "recharts";
+import useUserStatus from "@/hooks/useUserStatus";
+import dayjs, { Period } from '@/plugins/dayjs';
+import ActivitySelectRange from "./ActivitySelectRange";
 
 interface Props extends DefaultProps {
 

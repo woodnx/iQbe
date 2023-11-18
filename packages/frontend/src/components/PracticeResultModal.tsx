@@ -1,5 +1,5 @@
 import { Button, Center, Modal, ModalProps, Space, Stack, Title } from "@mantine/core";
-import { useIsMobile } from "../contexts/isMobile";
+import { useIsMobile } from "@/contexts/isMobile";
 
 interface Props extends ModalProps {
   rightTotal: number,

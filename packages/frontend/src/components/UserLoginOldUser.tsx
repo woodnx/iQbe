@@ -1,9 +1,9 @@
+import { useReducer } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button, Paper, PasswordInput, TextInput } from "@mantine/core";
-import { notifications } from "@mantine/notifications";
-import { loginWithUsername } from "../plugins/auth";
 import { useForm } from "@mantine/form";
-import { useReducer } from "react";
+import { notifications } from "@mantine/notifications";
+import { loginWithUsername } from "@/plugins/auth";
 
 export function UserLoginModal() {
   const navigate = useNavigate();

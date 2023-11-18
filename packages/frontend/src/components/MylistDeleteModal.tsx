@@ -1,7 +1,7 @@
 import { ActionIcon, Button, DefaultProps, Group, Modal, Selectors, Text, createStyles } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { IconTrash } from "@tabler/icons-react";
-import { useIsMobile } from "../contexts/isMobile";
+import { useIsMobile } from "@/contexts/isMobile";
 
 const useStyles = createStyles((theme) => ({
   button: {

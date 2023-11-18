@@ -1,6 +1,6 @@
+import { Quiz } from "@/types"
+import { useMylistInfomations } from "@/hooks/useMylists";
 import QuizCard from "./QuizCard"
-import { Quiz } from "../types"
-import { useMylistInfomations } from "../hooks/useMylists";
 
 interface QuizListProps {
   quizzes: Quiz[],

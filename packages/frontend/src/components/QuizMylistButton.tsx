@@ -1,14 +1,14 @@
-import { ActionIcon, Button, Checkbox, DefaultProps, Divider, Menu, createStyles } from "@mantine/core";
-import { IconPlaylistAdd, IconPlus } from "@tabler/icons-react";
-import { useDisclosure } from "@mantine/hooks";
-import MylistCreateModal from "./MylistCreateModal";
-import axios from "../plugins/axios";
-import { MylistInformation } from "../types";
 import { useState } from "react";
+import { ActionIcon, Button, Checkbox, DefaultProps, Divider, Menu, createStyles } from "@mantine/core";
+import { useDisclosure } from "@mantine/hooks";
+import { IconPlaylistAdd, IconPlus } from "@tabler/icons-react";
 import Sqids from "sqids";
 import dayjs from "dayjs";
-import useUserStore from "../store/user";
-import { useIsMobile } from "../contexts/isMobile";
+import { MylistInformation } from "@/types";
+import axios from "@/plugins/axios";
+import useUserStore from "@/store/user";
+import { useIsMobile } from "@/contexts/isMobile";
+import MylistCreateModal from "./MylistCreateModal";
 
 const useStyle = createStyles((theme) => ({
   button: {

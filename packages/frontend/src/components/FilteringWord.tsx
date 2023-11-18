@@ -1,6 +1,6 @@
 import { DefaultProps, Group, Radio, TextInput } from "@mantine/core"
-import { formInputProps } from "../hooks"
-import { KeywordOption } from "../types"
+import { formInputProps } from "@/hooks"
+import { KeywordOption } from "@/types"
 
 export type optionProps = {
   value: string,
