@@ -1,6 +1,5 @@
 import express from 'express';
 import bcrypt from 'bcrypt';
-import dotenv from 'dotenv';
 import Hashids from 'hashids';
 import dayjs from '../plugins/day';
 import { generateAccessToken, generateRefreshToken } from '../plugins/jsonwebtoken';
@@ -8,7 +7,6 @@ import { db } from '../database';
 import { sql } from 'kysely';
 
 const router = express.Router();
-dotenv.config();
 const hashids = new Hashids(
   /* salt: */      process.env.HASHIDS_SALT,
   /* minLength: */ 28,
@@ -100,6 +98,8 @@ router.post('/login', async (req, res) => {
 router.post('/signup', async (req, res) => {
   const username: string | undefined = req.body.username;
   const password: string | undefined = req.body.password;
+  const requiredInviteCode: boolean = Boolean(req.body.requiredInviteCode);
+  const code: string | undefined = req.body.inviteCode;
   const created = dayjs().format('YYYY-MM-DD HH:mm:ss');
   const expDate = dayjs().add(1, 'year').toDate();
 
@@ -109,14 +109,43 @@ router.post('/signup', async (req, res) => {
   }
 
   try {
-    const userIds = await db.selectFrom('users').select('id').execute();
-    const lastUser = userIds[userIds.length - 1].id;
+    const userIds = await db.selectFrom('users').select('id').orderBy('id desc').limit(1).execute();
+    const lastUser = userIds.length !== 0 ? userIds[0].id : 0;
     const newUserId = [ ...Array(lastUser + 1).keys() ];
 
     const uid = hashids.encode(newUserId);
     const hashedPasswd = bcrypt.hashSync(password, 10);
 
     const userData = await db.transaction().execute(async (trx) => {
+      if (requiredInviteCode) {
+        if (!code || !code.trim()) {
+          res.status(400).send('Undefined invite code');
+          return;
+        }
+
+        const inviteCode = await trx
+        .selectFrom('invite_codes')
+        .selectAll()
+        .where('code', '=', code)
+        .executeTakeFirstOrThrow();
+
+        if (inviteCode.used) {
+          res.status(400).send('Invaild invite code');
+          return;
+        }
+
+        if (!inviteCode) {
+          res.status(400).send('No invite code');
+          return;
+        }
+
+        await trx
+        .updateTable('invite_codes')
+        .set({ used: 1 })
+        .where('code', '=', code)
+        .executeTakeFirstOrThrow();
+      }
+
       await trx
       .insertInto('users')
       .values({
@@ -165,11 +194,11 @@ router.post('/signup', async (req, res) => {
 });
 
 router.post('/token', async (req, res) => {
-  const refreshToken = req.body.refresh_token;
+  const refreshToken: string | undefined = req.body.refresh_token;
   const uid = req.body.id;
 
   if (!refreshToken) {
-    res.status(401).send('invailed token');
+    res.status(401).send('no token');
     return;
   }
 
@@ -197,9 +226,14 @@ router.post('/token', async (req, res) => {
       ]).as('token'),
     ])
     .where('user_id', '=', userId)
-    .executeTakeFirstOrThrow()).token;
+    .executeTakeFirst())?.token;
     
-    if (token !== refreshToken) {
+    if (!token) {
+      res.status(400).send('no token')
+      return;
+    }
+
+    if (refreshToken.localeCompare(token, undefined, { sensitivity: 'base' })) {
       res.status(400).send('invailed token');
       return;
     }

@@ -9,7 +9,8 @@
     "watch": "tsc-watch --noClear --onSuccess \"node ./dist/index.js\"",
     "migrate:create": "npx prisma migrate dev --create-only",
     "migrate:exe": "npx prisma migrate dev",
-    "migrate:status": "npx prisma migrate status"
+    "migrate:status": "npx prisma migrate status",
+    "migrate:reset": "npx prisma migrate reset"
   },
   "author": "",
   "license": "ISC",
@@ -18,7 +19,6 @@
     "bcrypt": "^5.1.1",
     "cors": "^2.8.5",
     "dayjs": "^1.11.9",
-    "dotenv": "^16.3.1",
     "express": "^4.18.2",
     "firebase-admin": "^11.10.1",
     "hashids": "^2.3.0",

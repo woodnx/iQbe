@@ -21,6 +21,11 @@ export type histories = {
     judgement: number;
     pressed_word: Generated<number | null>;
 };
+export type invite_codes = {
+    id: Generated<number>;
+    code: string;
+    used: Generated<number>;
+};
 export type levels = {
     id: Generated<number>;
     name: string;
@@ -102,6 +107,7 @@ export type DB = {
     categories: categories;
     favorites: favorites;
     histories: histories;
+    invite_codes: invite_codes;
     levels: levels;
     mylists: mylists;
     mylists_quizzes: mylists_quizzes;

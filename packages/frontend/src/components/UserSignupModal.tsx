@@ -10,8 +10,11 @@ import { IconCheck } from "@tabler/icons-react";
 
 interface SubmitValue {
   username: string,
-  password: string
+  password: string,
+  inviteCode?: string,
 }
+
+const requiredInviteCode = import.meta.env.VITE_REQUIRED_INVITE_CODE !== 'false' ? true : false;
 
 export function UserSignupModal() {
   const [ available, setAvailable ] = useState(false);
@@ -21,6 +24,7 @@ export function UserSignupModal() {
       username: '',
       password: '',
       confirmPassword: '',
+      inviteCode: '',
     },
     validate: {
       username: (value) => 
@@ -77,7 +81,7 @@ export function UserSignupModal() {
 
   const submit = async (values: SubmitValue) => {
     try { 
-      await signupUser(values.username, values.password)
+      await signupUser(values.username, values.password, requiredInviteCode, values.inviteCode)
       .then(async (_user) => {
         navigate('/');
       });
@@ -85,8 +89,8 @@ export function UserSignupModal() {
       form.reset();
     } catch {
       notifications.show({
-        title: 'Login Error',
-        message: 'No such user',
+        title: 'Signup Error',
+        message: '',
         color: 'red',
         withBorder: true,
       });
@@ -122,6 +126,19 @@ export function UserSignupModal() {
           size="md"
           mt="sm"
         />
+        {
+          requiredInviteCode 
+          ? 
+          <TextInput
+            {...form.getInputProps('inviteCode')}
+            placeholder="Invite code"
+            label="Invite code"
+            radius="xl"
+            size="md"
+            mt="sm"
+          /> 
+          : null
+        }
         <Button 
           fullWidth 
           type="submit" 
