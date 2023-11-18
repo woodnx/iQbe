@@ -1,12 +1,12 @@
-import { useNavigate, useParams } from "react-router-dom"
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { Card, Center, Grid, Group, Loader, Text } from "@mantine/core";
 import QuizControllBar from "../components/QuizControllBar";
 import FilteringModal from "../components/FilteringModal";
 import QuizShuffleButton from "../components/QuizShuffleButton";
-import { Card, Center, Grid, Group, Loader, Text } from "@mantine/core";
 import QuizPagination from "../components/QuizPagination";
 import QuizList from "../components/QuizList";
 import { KeywordOption, MylistInformation, QuizRequestParams } from "../types";
-import { useEffect, useState } from "react";
 import useQuizzes from "../hooks/useQuizzes";
 import { useMylistInfomations } from "../hooks/useMylists";
 import MylistDeleteModal from "../components/MylistDeleteModal";

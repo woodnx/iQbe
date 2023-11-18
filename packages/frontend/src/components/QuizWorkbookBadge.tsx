@@ -1,5 +1,5 @@
 import { Badge, BadgeProps } from "@mantine/core";
-import { useIsMobile } from "../contexts/isMobile";
+import { useIsMobile } from "@/contexts/isMobile";
 
 interface Props extends BadgeProps {
   workbookName: string,

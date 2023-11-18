@@ -1,5 +1,5 @@
 import { Button } from "@mantine/core";
-import { logoutUser } from "../plugins/auth";
+import { logoutUser } from "@/plugins/auth";
 
 export default function LogoutButton() {
   return (

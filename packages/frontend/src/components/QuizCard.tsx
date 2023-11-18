@@ -1,9 +1,9 @@
+import { useState } from "react";
 import { Button, Card, DefaultProps, Flex, Group, Text, } from "@mantine/core";
+import { Judgement, MylistInformation, Quiz } from "@/types";
 import QuizMylistButton from "./QuizMylistButton";
 import QuizFavoriteButton from "./QuizFavoriteButton";
-import { Judgement, MylistInformation, Quiz } from "../types";
 import { QuizWorkbookBadge } from "./QuizWorkbookBadge";
-import { useState } from "react";
 
 interface Props extends DefaultProps{
   index: number,

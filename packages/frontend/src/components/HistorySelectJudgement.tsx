@@ -1,5 +1,5 @@
+import { Judgement } from "@/types";
 import HistorySelectButton from "./HistorySelectButton";
-import { Judgement } from "../types";
 
 interface Props {
   judgements: Judgement[],

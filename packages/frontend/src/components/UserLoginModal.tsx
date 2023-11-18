@@ -1,9 +1,9 @@
+import { useReducer } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button, Paper, PasswordInput, TextInput } from "@mantine/core";
-import { notifications } from "@mantine/notifications";
-import { loginOldUser, loginWithUsername } from "../plugins/auth";
 import { useForm } from "@mantine/form";
-import { useReducer } from "react";
+import { notifications } from "@mantine/notifications";
+import { loginOldUser, loginWithUsername } from "@/plugins/auth";
 
 interface SubmitValue {
   username: string,

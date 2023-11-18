@@ -1,7 +1,7 @@
 import React, { forwardRef  } from "react";
 import useSWR from "swr";
-import { fetcher } from "../fetchers";
 import { Badge, DefaultProps, Group, MultiSelect } from "@mantine/core";
+import { fetcher } from "@/fetchers";
 
 interface WorkbookProps extends React.ComponentPropsWithoutRef<'div'> {
   id: string,
