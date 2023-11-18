@@ -1,7 +1,7 @@
 import express from 'express'
-import dayjs, { generateRange } from '../day'
-import type { Period } from '../day'
-import knex from '../knex'
+import dayjs, { generateRange } from '../plugins/day'
+import type { Period } from '../plugins/day'
+import knex from '../plugins/knex'
 import { db } from '../database'
 import { sql } from 'kysely'
 

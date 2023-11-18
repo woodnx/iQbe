@@ -9,12 +9,14 @@
   "private": true,
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "node ./scripts/build.mjs",
-    "start": "cd packages/backend/dist && node index.js",
+    "build": "env-cmd -f .env node ./scripts/build.mjs",
+    "start": "cd packages/backend/dist && env-cmd -f .env node index.js",
     "clean": "node ./scripts/clean.mjs",
-    "dev": "node ./scripts/dev.mjs",
-    "migrate:dev": "cd packages/backend && npm run migrate:dev",
-    "migrate:status": "cd packages/backend && npm run migrate:status"
+    "dev": "env-cmd -f .env node ./scripts/dev.mjs",
+    "migrate:create": "cd packages/backend && env-cmd -f ../../.env npm run migrate:create",
+    "migrate:exe": "cd packages/backend && env-cmd -f ../../.env npm run migrate:exe",
+    "migrate:status": "cd packages/backend && env-cmd -f ../../.env npm run migrate:status",
+    "migrate:reset": "cd packages/backend && env-cmd -f ../../.env npm run migrate:reset"
   },
   "repository": {
     "type": "git",

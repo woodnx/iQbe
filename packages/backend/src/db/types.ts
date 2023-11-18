@@ -21,6 +21,11 @@ export type histories = {
     judgement: number;
     pressed_word: Generated<number | null>;
 };
+export type invite_codes = {
+    id: Generated<number>;
+    code: string;
+    used: Generated<number>;
+};
 export type levels = {
     id: Generated<number>;
     name: string;
@@ -63,6 +68,13 @@ export type quizzes_categories = {
     sub_category_id: number;
     user_id: number;
 };
+export type refresh_tokens = {
+    id: Generated<number>;
+    user_id: number;
+    token: Buffer;
+    expDate: Timestamp;
+    expired: Generated<number>;
+};
 export type SequelizeMeta = {
     name: string;
 };
@@ -81,6 +93,9 @@ export type users = {
     id: Generated<number>;
     uid: Generated<string>;
     nickname: Generated<string>;
+    username: Generated<string>;
+    email: Generated<string>;
+    passwd: Generated<string>;
     modified: Timestamp;
     created: Timestamp | null;
 };
@@ -94,12 +109,14 @@ export type DB = {
     categories: categories;
     favorites: favorites;
     histories: histories;
+    invite_codes: invite_codes;
     levels: levels;
     mylists: mylists;
     mylists_quizzes: mylists_quizzes;
     quiz_reports: quiz_reports;
     quizzes: quizzes;
     quizzes_categories: quizzes_categories;
+    refresh_tokens: refresh_tokens;
     SequelizeMeta: SequelizeMeta;
     sub_categories: sub_categories;
     test_quizzes: test_quizzes;

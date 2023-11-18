@@ -60,6 +60,12 @@ model histories {
   @@index([quiz_id], map: "quiz_id")
 }
 
+model invite_codes {
+  id      BigInt   @id @default(autoincrement())
+  code    String   @db.VarChar(32)
+  used    Boolean  @default(false)
+}
+
 model levels {
   id        Int         @id @default(autoincrement())
   name      String      @db.VarChar(16)
@@ -152,6 +158,15 @@ model quizzes_categories {
   @@index([sub_category_id], map: "sub_category_id")
 }
 
+model refresh_tokens {
+  id      BigInt    @id @default(autoincrement())
+  user_id BigInt    @db.UnsignedBigInt
+  token   Bytes     @db.Binary(16)
+  expDate DateTime  
+  expired Boolean   @default(false)
+  users   users     @relation(fields: [user_id], references: [id], onUpdate: Cascade, onDelete: Cascade)
+}
+
 model sub_categories {
   id                 BigInt               @id @default(autoincrement())
   parent_id          BigInt
@@ -198,6 +213,9 @@ model users {
   id             BigInt           @id @default(autoincrement()) @db.UnsignedBigInt
   uid            String           @unique(map: "uid") @default("") @db.VarChar(255)
   nickname       String           @default("") @db.VarChar(255)
+  username       String           @default("") @db.VarChar(255)
+  email          String           @default("") @db.VarChar(255)
+  passwd         String           @default("") @db.Char(60) 
   modified       DateTime         @db.DateTime(0)
   created        DateTime?        @db.DateTime(0)
   answer_logs    answer_logs[]    @ignore
@@ -205,6 +223,7 @@ model users {
   histories      histories[]
   mylists        mylists[]
   quiz_reports   quiz_reports[]
+  refresh_tokens refresh_tokens[]
   tests_results  tests_results[]  @ignore
   users_settings users_settings[] @ignore
 }

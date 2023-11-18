@@ -1,4 +1,5 @@
 import express, { Router } from 'express'
+import knex from '../plugins/knex'
 import { db } from '../database'
 
 const router: Router = express.Router()
