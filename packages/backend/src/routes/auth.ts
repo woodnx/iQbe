@@ -16,6 +16,7 @@ const hashids = new Hashids(
 router.post('/login', async (req, res) => {
   const username: string | undefined = req.body.username;
   const password: string | undefined = req.body.password;
+  const expDate = dayjs().add(1, 'year').toDate();
   const errorMes = 'No user with such a user name and password';
 
   if (!username) {
@@ -24,72 +25,72 @@ router.post('/login', async (req, res) => {
   }
 
   try {
-    let user = await db
-    .selectFrom('users')
-    .selectAll()
-    .where('username', '=', username)
-    .executeTakeFirst();
-
-    if (!user) {
-      const emailUser = await db
+    await db.transaction().execute(async (trx) => {
+      let user = await trx
       .selectFrom('users')
       .selectAll()
-      .where('email', '=', username)
-      .executeTakeFirstOrThrow();
-
-      if (!!emailUser && !emailUser.passwd) {
-        res.status(200).send('please do re-registration');
+      .where('username', '=', username)
+      .executeTakeFirst();
+  
+      if (!user) {
+        const emailUser = await trx
+        .selectFrom('users')
+        .selectAll()
+        .where('email', '=', username)
+        .executeTakeFirstOrThrow();
+  
+        if (!!emailUser && !emailUser.passwd) {
+          res.status(200).send('please do re-registration');
+          return;
+        } else if (!emailUser){
+          res.status(401).send(errorMes);
+          return;
+        }
+  
+        user = emailUser;
+      }
+  
+      if (!password) {
+        res.status(401).send('Undefined username or password');
         return;
-      } else if (!emailUser){
+      }
+  
+      const crctPassword = bcrypt.compareSync(password, user.passwd);
+      if (!crctPassword) {
         res.status(401).send(errorMes);
         return;
       }
-
-      user = emailUser;
-    }
-
-    if (!password) {
-      res.status(401).send('Undefined username or password');
-      return;
-    }
-
-    const crctPassword = bcrypt.compareSync(password, user.passwd);
-    if (!crctPassword) {
-      res.status(401).send(errorMes);
-      return;
-    }
-
-    const genTokenUser = {
-      uid: user.uid,
-      username,
-    };
-
-    const accessToken = await generateAccessToken(genTokenUser);
-    const refreshToken = (await db
-    .selectFrom('refresh_tokens')
-    .select(({ fn, val }) => [
-      fn<string>('concat', [
-        sql`SUBSTRING(HEX(token), 1, 8)`,
-        val('-'),
-        sql`SUBSTRING(HEX(token), 9, 4)`,
-        val('-'),
-        sql`SUBSTRING(HEX(token), 13, 4)`,
-        val('-'),
-        sql`SUBSTRING(HEX(token), 17, 4)`,
-        val('-'),
-        sql`SUBSTRING(HEX(token), 21, 12)`,
-      ]).as('token'),
-    ])
-    .where('user_id', '=', user.id)
-    .executeTakeFirst())?.token;
-
-    if(!refreshToken) {
-      res.status(400).send('no token');
-      return;
-    }
-
-    const { id, passwd, ...sendUser } = user;
-    return res.status(200).json({ accessToken, refreshToken, user: sendUser });
+  
+      const genTokenUser = {
+        uid: user.uid,
+        username,
+      };
+  
+      const accessToken = await generateAccessToken(genTokenUser);
+      const refreshToken = await generateRefreshToken(genTokenUser);
+  
+      // 古いリフレッシュトークンを失効
+      await trx
+      .updateTable('refresh_tokens')
+      .set({
+        expired: 1,
+      })
+      .where('user_id', '=', user.id)
+      .execute();
+      
+      // 新しいリフレッシュトークンを登録
+      await trx
+      .insertInto('refresh_tokens')
+      .values({ 
+        user_id: user.id,
+        token: sql<Buffer>`UNHEX(REPLACE(${refreshToken}, '-', ''))`,
+        expDate,
+      })
+      .execute();
+  
+      const { id, passwd, ...sendUser } = user;
+      res.status(200).json({ accessToken, refreshToken, user: sendUser });
+    });
   } catch(e) {
     res.status(400).json({ error: 'failed login' });
   }
@@ -224,16 +225,18 @@ router.post('/token', async (req, res) => {
         val('-'),
         sql`SUBSTRING(HEX(token), 21, 12)`,
       ]).as('token'),
+      'expired'
     ])
     .where('user_id', '=', userId)
-    .executeTakeFirst())?.token;
+    .orderBy('id desc')
+    .executeTakeFirst());
     
     if (!token) {
       res.status(400).send('no token')
       return;
     }
 
-    if (refreshToken.localeCompare(token, undefined, { sensitivity: 'base' })) {
+    if (refreshToken.localeCompare(token.token, undefined, { sensitivity: 'base' }) || token.expired) {
       res.status(400).send('invailed token');
       return;
     }

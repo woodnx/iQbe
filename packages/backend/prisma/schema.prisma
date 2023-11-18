@@ -159,9 +159,11 @@ model quizzes_categories {
 }
 
 model refresh_tokens {
-  user_id BigInt    @id @db.UnsignedBigInt
+  id      BigInt    @id @default(autoincrement())
+  user_id BigInt    @db.UnsignedBigInt
   token   Bytes     @db.Binary(16)
-  expDate DateTime
+  expDate DateTime  
+  expired Boolean   @default(false)
   users   users     @relation(fields: [user_id], references: [id], onUpdate: Cascade, onDelete: Cascade)
 }
 
