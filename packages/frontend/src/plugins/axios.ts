@@ -35,6 +35,13 @@ axios.interceptors.response.use((responce) => {
     });
   }
 
+  // @ts-ignore
+  if (error.response?.data === 'no token' || error.response?.data === 'invalid token') {
+    localStorage.setItem('accessToken', "");
+    localStorage.setItem('refreshToken', "");
+    localStorage.setItem('uid', "");
+  }
+
   return Promise.reject(error);
 });
 
