@@ -69,9 +69,11 @@ export type quizzes_categories = {
     user_id: number;
 };
 export type refresh_tokens = {
+    id: Generated<number>;
     user_id: number;
     token: Buffer;
     expDate: Timestamp;
+    expired: Generated<number>;
 };
 export type SequelizeMeta = {
     name: string;
