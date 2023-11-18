@@ -1,5 +1,5 @@
 import _axios, { AxiosError } from "axios";
-import useUserStore from "../store/user";
+import { getIdToken } from "./auth";
 
 const axios = _axios.create({
   baseURL: '/api',
@@ -13,7 +13,7 @@ const axios = _axios.create({
 
 axios.interceptors.request.use(async (request) => {
   //リクエスト前に毎回idTokenを取得する
-  const idToken = useUserStore.getState().idToken;
+  const idToken = localStorage.getItem('accessToken');
   
   request.headers.Authorization = idToken;
   
@@ -30,7 +30,16 @@ axios.interceptors.response.use((responce) => {
 (error: AxiosError) => {
   // @ts-ignore
   if (error.response?.data.message === 'invalid authorization'){
-    useUserStore.getState().setIdToken();
+    getIdToken().then(token => {
+      localStorage.setItem('accessToken', token || "");
+    });
+  }
+
+  // @ts-ignore
+  if (error.response?.data === 'no token' || error.response?.data === 'invalid token') {
+    localStorage.setItem('accessToken', "");
+    localStorage.setItem('refreshToken', "");
+    localStorage.setItem('uid', "");
   }
 
   return Promise.reject(error);

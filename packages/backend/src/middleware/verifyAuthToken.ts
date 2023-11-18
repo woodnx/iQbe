@@ -1,6 +1,5 @@
 import type { Request, Response, NextFunction } from 'express';
-import { auth } from 'firebase-admin';
-import knex from '../knex';
+import { verifyAccessToken } from '../plugins/jsonwebtoken';
 
 // ユーザ認証ミドルウェア
 export default async function (req: Request, res: Response, next: NextFunction) {
@@ -14,12 +13,7 @@ export default async function (req: Request, res: Response, next: NextFunction) 
 
   try {
     // idTokenを検証
-    const decodedIdToken = await auth().verifyIdToken(idToken);
-    req.user = decodedIdToken;
-
-    const userId = await knex('users').select('id').where('uid', decodedIdToken.uid).first()
-
-    req.userId = userId.id
+    await verifyAccessToken(idToken);
 
     next();
   } catch(e) {

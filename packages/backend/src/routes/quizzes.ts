@@ -1,9 +1,7 @@
 import express, { Router, Request } from 'express'
 import { sql } from 'kysely';
-import knex from '../knex';
 import dayjs from 'dayjs';
 import { db } from '../database';
-import { Timestamp } from '../db/types';
 
 const router: Router = express.Router()
 
@@ -57,7 +55,7 @@ router.get('/:listName?', async (req: QuizRequest, res) => {
     .innerJoin('workbooks', 'quizzes.workbook_id', 'workbooks.id')
     .innerJoin('levels', 'workbooks.level_id', 'levels.id')
     //.leftJoin('histories', 'histories.quiz_id', 'quizzes.id')
-    .select(({ fn, val, ref }) => [
+    .select(({ fn }) => [
       'quizzes.id as id',
       'quizzes.que as question',
       'quizzes.ans as answer',
@@ -142,28 +140,42 @@ router.get('/:listName?', async (req: QuizRequest, res) => {
     .offset(maxView*(page - 1))
     .execute();
 
-    const favorites = await knex('favorites')
+    const favorites = await db
+    .selectFrom('favorites')
     .select('quiz_id')
-    .where('user_id', userId)
+    .where('user_id', '=', userId)
+    .execute();
 
-    const mylists = await knex('mylists_quizzes')
-    .select('quiz_id', 'mylist_id')
+    const mylists = await db
+    .selectFrom('mylists_quizzes')
     .innerJoin('mylists', 'mylists_quizzes.mylist_id', 'mylists.id')
-    .where('mylists.user_id', userId)
+    .select(['quiz_id', 'mylist_id'])
+    .where('mylists.user_id', '=', userId)
+    .execute();
 
     const data = await Promise.all(
       quizzes.map(async quiz => {
-        const total = await knex('histories')
-        .count('*', {as: 'total'})
-        .where('quiz_id', quiz.id).first()
+        const total = await db
+        .selectFrom('histories')
+        .select(({ fn }) => [
+          fn.count('quiz_id').as('total')
+        ])
+        .where('quiz_id', '=', quiz.id)
+        .executeTakeFirst();
 
-        const right = await knex('histories')
-        .count('*', {as: 'right'})
-        .where('quiz_id', quiz.id)
-        .andWhere('judgement', 1).first()
+        const right = await db
+        .selectFrom('histories')
+        .select(({ fn }) => [
+          fn.count('quiz_id').as('right')
+        ])
+        .where(({ eb, and }) => and([
+          eb('quiz_id', '=', quiz.id),
+          eb('judgement', '=', 1),
+        ]))
+        .executeTakeFirst();
 
-        const isFavorite = favorites.some(f => f.quiz_id == quiz.id)
-        const registerdMylist = mylists.filter(m => m.quiz_id == quiz.id).map(m => m.mylist_id)
+        const isFavorite = favorites.some(f => f.quiz_id == quiz.id);
+        const registerdMylist = mylists.filter(m => m.quiz_id == quiz.id).map(m => m.mylist_id);
 
         return {
           ...quiz,
@@ -171,12 +183,9 @@ router.get('/:listName?', async (req: QuizRequest, res) => {
           ...right,
           isFavorite,
           registerdMylist,
-        }
-      }
-    ))
+        };
+    }));
 
-    //console.log(data)
-    
     res.status(200).send(data)
   } catch(e) {
     console.log('An Error Occurred')

@@ -1,7 +1,7 @@
 import express, { Router } from 'express';
 import { writeFileSync } from 'fs';
 import path from 'path';
-import dayjs from '../day';
+import dayjs from '../plugins/day';
 import { db } from '../database';
 
 const router: Router = express.Router();

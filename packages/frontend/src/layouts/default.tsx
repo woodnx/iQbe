@@ -1,4 +1,3 @@
-import { onAuthStateChanged } from "firebase/auth";
 import { useLayoutEffect } from "react";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { ActionIcon, AppShell, Center, Container, Drawer, Footer, Group, Loader, NavLink, Navbar, ThemeIcon, createStyles, getStylesRef } from "@mantine/core";
@@ -7,12 +6,10 @@ import { useState } from "react";
 import { useDisclosure, useMediaQuery } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
 import useUserStore from "../store/user";
-import LogoutButton from "../components/LogoutButton";
+import UserLogoutButton from "../components/UserLogoutButton";
 import { useMylistInfomations } from "../hooks/useMylists";
 import Logo from "../components/Logo";
-import { auth } from "../plugins/firebase";
-import axios from "../plugins/axios";
-import { UserData } from "../types";
+import { checkAuth } from "../plugins/auth";
 
 const mockdata = [
   { 
@@ -72,8 +69,6 @@ export default function DefaultLayout() {
   const [opened, { open, close }] = useDisclosure(false);
   const navigate = useNavigate();
   const location = useLocation();
-  const idToken = useUserStore((state) => state.idToken);
-  const setIdToken = useUserStore((state) => state.setIdToken);
   const setUserData = useUserStore((state) => state.setUserData);
   const { mylists } = useMylistInfomations(!loading);
   
@@ -81,9 +76,10 @@ export default function DefaultLayout() {
     let ignore = false;
     setActive(mockdata.findIndex((data) => data.link === location.pathname));
 
-    const authStateChanged = onAuthStateChanged(auth, async (user) => {
+    checkAuth()
+    .then((user) => {
       if (ignore) return;
-      if (!user) { 
+      if (!user) {
         navigate('/login') 
         notifications.show({
           title: 'Require Login',
@@ -91,16 +87,14 @@ export default function DefaultLayout() {
           color: 'red',
           withBorder: true,
         });
-        return; 
+        return;
       }
-      if (!idToken) await setIdToken();
-      const userData = await axios.put<UserData>('/users/login').then(res => res.data);
       setLoading(false);
-      setUserData(userData);
+      setUserData(user);
     });
     return () => {
       ignore = true;
-      authStateChanged();
+      // authStateChanged();
     }
   }, []);
 
@@ -162,7 +156,7 @@ export default function DefaultLayout() {
         {mylistLinks}
       </Navbar.Section>
       <Navbar.Section>
-        <LogoutButton/>
+        <UserLogoutButton/>
       </Navbar.Section>
     </Navbar>
   );
@@ -258,7 +252,7 @@ export default function DefaultLayout() {
                 {mylistLinks}
               </Navbar.Section>
               <Navbar.Section>
-                <LogoutButton/>
+                <UserLogoutButton/>
               </Navbar.Section>
             </Navbar>
           </Drawer.Body>
