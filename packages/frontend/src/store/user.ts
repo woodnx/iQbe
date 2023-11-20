@@ -12,8 +12,8 @@ export type UserState = {
   idToken: string | null,
   setIdToken: () => void,
   setUserData: ({
-    id, 
-    nickname
+    uid, 
+    username
   }: UserData) => void,
 };
 
@@ -33,8 +33,8 @@ const useUserStore: UseBoundStore<StoreApi<UserState>> = create<UserState>((set)
     set({ idToken });
   },
   setUserData: ({
-    id, 
-    nickname
+    uid,
+    username
   }) => {
     set({ userId: id, nickname });
   }

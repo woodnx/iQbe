@@ -1,6 +1,6 @@
 import express, { Router } from 'express'
-import dayjs from '../plugins/day'
-import { db } from '../database';
+import { db } from '@/database';
+import dayjs from '@/plugins/day'
 
 const router: Router = express.Router();
 

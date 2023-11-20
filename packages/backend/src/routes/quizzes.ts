@@ -1,7 +1,7 @@
 import express, { Router, Request } from 'express'
 import { sql } from 'kysely';
 import dayjs from 'dayjs';
-import { db } from '../database';
+import { db } from '@/database';
 
 const router: Router = express.Router()
 

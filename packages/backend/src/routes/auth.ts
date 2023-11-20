@@ -1,10 +1,10 @@
 import express from 'express';
+import { sql } from 'kysely';
 import bcrypt from 'bcrypt';
 import Hashids from 'hashids';
-import dayjs from '../plugins/day';
-import { generateAccessToken, generateRefreshToken } from '../plugins/jsonwebtoken';
-import { db } from '../database';
-import { sql } from 'kysely';
+import { db } from '@/database';
+import dayjs from '@/plugins/day';
+import { generateAccessToken, generateRefreshToken } from '@/plugins/jsonwebtoken';
 
 const router = express.Router();
 const hashids = new Hashids(
