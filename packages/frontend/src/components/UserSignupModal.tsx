@@ -1,12 +1,11 @@
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button, Flex, Paper, PasswordInput, Space, Text, TextInput } from "@mantine/core";
 import { useForm, isNotEmpty, matchesField } from '@mantine/form';
 import { notifications } from "@mantine/notifications";
-import { signupUser } from "../plugins/auth";
-import { useEffect, useState } from "react";
-import axios from "../plugins/axios";
-import { IconAlertTriangle } from "@tabler/icons-react";
-import { IconCheck } from "@tabler/icons-react";
+import { IconAlertTriangle, IconCheck } from "@tabler/icons-react";
+import { signupUser } from "@/plugins/auth";
+import axios from "@/plugins/axios";
 
 interface SubmitValue {
   username: string,

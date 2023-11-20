@@ -1,7 +1,7 @@
-import express, { Router } from 'express'
-import { db } from '../database'
+import express, { Router } from 'express';
+import { db } from '@/database';
 
-const router: Router = express.Router()
+const router: Router = express.Router();
 
 router.get('/', async (req, res) => {
   try {

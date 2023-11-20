@@ -1,13 +1,13 @@
-import QuizList from '../components/QuizList'
-import QuizControllBar from '../components/QuizControllBar'
-import useQuizzes from '../hooks/useQuizzes'
+import QuizList from '@/components/QuizList'
+import QuizControllBar from '@/components/QuizControllBar'
+import useQuizzes from '@/hooks/useQuizzes'
 import { Center, Grid, Group, Loader } from '@mantine/core'
-import FilteringModal from '../components/FilteringModal'
-import { KeywordOption, QuizRequestParams } from '../types'
+import FilteringModal from '@/components/FilteringModal'
+import { KeywordOption, QuizRequestParams } from '@/types'
 import { useState } from 'react'
-import QuizPagination from '../components/QuizPagination'
-import QuizShuffleButton from '../components/QuizShuffleButton'
-import QuizHiddenAnswerButton from '../components/QuizHiddenAnswerButton'
+import QuizPagination from '@/components/QuizPagination'
+import QuizShuffleButton from '@/components/QuizShuffleButton'
+import QuizHiddenAnswerButton from '@/components/QuizHiddenAnswerButton'
 
 export default function Search() {
   const [ params, setParams ] = useState<QuizRequestParams>({perPage: 100})

@@ -1,17 +1,17 @@
 import { useState } from "react"
-import { Judgement, KeywordOption, QuizRequestParams } from "../types"
-import useQuizzes from "../hooks/useQuizzes";
-import QuizControllBar from "../components/QuizControllBar";
-import FilteringModal from "../components/FilteringModal";
-import QuizShuffleButton from "../components/QuizShuffleButton";
-import QuizPagination from "../components/QuizPagination";
-import QuizList from "../components/QuizList";
 import { Center, Grid, Group, Loader } from "@mantine/core";
-import HistorySelectJudgement from "../components/HistorySelectJudgement";
-import HistoryDateRange from "../components/HistoryDateRange";
-import dayjs from "../plugins/dayjs";
-import { useHistories } from "../hooks/useHistories";
-import QuizHiddenAnswerButton from "../components/QuizHiddenAnswerButton";
+import { Judgement, KeywordOption, QuizRequestParams } from "@/types"
+import useQuizzes from "@/hooks/useQuizzes";
+import QuizControllBar from "@/components/QuizControllBar";
+import FilteringModal from "@/components/FilteringModal";
+import QuizShuffleButton from "@/components/QuizShuffleButton";
+import QuizPagination from "@/components/QuizPagination";
+import QuizList from "@/components/QuizList";
+import HistorySelectJudgement from "@/components/HistorySelectJudgement";
+import HistoryDateRange from "@/components/HistoryDateRange";
+import dayjs from "@/plugins/dayjs";
+import { useHistories } from "@/hooks/useHistories";
+import QuizHiddenAnswerButton from "@/components/QuizHiddenAnswerButton";
  
 export default function History() {
   const [ activePage, setPage ] = useState(1);

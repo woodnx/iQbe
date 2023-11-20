@@ -1,6 +1,6 @@
 import { ActionIcon, Button, DefaultProps } from "@mantine/core";
 import { IconEye, IconEyeOff } from "@tabler/icons-react";
-import { useIsMobile } from "../contexts/isMobile";
+import { useIsMobile } from "@/contexts/isMobile";
 
 interface Props extends DefaultProps {
   isHidden: boolean,

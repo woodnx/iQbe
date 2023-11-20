@@ -2,7 +2,7 @@ import express from 'express';
 import fs from 'fs';
 import path from 'path';
 import cors from 'cors';
-import verifyAuthToken from './middleware/verifyAuthToken';
+import verifyAuthToken from '@/middleware/verifyAuthToken';
 import server from './allowed-server';
 
 const app = express(); // expressをインスタンス化

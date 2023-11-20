@@ -1,11 +1,11 @@
+import { useLayoutEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button, Center, Modal, Stack } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { UserLoginModal } from '../components/UserLoginModal';
-import Logo from "../components/Logo";
-import { UserSignupModal } from "../components/UserSignupModal";
-import { useLayoutEffect } from "react";
-import { checkAuth } from "../plugins/auth";
-import { useNavigate } from "react-router-dom";
+import { UserLoginModal } from '@/components/UserLoginModal';
+import Logo from "@/components/Logo";
+import { UserSignupModal } from "@/components/UserSignupModal";
+import { checkAuth } from "@/plugins/auth";
 
 export default function Login() {
   const [ loginOpened, { open: loginOpen, close: loginClose } ] = useDisclosure(false);

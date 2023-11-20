@@ -1,6 +1,6 @@
+import { ReactNode } from "react";
 import { Grid, Group, Header, Text } from "@mantine/core";
 import { useElementSize } from "@mantine/hooks";
-import { ReactNode } from "react";
 
 interface QuizControllBarProps {
   height: number,

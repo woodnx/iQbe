@@ -1,8 +1,8 @@
+import { useState } from "react";
 import { ActionIcon, DefaultProps, Popover, UnstyledButton } from "@mantine/core";
 import { DatePicker } from '@mantine/dates';
 import { IconChevronLeft, IconChevronRight } from "@tabler/icons-react";
-import dayjs from "../plugins/dayjs";
-import { useState } from "react";
+import dayjs from "@/plugins/dayjs";
 
 interface Props extends DefaultProps{
   dates: number[],
