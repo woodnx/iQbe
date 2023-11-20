@@ -1,7 +1,7 @@
+import { useState } from "react";
 import { ActionIcon } from "@mantine/core";
 import { IconStar, IconStarFilled } from "@tabler/icons-react";
-import { useState } from "react";
-import axios from "../plugins/axios";
+import axios from "@/plugins/axios";
 
 interface QuizFavoriteButtonProps {
   isFavorite: boolean,

@@ -5,6 +5,11 @@ import myManifest from './manifest.json';
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  resolve: {
+    alias: {
+      "@/": `${__dirname}/src/`,
+    },
+  },
   server: {
 		proxy: {
       '/api': {

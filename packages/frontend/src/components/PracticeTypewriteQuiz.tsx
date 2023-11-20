@@ -1,7 +1,7 @@
 import { Card, DefaultProps, Overlay, Progress, Text } from "@mantine/core";
 import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
 import 'react-circular-progressbar/dist/styles.css';
-import { useIsMobile } from "../contexts/isMobile";
+import { useIsMobile } from "@/contexts/isMobile";
 
 interface Props extends DefaultProps {
   question: string,

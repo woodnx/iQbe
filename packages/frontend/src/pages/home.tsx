@@ -1,6 +1,6 @@
 import { Card, Grid, Tabs } from "@mantine/core";
-import ActivityStatus from "../components/ActivityStatus";
-import ActivityUserRanking from "../components/ActivityUserRanking";
+import ActivityStatus from "@/components/ActivityStatus";
+import ActivityUserRanking from "@/components/ActivityUserRanking";
 
 export default function Home() {
   return (

@@ -1,6 +1,6 @@
 import { ActionIcon, Button, DefaultProps } from "@mantine/core"
 import { IconArrowsShuffle } from "@tabler/icons-react"
-import { useIsMobile } from "../contexts/isMobile";
+import { useIsMobile } from "@/contexts/isMobile";
 
 interface QuizShuffleButton extends DefaultProps {
   apply: (seed: number) => void

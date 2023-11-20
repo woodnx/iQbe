@@ -1,6 +1,6 @@
 import { Button, DefaultProps, Menu } from "@mantine/core";
-import { Period } from "../plugins/dayjs";
 import { IconChevronDown } from "@tabler/icons-react";
+import { Period } from "@/plugins/dayjs";
 
 interface Props extends DefaultProps {
   period: Period,

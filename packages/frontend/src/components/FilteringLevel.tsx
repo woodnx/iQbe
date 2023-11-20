@@ -1,6 +1,6 @@
 import useSWR from "swr";
-import { fetcher } from "../fetchers";
 import { Checkbox, DefaultProps, Group } from "@mantine/core";
+import { fetcher } from "@/fetchers";
 
 interface FilteringLevelProps extends DefaultProps {
   value: string[] | undefined,
