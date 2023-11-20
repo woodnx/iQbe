@@ -1,11 +1,10 @@
-import express from 'express'
-import dayjs, { generateRange } from '../plugins/day'
-import type { Period } from '../plugins/day'
-import knex from '../plugins/knex'
-import { db } from '../database'
-import { sql } from 'kysely'
+import express from 'express';
+import { sql } from 'kysely';
+import { db } from '@/database';
+import type { Period } from '@/plugins/day';
+import dayjs, { generateRange } from '@/plugins/day';
 
-const router = express.Router()
+const router = express.Router();
 
 router.get('/status/:date/:period', async (req, res) => {
   const userId = req.userId;

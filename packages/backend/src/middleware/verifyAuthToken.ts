@@ -1,5 +1,5 @@
 import type { Request, Response, NextFunction } from 'express';
-import { verifyAccessToken } from '../plugins/jsonwebtoken';
+import { verifyAccessToken } from '@/plugins/jsonwebtoken';
 
 // ユーザ認証ミドルウェア
 export default async function (req: Request, res: Response, next: NextFunction) {

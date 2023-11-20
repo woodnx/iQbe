@@ -1,7 +1,7 @@
-import express from 'express'
-import knex from '../plugins/knex'
+import express from 'express';
+import knex from '@/plugins/knex';
 
-const router = express.Router()
+const router = express.Router();
 
 router.get('/', async (req, res) => {
   const quizId = req.query.quizId

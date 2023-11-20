@@ -1,10 +1,8 @@
-import express, { Router } from 'express'
-import knex from '../plugins/knex'
-import dayjs from '../plugins/day'
-import { db } from '../database'
-import e from 'express'
+import express, { Router } from 'express';
+import { db } from '@/database';
+import dayjs from '@/plugins/day';
 
-const router: Router = express.Router()
+const router: Router = express.Router();
 
 router.get('/', async (req, res) => {
   const userId = req.userId;

@@ -1,5 +1,5 @@
 import type { Knex } from "knex";
-import db_info from '../db-info.json'
+import db_info from '@/db-info.json'
 
 // Update with your config settings.
 

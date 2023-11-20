@@ -1,7 +1,7 @@
 import express from 'express';
 import dotenv from 'dotenv';
 import Hashids from 'hashids';
-import { db } from '../database';
+import { db } from '@/database';
 
 const router = express.Router();
 dotenv.config();
