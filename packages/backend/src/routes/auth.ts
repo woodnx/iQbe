@@ -98,6 +98,7 @@ router.post('/login', async (req, res) => {
 
 router.post('/signup', async (req, res) => {
   const username: string | undefined = req.body.username;
+  const email: string | undefined = req.body.email;
   const password: string | undefined = req.body.password;
   const requiredInviteCode: boolean = Boolean(req.body.requiredInviteCode);
   const code: string | undefined = req.body.inviteCode;
@@ -131,7 +132,7 @@ router.post('/signup', async (req, res) => {
         .executeTakeFirstOrThrow();
 
         if (inviteCode.used) {
-          res.status(400).send('Invaild invite code');
+          res.status(400).send('Invalid invite code');
           return;
         }
 
@@ -153,6 +154,7 @@ router.post('/signup', async (req, res) => {
         uid,
         nickname: username,
         username,
+        email,
         passwd: hashedPasswd,
         modified: created,
         created,
@@ -236,8 +238,13 @@ router.post('/token', async (req, res) => {
       return;
     }
 
+    if (token.expired) {
+      res.status(400).send('token expired')
+      return;
+    }
+
     if (refreshToken.localeCompare(token.token, undefined, { sensitivity: 'base' }) || token.expired) {
-      res.status(400).send('invailed token');
+      res.status(400).send('invalid token');
       return;
     }
 
