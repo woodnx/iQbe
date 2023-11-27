@@ -34,28 +34,9 @@ export default function Root() {
   const requiredLogin = !requireDraftLayoutPages.includes(location.pathname);
   const Layout = requiredLogin ? DefaultLayout : DraftLayout;
 
-  // const modal = () => modals.openConfirmModal({
-  //   title: 'Reset Password',
-  //   children: 
-  //   <Text>
-  //     パスワード再設定
-  //   </Text>,
-  //   labels: {
-  //     confirm: 'Confirm',
-  //     cancel: 'Cancel'
-  //   }
-  // })
-
   useEffect(() => {
     document.title = `${defineTitle(location.pathname)} | iQbe`;
   }, [location]);
-
-  // useEffect(() => {
-  //   if (location.pathname === '/reset-password' && !searchParams.get('token')) {
-  //     navigate('/');
-  //     modal();
-  //   }
-  // }, [])
 
   return (
     <Routes>
