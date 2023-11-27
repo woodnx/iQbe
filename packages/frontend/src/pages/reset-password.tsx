@@ -2,8 +2,8 @@ import { useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Button, Center, PasswordInput, Stack, TextInput, Title } from "@mantine/core";
 import { isNotEmpty, matchesField, useForm } from "@mantine/form";
-import { modals } from '@mantine/modals';
 import axios from "@/plugins/axios";
+import { useSetRequestResetPassword } from "@/contexts/requestResetPassword";
 
 interface SubmitValue {
   username: string,
@@ -14,6 +14,7 @@ export default function ResetPassword() {
   const [ searchParams ] = useSearchParams();
   const navigate = useNavigate();
   const token = searchParams.get("token");
+  const setRequesting = useSetRequestResetPassword();
   const form = useForm({
     initialValues: {
       username: '',
@@ -24,11 +25,6 @@ export default function ResetPassword() {
       newPassword: isNotEmpty('Password is required'),
       confirmNewPassword: matchesField('newPassword', 'Passwords are not the same'),
     }
-  });
-  const modal = () => modals.openContextModal({
-    modal: 'requestResetPassword',
-    title: 'Reset password',
-    innerProps: {},
   });
 
   const submit = async (v: SubmitValue) => {
@@ -48,7 +44,7 @@ export default function ResetPassword() {
   useEffect(() => {
     if (!token) {
       navigate('/');
-      modal();
+      setRequesting(true);
     }
   }, []);
 
