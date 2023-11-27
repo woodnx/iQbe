@@ -45,6 +45,13 @@ export type mylists_quizzes = {
     quiz_id: number;
     registered: Timestamp;
 };
+export type password_reset_tokens = {
+    id: Generated<number>;
+    user_id: number;
+    token: string;
+    expDate: Timestamp;
+    used: Generated<number>;
+};
 export type quiz_reports = {
     quiz_id: number;
     user_id: number;
@@ -113,6 +120,7 @@ export type DB = {
     levels: levels;
     mylists: mylists;
     mylists_quizzes: mylists_quizzes;
+    password_reset_tokens: password_reset_tokens;
     quiz_reports: quiz_reports;
     quizzes: quizzes;
     quizzes_categories: quizzes_categories;
