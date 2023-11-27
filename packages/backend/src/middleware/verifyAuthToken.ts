@@ -1,5 +1,6 @@
 import type { Request, Response, NextFunction } from 'express';
 import { verifyAccessToken } from '@/plugins/jsonwebtoken';
+import { db } from '@/database';
 
 // ユーザ認証ミドルウェア
 export default async function (req: Request, res: Response, next: NextFunction) {
@@ -13,7 +14,15 @@ export default async function (req: Request, res: Response, next: NextFunction) 
 
   try {
     // idTokenを検証
-    await verifyAccessToken(idToken);
+    const decodedUser = await verifyAccessToken(idToken);
+
+    const user = await db
+    .selectFrom('users')
+    .selectAll()
+    .where('uid', '=', decodedUser.uid)
+    .executeTakeFirstOrThrow();
+
+    req.userId = user.id;
 
     next();
   } catch(e) {
