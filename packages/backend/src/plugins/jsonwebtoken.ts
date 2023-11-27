@@ -1,8 +1,5 @@
 import { randomUUID } from 'crypto';
-import dotenv from 'dotenv';
 import jwt, { Secret, SignOptions } from 'jsonwebtoken';
-
-dotenv.config();
 
 /* 定数設定 */
 const jwtSecret: Secret = process.env.JWT_SECRET_KEY || "";
@@ -18,9 +15,15 @@ interface User {
   username: string,
 }
 
-const generateAccessToken = (user: User) => {
+interface VerifyedToken {
+  uid: string,
+  iat: number,
+  exp: number,
+}
+
+const generateAccessToken = ({ uid, username }: User) => {
   const jwtPayload = {
-    uid: user.uid,
+    uid,
   };
 
   return new Promise<string>((resolve, reject) => {
@@ -45,12 +48,13 @@ const generateRefreshToken = (user: User) => {
 }
 
 const verifyAccessToken = (token: string) => {
-  return new Promise((resolve, reject) => {
+  return new Promise<VerifyedToken>((resolve, reject) => {
     jwt.verify(token, jwtSecret, (error, user) => {
-      if (error) {
-        reject(error); 
+      if (error || !user) {
+        const noUser = new Error('TokenVerifyError: no user');
+        reject(error || noUser); 
       }
-      resolve(user);
+      resolve(JSON.parse(JSON.stringify(user)));
     });
   });
 }
