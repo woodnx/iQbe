@@ -1,7 +1,6 @@
 import axios from "@/plugins/axios";
 import { Alert, Button, TextInput } from "@mantine/core";
 import { isNotEmpty, useForm } from "@mantine/form";
-import { ContextModalProps } from '@mantine/modals';
 import { IconAlertCircle } from "@tabler/icons-react";
 
 interface SubmitValue {
@@ -9,7 +8,11 @@ interface SubmitValue {
   email: string
 }
 
-export default function ResetPasswordModal({ context, id, innerProps: _ }: ContextModalProps) {
+interface Props {
+  onSubmit: () => void,
+}
+
+export default function ResetPasswordModal({ onSubmit }: Props) {
   const form = useForm({
     initialValues: {
       username: '',
@@ -22,11 +25,11 @@ export default function ResetPasswordModal({ context, id, innerProps: _ }: Conte
   });
 
   const submit = async (v: SubmitValue) => {
-    context.closeModal(id);
     await axios.post('/request-reset-password', {
       email: v.email,
       username: v.username,
     }).then(res => res.data);
+    onSubmit();
   }
 
   return (
