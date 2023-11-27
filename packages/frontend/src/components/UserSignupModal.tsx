@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button, Flex, Paper, PasswordInput, Space, Text, TextInput } from "@mantine/core";
-import { useForm, isNotEmpty, matchesField } from '@mantine/form';
+import { useForm, isNotEmpty, matchesField, isEmail } from '@mantine/form';
 import { notifications } from "@mantine/notifications";
 import { IconAlertTriangle, IconCheck } from "@tabler/icons-react";
 import { signupUser } from "@/plugins/auth";
@@ -22,6 +22,7 @@ export function UserSignupModal() {
     initialValues: {
       username: '',
       password: '',
+      email: '',
       confirmPassword: '',
       inviteCode: '',
     },
@@ -32,6 +33,7 @@ export function UserSignupModal() {
         : !available
         ? ''
         : null,
+      email: isEmail('Invalid email'),
       password: isNotEmpty('Password is required'),
       confirmPassword: matchesField('password', 'Passwords are not the same'),
     },
@@ -109,6 +111,16 @@ export function UserSignupModal() {
           inputWrapperOrder={['label', 'input', 'description', 'error']}
         >
         </TextInput>
+        <TextInput 
+          {...form.getInputProps('email')}
+          placeholder="Email"
+          description="Necessary for password resetting, etc."
+          label="Email"
+          radius="xl"
+          size="md"
+          inputWrapperOrder={['label', 'input', 'description', 'error']}
+        >
+        </TextInput>
         <PasswordInput
           {...form.getInputProps('password')}
           placeholder="Password"
@@ -131,10 +143,12 @@ export function UserSignupModal() {
           <TextInput
             {...form.getInputProps('inviteCode')}
             placeholder="Invite code"
+            description="This server requires an invitation code"
             label="Invite code"
             radius="xl"
             size="md"
             mt="sm"
+            inputWrapperOrder={['label', 'input', 'description', 'error']}
           /> 
           : null
         }

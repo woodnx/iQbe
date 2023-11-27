@@ -1,10 +1,18 @@
-import { Card, Grid, Tabs } from "@mantine/core";
+import { Card, Grid, Modal, Tabs } from "@mantine/core";
 import ActivityStatus from "@/components/ActivityStatus";
 import ActivityUserRanking from "@/components/ActivityUserRanking";
+import { useRequestResetPassword, useSetRequestResetPassword } from "@/contexts/requestResetPassword";
+import ResetPasswordModal from "@/components/ResetPasswordModal";
 
 export default function Home() {
+  const requesting = useRequestResetPassword();
+  const setRequesting = useSetRequestResetPassword();
+
   return (
     <>
+      <Modal opened={requesting} onClose={() => setRequesting(false)} >
+        <ResetPasswordModal onSubmit={() => setRequesting(false)} />
+      </Modal>
       <Grid>
         <Grid.Col span={12} md={6}>
           <Card
