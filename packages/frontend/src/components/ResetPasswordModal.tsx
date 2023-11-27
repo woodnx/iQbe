@@ -1,6 +1,6 @@
 import axios from "@/plugins/axios";
 import { Alert, Button, TextInput } from "@mantine/core";
-import { useForm } from "@mantine/form";
+import { isNotEmpty, useForm } from "@mantine/form";
 import { ContextModalProps } from '@mantine/modals';
 import { IconAlertCircle } from "@tabler/icons-react";
 
@@ -15,10 +15,14 @@ export default function ResetPasswordModal({ context, id, innerProps: _ }: Conte
       username: '',
       email: '',
     },
+    validate: {
+      username: isNotEmpty(),
+      email: isNotEmpty()
+    }
   });
 
   const submit = async (v: SubmitValue) => {
-    context.closeContextModal(id);
+    context.closeModal(id);
     await axios.post('/request-reset-password', {
       email: v.email,
       username: v.username,
@@ -53,6 +57,7 @@ export default function ResetPasswordModal({ context, id, innerProps: _ }: Conte
         fullWidth 
         type="submit" 
         my="lg"
+        disabled={!form.isValid()}
       >
         Register
       </Button>
