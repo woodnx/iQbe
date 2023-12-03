@@ -3,9 +3,9 @@ import { sql } from 'kysely';
 import dayjs from 'dayjs';
 import { db } from '@/database';
 
-const router: Router = express.Router()
+const router: Router = express.Router();
 
-type KeywordOption = "1" | "2" | "3" 
+type KeywordOption = "1" | "2" | "3"; 
 
 interface QuizRequest extends Request { 
   query: {
@@ -22,33 +22,24 @@ interface QuizRequest extends Request {
     judgement?: string[],
     mylistId?: string,
   }
-}
-
-interface Quizzes {
-  id: number,
-  question: string,
-  answer: string,
-  workbook: string,
-  level: string,
-  date: string,
-}
+};
 
 router.get('/:listName?', async (req: QuizRequest, res) => {
-  const page     = !!req.query.page     ? Number(req.query.page)    : 1
-  const maxView  = !!req.query.perPage || Number(req.query.perPage) <= 100  ? Number(req.query.perPage) : 100
-  const seed     = !!req.query.seed     ? Number(req.query.seed)    : undefined
-  const workbook = !!req.query.workbook ? req.query.workbook.map(v => Number(v)) : undefined
-  const level    = !!req.query.level    ? req.query.level.map(v => Number(v))    : undefined
-  const keyword  = req.query.keyword
-  const keywordOption = Number(req.query.keywordOption) || undefined
-  const crctAnsRatio = req.query.crctAnsRatio
-  const since = req.query.since
-  const until = req.query.until
-  const judgement = req.query.judgement
-  const mylistId = req.query.mylistId
+  const page     = !!req.query.page     ? Number(req.query.page)    : 1;
+  const maxView  = !!req.query.perPage || Number(req.query.perPage) <= 100  ? Number(req.query.perPage) : 100;
+  const seed     = !!req.query.seed     ? Number(req.query.seed)    : undefined;
+  const workbook = !!req.query.workbook ? req.query.workbook.map(v => Number(v)) : undefined;
+  const level    = !!req.query.level    ? req.query.level.map(v => Number(v))    : undefined;
+  const keyword  = req.query.keyword;
+  const keywordOption = Number(req.query.keywordOption) || undefined;
+  const crctAnsRatio = req.query.crctAnsRatio;
+  const since = req.query.since;
+  const until = req.query.until;
+  const judgement = !!req.query.judgement ? req.query.judgement.map(v => Number(v)) : undefined;
+  const mylistId = req.query.mylistId;
 
-  const userId = req.userId
-  const listName = req.params.listName
+  const userId = req.userId;
+  const listName = req.params.listName;
 
   try {
     let query = db.selectFrom('quizzes')
@@ -76,7 +67,7 @@ router.get('/:listName?', async (req: QuizRequest, res) => {
       // .as('rights'),
 
       //{ total: knex.raw('quizzes.total_crct_ans + quizzes.total_wrng_ans + quizzes.total_through_ans')},
-    )
+    );
 
     if (!!workbook) query = query.where('workbooks.id', 'in', workbook);
     if (!!level)    query = query.where('levels.id', 'in', level);
@@ -123,7 +114,16 @@ router.get('/:listName?', async (req: QuizRequest, res) => {
         'histories.practiced as practiced',
       ])
       .where('histories.user_id', '=', userId)
-      .where(({ between }) => between('histories.practiced', s, u));
+      .where(({ eb, and, between }) => (
+        !!judgement 
+        ?
+        and([
+          eb('histories.judgement', 'in', judgement),
+          between('histories.practiced', s, u)
+        ])
+        : 
+        between('histories.practiced', s, u)
+      ));
     } 
     else if (listName === 'mylist') {
       query = query
@@ -191,6 +191,6 @@ router.get('/:listName?', async (req: QuizRequest, res) => {
     console.log('An Error Occurred')
     console.error(e)
   }
-})
+});
 
 module.exports = router
