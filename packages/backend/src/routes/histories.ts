@@ -58,6 +58,14 @@ router.post('/', async (req, res) => {
       };
 
       const inserts = await trx.insertInto('histories').values(data).execute();
+      const updates = await trx.updateTable('quizzes')
+      .set(eb => ({
+        total_crct_ans:    eb('total_crct_ans',    '+', judgement === 1 ? 1 : 0),
+        total_wrng_ans:    eb('total_wrng_ans',    '+', judgement === 0 ? 1 : 0),
+        total_through_ans: eb('total_through_ans', '+', judgement === 2 ? 1 : 0),
+      }))
+      .where('id', '=', quiz_id)
+      .execute();
       const message = `${inserts.length} new histories saved`;
       
       res.status(201).send(message);
