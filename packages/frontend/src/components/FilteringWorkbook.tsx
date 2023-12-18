@@ -20,6 +20,20 @@ interface FilteringWorkbookProps extends DefaultProps {
   onChange: (value: string[]) => void
 }
 
+const Item = forwardRef<HTMLDivElement, WorkbookProps>(
+  ({ id, label, color, ...others}: WorkbookProps, ref) => (
+  <div ref={ref} {...others}>
+    <Group noWrap>
+      <Badge
+        variant="dot"
+        size="lg" 
+        radius="sm" 
+        color={color}
+      >{label}</Badge>
+    </Group>
+  </div>
+))
+
 export default function FilteringWorkbook({ 
   value, 
   onChange,
@@ -28,20 +42,6 @@ export default function FilteringWorkbook({
   const { data: workbooks } = useSWR<Workbook[]>('/workbooks/color', fetcher)
 
   const data = workbooks ? workbooks.map(({id, label, ...others}) => ({...others, value: String(id), key: id, label})) : []
-
-  const Item = forwardRef<HTMLDivElement, WorkbookProps>(
-    ({ id, label, color, ...others}: WorkbookProps, ref) => (
-    <div ref={ref} {...others}>
-      <Group noWrap>
-        <Badge
-          variant="dot"
-          size="lg" 
-          radius="sm" 
-          color={color}
-        >{label}</Badge>
-      </Group>
-    </div>
-  ))
 
   return (
     <MultiSelect
