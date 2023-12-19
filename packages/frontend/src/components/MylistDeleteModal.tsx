@@ -73,8 +73,6 @@ export default function MylistDeleteModal({
         onClose={close}
         title={<Text weight={500} size="xl">Delete Mylist</Text>}
         size={ isMobile ? 'xs' : 'md' }
-        pos="absolute"
-        left="-5%"
         centered
       >
         <Text>マイリストを削除しますか？</Text>

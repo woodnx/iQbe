@@ -25,7 +25,6 @@ export default function MylistCreateModal({
       opened={opened} 
       onClose={onClose}
       size={ isMobile ? 'xs' : 'md' }
-      pos="absolute"
       centered
       zIndex={10000}
     >
