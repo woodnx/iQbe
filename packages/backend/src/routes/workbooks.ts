@@ -6,11 +6,11 @@ const router: Router = express.Router();
 router.get('/', async (req, res) => {
   try {
     const workbooks = await db.selectFrom('workbooks').selectAll().execute();
-    res.status(200).send(workbooks)
+    res.status(200).send(workbooks);
   } catch(err) {
-    console.error(err)
+    console.error(err);
   } 
-})
+});
 
 router.get('/color', async (req, res) => {
   try {
@@ -23,10 +23,10 @@ router.get('/color', async (req, res) => {
     ])
     .execute();
 
-    res.status(200).send(workbooks)
+    res.status(200).send(workbooks);
   } catch(err) {
-    console.error(err)
+    console.error(err);
   } 
-})
+});
 
-module.exports = router
+module.exports = router;
