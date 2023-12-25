@@ -1,80 +1,105 @@
 import { useLayoutEffect } from "react";
-import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
-import { ActionIcon, AppShell, Center, Container, Drawer, Footer, Group, Loader, NavLink, Navbar, ThemeIcon, createStyles, getStylesRef } from "@mantine/core";
-import { IconActivity, IconHistory, IconHome, IconList, IconMenu2, IconSchool, IconSearch, IconStar } from "@tabler/icons-react";
+import { Outlet, useLocation, useNavigate } from "react-router-dom";
+import { ActionIcon, AppShell, Center, Container, Drawer, Footer, Group, Loader, Navbar } from "@mantine/core";
+import { IconActivity, IconHistory, IconHome, IconMenu2, IconPencil, IconSchool, IconSearch, IconStar } from "@tabler/icons-react";
 import { useState } from "react";
-import { useDisclosure, useMediaQuery } from "@mantine/hooks";
+import { useDisclosure } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
 import useUserStore from "../store/user";
 import UserLogoutButton from "../components/UserLogoutButton";
 import { useMylistInfomations } from "../hooks/useMylists";
 import Logo from "../components/Logo";
 import { checkAuth } from "../plugins/auth";
+import { useWorkbooks } from "@/hooks/useWorkbooks";
+import NavbarLink from "@/components/NavbarLink";
+import { IconBooks } from "@tabler/icons-react";
+import { useIsMobile } from "@/contexts/isMobile";
 
-const mockdata = [
-  { 
-    label: 'Activity',
-    icon: IconActivity,
-    link: '/',
-  },
-  {
-    label: 'Search',
-    icon: IconSearch,
-    link: '/search',
-  },
-  {
-    label: 'Practice',
-    icon: IconSchool,
-    link: '/practice',
-  },
-  {
-    label: 'Favorite',
-    icon: IconStar,
-    link: '/favorite',
-  },
-  {
-    label: 'History',
-    icon: IconHistory,
-    link: '/history',
-  },
-];
-
-const useStyles = createStyles((theme) => ({
-  link: {
-    ...theme.fn.focusStyles(),
-    padding: `${theme.spacing.xs} ${theme.spacing.sm}`,
-    borderRadius: theme.radius.sm,
-  },
-  linkIcon: {
-    ref: getStylesRef('icon'),
-    color: theme.colorScheme === 'dark' ? theme.colors.dark[2] : theme.colors.gray[6],
-    marginRight: theme.spacing.sm,
-  },
-  linkActive: {
-    '&, &:hover': {
-      backgroundColor: theme.fn.variant({ variant: 'light', color: theme.primaryColor }).background,
-      color: theme.fn.variant({ variant: 'light', color: theme.primaryColor }).color,
-      [`& .${getStylesRef('icon')}`]: {
-        color: theme.fn.variant({ variant: 'light', color: theme.primaryColor }).color,
-      },
-    },
-  },
-}));
+const checkPathname = (pathname: string) => {
+  if (pathname === '/') return '/';
+  else if (pathname === '/search') return '/search';
+  else if (pathname === '/practice') return '/practice';
+  else if (pathname === '/favorite') return '/favorite';
+  else if (pathname === '/history') return '/history';
+  else if (pathname.includes('create')) return '/create';
+  else if (pathname.includes('mylist')) return '/mylist';
+  else return '';
+}
 
 export default function DefaultLayout() {
-  const [ active, setActive ] = useState(0);
+  const [ activeLink, setActiveLink ] = useState<string>("0");
   const [ loading, setLoading ] = useState(true);
-  const { classes } = useStyles();
-  const matches = useMediaQuery('(min-width: 48em)');
   const [opened, { open, close }] = useDisclosure(false);
   const navigate = useNavigate();
   const location = useLocation();
   const setUserData = useUserStore((state) => state.setUserData);
   const { mylists } = useMylistInfomations(!loading);
+  const { workbooks } = useWorkbooks(!loading);
+  const isMobile = useIsMobile();
+
+  const mockMylists = mylists?.map(m => ({
+    label: m.name,
+    link: `${m.mid}`
+  }));
+
+  const mockWorkbooks = workbooks?.map(w => ({
+    label: w.name,
+    link: `${w.id}`
+  }));
+
+  const mockdata = [
+    { 
+      label: 'Activity',
+      icon: IconActivity,
+      link: '/',
+    },
+    {
+      label: 'Search',
+      icon: IconSearch,
+      link: '/search',
+    },
+    {
+      label: 'Practice',
+      icon: IconSchool,
+      link: '/practice',
+    },
+    {
+      label: 'Create',
+      icon: IconPencil,
+      link: '/create',
+      links: [
+        {
+          label: 'すべてのクイズ',
+          link: 'all-quiz',
+        },
+        ...mockWorkbooks || [],
+      ]
+    },
+    {
+      label: 'Favorite',
+      icon: IconStar,
+      link: '/favorite'
+    },
+    {
+      label: 'History',
+      icon: IconHistory,
+      link: '/history'
+    },
+    {
+      label: 'もっとみる',
+      icon: IconBooks,
+      link: '/mylist',
+      isTab: true,
+      links: [
+        ...mockMylists || [],
+      ]
+    },
+  ];
+
+  const activeIdx = mockdata.findIndex((data) => checkPathname(location.pathname) === data.link);
   
   useLayoutEffect(() => {
     let ignore = false;
-    setActive(mockdata.findIndex((data) => data.link === location.pathname));
 
     checkAuth()
     .then((user) => {
@@ -94,71 +119,36 @@ export default function DefaultLayout() {
     });
     return () => {
       ignore = true;
-      // authStateChanged();
     }
   }, []);
 
-  const items = mockdata.map((item, index) => {
-    const icon = (
-      <ThemeIcon variant="subtile">
-        <item.icon size="1.25rem" stroke={1.5} />
-      </ThemeIcon>
-    );
-
-    return (
-      <NavLink
-        component={Link}
-        classNames={{root: classes.link}}
-        key={item.label}
-        active={index === active}
-        label={item.label}
-        icon={icon}
-        to={item.link}
-        onClick={() => { 
-          setActive(index);
-          close();
-        }}
-      >
-      </NavLink>
-    );
-  });
-
-  const mylistLinks = mylists?.map((mylist, idx) => {
-    return (
-      <NavLink
-        component={Link}
-        classNames={{root: classes.link}}
-        key={mylist.mid}
-        active={idx + mockdata.length === active}
-        label={mylist.name}
-        icon={<IconList/>}
-        to={`mylist/${mylist.mid}`}
-        onClick={() => { 
-          setActive(idx + mockdata.length);
-          close();
-        }}
-      />
-    );
-  });
-
-  const navbar = (
-    <Navbar 
-      p="md" 
-      width={{xs: 250}} 
-      hidden
-      hiddenBreakpoint="sm"
-    >
+  const MyNavbarSections = () => (
+    <>
       <Navbar.Section grow>
         <Group position="apart">
           <Logo horizonal width={100} mb="xs"/>
         </Group>
-        {items}
-        {mylistLinks}
+        {
+          mockdata.map((i,idx) => 
+            <NavbarLink 
+              {...i} 
+              key={idx} 
+              isActive={activeIdx == idx}
+              activeLink={activeLink}
+              onNavigate={(link, linksIdx) => {
+                navigate(link);
+                setActiveLink(linksIdx !== undefined ? `${activeIdx}.${linksIdx}` : `${activeIdx}`);
+                close();
+              }}
+              my={5}
+            />
+          )
+        }
       </Navbar.Section>
       <Navbar.Section>
         <UserLogoutButton/>
       </Navbar.Section>
-    </Navbar>
+    </>
   );
 
   const footer = (
@@ -166,7 +156,6 @@ export default function DefaultLayout() {
     <Footer 
       height={100}
       withBorder={false}
-      left={-1}
     >
       <Group 
         p="sm"
@@ -186,7 +175,7 @@ export default function DefaultLayout() {
           radius="xl"
           variant="light"
           onClick={() => {
-            setActive(0); 
+            setActiveLink("0"); 
             navigate('/');
           }}
         >
@@ -197,7 +186,7 @@ export default function DefaultLayout() {
           radius="xl"
           variant="light"
           onClick={() => {
-            setActive(1); 
+            setActiveLink("1"); 
             navigate('/search');
           }}
         >
@@ -208,7 +197,7 @@ export default function DefaultLayout() {
           radius="xl"
           variant="light"
           onClick={() => {
-            setActive(2); 
+            setActiveLink("3"); 
             navigate('/practice');
           }}
         >
@@ -220,8 +209,9 @@ export default function DefaultLayout() {
   )
 
   return (
-    <>
-    {loading ? 
+    <> {
+    loading 
+    ? 
       <Center h="100vh">
         <Loader variant="dots"/>
       </Center>
@@ -229,8 +219,16 @@ export default function DefaultLayout() {
       <AppShell
         pt={2}
         layout="alt"
-        navbar={navbar}
-        footer={!matches ? footer : <></>}
+        navbar={
+          <Navbar 
+            p="md" 
+            width={{xs: 250}}
+            hidden={isMobile}
+          >
+            <MyNavbarSections/>
+          </Navbar>
+        }
+        footer={isMobile ? footer : <></>}
         navbarOffsetBreakpoint="sm"
       >
         <Drawer 
@@ -240,20 +238,10 @@ export default function DefaultLayout() {
           title={<Logo horizonal width={90}/>}
           withCloseButton={false}
           pos="absolute"
-          left="-1px" 
         >
           <Drawer.Body p={0}>
             <Navbar p="md">
-              <Navbar.Section grow>
-                <Group position="apart">
-                  <Logo horizonal width={100} mb="xs"/>
-                </Group>
-                {items}
-                {mylistLinks}
-              </Navbar.Section>
-              <Navbar.Section>
-                <UserLogoutButton/>
-              </Navbar.Section>
+              <MyNavbarSections/>
             </Navbar>
           </Drawer.Body>
         </Drawer>
@@ -261,7 +249,6 @@ export default function DefaultLayout() {
           <Outlet/>
         </Container>
       </AppShell>
-    }
-    </>
+    } </>
   );
 }
