@@ -104,7 +104,7 @@ export default function QuizMylistButton({
           {
             mylists?.map((m, idx) => 
               <Menu.Item 
-                key={m.id}
+                key={m.mid}
               >
                 <Checkbox
                   label={m.name}
