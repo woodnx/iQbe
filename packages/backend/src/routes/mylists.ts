@@ -128,16 +128,14 @@ router.put('/rename', async (req, res) => {
     const newList = await db.transaction().execute(async trx => {
       await trx.updateTable('mylists')
       .set({ name: newName })
-      .where('id', '=', mid)
-      .execute();
+      .where('mid', '=', mid)
+      .executeTakeFirst();
 
       return await trx.selectFrom('mylists')
       .select([ 'name', 'mid' ])
       .where('user_id', '=', userId)
       .execute();
     });
-
-    console.log(newList)
 
     res.status(200).send(newList)
   } catch(e) {
