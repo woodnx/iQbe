@@ -1,8 +1,10 @@
 import express, { Router } from 'express';
 import { db } from '@/database';
 import dayjs from '@/plugins/day';
+import Hashids from 'hashids';
 
 const router: Router = express.Router();
+const hashids = new Hashids(process.env.HASHIDS_SALT, 10, process.env.HASHIDS_ALPHABET);
 
 router.get('/', async (req, res) => {
   const userId = req.userId;
@@ -12,6 +14,22 @@ router.get('/', async (req, res) => {
     .select(['name', 'id', 'mid'])
     .where('user_id', '=', userId)
     .execute();
+
+    for (const m of mylists) {
+      if (!m.mid) {
+        const mylistIds = m.id;
+
+        const mid = hashids.encode(mylistIds);
+
+        await db.transaction().execute(async (trx) => {
+          trx
+          .updateTable('mylists')
+          .set({ mid: mid })
+          .where('id', '=', m.id)
+          .execute();
+        });
+      }
+    }
     
     res.status(200).send(mylists);
   } catch(e) {
@@ -21,7 +39,6 @@ router.get('/', async (req, res) => {
 
 router.post('/', async (req, res) => {
   const listName = req.body.listName
-  const mid = req.body.mid
   const userId = req.userId
   const now = dayjs().format('YYYY-MM-DD HH:mm:ss')
 
@@ -32,6 +49,10 @@ router.post('/', async (req, res) => {
     
   try {
     await db.transaction().execute(async trx => {
+      const mylistsId = await db.selectFrom('mylists').select('id').orderBy('id desc').limit(1).execute();
+      const lastMylistId = mylistsId.length !== 0 ? mylistsId[0].id : 0;
+      const mid = hashids.encode(lastMylistId + 1);
+
       const data = {
         user_id: userId,
         name: listName,
@@ -94,20 +115,20 @@ router.put('/quiz', async (req, res) => {
 })
 
 router.put('/rename', async (req, res) => {
-  const mylistId = req.body.mylistId
+  const mid = req.body.mid
   const userId = req.userId
   const newName = req.body.newName
 
-  if (!userId || !mylistId || !newName) {
+  if (!userId || !mid || !newName) {
     res.status(400).send(`Undefined user id or mylist id or mylist's name`)
     return
   }
 
   try {
     const newList = await db.transaction().execute(async trx => {
-      const updates = await trx.updateTable('mylists')
+      await trx.updateTable('mylists')
       .set({ name: newName })
-      .where('id', '=', mylistId)
+      .where('id', '=', mid)
       .execute();
 
       return await trx.selectFrom('mylists')
@@ -116,27 +137,11 @@ router.put('/rename', async (req, res) => {
       .execute();
     });
 
+    console.log(newList)
+
     res.status(200).send(newList)
   } catch(e) {
     res.status(400).send('An Error Occurd')
-    console.error(e)
-  }
-})
-
-router.put('/mid',async (req, res) => {
-  const mid = req.body.mid
-  const mylistId = req.body.mylistId
-
-  try {
-    await db.transaction().execute(async (trx) => {
-      trx
-      .updateTable('mylists')
-      .set({ mid: mid })
-      .where('id', '=', mylistId)
-      .execute();
-    });
-  } catch(e) {
-    res.status(400).send('An Error Occured')
     console.error(e)
   }
 })

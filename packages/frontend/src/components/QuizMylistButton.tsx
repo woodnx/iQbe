@@ -2,11 +2,8 @@ import { useState } from "react";
 import { ActionIcon, Button, Checkbox, DefaultProps, Divider, Menu, createStyles } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { IconPlaylistAdd, IconPlus } from "@tabler/icons-react";
-import Sqids from "sqids";
-import dayjs from "dayjs";
 import { MylistInformation } from "@/types";
 import axios from "@/plugins/axios";
-import useUserStore from "@/store/user";
 import { useIsMobile } from "@/contexts/isMobile";
 import MylistCreateModal from "./MylistCreateModal";
 
@@ -34,17 +31,12 @@ export default function QuizMylistButton({
   const [ creating, create ] = useDisclosure(false);
   const { classes } = useStyle();
   const [ selectedMyListIdx, setSelectedMylistIdx ] = useState(registerdMylistId.map(id => mylists?.findIndex(list => list.id == id)));
-  const userId = useUserStore((state) => state.userId);
   const isMobile = useIsMobile();
 
   const createMylist = async (mylistname: string) => {
-    const sqids = new Sqids({ minLength: 10, alphabet: mylistname });
-    const now = dayjs().unix();
-    const mid = sqids.encode([ userId, now ]);
 
     const newMyList = await axios.post<MylistInformation>('/mylists', {
       listName: mylistname,
-      mid,
     }).then(res => res.data);
 
     await axios.put('/mylists/quiz', {

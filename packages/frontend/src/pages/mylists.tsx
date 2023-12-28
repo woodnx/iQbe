@@ -78,14 +78,13 @@ export default function Mylist(){
       mid,
       newName: newNameProps.value,
     }).then(res => res.data);
-    console.log(newlist)
     mutate(newlist);
   }
 
   const toDelete = async () => {
     const newlist = await axios.delete<MylistInformation[]>('/mylists/list', {
       data: {
-        mid
+        mylistId: mid,
       }
     }).then(res => res.data);
     navigator('/');
