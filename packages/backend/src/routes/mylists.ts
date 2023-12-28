@@ -31,7 +31,7 @@ router.get('/', async (req, res) => {
       }
     }
     
-    res.status(200).send(mylists);
+    res.status(200).send(mylists.map(({ id, ...others }) => others));
   } catch(e) {
     console.error(e)
   }
@@ -67,7 +67,7 @@ router.post('/', async (req, res) => {
         .execute();
       const newList = await trx
         .selectFrom('mylists')
-        .selectAll()
+        .select(['name', 'mid'])
         .where('name', '=', listName)
         .execute();
       
@@ -132,7 +132,7 @@ router.put('/rename', async (req, res) => {
       .execute();
 
       return await trx.selectFrom('mylists')
-      .select([ 'name', 'id', 'mid' ])
+      .select([ 'name', 'mid' ])
       .where('user_id', '=', userId)
       .execute();
     });
@@ -180,7 +180,7 @@ router.delete('/list', async (req, res) => {
 
       return await trx
       .selectFrom('mylists')
-      .select([ 'name', 'id', 'mid' ])
+      .select([ 'name', 'mid' ])
       .where('user_id', '=', userId)
       .execute();
     });
