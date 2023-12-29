@@ -49,8 +49,8 @@ router.get('/color', setWid, async (req, res) => {
     const workbooks = await db.selectFrom('workbooks')
     .innerJoin('levels', 'workbooks.level_id', 'levels.id')
     .select([
-      'workbooks.id as id',
       'workbooks.name as label',
+      'wid',
       'levels.color as color',
     ])
     .execute();
