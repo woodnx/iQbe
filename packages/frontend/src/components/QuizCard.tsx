@@ -4,6 +4,7 @@ import { Judgement, MylistInformation, Quiz } from "@/types";
 import QuizMylistButton from "./QuizMylistButton";
 import QuizFavoriteButton from "./QuizFavoriteButton";
 import { QuizWorkbookBadge } from "./QuizWorkbookBadge";
+import QuizDetailsMenu from "./QuizDetailesMenu";
 
 interface Props extends DefaultProps{
   index: number,
@@ -42,7 +43,11 @@ export default function QuizCard({
   )
 
   return (
-    <Card withBorder bg={color} {...others}>
+    <Card 
+      withBorder 
+      bg={color}
+      {...others}
+    >
       <Group position="apart">
         <Text>No.{index}</Text>
         <QuizFavoriteButton
@@ -65,11 +70,20 @@ export default function QuizCard({
           registerdMylistId={quiz.registerdMylist}
           mylists={mylists}
         />
-        <QuizWorkbookBadge
-          workbookName={quiz.workbook}
-          levelColor={quiz.level}
-          date={quiz.date}
-        />
+        <Group>
+          {
+            (!!quiz.workbook) 
+            ?
+            <QuizWorkbookBadge
+              workbookName={quiz.workbook}
+              levelColor={quiz.level || 'dark'}
+              date={quiz.date}
+            />
+            :
+            null 
+          }
+          <QuizDetailsMenu/>
+        </Group>
       </Flex>
     </Card>
   )
