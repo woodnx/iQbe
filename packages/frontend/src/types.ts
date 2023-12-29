@@ -58,3 +58,10 @@ export interface UserData {
   uid: string,
   username: string,
 }
+
+export interface WorkbooksData {
+  id: number,
+  wid: string,
+  name: string,
+  level_id?: number,
+}

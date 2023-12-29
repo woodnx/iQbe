@@ -10,12 +10,12 @@ router.get('/', async (req, res) => {
   const userId = req.userId;
 
   try {
-    const mylists = await db.selectFrom('mylists')
-    .select(['name', 'id', 'mid'])
+    const _mylists = await db.selectFrom('mylists')
+    .selectAll()
     .where('user_id', '=', userId)
     .execute();
 
-    for (const m of mylists) {
+    for (const m of _mylists) {
       if (!m.mid) {
         const mylistIds = m.id;
 
@@ -30,6 +30,11 @@ router.get('/', async (req, res) => {
         });
       }
     }
+
+    const mylists = await db.selectFrom('mylists')
+    .selectAll()
+    .where('user_id', '=', userId)
+    .execute();
     
     res.status(200).send(mylists.map(({ id, ...others }) => others));
   } catch(e) {
