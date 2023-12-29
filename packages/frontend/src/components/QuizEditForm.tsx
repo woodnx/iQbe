@@ -1,22 +1,14 @@
 import React, { forwardRef } from "react";
-import axios from "@/plugins/axios";
 import { Button, Card, DefaultProps, Grid, Group, Select, Switch, Text, Textarea } from "@mantine/core";
 import { isNotEmpty, useForm } from "@mantine/form"
 import { useCategories, useSubCategories } from "@/hooks/useCategories";
 import { useWorkbooks } from "@/hooks/useWorkbooks";
-
-interface SubmitValue {
-  question: string,
-  answer: string,
-  category: string,
-  subCategory: string,
-  workbook: string,
-  isPublic: boolean,
-}
+import { SubmitValue } from "@/types";
 
 interface Props extends DefaultProps {
   question?: string,
   answer?: string,
+  onSubmit?: (v: SubmitValue) => void,
 }
 
 interface ItemProps extends React.ComponentPropsWithRef<'div'> {
@@ -35,9 +27,10 @@ const SelectItem = forwardRef<HTMLDivElement, ItemProps>(
   )
 )
 
-export default function CreateQuizForm({
+export default function QuizEditForm({
   question: initialQuestion,
   answer: initialAnswer,
+  onSubmit = () => {},
   ...others
 }: Props) {
   const { categories: ct } = useCategories();
@@ -63,16 +56,8 @@ export default function CreateQuizForm({
   const subCategories = sct?.filter(c => c.parent_id === Number(form.values.category)).map(c => ({ ...c, value: String(c.id), label: c.name}));
   const workbooks = wkb?.map(w => ({ ...w, value: w.wid, label: w.name}));
 
-  const submit = ({ question, answer, category, subCategory, workbook, isPublic }: SubmitValue) => {
-    axios.post('quizzes', {
-      question,
-      answer,
-      category,
-      subCategory,
-      workbook,
-      visible: isPublic ? 1 : 0,
-    });
-    close();
+  const submit = (v: SubmitValue) => {
+    onSubmit(v);
     form.reset();
   }
 

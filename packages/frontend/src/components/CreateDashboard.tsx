@@ -4,14 +4,27 @@ import WorkbookCard from "@/components/WorkbookCard";
 import { useIsMobile } from "@/contexts/isMobile";
 import { Divider, Grid, Group, Title } from "@mantine/core";
 import { useWorkbooks } from "@/hooks/useWorkbooks";
+import axios from "@/plugins/axios";
+import { SubmitValue } from "@/types";
 
 export default function CreateDashboard() {
   const isMobile = useIsMobile();
   const { workbooks } = useWorkbooks(true);
 
+  const submit = ({ question, answer, category, subCategory, workbook, isPublic }: SubmitValue) => {
+    axios.post('quizzes', {
+      question,
+      answer,
+      category,
+      subCategory,
+      workbook,
+      visible: isPublic ? 1 : 0,
+    });
+  }
+
   return (
     <>
-      <QuizEditForm mb={16}/>
+      <QuizEditForm mb={16} onSubmit={submit}/>
       <Divider/>
       <Group position="apart" my="lg">
         <Title fz={isMobile ? 25 : 35}>Editable Quiz List</Title>
