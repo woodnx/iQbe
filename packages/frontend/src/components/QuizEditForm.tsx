@@ -81,8 +81,19 @@ export default function QuizEditForm({
           my="sm"
         />
 
-        <Grid grow>
+        <Grid grow columns={24}>
           <Grid.Col md={6}>
+            <Select
+              value={form.values.workbook} 
+              onChange={(w) => form.setValues({ workbook: w || "" })} 
+              data={workbooks || []} 
+              label="Workbook"
+              withinPortal
+              clearable
+              searchable
+            />
+          </Grid.Col>
+          <Grid.Col md={9}>
             <Select
               value={form.values.category} 
               onChange={(c) => form.setValues({ category: c || "" })} 
@@ -92,7 +103,7 @@ export default function QuizEditForm({
               withinPortal
             />
           </Grid.Col>
-          <Grid.Col md={6}>
+          <Grid.Col md={9}>
             <Select 
               key={form.values.category}
               value={form.values.subCategory} 
@@ -105,14 +116,6 @@ export default function QuizEditForm({
           </Grid.Col>
         </Grid>
         <Group position="apart" mt="sm">
-          <Select
-            value={form.values.workbook} 
-            onChange={(w) => form.setValues({ workbook: w || "" })} 
-            data={workbooks || []} 
-            label="Workbook"
-            withinPortal
-            clearable
-          />
           <Switch
             checked={form.values.isPublic}
             onChange={() => form.setValues({ isPublic: !form.values.isPublic })}
