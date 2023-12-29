@@ -1,4 +1,4 @@
-import { Box, Collapse, Text, ThemeIcon, UnstyledButton, rem, createStyles, getStylesRef, DefaultProps, Flex } from "@mantine/core";
+import { Box, Collapse, Text, ThemeIcon, UnstyledButton, rem, createStyles, getStylesRef, DefaultProps, Flex, ScrollArea } from "@mantine/core";
 import { IconChevronRight } from "@tabler/icons-react";
 import React, { useState } from "react";
 
@@ -151,6 +151,7 @@ export default function ({
         <Collapse 
           in={opened}
         >
+          <ScrollArea h={200}>
           {
             (links || []).map((l, idx) => 
               <Link 
@@ -163,6 +164,7 @@ export default function ({
               />
             )
           }
+          </ScrollArea>
         </Collapse> : null}
     </>
   );

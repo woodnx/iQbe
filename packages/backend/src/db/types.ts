@@ -58,6 +58,15 @@ export type quiz_reports = {
     reason: Generated<string | null>;
     registered: Timestamp | null;
 };
+export type quiz_tags = {
+    id: Generated<number>;
+    label: string;
+    color: string | null;
+};
+export type quiz_visible_users = {
+    quiz_id: number;
+    user_id: number;
+};
 export type quizzes = {
     id: Generated<number>;
     workbook_id: number | null;
@@ -68,6 +77,7 @@ export type quizzes = {
     total_crct_ans: number | null;
     total_wrng_ans: number | null;
     total_through_ans: number | null;
+    creator_id: number | null;
 };
 export type quizzes_categories = {
     quiz_id: number;
@@ -111,6 +121,8 @@ export type workbooks = {
     name: string | null;
     date: Timestamp | null;
     level_id: number | null;
+    wid: string | null;
+    creator_id: number | null;
 };
 export type DB = {
     categories: categories;
@@ -122,6 +134,8 @@ export type DB = {
     mylists_quizzes: mylists_quizzes;
     password_reset_tokens: password_reset_tokens;
     quiz_reports: quiz_reports;
+    quiz_tags: quiz_tags;
+    quiz_visible_users: quiz_visible_users;
     quizzes: quizzes;
     quizzes_categories: quizzes_categories;
     refresh_tokens: refresh_tokens;

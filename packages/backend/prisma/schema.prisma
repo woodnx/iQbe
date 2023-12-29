@@ -140,19 +140,31 @@ model quiz_reports {
   @@index([user_id], map: "user_id")
 }
 
+model quiz_visible_users {
+  quiz_id BigInt  @db.UnsignedBigInt
+  user_id BigInt  @db.UnsignedBigInt
+  quizzes quizzes @relation(fields: [quiz_id], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  users   users   @relation(fields: [user_id], references: [id], onUpdate: Cascade, onDelete: Cascade)
+
+  @@id([quiz_id, user_id])
+}
+
 model quizzes {
-  id                BigInt            @id @default(autoincrement()) @db.UnsignedBigInt
-  workbook_id       Int?
-  que               String            @db.VarChar(2048)
-  ans               String            @db.VarChar(256)
-  anoans            String?           @db.VarChar(256)
-  attribute         String?           @db.VarChar(32)
-  total_crct_ans    Int?
-  total_wrng_ans    Int?
-  total_through_ans Int?
-  favorites         favorites[]
-  histories         histories[]
-  mylists_quizzes   mylists_quizzes[]
+  id                 BigInt               @id @default(autoincrement()) @db.UnsignedBigInt
+  workbook_id        Int?
+  que                String               @db.VarChar(2048)
+  ans                String               @db.VarChar(256)
+  anoans             String?              @db.VarChar(256)
+  attribute          String?              @db.VarChar(32)
+  total_crct_ans     Int?
+  total_wrng_ans     Int?
+  total_through_ans  Int?
+  creator_id         BigInt?              @db.UnsignedBigInt 
+  favorites          favorites[]
+  histories          histories[]
+  mylists_quizzes    mylists_quizzes[]
+  quiz_visible_users quiz_visible_users[]
+  users              users?               @relation(fields: [creator_id], references: [id], onUpdate: Cascade, onDelete: Cascade)
 }
 
 model quizzes_categories {
@@ -185,6 +197,12 @@ model sub_categories {
   categories         categories           @relation(fields: [parent_id], references: [id], onUpdate: Restrict, map: "sub_categories_ibfk_1")
 
   @@index([parent_id], map: "parent_id")
+}
+
+model quiz_tags {
+  id    BigInt  @id @default(autoincrement())
+  label String  @db.VarChar(128)
+  color String? @db.VarChar(64)
 }
 
 /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
@@ -233,9 +251,12 @@ model users {
   mylists               mylists[]
   password_reset_tokens password_reset_tokens[]
   quiz_reports          quiz_reports[]
+  quiz_visible_users    quiz_visible_users[]
+  quizzes               quizzes[]
   refresh_tokens        refresh_tokens[]
   tests_results         tests_results[]  @ignore
   users_settings        users_settings[] @ignore
+  workbooks             workbooks[]
 }
 
 /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
@@ -253,11 +274,14 @@ model users_settings {
 }
 
 model workbooks {
-  id       Int       @id @default(autoincrement())
-  name     String?   @db.VarChar(255)
-  date     DateTime? @db.DateTime(0)
-  level_id Int?
-  levels   levels?   @relation(fields: [level_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "workbooks_ibfk_1")
+  id         Int       @id @default(autoincrement())
+  name       String?   @db.VarChar(255)
+  date       DateTime? @db.DateTime(0)
+  level_id   Int?
+  wid        String?   @db.VarChar(20)
+  creator_id BigInt?   @db.UnsignedBigInt
+  levels     levels?   @relation(fields: [level_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "workbooks_ibfk_1")
+  users      users?    @relation(fields: [creator_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
   @@index([level_id], map: "level_id")
 }

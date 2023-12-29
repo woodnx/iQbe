@@ -44,7 +44,7 @@ export default function DefaultLayout() {
 
   const mockWorkbooks = workbooks?.map(w => ({
     label: w.name,
-    link: `${w.id}`
+    link: `${w.wid}`
   }));
 
   const mockdata = [
@@ -70,7 +70,7 @@ export default function DefaultLayout() {
       links: [
         {
           label: 'すべてのクイズ',
-          link: 'all-quiz',
+          link: 'all',
         },
         ...mockWorkbooks || [],
       ]
