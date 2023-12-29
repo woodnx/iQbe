@@ -65,3 +65,12 @@ export interface WorkbooksData {
   name: string,
   level_id?: number,
 }
+
+export interface SubmitValue {
+  question: string,
+  answer: string,
+  category: string,
+  subCategory: string,
+  workbook: string,
+  isPublic: boolean,
+}
