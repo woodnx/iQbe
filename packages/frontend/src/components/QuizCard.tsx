@@ -82,7 +82,16 @@ export default function QuizCard({
             :
             null 
           }
-          <QuizDetailsMenu/>
+          <QuizDetailsMenu
+            quizId={quiz.id}
+            creatorId={quiz.creator}
+            question={quiz.question}
+            answer={quiz.answer}
+            workbook={quiz.wid}
+            category={String(quiz.category)}
+            subCategory={String(quiz.subCategory)}
+            isPublic={!!quiz.isPublic}
+          />
         </Group>
       </Flex>
     </Card>

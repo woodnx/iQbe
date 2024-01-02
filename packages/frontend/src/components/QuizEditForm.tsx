@@ -1,6 +1,6 @@
 import React, { forwardRef } from "react";
 import { Button, Card, DefaultProps, Grid, Group, Select, Switch, Text, Textarea } from "@mantine/core";
-import { isNotEmpty, useForm } from "@mantine/form"
+import { useForm } from "@mantine/form"
 import { useCategories, useSubCategories } from "@/hooks/useCategories";
 import { useWorkbooks } from "@/hooks/useWorkbooks";
 import { SubmitValue } from "@/types";
@@ -8,6 +8,10 @@ import { SubmitValue } from "@/types";
 interface Props extends DefaultProps {
   question?: string,
   answer?: string,
+  workbook?: string,
+  category?: string,
+  subCategory?: string,
+  isPublic?: boolean,
   onSubmit?: (v: SubmitValue) => void,
 }
 
@@ -28,8 +32,12 @@ const SelectItem = forwardRef<HTMLDivElement, ItemProps>(
 )
 
 export default function QuizEditForm({
-  question: initialQuestion,
-  answer: initialAnswer,
+  question: initialQuestion = "",
+  answer: initialAnswer = "",
+  workbook: initialWorkbook = "",
+  category: initialCategory = "",
+  subCategory: initialSubCategory = "",
+  isPublic: initialIsPublic,
   onSubmit = () => {},
   ...others
 }: Props) {
@@ -39,16 +47,16 @@ export default function QuizEditForm({
 
   const form = useForm({
     initialValues: {
-      question: initialQuestion || '',
-      answer: initialAnswer || '',
-      isPublic: false,
-      category: '',
-      subCategory: '',
-      workbook: '',
+      question: initialQuestion || "",
+      answer: initialAnswer || "",
+      isPublic: !!initialIsPublic,
+      category: initialCategory || "",
+      subCategory: initialSubCategory || "",
+      workbook: initialWorkbook || "",
     },
     validate: {
-      question: isNotEmpty(),
-      answer: isNotEmpty(),
+      question: (v) =>  (v == initialQuestion),
+      answer: (v) => (v == initialAnswer),
     },
   });
 
@@ -84,8 +92,8 @@ export default function QuizEditForm({
         <Grid grow columns={24}>
           <Grid.Col md={6}>
             <Select
-              value={form.values.workbook} 
-              onChange={(w) => form.setValues({ workbook: w || "" })} 
+              {...form.getInputProps('workbook')}
+              defaultValue={initialWorkbook}
               data={workbooks || []} 
               label="Workbook"
               withinPortal
@@ -95,8 +103,7 @@ export default function QuizEditForm({
           </Grid.Col>
           <Grid.Col md={9}>
             <Select
-              value={form.values.category} 
-              onChange={(c) => form.setValues({ category: c || "" })} 
+              {...form.getInputProps('category')}
               itemComponent={SelectItem}
               data={categories || []} 
               label="Genre"
@@ -106,8 +113,7 @@ export default function QuizEditForm({
           <Grid.Col md={9}>
             <Select 
               key={form.values.category}
-              value={form.values.subCategory} 
-              onChange={(c) => form.setValues({ subCategory: c || "" })}
+              {...form.getInputProps('subCategory')}
               itemComponent={SelectItem}
               data={subCategories || []} 
               label="Sub genre"
@@ -117,15 +123,14 @@ export default function QuizEditForm({
         </Grid>
         <Group position="apart" mt="sm">
           <Switch
-            checked={form.values.isPublic}
-            onChange={() => form.setValues({ isPublic: !form.values.isPublic })}
+            {...form.getInputProps('isPublic', {type: 'checkbox'})}
             label="Publish quiz"
             my="sm"
           />
           <Button
             disabled={!form.isValid()}
             type="submit"
-          >Create</Button>
+          >{ !!initialQuestion ? 'Edit' : 'Create' }</Button>
         </Group>
       </form>
     </Card>

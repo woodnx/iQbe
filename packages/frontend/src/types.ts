@@ -5,6 +5,7 @@ export interface Quiz {
   question: string,
   answer: string,
   workbook: string,
+  wid: string,
   level: string,
   date: string,
   total: number,
@@ -13,6 +14,10 @@ export interface Quiz {
   registerdMylist: number[],
   size: number,
   judgement?: Judgement,
+  creator: string,
+  category?: number,
+  subCategory?: number,
+  isPublic?: boolean,
 }
 
 export interface QuizRequestParams {
@@ -67,10 +72,10 @@ export interface WorkbooksData {
 }
 
 export interface SubmitValue {
-  question: string,
-  answer: string,
-  category: string,
-  subCategory: string,
-  workbook: string,
-  isPublic: boolean,
+  question?: string,
+  answer?: string,
+  category?: string,
+  subCategory?: string,
+  workbook?: string,
+  isPublic?: boolean,
 }
