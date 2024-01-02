@@ -46,7 +46,7 @@ router.get('/status/:date/:period', async (req, res) => {
           .select(({ fn }) => [ fn.count('quiz_id').as('count') ])
           .where(({ eb, and, between }) => and([
             eb('user_id', '=', userId),
-            eb('judgement', '=', 1),
+            eb('judgement', '=', 2),
             between('practiced', range[0], range[1]),
           ]))
           .executeTakeFirst()

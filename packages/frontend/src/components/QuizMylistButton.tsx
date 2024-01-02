@@ -2,11 +2,8 @@ import { useState } from "react";
 import { ActionIcon, Button, Checkbox, DefaultProps, Divider, Menu, createStyles } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { IconPlaylistAdd, IconPlus } from "@tabler/icons-react";
-import Sqids from "sqids";
-import dayjs from "dayjs";
 import { MylistInformation } from "@/types";
 import axios from "@/plugins/axios";
-import useUserStore from "@/store/user";
 import { useIsMobile } from "@/contexts/isMobile";
 import MylistCreateModal from "./MylistCreateModal";
 
@@ -22,7 +19,7 @@ const useStyle = createStyles((theme) => ({
 
 interface Props extends DefaultProps {
   quizId: number,
-  registerdMylistId: number[],
+  registerdMylistId: string[],
   mylists: MylistInformation[],
 }
 
@@ -33,38 +30,32 @@ export default function QuizMylistButton({
 }: Props) {
   const [ creating, create ] = useDisclosure(false);
   const { classes } = useStyle();
-  const [ selectedMyListIdx, setSelectedMylistIdx ] = useState(registerdMylistId.map(id => mylists?.findIndex(list => list.id == id)));
-  const userId = useUserStore((state) => state.userId);
+  const [ selectedMyListIdx, setSelectedMylistIdx ] = useState(registerdMylistId.map(id => mylists?.findIndex(list => list.mid == id)));
   const isMobile = useIsMobile();
 
   const createMylist = async (mylistname: string) => {
-    const sqids = new Sqids({ minLength: 10, alphabet: mylistname });
-    const now = dayjs().unix();
-    const mid = sqids.encode([ userId, now ]);
-
     const newMyList = await axios.post<MylistInformation>('/mylists', {
       listName: mylistname,
-      mid,
     }).then(res => res.data);
 
     await axios.put('/mylists/quiz', {
       quizId,
-      mylistId: newMyList.id,
+      MIDIConnectionEvent: newMyList.mid,
     })
   }
 
-  const saveToList = async (mylistId: number, arrayIdx: number) => {
+  const saveToList = async (mid: string, arrayIdx: number) => {
     if (!selectedMyListIdx.includes(arrayIdx)) { // add to mylist
       await axios.put('/mylists/quiz', {
         quizId,
-        mylistId: mylistId,
+        mid,
       });
       setSelectedMylistIdx([...selectedMyListIdx, arrayIdx]);
     } else {
       await axios.delete('/mylists/quiz', {
         data: {
           quizId,
-          mylistId: mylistId,
+          mid,
       }});
       setSelectedMylistIdx(selectedMyListIdx.filter(idx => idx != arrayIdx));
     }
@@ -112,12 +103,12 @@ export default function QuizMylistButton({
           {
             mylists?.map((m, idx) => 
               <Menu.Item 
-                key={m.id}
+                key={m.mid}
               >
                 <Checkbox
                   label={m.name}
                   checked={selectedMyListIdx.includes(idx)}
-                  onChange={() => saveToList(m.id, idx)}
+                  onChange={() => saveToList(m.mid, idx)}
                 />
               </Menu.Item>
             )

@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { Center, Grid, Group, Loader } from "@mantine/core";
-import { Judgement, KeywordOption, QuizRequestParams } from "@/types"
+import { Judgement, KeywordOption } from "@/types"
 import useQuizzes from "@/hooks/useQuizzes";
 import QuizControllBar from "@/components/QuizControllBar";
 import FilteringModal from "@/components/FilteringModal";
@@ -20,8 +20,7 @@ export default function History() {
     dayjs().startOf('day').valueOf(),
     dayjs().endOf('day').valueOf(),
   ]);
-  const [ params, setParams ] = useState<QuizRequestParams>({ perPage: 100, since: dates[0], until: dates[1] });
-  const { quizzes } = useQuizzes(params, '/history');
+  const { quizzes, params, setParams } = useQuizzes({ perPage: 100, since: dates[0], until: dates[1] }, '/history');
   const { histories } = useHistories(dates[0], dates[1]);
   const [ isHidden, setIsHidden ] = useState(false);
   const size = !!quizzes && quizzes.length !== 0 ? quizzes[0].size : 0;
@@ -132,7 +131,7 @@ export default function History() {
               <Center>
                 <QuizPagination
                   page={activePage}
-                  total={!!params.perPage ? Math.ceil(size / params.perPage) : 0}
+                  total={!!params?.perPage ? Math.ceil(size / params.perPage) : 0}
                   setPage={changePage}
                 />
               </Center>

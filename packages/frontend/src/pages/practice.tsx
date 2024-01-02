@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Card, Group, Loader, Overlay, Text } from "@mantine/core";
 import PracticeTypewriteQuiz from "../components/PracticeTypewriteQuiz";
 import useQuizzes from "../hooks/useQuizzes";
-import { KeywordOption, QuizRequestParams } from "../types";
+import { KeywordOption } from "../types";
 import FilteringModal from "../components/FilteringModal";
 import { useTimer, useTypewriter } from "../hooks";
 import { useDisclosure } from "@mantine/hooks";
@@ -15,13 +15,13 @@ import { useNavigate } from "react-router-dom";
 import PracticeResultModal  from "../components/PracticeResultModal";
 
 export default function Practice() {
-  const [ params, setParams ] = useState<QuizRequestParams | null>(null);
+  // const [ params, setParams ] = useState<QuizRequestParams | null>(null);
   const [ nowNumber, setNowNumber ] = useState(0);
   const [ shouldFetch, setShouldFetch ] = useState(false);
   const [ scene, setScene ] = useState(0);
   const [ filtering, filter ] = useDisclosure(false);
   const [ resulted, result ] = useDisclosure(false);
-  const { quizzes } = useQuizzes(params || {}, '', shouldFetch);
+  const { quizzes, params, setParams } = useQuizzes(undefined, '', shouldFetch);
   const [ rightList, setRightList ] = useState<number[]>([]);
   const [ pressedWord, setPressedWord ] = useState(0);
   const navigator = useNavigate();

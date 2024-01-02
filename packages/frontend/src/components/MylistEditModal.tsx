@@ -76,8 +76,6 @@ export default function MylistEditModal({
         onClose={close}
         title={<Text weight={500} size="xl">Edit Mylist</Text>}
         size={ isMobile ? 'xs' : 'md' }
-        pos="absolute"
-        left="-5%"
         centered
       >
         <TextInput
