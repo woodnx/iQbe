@@ -5,7 +5,6 @@ import { IconActivity, IconHistory, IconHome, IconMenu2, IconPencil, IconSchool,
 import { useState } from "react";
 import { useDisclosure } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
-import useUserStore from "../store/user";
 import UserLogoutButton from "../components/UserLogoutButton";
 import { useMylistInfomations } from "../hooks/useMylists";
 import Logo from "../components/Logo";
@@ -32,7 +31,6 @@ export default function DefaultLayout() {
   const [opened, { open, close }] = useDisclosure(false);
   const navigate = useNavigate();
   const location = useLocation();
-  const setUserData = useUserStore((state) => state.setUserData);
   const { mylists } = useMylistInfomations(!loading);
   const { workbooks } = useWorkbooks(!loading);
   const isMobile = useIsMobile();
@@ -115,7 +113,6 @@ export default function DefaultLayout() {
         return;
       }
       setLoading(false);
-      setUserData(user);
     });
     return () => {
       ignore = true;
