@@ -3,17 +3,16 @@ import QuizControllBar from '../components/QuizControllBar'
 import useQuizzes from '../hooks/useQuizzes'
 import { Center, Grid, Group, Loader } from '@mantine/core'
 import FilteringModal from '../components/FilteringModal'
-import { KeywordOption, QuizRequestParams } from '../types'
+import { KeywordOption } from '../types'
 import { useState } from 'react'
 import QuizPagination from '../components/QuizPagination'
 import QuizShuffleButton from '../components/QuizShuffleButton'
 import QuizHiddenAnswerButton from '../components/QuizHiddenAnswerButton'
 
 export default function Search() {
-  const [ params, setParams ] = useState<QuizRequestParams>({perPage: 100})
   const [activePage, setPage] = useState(1);
   const [ isHidden, setIsHidden ] = useState(false);
-  const { quizzes } = useQuizzes(params)
+  const { quizzes, params, setParams } = useQuizzes()
 
   const size = !!quizzes && !!quizzes.length ? quizzes[0].size : 0
 
@@ -79,7 +78,7 @@ export default function Search() {
             <Center>
               <QuizPagination
                 page={activePage}
-                total={!!params.perPage ? Math.ceil(size / params.perPage) : 0}
+                total={!!params?.perPage ? Math.ceil(size / params.perPage) : 0}
                 setPage={changePage}
               />
             </Center>
