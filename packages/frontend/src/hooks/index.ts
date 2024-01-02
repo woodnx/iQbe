@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useRef, useState } from "react"
-import useUserStore from "../store/user"
 import { useCounter } from "@mantine/hooks"
 
 export interface formInputProps {
@@ -250,35 +249,4 @@ export const useAnimationFrame = (callback = () => {}) => {
       if (reqIdRef.current) cancelAnimationFrame(reqIdRef.current) 
     };
   }, [loop]);
-}
-
-export const useFetch = <T>(
-  url: string, 
-  init?: RequestInit
-) => {
-  const [data, setData] = useState<T>()
-  const [error, setError] = useState()
-  const [loading, setLoading] = useState(true)
-  const token = useUserStore((state) => state.idToken)
-  const baseUrl = 'http://localhost:9000/v2'
-
-  useEffect(() => {
-    if (!url) return
-    fetch(`${baseUrl}${url}`, {
-      ...init,
-      headers: {
-        "Authorization": `${token}`
-      }
-    })
-    .then(res => res.json())
-    .then(setData)
-    .then(() => setLoading(false))
-    .catch(setError)
-  }, [url])
-
-  return {
-    loading,
-    data,
-    error
-  }
 }
