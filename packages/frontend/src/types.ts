@@ -11,7 +11,7 @@ export interface Quiz {
   total: number,
   right: number,
   isFavorite: boolean,
-  registerdMylist: number[],
+  registerdMylist: string[],
   size: number,
   judgement?: Judgement,
   creator: string,
@@ -54,7 +54,6 @@ export interface Rank {
 export type Judgement = 0 | 1 | 2;
 
 export interface MylistInformation {
-  id: number,
   name: string,
   mid: string,
 }
