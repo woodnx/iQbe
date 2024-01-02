@@ -5,14 +5,19 @@ export interface Quiz {
   question: string,
   answer: string,
   workbook: string,
+  wid: string,
   level: string,
   date: string,
   total: number,
   right: number,
   isFavorite: boolean,
-  registerdMylist: number[],
+  registerdMylist: string[],
   size: number,
   judgement?: Judgement,
+  creator: string,
+  category?: number,
+  subCategory?: number,
+  isPublic?: boolean,
 }
 
 export interface QuizRequestParams {
@@ -49,7 +54,6 @@ export interface Rank {
 export type Judgement = 0 | 1 | 2;
 
 export interface MylistInformation {
-  id: number,
   name: string,
   mid: string,
 }
@@ -57,4 +61,20 @@ export interface MylistInformation {
 export interface UserData {
   uid: string,
   username: string,
+}
+
+export interface WorkbooksData {
+  id: number,
+  wid: string,
+  name: string,
+  level_id?: number,
+}
+
+export interface SubmitValue {
+  question?: string,
+  answer?: string,
+  category?: string,
+  subCategory?: string,
+  workbook?: string,
+  isPublic?: boolean,
 }

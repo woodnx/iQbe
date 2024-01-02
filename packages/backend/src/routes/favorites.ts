@@ -41,7 +41,8 @@ router.delete('/', async (req, res) => {
       .where(({ eb, and }) => and([
         eb('user_id', '=', userId),
         eb('quiz_id', '=', quizId),
-      ]));
+      ]))
+      .execute();
     });
 
     res.status(204).send()

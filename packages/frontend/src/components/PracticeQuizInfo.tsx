@@ -50,11 +50,17 @@ export function PracticeQuizInfo({
           mylists={mylists || []}
           key={quizId}
         />
-        <QuizWorkbookBadge
-          workbookName={workbook}
-          levelColor={level}
-          date={date}
-        />
+        {
+          (!!workbook && !!level && !!date) 
+          ?
+          <QuizWorkbookBadge
+            workbookName={workbook}
+            levelColor={level}
+            date={date}
+          />
+          :
+          null 
+        }
       </Group>
       { !visible ? <Overlay blur={50} color="#fff" zIndex={100}/> : null }
     </Card>

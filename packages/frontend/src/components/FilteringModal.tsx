@@ -102,7 +102,7 @@ export default function FilteringModal({
             leftIcon={<IconSearch/>}
             onClick={() => { 
               apply(workbooks, levels, keywordProps.value, keywordOption, perPage);
-              innerOnClose();
+              close();
             }}
           >Search</Button>
         </Group>

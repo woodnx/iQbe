@@ -14,25 +14,32 @@ const hashids = new Hashids(
 );
 
 router.post('/login', async (req, res) => {
+  // ボディパラメータ
   const username: string | undefined = req.body.username;
   const password: string | undefined = req.body.password;
+
   const expDate = dayjs().add(1, 'year').toDate();
   const errorMes = 'No user with such a user name and password';
 
+  // エラー処理
   if (!username) {
     res.status(401).send('Undefined username or password');
     return;
   }
 
+  // DB接続
   try {
     await db.transaction().execute(async (trx) => {
+      // usernameからUserを特定
       let user = await trx
       .selectFrom('users')
       .selectAll()
       .where('username', '=', username)
       .executeTakeFirst();
-  
+      
+      // Userがいないときは，一旦再登録が必要かチェックする
       if (!user) {
+        // emailカラムが存在すれば，再登録を促す
         const emailUser = await trx
         .selectFrom('users')
         .selectAll()
@@ -49,7 +56,7 @@ router.post('/login', async (req, res) => {
   
         user = emailUser;
       }
-  
+
       if (!password) {
         res.status(401).send('Undefined username or password');
         return;
@@ -60,7 +67,7 @@ router.post('/login', async (req, res) => {
         res.status(401).send(errorMes);
         return;
       }
-  
+      
       const genTokenUser = {
         uid: user.uid,
         username,
@@ -97,6 +104,7 @@ router.post('/login', async (req, res) => {
 });
 
 router.post('/signup', async (req, res) => {
+  // ボディパラメータ
   const username: string | undefined = req.body.username;
   const email: string | undefined = req.body.email;
   const password: string | undefined = req.body.password;
@@ -111,6 +119,7 @@ router.post('/signup', async (req, res) => {
   }
 
   try {
+    // 内部userIdを求める
     const userIds = await db.selectFrom('users').select('id').orderBy('id desc').limit(1).execute();
     const lastUser = userIds.length !== 0 ? userIds[0].id : 0;
     const newUserId = [ ...Array(lastUser + 1).keys() ];
@@ -119,6 +128,7 @@ router.post('/signup', async (req, res) => {
     const hashedPasswd = bcrypt.hashSync(password, 10);
 
     const userData = await db.transaction().execute(async (trx) => {
+      // 招待コードの検証
       if (requiredInviteCode) {
         if (!code || !code.trim()) {
           res.status(400).send('Undefined invite code');
@@ -213,6 +223,7 @@ router.post('/token', async (req, res) => {
     .executeTakeFirstOrThrow()
     ).id;
 
+    // バイナリからエンコードする
     const token = (await db
     .selectFrom('refresh_tokens')
     .select(({ fn, val }) => [

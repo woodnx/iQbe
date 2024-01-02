@@ -4,13 +4,13 @@ import { Badge, DefaultProps, Group, MultiSelect } from "@mantine/core";
 import { fetcher } from "@/fetchers";
 
 interface WorkbookProps extends React.ComponentPropsWithoutRef<'div'> {
-  id: string,
+  wid: string,
   label: string,
   color: string,
 }
 
 export interface Workbook {
-  id: number,
+  wid: string,
   label: string,
   color: string,
 }
@@ -20,6 +20,20 @@ interface FilteringWorkbookProps extends DefaultProps {
   onChange: (value: string[]) => void
 }
 
+const Item = forwardRef<HTMLDivElement, WorkbookProps>(
+  ({ wid, label, color, ...others}: WorkbookProps, ref) => (
+  <div ref={ref} {...others}>
+    <Group noWrap>
+      <Badge
+        variant="dot"
+        size="lg" 
+        radius="sm" 
+        color={color}
+      >{label}</Badge>
+    </Group>
+  </div>
+))
+
 export default function FilteringWorkbook({ 
   value, 
   onChange,
@@ -27,27 +41,13 @@ export default function FilteringWorkbook({
  }: FilteringWorkbookProps ) {
   const { data: workbooks } = useSWR<Workbook[]>('/workbooks/color', fetcher)
 
-  const data = workbooks ? workbooks.map(({id, label, ...others}) => ({...others, value: String(id), key: id, label})) : []
-
-  const Item = forwardRef<HTMLDivElement, WorkbookProps>(
-    ({ id, label, color, ...others}: WorkbookProps, ref) => (
-    <div ref={ref} {...others}>
-      <Group noWrap>
-        <Badge
-          variant="dot"
-          size="lg" 
-          radius="sm" 
-          color={color}
-        >{label}</Badge>
-      </Group>
-    </div>
-  ))
+  const data = workbooks?.map(({wid, ...others}) => ({...others, value: wid, key: wid}))
 
   return (
     <MultiSelect
       label="Select Workbooks"
       searchable
-      data={data}
+      data={data || []}
       itemComponent={Item}
       filter={(value, selected, item) => !selected && (item.label?.includes(value) || false)}
       value={value} 
