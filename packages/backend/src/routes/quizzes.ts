@@ -148,7 +148,7 @@ router.get('/:listName?', async (req: QuizRequest, res) => {
     const mylists = await db
     .selectFrom('mylists_quizzes')
     .innerJoin('mylists', 'mylists_quizzes.mylist_id', 'mylists.id')
-    .select(['quiz_id', 'mylist_id'])
+    .select(['quiz_id', 'mylists.mid as mid'])
     .where('mylists.user_id', '=', userId)
     .execute();
 
@@ -183,7 +183,7 @@ router.get('/:listName?', async (req: QuizRequest, res) => {
         .executeTakeFirst();
 
         const isFavorite = favorites.some(f => f.quiz_id == quiz.id);
-        const registerdMylist = mylists.filter(m => m.quiz_id == quiz.id).map(m => m.mylist_id);
+        const registerdMylist = mylists.filter(m => m.quiz_id == quiz.id).map(m => m.mid);
 
         return {
           ...quiz,
