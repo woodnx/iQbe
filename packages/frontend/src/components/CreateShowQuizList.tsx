@@ -6,7 +6,7 @@ import FilteringModal from "@/components/FilteringModal";
 import QuizShuffleButton from "@/components/QuizShuffleButton";
 import QuizPagination from "@/components/QuizPagination";
 import QuizList from "@/components/QuizList";
-import { KeywordOption, QuizRequestParams, WorkbooksData } from "@/types";
+import { KeywordOption, WorkbooksData } from "@/types";
 import useQuizzes from "@/hooks/useQuizzes";
 import MylistDeleteModal from "@/components/MylistDeleteModal";
 import MylistEditModal from "@/components/MylistEditModal";
@@ -21,9 +21,8 @@ interface Props extends DefaultProps {
 export default function({ wid }: Props) {
   const isAll = (wid == 'all');
   const navigator = useNavigate();
-  const [ params, setParams ] = useState<QuizRequestParams>({ perPage: 100, workbooks: isAll ? undefined : [ wid ] });
   const [ activePage, setPage ] = useState(1);
-  const { quizzes } = useQuizzes(params, `/create`);
+  const { quizzes, params, setParams } = useQuizzes({ perPage: 100, workbooks: isAll ? undefined : [ wid ] }, `/create`);
   const { workbooks, mutate } = useWorkbooks();
 
   const size = !!quizzes && quizzes.length !== 0 ? quizzes[0].size : 0;
@@ -133,7 +132,7 @@ export default function({ wid }: Props) {
             <Center>
               <QuizPagination
                 page={activePage}
-                total={!!params.perPage ? Math.ceil(size / params.perPage) : 0}
+                total={!!params?.perPage ? Math.ceil(size / params.perPage) : 0}
                 setPage={changePage}
               />
             </Center>

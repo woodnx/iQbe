@@ -6,7 +6,7 @@ import FilteringModal from "../components/FilteringModal";
 import QuizShuffleButton from "../components/QuizShuffleButton";
 import QuizPagination from "../components/QuizPagination";
 import QuizList from "../components/QuizList";
-import { KeywordOption, MylistInformation, QuizRequestParams } from "../types";
+import { KeywordOption, MylistInformation } from "../types";
 import useQuizzes from "../hooks/useQuizzes";
 import { useMylistInfomations } from "../hooks/useMylists";
 import MylistDeleteModal from "../components/MylistDeleteModal";
@@ -18,9 +18,8 @@ export default function Mylist(){
   const pageParams = useParams();
   const navigator = useNavigate();
   const mid = pageParams.mid;
-  const [ params, setParams ] = useState<QuizRequestParams>({ perPage: 100, mid: mid });
   const [ activePage, setPage ] = useState(1);
-  const { quizzes } = useQuizzes(params, `/mylist`);
+  const { quizzes, params, setParams } = useQuizzes({ perPage: 100, mid: mid }, `/mylist`);
   const { mylists, mutate } = useMylistInfomations();
 
   const size = !!quizzes && quizzes.length !== 0 ? quizzes[0].size : 0;
@@ -136,7 +135,7 @@ export default function Mylist(){
             <Center>
               <QuizPagination
                 page={activePage}
-                total={!!params.perPage ? Math.ceil(size / params.perPage) : 0}
+                total={!!params?.perPage ? Math.ceil(size / params.perPage) : 0}
                 setPage={changePage}
               />
             </Center>
