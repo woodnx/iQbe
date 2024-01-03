@@ -12,7 +12,7 @@ interface Props extends DefaultProps {
   level?: string,
   date?: string,
   isFavorite?: boolean,
-  registeredMylist?: number[],
+  registeredMylist?: string[],
   visible: boolean,
 }
 
