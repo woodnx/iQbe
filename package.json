@@ -10,7 +10,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "env-cmd -f .env node ./scripts/build.mjs",
-    "start": "cd packages/backend/dist && env-cmd -f .env node index.js",
+    "start": "cd packages/backend/dist && env-cmd -f ../../../.env node index.js",
     "clean": "node ./scripts/clean.mjs",
     "dev": "env-cmd -f .env node ./scripts/dev.mjs",
     "migrate:create": "cd packages/backend && env-cmd -f ../../.env npm run migrate:create",
