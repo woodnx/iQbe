@@ -74,13 +74,26 @@ router.post('/login', async (req, res) => {
       };
   
       const accessToken = await generateAccessToken(genTokenUser);
-  
-      // 古いリフレッシュトークンを失効
-      const refreshToken = (await trx
-      .selectFrom('refresh_tokens')
-      .select('token')
-      .where('user_id', '=', user.id)
-      .executeTakeFirstOrThrow()).token;
+
+      const refreshToken = (await db
+        .selectFrom('refresh_tokens')
+        .select(({ fn, val }) => [
+          fn<string>('concat', [
+            sql`SUBSTRING(HEX(token), 1, 8)`,
+            val('-'),
+            sql`SUBSTRING(HEX(token), 9, 4)`,
+            val('-'),
+            sql`SUBSTRING(HEX(token), 13, 4)`,
+            val('-'),
+            sql`SUBSTRING(HEX(token), 17, 4)`,
+            val('-'),
+            sql`SUBSTRING(HEX(token), 21, 12)`,
+          ]).as('token'),
+          'expired'
+        ])
+        .where('user_id', '=', user.id)
+        .orderBy('id desc')
+        .executeTakeFirst())?.token;
   
       const { id, passwd, ...sendUser } = user;
       res.status(200).json({ accessToken, refreshToken, user: sendUser });
