@@ -26,6 +26,7 @@ export default defineConfig({
         'offline.html',
         'favicon.ico',
         'iqbe-icon.png',
+        'iqbe.png',
       ],
       devOptions: {
         enabled: true,
