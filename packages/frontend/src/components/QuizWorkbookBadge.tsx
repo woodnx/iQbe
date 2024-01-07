@@ -22,7 +22,7 @@ export function QuizWorkbookBadge({
       size={ isMobile ? "md" : "lg" }
       {...other}
     >
-      {workbookName}{!!date ? `${(date.slice(0, 4))}` : null}
+      {workbookName}{!!date ? `(${date.slice(0, 4)})` : null}
     </Badge>
   )
 }
