@@ -4,7 +4,7 @@ import { MylistInformation } from '../types';
 
 const fetcher = (url: string) => axios.get<MylistInformation[]>(url).then(res => res.data); 
 
-export const useMylistInfomations = (shouldFetch = true) => {
+export const useMylists = (shouldFetch = true) => {
   const { data: mylists, isLoading, error, mutate } = useSWR(
     shouldFetch ? '/mylists' : null, 
   fetcher);
