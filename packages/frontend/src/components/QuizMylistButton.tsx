@@ -40,7 +40,7 @@ export default function QuizMylistButton({
 
     await axios.put('/mylists/quiz', {
       quizId,
-      MIDIConnectionEvent: newMyList.mid,
+      mid: newMyList.mid,
     })
   }
 
