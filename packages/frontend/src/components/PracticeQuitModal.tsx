@@ -46,8 +46,6 @@ export default function PracticePauseModal({
         opened={opened} 
         onClose={() => close()}
         size={ isMobile ? 'xs' : 'md' }
-        pos="absolute"
-        left="-5%"
       >
         <Center>
           <Title>Pause</Title>
