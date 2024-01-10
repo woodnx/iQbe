@@ -1,9 +1,8 @@
 import { ReactNode } from "react";
-import { Grid, Group, Header, Text } from "@mantine/core";
-import { useElementSize } from "@mantine/hooks";
+import { DefaultProps, Group, Header, Stack, Text } from "@mantine/core";
+import { useResizeObserver } from "@mantine/hooks";
 
-interface QuizControllBarProps {
-  height: number,
+interface Props extends DefaultProps {
   total: number,
   buttons: ReactNode,
   pagination: ReactNode,
@@ -14,24 +13,24 @@ export default function QuizControllBar({
   total, 
   buttons, 
   pagination,
-  header = <></>
-}: QuizControllBarProps) {
-  const { ref, height } = useElementSize();
+  header = <></>,
+  ...others
+}: Props) {
+  const [ ref, rect ] = useResizeObserver();
+
   return (
     <Header
-      height={height}
+      height={rect.height + rect.y * 2}
       fixed
     >
-      <Grid px={10} pt={10} ref={ref}>
+      <Stack {...others} ref={ref} spacing={0} >
         { header }
-        <Grid.Col span={12}>
-          <Group position="apart">
-            <div>{ buttons }</div>
-            <Text ta="right">総問題数: {total}</Text>
-          </Group>
-        </Grid.Col>
+        <Group position="apart">
+          <div>{ buttons }</div>
+          <Text ta="right">総問題数: {total}</Text>
+        </Group>
         { pagination }
-      </Grid>
+      </Stack>
     </Header>
   );
 }

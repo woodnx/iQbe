@@ -21,7 +21,7 @@ export default function Practice() {
   const [ scene, setScene ] = useState(0);
   const [ filtering, filter ] = useDisclosure(false);
   const [ resulted, result ] = useDisclosure(false);
-  const { quizzes, params, setParams } = useQuizzes(undefined, '', shouldFetch);
+  const { quizzes, params, setParams } = useQuizzes('', undefined, shouldFetch);
   const [ rightList, setRightList ] = useState<number[]>([]);
   const [ pressedWord, setPressedWord ] = useState(0);
   const navigator = useNavigate();
