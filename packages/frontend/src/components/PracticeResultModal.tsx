@@ -38,8 +38,6 @@ export default function PracticeResultModal({
       withCloseButton={false}
       closeOnClickOutside={false}
       size={isMobile ? 'xs' : 'md'}
-      pos="absolute"
-      left="-5%"
       {...others}
     >
       <Center>
