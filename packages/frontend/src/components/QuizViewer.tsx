@@ -12,6 +12,8 @@ import useQuizzes from '@/hooks/useQuizzes';
 import { useHistories } from "@/hooks/useHistories";
 import HistorySelectJudgement from './HistorySelectJudgement';
 import HistoryDateRange from './HistoryDateRange';
+import QuizTransfarButton from './QuizTransfarButton';
+import { useNavigate } from 'react-router-dom';
 
 interface Props {
   path?: string,
@@ -33,6 +35,7 @@ export default function({
     dayjs().startOf('day').valueOf(),
     dayjs().endOf('day').valueOf(),
   ]);
+  const navigate = useNavigate();
   const { quizzes, params, setParams } = useQuizzes(path, initialParams);
   const { histories } = useHistories(dates[0], dates[1]);
   const right = !!histories ? Number(histories.right) : 0;
@@ -79,6 +82,10 @@ export default function({
     setParams({...params, page});
   }
 
+  const toTransfar = () => {
+    navigate(`/practice?path=/${path}`);
+  }
+
   const changeJudgement = (
     judgements: Judgement[]
   ) => {
@@ -118,6 +125,9 @@ export default function({
               isHidden={isHidden}
               onToggle={setIsHidden}
             />
+            <QuizTransfarButton
+              apply={toTransfar}
+            />
           </Group>
         }
         pagination={
@@ -141,7 +151,7 @@ export default function({
               </Center>
             </>
             : null}
-            <Center mt="xs">
+            <Center mt="sm">
               <QuizPagination
                 page={activePage}
                 total={!!params?.perPage ? Math.ceil(size / params.perPage) : 0}
