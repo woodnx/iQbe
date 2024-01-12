@@ -37,7 +37,8 @@ export default function({
   const [ rightList, setRightList ] = useState<number[]>([]);
   const [ pressedWord, setPressedWord ] = useState(0);
   const quiz = !!quizzes ? quizzes[shuffledList[nowNumber]] : null;
-  const size = quizzes?.length || 0;
+  const maxQuizSize = quizzes?.length || 0;
+  const size = !!quizzes && !!quizzes.length ? quizzes[0].size : 0;
 
   const delay = useTimer(500, 100, () => setScene(1)); 
   const typewriter = useTypewriter(quiz?.question || "", 100, () => setScene(2));
@@ -123,11 +124,11 @@ export default function({
 
   const judgeQuiz = (judgement: number) => {
     record(judgement);
-    setNowNumber(nowNumber+1);
     
-    if (nowNumber >= (size-1)) {
+    if (nowNumber >= (maxQuizSize-1)) {
       setScene(5);
     } else { 
+      setNowNumber(nowNumber+1);
       setScene(0);
     }
   }
@@ -156,10 +157,20 @@ export default function({
       }
       <PracticeResultModal
         rightTotal={rightList.length}
-        quizzesTotal={size || 1}
+        quizzesTotal={maxQuizSize || 1}
+        isTransfer={isTransfer}
+        canNext={(quizzes && params?.perPage && params?.page) ? Math.ceil(size / params?.perPage) >= params?.page + 1 : false}
         opened={resulted}
         onClose={result.close}
         onRetry={() => setScene(0)}
+        onNext={() => {
+          setParams({
+            ...params,
+            page: (!!params?.page) ? params.page + 1 : 0
+          });
+          setScene(0);
+          setNowNumber(0);
+        }}
         onTry={filter.open}
         onQuit={() => navigator('/')}
       />
@@ -168,7 +179,7 @@ export default function({
           apply={toFilter}
           opened={filtering}
           onOpen={filter.open}
-          onClose={!!params ? filter.close : toFilter}
+          onClose={!!quizzes ? filter.close : toFilter}
         />
         <PracticeQuitModal
           onJudge={(j) => stopQuiz(j)}
@@ -176,7 +187,7 @@ export default function({
       </Group>
       <Text ta="center">
         <Text span fz={38} fw={700} >{ nowNumber+1 }</Text> 
-        <Text span fz={18} fw={500}> / { size }</Text>
+        <Text span fz={18} fw={500}> / { maxQuizSize }</Text>
       </Text>
       <Card p="md" radius="lg" withBorder>
         <PracticeTypewriteQuiz
