@@ -1,7 +1,8 @@
 import React, { forwardRef  } from "react";
 import useSWR from "swr";
-import { Badge, DefaultProps, Group, MultiSelect } from "@mantine/core";
+import { DefaultProps, MultiSelect } from "@mantine/core";
 import { fetcher } from "@/fetchers";
+import { QuizWorkbookBadge } from "./QuizWorkbookBadge";
 
 interface WorkbookProps extends React.ComponentPropsWithoutRef<'div'> {
   wid: string,
@@ -23,14 +24,10 @@ interface FilteringWorkbookProps extends DefaultProps {
 const Item = forwardRef<HTMLDivElement, WorkbookProps>(
   ({ wid, label, color, ...others}: WorkbookProps, ref) => (
   <div ref={ref} {...others}>
-    <Group noWrap>
-      <Badge
-        variant="dot"
-        size="lg" 
-        radius="sm" 
-        color={color}
-      >{label}</Badge>
-    </Group>
+    <QuizWorkbookBadge
+      workbookName={label}
+      levelColor={color}
+    />
   </div>
 ))
 

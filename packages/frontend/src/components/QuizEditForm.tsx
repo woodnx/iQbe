@@ -1,6 +1,6 @@
 import React, { forwardRef } from "react";
 import { Button, Card, DefaultProps, Grid, Group, Select, Switch, Text, Textarea } from "@mantine/core";
-import { useForm } from "@mantine/form"
+import { isNotEmpty, useForm } from "@mantine/form"
 import { useCategories, useSubCategories } from "@/hooks/useCategories";
 import { useWorkbooks } from "@/hooks/useWorkbooks";
 import { SubmitValue } from "@/types";
@@ -55,8 +55,8 @@ export default function QuizEditForm({
       workbook: initialWorkbook || "",
     },
     validate: {
-      question: (v) =>  (v == initialQuestion),
-      answer: (v) => (v == initialAnswer),
+      question: isNotEmpty(),
+      answer: isNotEmpty(),
     },
   });
 
