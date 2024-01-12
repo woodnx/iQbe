@@ -74,7 +74,7 @@ router.post('/', async (req, res) => {
         .selectFrom('mylists')
         .select(['name', 'mid'])
         .where('name', '=', listName)
-        .execute();
+        .executeTakeFirstOrThrow();
       
       const message = `${inserts.length} new mylists saved (user: ${userId})`;
       
@@ -162,10 +162,14 @@ router.delete('/quiz', async (req, res) => {
 
   try {
     await db.transaction().execute(async trx => {
+      const mylsitId = (await trx.selectFrom('mylists')
+      .select('id')
+      .where('mid', '=', mid)
+      .executeTakeFirstOrThrow())?.id
+
       const deletes = await trx.deleteFrom('mylists_quizzes')
-      .innerJoin('mylists', 'mylists.id', 'mylists_quizzes.mylist_id')
       .where(({ and, eb }) => and([
-        eb('mylists.mid', '=', mid),
+        eb('mylist_id', '=', mylsitId),
         eb('quiz_id', '=', quizId)
       ]))
       .executeTakeFirst();
