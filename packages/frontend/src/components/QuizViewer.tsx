@@ -164,6 +164,7 @@ export default function({
       <QuizList
         quizzes={quizzes}
         isHidden={isHidden}
+        coloring={isHistory}
       />  
     </>
   )
