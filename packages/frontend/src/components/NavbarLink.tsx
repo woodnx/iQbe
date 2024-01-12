@@ -151,7 +151,7 @@ export default function ({
         <Collapse 
           in={opened}
         >
-          <ScrollArea h={200}>
+          <ScrollArea.Autosize mah={200}>
           {
             (links || []).map((l, idx) => 
               <Link 
@@ -164,7 +164,7 @@ export default function ({
               />
             )
           }
-          </ScrollArea>
+          </ScrollArea.Autosize>
         </Collapse> : null}
     </>
   );
