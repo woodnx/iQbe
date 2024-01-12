@@ -50,12 +50,12 @@ const createFilter = ({
 }
 
 const useQuizzes = (
-  initalParams: QuizRequestParams = { perPage: 100 },
   path = '',
+  initialParams: QuizRequestParams = { perPage: 100 },
   shouldFetch = true,
 ) => {
-  const { data: params, mutate: setParams } = useSWR<QuizRequestParams>('params', null, { fallbackData: initalParams});
-  const filter = createFilter(params || {}).toString()
+  const { data: params, mutate: setParams } = useSWR<QuizRequestParams>('params', null, { fallbackData: initialParams});
+  const filter = createFilter(params || {}).toString();
 
   const { data: quizzes, isLoading, error, mutate } = useSWR(
     shouldFetch ? [`/quizzes${path}`, filter ] : null,

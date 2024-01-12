@@ -6,7 +6,7 @@ import { useState } from "react";
 import { useDisclosure } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
 import UserLogoutButton from "../components/UserLogoutButton";
-import { useMylistInfomations } from "../hooks/useMylists";
+import { useMylists } from "../hooks/useMylists";
 import Logo from "../components/Logo";
 import { checkAuth } from "../plugins/auth";
 import { useWorkbooks } from "@/hooks/useWorkbooks";
@@ -31,7 +31,7 @@ export default function DefaultLayout() {
   const [opened, { open, close }] = useDisclosure(false);
   const navigate = useNavigate();
   const location = useLocation();
-  const { mylists } = useMylistInfomations(!loading);
+  const { mylists } = useMylists(!loading);
   const { workbooks } = useWorkbooks(!loading);
   const isMobile = useIsMobile();
 

@@ -4,9 +4,12 @@ import { useIsMobile } from "@/contexts/isMobile";
 interface Props extends ModalProps {
   rightTotal: number,
   quizzesTotal: number,
-  onRetry: () => void,
-  onTry: () => void,
-  onQuit: () => void,
+  isTransfer: boolean,
+  canNext: boolean,
+  onRetry?: () => void,
+  onNext?: () => void,
+  onTry?: () => void,
+  onQuit?: () => void,
 }
 
 const defineMessage = (rate: number) => {
@@ -21,10 +24,13 @@ export default function PracticeResultModal({
   rightTotal,
   quizzesTotal,
   opened,
+  isTransfer,
+  canNext,
   onClose,
-  onRetry,
-  onTry,
-  onQuit,
+  onNext = () => {},
+  onRetry = () => {},
+  onTry = () => {},
+  onQuit = () => {},
   ...others
 }: Props) {
   const isMobile = useIsMobile();
@@ -38,8 +44,6 @@ export default function PracticeResultModal({
       withCloseButton={false}
       closeOnClickOutside={false}
       size={isMobile ? 'xs' : 'md'}
-      pos="absolute"
-      left="-5%"
       {...others}
     >
       <Center>
@@ -49,7 +53,6 @@ export default function PracticeResultModal({
       <Stack
         spacing="md"
         h={300}
-        sx={(theme) => ({ backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[8] : theme.colors.gray[0] })}
       >
         <Button
           size="lg"
@@ -58,15 +61,24 @@ export default function PracticeResultModal({
             onRetry();
             onClose();
           }}
-        >やりなおす</Button>
+        >同じ問題群でやりなおす</Button>
         <Button
           size="lg"
           color="blue.4"
+          disabled={isTransfer || !canNext}
+          onClick={() => {
+            onNext();
+          }}
+        >次の{quizzesTotal}問をする</Button>
+        <Button
+          size="lg"
+          color="orange"
+          disabled={isTransfer}
           onClick={() => {
             onTry();
             onClose();
-          }}>違う問題をする</Button>
-        {/* <Button size="lg" color="green">Searchに戻る</Button> */}
+          }}
+        >絞り込みをやり直す</Button>
         <Button
           size="lg"
           variant="outline"
@@ -74,7 +86,8 @@ export default function PracticeResultModal({
           onClick={() => {
             onQuit();
             onClose();
-          }}>クイズをやめる</Button>
+          }}
+        >クイズをやめる</Button>
       </Stack>
     </Modal>
   )

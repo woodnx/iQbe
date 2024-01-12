@@ -1,5 +1,5 @@
 import { Card, DefaultProps, Group, Overlay, Text } from "@mantine/core";
-import { useMylistInfomations } from "@/hooks/useMylists";
+import { useMylists } from "@/hooks/useMylists";
 import { useIsMobile } from "@/contexts/isMobile";
 import QuizFavoriteButton from "./QuizFavoriteButton";
 import { QuizWorkbookBadge } from "./QuizWorkbookBadge";
@@ -28,7 +28,7 @@ export function PracticeQuizInfo({
   ...other
 }: Props) {
   const isMobile = useIsMobile();
-  const { mylists } = useMylistInfomations();
+  const { mylists } = useMylists();
 
   return (
     <Card p="sm" radius="sm" { ...other }>
