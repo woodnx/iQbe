@@ -118,7 +118,8 @@ router.get('/:listName?', async (req: QuizRequest, res) => {
         ])
         : 
         between('histories.practiced', s, u)
-      ));
+      ))
+      .orderBy('histories.practiced desc');
     }
     else if (listName === 'create') {
       query = query
