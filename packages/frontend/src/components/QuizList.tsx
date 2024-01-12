@@ -5,12 +5,16 @@ import { Center, Loader } from "@mantine/core";
 
 interface QuizListProps {
   quizzes?: Quiz[],
+  page: number,
+  perPage: number,
   isHidden?: boolean,
   coloring?: boolean,
 }
 
 export default function QuizList({
   quizzes,
+  page,
+  perPage,
   isHidden = false,
   coloring = false,
 }: QuizListProps) {
@@ -26,7 +30,7 @@ export default function QuizList({
         quizzes.map((quiz, idx) => (
           <QuizCard 
             key={`${idx}${isHidden}`}
-            index={idx+1}
+            index={(page -1) * perPage + idx + 1}
             quiz={quiz}
             mylists={mylists || []}
             coloring={coloring}

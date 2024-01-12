@@ -1,4 +1,5 @@
 import { ReactNode, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Center, Group, Stack, } from '@mantine/core';
 import dayjs from "@/plugins/dayjs";
 import QuizList from '@/components/QuizList';
@@ -13,7 +14,6 @@ import { useHistories } from "@/hooks/useHistories";
 import HistorySelectJudgement from './HistorySelectJudgement';
 import HistoryDateRange from './HistoryDateRange';
 import QuizTransfarButton from './QuizTransfarButton';
-import { useNavigate } from 'react-router-dom';
 
 interface Props {
   path?: string,
@@ -163,6 +163,8 @@ export default function({
       />
       <QuizList
         quizzes={quizzes}
+        page={activePage}
+        perPage={params?.perPage || 0}
         isHidden={isHidden}
         coloring={isHistory}
       />  
