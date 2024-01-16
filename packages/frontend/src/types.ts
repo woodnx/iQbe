@@ -82,10 +82,10 @@ export interface SubCategory extends Category {
 }
 
 export interface SubmitValue {
-  question?: string,
-  answer?: string,
-  category?: string,
-  subCategory?: string,
-  workbook?: string,
-  isPublic?: boolean,
+  question?: string | null,
+  answer?: string | null,
+  category?: string | null,
+  subCategory?: string | null,
+  workbook?: string | null,
+  isPublic?: boolean | null,
 }

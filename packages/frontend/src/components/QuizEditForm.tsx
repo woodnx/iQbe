@@ -9,34 +9,34 @@ interface Props extends BoxProps {
   question?: string,
   answer?: string,
   workbook?: string,
-  category?: string,
-  subCategory?: string,
+  category?: string | null,
+  subCategory?: string | null,
   isPublic?: boolean,
   onSubmit?: (v: SubmitValue) => void,
 }
 
 export default function QuizEditForm({
-  question: initialQuestion = "",
-  answer: initialAnswer = "",
-  workbook: initialWorkbook = "",
-  category: initialCategory = "",
-  subCategory: initialSubCategory = "",
+  question: initialQuestion,
+  answer: initialAnswer,
+  workbook: initialWorkbook,
+  category: initialCategory,
+  subCategory: initialSubCategory,
   isPublic: initialIsPublic,
   onSubmit = () => {},
   ...others
 }: Props) {
-  const { categories: ct } = useCategories();
+  const { categories } = useCategories();
   const { subCategories: sct } = useSubCategories();
   const { workbooks: wkb } = useWorkbooks('/user');
 
   const form = useForm({
     initialValues: {
-      question: initialQuestion || "",
-      answer: initialAnswer || "",
+      question: initialQuestion,
+      answer: initialAnswer,
       isPublic: !!initialIsPublic,
-      category: initialCategory || "",
-      subCategory: initialSubCategory || "",
-      workbook: initialWorkbook || "",
+      category: initialCategory,
+      subCategory: initialSubCategory,
+      workbook: initialWorkbook,
     },
     validate: {
       question: isNotEmpty(),
@@ -44,7 +44,6 @@ export default function QuizEditForm({
     },
   });
 
-  const categories = ct?.map(c => ({ ...c, value: String(c.id), label: c.name}));
   const subCategories = sct?.filter(c => c.parent_id === Number(form.values.category)).map(c => ({ ...c, value: String(c.id), label: c.name}));
   const workbooks = wkb?.map(w => ({ ...w, value: w.wid, label: w.name}));
 
@@ -86,17 +85,18 @@ export default function QuizEditForm({
           </Grid.Col>
           <Grid.Col span={{ md: 9 }}>
             <CategorySelector
-              data={categories}
-              {...form.getInputProps('category')}
               label="Genre"
+              data={categories}
+              onClear={() => form.setFieldValue('subCategory', null)}
+              {...form.getInputProps('category')}
             />
           </Grid.Col>
           <Grid.Col span={{ md: 9 }}>
             <CategorySelector
-              key={form.values.category}
-              {...form.getInputProps('subCategory')}
-              data={subCategories || []} 
               label="Sub genre"
+              key={form.values.category}
+              data={subCategories || []} 
+              {...form.getInputProps('subCategory')}
             />
           </Grid.Col>
         </Grid>
