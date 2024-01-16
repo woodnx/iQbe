@@ -4,17 +4,19 @@ import { CloseButton, Combobox, Input, InputBase, ScrollArea, Text, useCombobox 
 interface Props {
   data: Category[] | undefined,
   value?: string,
-  onChange?: (value: string | null) => void,
   label?: string,
   placeholder?: string,
+  onChange?: (value: string | null) => void,
+  onClear?: () => void,
 }
 
 export default function({
   data,
   value,
-  onChange = () => {},
   label,
   placeholder,
+  onChange = () => {},
+  onClear = () => {},
 }: Props) {
   const combobox = useCombobox({
     onDropdownClose: () => combobox.resetSelectedOption(),
@@ -46,11 +48,14 @@ export default function({
           type="button"
           pointer
           rightSection={
-            value !== null ? (
+            value != null ? (
               <CloseButton
                 size="sm"
                 onMouseDown={(e) => e.preventDefault()}
-                onClick={() => onChange("")}
+                onClick={() => { 
+                  onChange(null);
+                  onClear();
+                }}
                 aria-label="Clear value"
               />
             ) : (
@@ -58,7 +63,7 @@ export default function({
             )
           }
           onClick={() => combobox.toggleDropdown()}
-          rightSectionPointerEvents="none"
+          rightSectionPointerEvents={value == null ? 'none' : 'all'}
         >
           { display || <Input.Placeholder>{placeholder || 'Pick value'}</Input.Placeholder>}
         </InputBase>
