@@ -1,8 +1,8 @@
 import { useIsMobile } from "@/contexts/isMobile";
-import { ActionIcon, Button, DefaultProps } from "@mantine/core";
+import { ActionIcon, Button, BoxProps } from "@mantine/core";
 import { IconArrowAutofitContent } from "@tabler/icons-react";
 
-interface Props extends DefaultProps {
+interface Props extends BoxProps {
   apply: () => void
 }
 
@@ -17,7 +17,7 @@ export default function({
   const DefaultButton = () => (
     <Button
       onClick={() => apply()}
-      leftIcon={<Icon/>}
+      leftSection={<Icon/>}
       variant="outline"
       color={color}
       { ...others }

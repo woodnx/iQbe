@@ -23,7 +23,7 @@ export function QuizWorkbookBadge({
       color={levelColor} 
       radius="sm"
       size={ isMobile ? "md" : "lg" }
-      sx={{ textTransform: 'none', backgroundColor: '#fff' }}
+      style={{ textTransform: 'none', backgroundColor: '#fff' }}
       {...other}
     >
       <div>{workbookName}{!!date ? `(${date.slice(0, 4)})` : null}</div>

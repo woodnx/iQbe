@@ -1,7 +1,7 @@
-import { DefaultProps, Grid, MantineNumberSize, SimpleGrid } from "@mantine/core";
+import { BoxProps, Grid, SimpleGrid } from "@mantine/core";
 
-interface Props extends DefaultProps{
-  width?: MantineNumberSize,
+interface Props extends BoxProps{
+  width?: string | number,
   horizonal?: boolean,
   withname?: boolean,
 }

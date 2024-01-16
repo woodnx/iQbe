@@ -1,9 +1,9 @@
-import { Card, DefaultProps, Overlay, Progress, Text } from "@mantine/core";
+import { Card, BoxProps, Overlay, Progress, Text } from "@mantine/core";
 import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
 import 'react-circular-progressbar/dist/styles.css';
 import { useIsMobile } from "@/contexts/isMobile";
 
-interface Props extends DefaultProps {
+interface Props extends BoxProps {
   question: string,
   visible: boolean,
   time: number,

@@ -1,58 +1,42 @@
-import React, { forwardRef } from "react";
-import { Button, Card, DefaultProps, Grid, Group, Select, Switch, Text, Textarea } from "@mantine/core";
+import { Button, Card, BoxProps, Grid, Group, Select, Switch, Textarea } from "@mantine/core";
 import { isNotEmpty, useForm } from "@mantine/form"
 import { useCategories, useSubCategories } from "@/hooks/useCategories";
 import { useWorkbooks } from "@/hooks/useWorkbooks";
 import { SubmitValue } from "@/types";
+import CategorySelector from "./CategorySelector";
 
-interface Props extends DefaultProps {
+interface Props extends BoxProps {
   question?: string,
   answer?: string,
   workbook?: string,
-  category?: string,
-  subCategory?: string,
+  category?: string | null,
+  subCategory?: string | null,
   isPublic?: boolean,
   onSubmit?: (v: SubmitValue) => void,
 }
 
-interface ItemProps extends React.ComponentPropsWithRef<'div'> {
-  label: string,
-  description: string,
-}
-
-const SelectItem = forwardRef<HTMLDivElement, ItemProps>(
-  ({ label, description, ...others}: ItemProps, ref) => (
-    <div ref={ref} {...others}>
-      <Text size="sm">{label}</Text>
-      <Text size="xs" opacity={0.65}>
-        {description}
-      </Text>
-    </div>
-  )
-)
-
 export default function QuizEditForm({
-  question: initialQuestion = "",
-  answer: initialAnswer = "",
-  workbook: initialWorkbook = "",
-  category: initialCategory = "",
-  subCategory: initialSubCategory = "",
+  question: initialQuestion,
+  answer: initialAnswer,
+  workbook: initialWorkbook,
+  category: initialCategory,
+  subCategory: initialSubCategory,
   isPublic: initialIsPublic,
   onSubmit = () => {},
   ...others
 }: Props) {
-  const { categories: ct } = useCategories();
+  const { categories } = useCategories();
   const { subCategories: sct } = useSubCategories();
-  const { workbooks: wkb } = useWorkbooks();
+  const { workbooks: wkb } = useWorkbooks('/user');
 
   const form = useForm({
     initialValues: {
-      question: initialQuestion || "",
-      answer: initialAnswer || "",
+      question: initialQuestion,
+      answer: initialAnswer,
       isPublic: !!initialIsPublic,
-      category: initialCategory || "",
-      subCategory: initialSubCategory || "",
-      workbook: initialWorkbook || "",
+      category: initialCategory,
+      subCategory: initialSubCategory,
+      workbook: initialWorkbook,
     },
     validate: {
       question: isNotEmpty(),
@@ -60,7 +44,6 @@ export default function QuizEditForm({
     },
   });
 
-  const categories = ct?.map(c => ({ ...c, value: String(c.id), label: c.name}));
   const subCategories = sct?.filter(c => c.parent_id === Number(form.values.category)).map(c => ({ ...c, value: String(c.id), label: c.name}));
   const workbooks = wkb?.map(w => ({ ...w, value: w.wid, label: w.name}));
 
@@ -90,38 +73,34 @@ export default function QuizEditForm({
         />
 
         <Grid grow columns={24}>
-          <Grid.Col md={6}>
+          <Grid.Col span={{ md: 6 }}>
             <Select
               {...form.getInputProps('workbook')}
               defaultValue={initialWorkbook}
               data={workbooks || []} 
               label="Workbook"
-              withinPortal
               clearable
               searchable
             />
           </Grid.Col>
-          <Grid.Col md={9}>
-            <Select
-              {...form.getInputProps('category')}
-              itemComponent={SelectItem}
-              data={categories || []} 
+          <Grid.Col span={{ md: 9 }}>
+            <CategorySelector
               label="Genre"
-              withinPortal
+              data={categories}
+              onClear={() => form.setFieldValue('subCategory', null)}
+              {...form.getInputProps('category')}
             />
           </Grid.Col>
-          <Grid.Col md={9}>
-            <Select 
-              key={form.values.category}
-              {...form.getInputProps('subCategory')}
-              itemComponent={SelectItem}
-              data={subCategories || []} 
+          <Grid.Col span={{ md: 9 }}>
+            <CategorySelector
               label="Sub genre"
-              withinPortal
+              key={form.values.category}
+              data={subCategories || []} 
+              {...form.getInputProps('subCategory')}
             />
           </Grid.Col>
         </Grid>
-        <Group position="apart" mt="sm">
+        <Group justify="space-between" mt="sm">
           <Switch
             {...form.getInputProps('isPublic', {type: 'checkbox'})}
             label="Publish quiz"

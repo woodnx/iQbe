@@ -1,13 +1,13 @@
-import { Button, DefaultProps, Menu } from "@mantine/core";
+import { Button, Menu } from "@mantine/core";
 import { IconChevronDown } from "@tabler/icons-react";
 import { Period } from "@/plugins/dayjs";
 
-interface Props extends DefaultProps {
+interface Props {
   period: Period,
   onClick: (period: Period) => void,
 }
 
-export default function ActivitySelectRange({
+export default function ({
   period,
   onClick,
 }: Props) {
@@ -21,11 +21,11 @@ export default function ActivitySelectRange({
     <Menu>
       <Menu.Target>
         <Button
-          uppercase
+          tt="uppercase"
           radius="xl"
           variant="outline"
           color="dark"
-          rightIcon={<IconChevronDown/>}
+          rightSection={<IconChevronDown/>}
         >
           { period }
         </Button>

@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useNavigate, useParams } from "react-router-dom";
-import { Card, Group, Text } from "@mantine/core";
+import { Card, Group, Text, getGradient, useMantineTheme } from "@mantine/core";
 import MylistDeleteModal from "@/components/MylistDeleteModal";
 import MylistEditModal from "@/components/MylistEditModal";
 import QuizViewer from "@/components/QuizViewer";
@@ -18,6 +18,8 @@ export default function Mylist(){
 
   const mylistName = mylists?.find(list => list.mid == mid)?.name;
   const [ newNameProps ] = useInput(mylistName || '');
+
+  const theme = useMantineTheme();
 
   useEffect(() => {
     setParams({
@@ -49,14 +51,14 @@ export default function Mylist(){
       mb="xs"
       w="100%" 
       withBorder
-      sx={(theme) => ({
-        backgroundImage: theme.fn.gradient(),
-        color: theme.white,
-      })}
+      style={{
+        backgroundImage: getGradient({ deg: 45, from: 'indigo', to: 'cyan' }, theme),
+        color: `var(--mantine-color-white)`,
+      }}
     >
-      <Group position="apart">
-        <Text weight={700} size={25}>{ mylistName }</Text>
-        <Group spacing="md">
+      <Group justify="space-between">
+        <Text fw={700} fz={25}>{ mylistName }</Text>
+        <Group justify="md">
           <MylistEditModal
             newNameProps={newNameProps}
             onSave={toEdit}

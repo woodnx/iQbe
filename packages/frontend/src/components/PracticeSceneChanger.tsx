@@ -43,7 +43,7 @@ export default function({
   const delay = useTimer(500, 100, () => setScene(1)); 
   const typewriter = useTypewriter(quiz?.question || "", 100, () => setScene(2));
   const countdown = useTimer(4000, 1000, () => setScene(4)); 
-  const through = useTimer(3000, 100, () => setScene(4)); 
+  const through = useTimer(3000, 10, () => setScene(4)); 
 
   useEffect(() => {
     switch(scene) {
@@ -174,7 +174,7 @@ export default function({
         onTry={filter.open}
         onQuit={() => navigator('/')}
       />
-      <Group position="apart">
+      <Group justify="space-between">
         <FilteringModal
           apply={toFilter}
           opened={filtering}

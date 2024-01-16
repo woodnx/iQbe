@@ -1,16 +1,15 @@
-import { Slider, SliderProps, Text } from "@mantine/core";
+import { Box, Slider, SliderProps, Text } from "@mantine/core";
 
-interface Props extends SliderProps {
-}
+interface Props extends SliderProps {}
 
-export default function FilteringQuizNumber({
+export default function ({
   value,
   onChange,
   ...others
 }: Props){
   return (
-    <>
-      <Text {...others}>表示問題数</Text>
+    <Box {...others}>
+      <Text>表示問題数</Text>
       <Slider 
         label={`${value}問`}
         min={1}
@@ -19,6 +18,6 @@ export default function FilteringQuizNumber({
         value={value}
         onChange={onChange}
       />
-    </>
+    </Box>
   )
 }

@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Card, DefaultProps, Group, Text } from "@mantine/core";
-import { WorkbooksData } from "@/types";
+import { Card, Group, Text, getGradient, useMantineTheme } from "@mantine/core";
+import { Workbook } from "@/types";
 import useQuizzes from "@/hooks/useQuizzes";
 import MylistDeleteModal from "@/components/MylistDeleteModal";
 import MylistEditModal from "@/components/MylistEditModal";
@@ -10,7 +10,7 @@ import axios from "@/plugins/axios";
 import { useWorkbooks } from "@/hooks/useWorkbooks";
 import QuizViewer from "./QuizViewer";
 
-interface Props extends DefaultProps {
+interface Props {
   wid: string,
 }
 
@@ -23,6 +23,8 @@ export default function({ wid }: Props) {
   const workbooksName = isAll ? 'すべてのクイズ' : workbooks?.find(list => list.wid == wid)?.name;
   const [ newNameProps ] = useInput(workbooksName || '');
 
+  const theme = useMantineTheme();
+
   useEffect(() => {
     setParams({ 
       perPage: 100, 
@@ -31,7 +33,7 @@ export default function({ wid }: Props) {
   }, [])
 
   const toEdit = async () => {
-    const newlist = await axios.put<WorkbooksData[]>('/workbooks/rename', {
+    const newlist = await axios.put<Workbook[]>('/workbooks/rename', {
       wid,
       newName: newNameProps.value,
     }).then(res => res.data);
@@ -39,7 +41,7 @@ export default function({ wid }: Props) {
   }
 
   const toDelete = async () => {
-    const newlist = await axios.delete<WorkbooksData[]>('/workbooks', {
+    const newlist = await axios.delete<Workbook[]>('/workbooks', {
       data: {
         wid
       }
@@ -53,15 +55,15 @@ export default function({ wid }: Props) {
       mb="xs"
       w="100%" 
       withBorder
-      sx={(theme) => ({
-        backgroundImage: theme.fn.gradient(),
-        color: theme.white,
-      })}
+      style={{
+        backgroundImage: getGradient({ deg: 45, from: 'indigo', to: 'cyan' }, theme),
+        color: `var(--mantine-color-white)`,
+      }}
     >
-      <Group position="apart">
-        <Text weight={700} size={25}>{ workbooksName }</Text>
+      <Group justify="space-between">
+        <Text fw={700} fz={25}>{ workbooksName }</Text>
         {
-          !isAll ? <Group spacing="md">
+          !isAll ? <Group gap="md">
             <MylistEditModal
               newNameProps={newNameProps}
               onSave={toEdit}
