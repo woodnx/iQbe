@@ -63,11 +63,22 @@ export interface UserData {
   username: string,
 }
 
-export interface WorkbooksData {
-  id: number,
+export interface Workbook {
   wid: string,
   name: string,
-  level_id?: number,
+  label: string,
+  color: string,
+  level_id: number,
+}
+
+export interface Category {
+  id: number,
+  name: string,
+  description: string,
+}
+
+export interface SubCategory extends Category {
+  parent_id: number,
 }
 
 export interface SubmitValue {

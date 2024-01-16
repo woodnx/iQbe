@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ActionIcon, Button, DefaultProps, Group, Modal } from "@mantine/core";
+import { ActionIcon, Button, BoxProps, Group, Modal } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { IconFilter, IconSearch } from "@tabler/icons-react";
 import { useInput } from "@/hooks";
@@ -10,7 +10,7 @@ import FilteringLevel from "./FilteringLevel";
 import FilteringQuizNumber from "./FilteringQuizNumber";
 import FilteringWord from "./FilteringWord";
 
-interface FilteringModalProps extends DefaultProps {
+interface FilteringModalProps extends BoxProps {
   apply: (
     workbooks?: string[],
     levels?: string[],
@@ -46,7 +46,7 @@ export default function FilteringModal({
   const defaultButton = (
     <Button 
       onClick={innerOnOpen}
-      leftIcon={<IconFilter/>}
+      leftSection={<IconFilter/>}
       variant="outline"
       color="orange"
       { ...others }
@@ -76,7 +76,7 @@ export default function FilteringModal({
         pos="absolute"
       >
         <FilteringWorkbook
-          value={workbooks} 
+          values={workbooks} 
           onChange={setWorkbooks}
         />
         <FilteringLevel 
@@ -88,7 +88,7 @@ export default function FilteringModal({
           wordInputProps={keywordProps} 
           wordSearchOption={{ 
             value: keywordOption, 
-            onChange: setkeywordOption 
+            onChange: setkeywordOption
           }}
           mt="lg"
         />
@@ -97,9 +97,9 @@ export default function FilteringModal({
           onChange={setPerPage}
           mt="lg"
         />
-        <Group mt="xl" position="right">
+        <Group mt="xl" justify="right">
           <Button 
-            leftIcon={<IconSearch/>}
+            leftSection={<IconSearch/>}
             onClick={() => { 
               apply(workbooks, levels, keywordProps.value, keywordOption, perPage);
               close();

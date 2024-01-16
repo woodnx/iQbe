@@ -4,8 +4,8 @@ import { logoutUser } from "@/plugins/auth";
 export default function LogoutButton() {
   return (
     <Button
+      td="uppercase"
       fullWidth
-      uppercase
       onClick={() => logoutUser()}
     >
       Logout

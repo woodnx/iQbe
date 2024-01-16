@@ -1,7 +1,7 @@
-import { DefaultProps, Text } from "@mantine/core";
+import { BoxProps, Text } from "@mantine/core";
 import { useCallback, useEffect, useRef, useState } from "react";
 
-interface Props extends DefaultProps {
+interface Props extends BoxProps {
   onFinish: () => void
 }
 

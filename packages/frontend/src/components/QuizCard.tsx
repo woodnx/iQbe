@@ -1,12 +1,12 @@
 import { useState } from "react";
-import { Button, Card, DefaultProps, Flex, Group, Text, } from "@mantine/core";
+import { Button, Card, BoxProps, Flex, Group, Text, } from "@mantine/core";
 import { Judgement, MylistInformation, Quiz } from "@/types";
 import QuizMylistButton from "./QuizMylistButton";
 import QuizFavoriteButton from "./QuizFavoriteButton";
 import { QuizWorkbookBadge } from "./QuizWorkbookBadge";
 import QuizDetailsMenu from "./QuizDetailesMenu";
 
-interface Props extends DefaultProps{
+interface Props extends BoxProps{
   index: number,
   quiz: Quiz,
   mylists: MylistInformation[],
@@ -33,9 +33,8 @@ export default function QuizCard({
 
   const hiddenButton = (
     <Button 
-      size="xs" 
+      size="compact-xs" 
       color="violet.4"
-      compact 
       onClick={() => setInnerIsHidden(false)}
     >
       Show answer
@@ -48,7 +47,7 @@ export default function QuizCard({
       bg={color}
       {...others}
     >
-      <Group position="apart">
+      <Group justify="space-between">
         <Text>No.{index}</Text>
         <QuizFavoriteButton
           isFavorite={quiz.isFavorite}
@@ -56,7 +55,7 @@ export default function QuizCard({
         />
       </Group>
       <Text pt={10}>{quiz.question}</Text>
-      <Text align="right" pt={10}>
+      <Text ta="right" pt={10}>
         {
           innerIsHidden ? hiddenButton : quiz.answer
         }

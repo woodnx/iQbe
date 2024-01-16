@@ -51,7 +51,7 @@ export default function PracticeResultModal({
       </Center>
       <Space h="md"/>
       <Stack
-        spacing="md"
+        gap="md"
         h={300}
       >
         <Button

@@ -28,6 +28,7 @@ export default function QuizFavoriteButton({
     <ActionIcon 
       color={isFavorite ? 'yellow.5' : 'gray'}
       onClick={addFavoriteList} 
+      variant="subtle"
     >
       {isFavorite ? <IconStarFilled/> : <IconStar/>}
     </ActionIcon>

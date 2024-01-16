@@ -29,7 +29,7 @@ export default function({
   return (
     <Menu withinPortal position="bottom-end">
       <Menu.Target>
-        <ActionIcon>
+        <ActionIcon variant="subtle" color="gray">
           <IconDots/>
         </ActionIcon>
       </Menu.Target>

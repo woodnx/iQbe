@@ -1,23 +1,14 @@
-import { useState } from "react";
-import { ActionIcon, Button, Checkbox, DefaultProps, Divider, Menu, createStyles } from "@mantine/core";
+import { ComponentProps, useState } from "react";
+import { ActionIcon, Button, Checkbox, Divider, Menu } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { IconPlaylistAdd, IconPlus } from "@tabler/icons-react";
+import classes from "./styles/QuizMylistButton.module.css";
 import { MylistInformation } from "@/types";
 import axios from "@/plugins/axios";
 import { useIsMobile } from "@/contexts/isMobile";
 import MylistCreateModal from "./MylistCreateModal";
 
-const useStyle = createStyles((theme) => ({
-  button: {
-    ...theme.fn.focusStyles(),
-    borderRadius: theme.radius.xl,
-    '&:hover': {
-      backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[5] : theme.colors.gray[0],
-    },
-  }
-}));
-
-interface Props extends DefaultProps {
+interface Props extends ComponentProps<typeof Button> {
   quizId: number,
   registerdMylistId: string[],
   mylists: MylistInformation[],
@@ -29,7 +20,6 @@ export default function QuizMylistButton({
   mylists,
 }: Props) {
   const [ creating, create ] = useDisclosure(false);
-  const { classes } = useStyle();
   const [ selectedMyListIdx, setSelectedMylistIdx ] = useState(registerdMylistId.map(id => mylists?.findIndex(list => list.mid == id)));
   const isMobile = useIsMobile();
 
@@ -64,7 +54,7 @@ export default function QuizMylistButton({
   const defaultButton = (
     <Button
       classNames={{root: classes.button}}
-      leftIcon={<IconPlaylistAdd />}
+      leftSection={<IconPlaylistAdd />}
       variant="outline"
       size="xs"
       bg="#fff"
@@ -115,7 +105,7 @@ export default function QuizMylistButton({
           }
           <Divider/>
           <Menu.Item 
-            icon={<IconPlus size={14}/>}
+            leftSection={<IconPlus size={14}/>}
             onClick={create.open}
           >
             マイリストを作成
