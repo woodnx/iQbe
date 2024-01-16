@@ -1,9 +1,9 @@
-import { Button, Center, DefaultProps, Group } from "@mantine/core";
+import { Button, Center, BoxProps, Group } from "@mantine/core";
 import { IconChevronsRight, IconPlaystationCircle, IconX } from "@tabler/icons-react";
 import PracticeQuizButton from "./PracticeQuizButton";
 import { useState } from "react";
 
-interface Props extends DefaultProps {
+interface Props extends BoxProps {
   canPress?: boolean,
   canJudge?: boolean,
   onJudge: (judgement: number) => void,
@@ -31,7 +31,7 @@ export function PracticeQuizController({
   
   return (
     <>
-      <Group position="center" grow {...others}>
+      <Group justify="center" grow {...others}>
         <Button fullWidth size="xl" color="red" onClick={() => judge(1)} disabled={!canJudge || !isPressed}>
           <IconPlaystationCircle/>
         </Button>
@@ -44,7 +44,7 @@ export function PracticeQuizController({
       </Group>
       <Center mt="sm">
         <PracticeQuizButton 
-          width={280}
+          w={280}
           onClick={pressed}
           disabled={!canPress}
         />

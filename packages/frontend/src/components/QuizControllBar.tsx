@@ -1,8 +1,9 @@
-import { ReactNode } from "react";
-import { DefaultProps, Group, Header, Stack, Text } from "@mantine/core";
+import { ComponentProps, ReactNode, useEffect } from "react";
+import { AppShell, Group, Stack, Text } from "@mantine/core";
 import { useResizeObserver } from "@mantine/hooks";
+import useHeaderHeight from "@/hooks/useHeaderHeight";
 
-interface Props extends DefaultProps {
+interface Props extends ComponentProps<typeof Stack> {
   total: number,
   buttons: ReactNode,
   pagination: ReactNode,
@@ -17,20 +18,30 @@ export default function QuizControllBar({
   ...others
 }: Props) {
   const [ ref, rect ] = useResizeObserver();
+  const { setHeaderHeight } = useHeaderHeight();
+  const height = rect.height + rect.y * 2;
+
+  useEffect(() => {
+    setHeaderHeight(height)
+  
+    return () => {
+      setHeaderHeight(0);
+    }
+  }, [rect]);
+  
 
   return (
-    <Header
-      height={rect.height + rect.y * 2}
-      fixed
+    <AppShell.Header
+      h={height}
     >
-      <Stack {...others} ref={ref} spacing={0} >
+      <Stack {...others} ref={ref} gap={0} >
         { header }
-        <Group position="apart">
+        <Group justify="space-between">
           <div>{ buttons }</div>
           <Text ta="right">総問題数: {total}</Text>
         </Group>
         { pagination }
       </Stack>
-    </Header>
+    </AppShell.Header>
   );
 }

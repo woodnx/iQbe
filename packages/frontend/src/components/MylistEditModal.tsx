@@ -1,46 +1,22 @@
-import { ActionIcon, Button, DefaultProps, Group, Modal, Selectors, Text, TextInput, createStyles } from "@mantine/core";
+import { ActionIcon, Button, BoxProps, Group, Modal, Text, TextInput } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { IconPencil } from "@tabler/icons-react";
 import { formInputProps } from "@/hooks";
 import { useIsMobile } from "@/contexts/isMobile";
+import classes from "./styles/MylistModal.module.css";
 
-const useStyles = createStyles((theme) => ({
-  button: {
-    ...theme.fn.focusStyles(),
-    borderRadius: theme.radius.xl,
-    backgroundColor: "#fff",
-    '&:hover': {
-      backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[5] : theme.colors.gray[0],
-    },
-  },
-  mobileButton: {
-    ...theme.fn.focusStyles(),
-    backgroundColor: "#fff",
-    '&:hover': {
-      backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[5] : theme.colors.gray[0],
-    },
-  },
-}));
-
-type MylistEditModalStylesNames = Selectors<typeof useStyles>;
-
-interface Props extends DefaultProps<MylistEditModalStylesNames> {
+interface Props extends BoxProps {
   newNameProps: formInputProps,
   onSave: () => void,
 }
 
 export default function MylistEditModal({
-  classNames,
-  styles,
-  unstyled,
   newNameProps,
   onSave,
 }: Props){
   const [ opened, { open, close } ] = useDisclosure();
   const isMobile = useIsMobile();
   const icon = <IconPencil/>;
-  // @ts-ignore
-  const { classes } = useStyles({}, { name: 'MylistEditModal', classNames, styles, unstyled });
 
   const edit = () => {
     onSave();
@@ -52,7 +28,7 @@ export default function MylistEditModal({
       className={classes.button}
       variant="outline" 
       radius="xl" 
-      leftIcon={icon}
+      leftSection={icon}
       onClick={open}
     >Edit</Button>
   );
@@ -74,14 +50,14 @@ export default function MylistEditModal({
       <Modal 
         opened={opened} 
         onClose={close}
-        title={<Text weight={500} size="xl">Edit Mylist</Text>}
+        title={<Text fw={500} size="xl">Edit Mylist</Text>}
         size={ isMobile ? 'xs' : 'md' }
         centered
       >
         <TextInput
           {...newNameProps}
         />
-        <Group position="apart" mt="sm">
+        <Group justify="space-between" mt="sm">
           <Button 
             variant="outline"
             color="dark"
@@ -89,7 +65,7 @@ export default function MylistEditModal({
           >Cancel</Button>
           <Button 
             onClick={edit}
-            leftIcon={icon}
+            leftSection={icon}
           >Save</Button>
         </Group>
       </Modal>

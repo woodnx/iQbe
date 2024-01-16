@@ -1,8 +1,8 @@
-import { ActionIcon, Button, DefaultProps } from "@mantine/core"
+import { ActionIcon, Button, BoxProps } from "@mantine/core"
 import { IconArrowsShuffle } from "@tabler/icons-react"
 import { useIsMobile } from "@/contexts/isMobile";
 
-interface QuizShuffleButton extends DefaultProps {
+interface QuizShuffleButton extends BoxProps {
   apply: (seed: number) => void
 }
 
@@ -16,7 +16,7 @@ export default function QuizShuffleButton({
   const defaultButton = (
     <Button
       onClick={() => apply(random)}
-      leftIcon={<IconArrowsShuffle/>}
+      leftSection={<IconArrowsShuffle/>}
       variant="outline"
       color="blue"
       { ...others }

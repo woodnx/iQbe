@@ -1,10 +1,10 @@
 import { useState } from "react";
-import { ActionIcon, DefaultProps, Popover, UnstyledButton } from "@mantine/core";
+import { ActionIcon, BoxProps, Popover, UnstyledButton } from "@mantine/core";
 import { DatePicker } from '@mantine/dates';
 import { IconChevronLeft, IconChevronRight } from "@tabler/icons-react";
 import dayjs from "@/plugins/dayjs";
 
-interface Props extends DefaultProps{
+interface Props extends BoxProps{
   dates: number[],
   onChangeDates: (dates: number[]) => void,
 }
@@ -50,11 +50,12 @@ export default function HistoryDateRange({
 
   return (
     <>
-      <ActionIcon >
-        <IconChevronLeft 
-          // @ts-ignore
-          onClick={() => setDates(nextDate(false)) }
-        />
+      <ActionIcon 
+        variant="subtle" 
+        color="gray"
+        onClick={() => setDates(nextDate(false)) }
+      >
+        <IconChevronLeft/>
       </ActionIcon>
       <Popover>
         <Popover.Target>
@@ -72,11 +73,12 @@ export default function HistoryDateRange({
           />
         </Popover.Dropdown>
       </Popover>
-      <ActionIcon>
-        <IconChevronRight 
-          // @ts-ignore
-          onClick={() => setDates(nextDate(true))}
-        />
+      <ActionIcon 
+        variant="subtle" 
+        color="gray"
+        onClick={() => setDates(nextDate(true))}
+      >
+        <IconChevronRight />
       </ActionIcon>
     </>
   )

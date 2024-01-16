@@ -17,25 +17,25 @@ export default function HistorySelectButton({
   onClick = () => {},
 }: Props) {
   const c = isSelect ? color : 'dark';
-  const weight = isSelect ? 500 : 'xl';
+  const weight = isSelect ? 500 : 400;
 
   return (
     <UnstyledButton onClick={onClick}>
       <Text 
         span 
         c={c} 
-        size={17}
-        weight={weight}
+        fz={17}
+        fw={weight}
       >{ label } </Text>
       <Text 
         component="span" 
         c={c} 
-        size={30}
-        weight={weight}
+        fz={30}
+        fw={weight}
       >{ count }</Text>
       {
         !!divide ? 
-          <Text component="span" size={30} mx={8}>/</Text>
+          <Text component="span" fz={30} mx={8}>/</Text>
         : null
       }
     </UnstyledButton>

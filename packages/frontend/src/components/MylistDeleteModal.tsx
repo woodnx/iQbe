@@ -1,43 +1,19 @@
-import { ActionIcon, Button, DefaultProps, Group, Modal, Selectors, Text, createStyles } from "@mantine/core";
+import { ActionIcon, Button, BoxProps, Group, Modal, Text } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { IconTrash } from "@tabler/icons-react";
 import { useIsMobile } from "@/contexts/isMobile";
+import classes from "./styles/MylistModal.module.css";
 
-const useStyles = createStyles((theme) => ({
-  button: {
-    ...theme.fn.focusStyles(),
-    borderRadius: theme.radius.xl,
-    backgroundColor: "#fff",
-    '&:hover': {
-      backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[5] : theme.colors.gray[0],
-    },
-  },
-  mobileButton: {
-    ...theme.fn.focusStyles(),
-    backgroundColor: "#fff",
-    '&:hover': {
-      backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[5] : theme.colors.gray[0],
-    },
-  },
-}));
-
-type MylistDeleteModalStyleNames = Selectors<typeof useStyles>;
-
-interface Props extends DefaultProps<MylistDeleteModalStyleNames> {
+interface Props extends BoxProps {
   onDelete: () => void,
 }
 
 export default function MylistDeleteModal({
-  classNames,
-  styles,
-  unstyled,
   onDelete,
 }: Props){
   const [ opened, { open, close } ] = useDisclosure();
   const isMobile = useIsMobile();
   const icon = <IconTrash/>;
-  // @ts-ignore
-  const { classes } = useStyles({}, { name: 'MylistDeleteModal', classNames, styles, unstyled });
 
   const del = () => {
     onDelete();
@@ -49,7 +25,7 @@ export default function MylistDeleteModal({
       className={classes.button}
       variant="outline" 
       radius="xl" 
-      leftIcon={icon}
+      leftSection={icon}
       onClick={open}
     >Delete</Button>
   );
@@ -71,13 +47,13 @@ export default function MylistDeleteModal({
       <Modal 
         opened={opened} 
         onClose={close}
-        title={<Text weight={500} size="xl">Delete Mylist</Text>}
+        title={<Text fw={500} size="xl">Delete Mylist</Text>}
         size={ isMobile ? 'xs' : 'md' }
         centered
       >
         <Text>マイリストを削除しますか？</Text>
         <Text c="red" size="sm">※この変更は元に戻せません。</Text>
-        <Group position="apart" mt="sm">
+        <Group justify="space-between" mt="sm">
           <Button 
             variant="outline"
             color="dark"
@@ -86,7 +62,7 @@ export default function MylistDeleteModal({
           <Button 
             color="red"
             onClick={del}
-            leftIcon={icon}
+            leftSection={icon}
           >Delete</Button>
         </Group>
       </Modal>

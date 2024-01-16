@@ -1,9 +1,9 @@
-import { ActionIcon, Button, Center, DefaultProps, Modal, Space, Stack, Title } from "@mantine/core";
+import { ActionIcon, Button, Center, BoxProps, Modal, Space, Stack, Title } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { IconPlayerPauseFilled } from "@tabler/icons-react";
 import { useIsMobile } from "@/contexts/isMobile";
 
-interface Props extends DefaultProps {
+interface Props extends BoxProps {
   onJudge: (judgement: number) => void,
 }
 
@@ -21,7 +21,7 @@ export default function PracticePauseModal({
     <Button
       variant="outline"
       onClick={open}
-      leftIcon={<IconPlayerPauseFilled/>}
+      leftSection={<IconPlayerPauseFilled/>}
       color="dark"
     >
       Pause
@@ -51,7 +51,7 @@ export default function PracticePauseModal({
           <Title>Pause</Title>
         </Center>
         <Space h={10}/>
-        <Stack spacing="md" h={300} sx={(theme) => ({ backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[8] : theme.colors.gray[0] })}>
+        <Stack gap="md" h={300}>
           <Button size="lg" color="red" onClick={() => judge(1)}>正解にしてやめる</Button>
           <Button size="lg" color="gray" onClick={() => judge(2)}>スルーにしてやめる</Button>
           <Button size="lg" color="blue" onClick={() => judge(0)}>誤答にしてやめる</Button>

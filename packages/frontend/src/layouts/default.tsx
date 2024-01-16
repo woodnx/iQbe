@@ -1,6 +1,6 @@
 import { useLayoutEffect } from "react";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
-import { ActionIcon, AppShell, Center, Container, Drawer, Footer, Group, Loader, Navbar } from "@mantine/core";
+import { ActionIcon, AppShell, Center, Container, Drawer, Group, Loader, } from "@mantine/core";
 import { IconActivity, IconHistory, IconHome, IconMenu2, IconPencil, IconSchool, IconSearch, IconStar } from "@tabler/icons-react";
 import { useState } from "react";
 import { useDisclosure } from "@mantine/hooks";
@@ -13,6 +13,7 @@ import { useWorkbooks } from "@/hooks/useWorkbooks";
 import NavbarLink from "@/components/NavbarLink";
 import { IconBooks } from "@tabler/icons-react";
 import { useIsMobile } from "@/contexts/isMobile";
+import useHeaderHeight from "@/hooks/useHeaderHeight";
 
 const checkPathname = (pathname: string) => {
   if (pathname === '/') return '/';
@@ -32,8 +33,9 @@ export default function DefaultLayout() {
   const navigate = useNavigate();
   const location = useLocation();
   const { mylists } = useMylists(!loading);
-  const { workbooks } = useWorkbooks(!loading);
+  const { workbooks } = useWorkbooks('/user', !loading);
   const isMobile = useIsMobile();
+  const { headerHeight }= useHeaderHeight();
 
   const mockMylists = mylists?.map(m => ({
     label: m.name,
@@ -121,8 +123,8 @@ export default function DefaultLayout() {
 
   const MyNavbarSections = () => (
     <>
-      <Navbar.Section grow>
-        <Group position="apart">
+      <AppShell.Section grow p="md">
+        <Group justify="space-between">
           <Logo horizonal width={100} mb="xs"/>
         </Group>
         {
@@ -141,28 +143,25 @@ export default function DefaultLayout() {
             />
           )
         }
-      </Navbar.Section>
-      <Navbar.Section>
+      </AppShell.Section>
+      <AppShell.Section p="md">
         <UserLogoutButton/>
-      </Navbar.Section>
+      </AppShell.Section>
     </>
   );
 
-  const footer = (
-  <>
-    <Footer 
-      height={100}
-      withBorder={false}
-    >
+  const MyFooter = () => (
+    <>
       <Group 
         p="sm"
-        position="apart" 
+        justify="space-between" 
         align="center"
       >
         <ActionIcon 
           size={70} 
           radius="xl"
           variant="light"
+          color="gray"
           onClick={open}
         >
           <IconMenu2 size="2rem"/>
@@ -171,6 +170,7 @@ export default function DefaultLayout() {
           size={70} 
           radius="xl"
           variant="light"
+          color="gray"
           onClick={() => {
             setActiveLink("0"); 
             navigate('/');
@@ -182,6 +182,7 @@ export default function DefaultLayout() {
           size={70} 
           radius="xl"
           variant="light"
+          color="gray"
           onClick={() => {
             setActiveLink("1"); 
             navigate('/search');
@@ -193,6 +194,7 @@ export default function DefaultLayout() {
           size={70} 
           radius="xl"
           variant="light"
+          color="gray"
           onClick={() => {
             setActiveLink("3"); 
             navigate('/practice');
@@ -201,8 +203,7 @@ export default function DefaultLayout() {
           <IconSchool size="2rem"/>
         </ActionIcon>
       </Group>
-    </Footer>
-  </>
+    </>
   )
 
   return (
@@ -214,19 +215,20 @@ export default function DefaultLayout() {
       </Center>
     :
       <AppShell
-        pt={2}
+        padding="md"
         layout="alt"
-        navbar={
-          <Navbar 
-            p="md" 
-            width={{xs: 250}}
-            hidden={isMobile}
-          >
-            <MyNavbarSections/>
-          </Navbar>
-        }
-        footer={isMobile ? footer : <></>}
-        navbarOffsetBreakpoint="sm"
+        navbar={{
+          width: {xs: 250},
+          breakpoint: 'sm',
+          collapsed: { mobile: isMobile }
+        }}
+        footer={{
+          height: 90,
+          collapsed: !isMobile
+        }}
+        header={{
+          height: headerHeight || 0,
+        }}
       >
         <Drawer 
           opened={opened} 
@@ -237,14 +239,27 @@ export default function DefaultLayout() {
           pos="absolute"
         >
           <Drawer.Body p={0}>
-            <Navbar p="md">
+            <AppShell.Navbar p="md">
               <MyNavbarSections/>
-            </Navbar>
+            </AppShell.Navbar>
           </Drawer.Body>
         </Drawer>
-        <Container size="lg" px={0}>
-          <Outlet/>
-        </Container>
+
+        <AppShell.Navbar>
+          <MyNavbarSections/>
+        </AppShell.Navbar>
+
+        <AppShell.Footer
+          withBorder={false}
+        >
+          <MyFooter/> 
+        </AppShell.Footer>
+
+        <AppShell.Main>
+          <Container size="lg" px={0}>
+            <Outlet/>
+          </Container>
+        </AppShell.Main>
       </AppShell>
     } </>
   );
