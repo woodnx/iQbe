@@ -25,7 +25,7 @@ export default function ActivityUserRanking(){
   
   return (
     <Card>
-      <Group position="apart">
+      <Group justify="space-between">
         <Title size="h2">Ranking</Title>
         <ActivitySelectRange
           period={period}

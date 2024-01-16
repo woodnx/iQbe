@@ -1,4 +1,4 @@
-import { DefaultProps, Group, Radio, TextInput } from "@mantine/core"
+import { BoxProps, Group, Radio, TextInput } from "@mantine/core"
 import { formInputProps } from "@/hooks"
 import { KeywordOption } from "@/types"
 
@@ -7,7 +7,7 @@ export type optionProps = {
   onChange: (value: KeywordOption) => void
 }
 
-interface FilteringWordProps extends DefaultProps {
+interface FilteringWordProps extends BoxProps {
   wordInputProps: formInputProps,
   wordSearchOption: optionProps,
 }
@@ -29,7 +29,12 @@ export default function FilteringWord({
       <Radio.Group 
         mt="sm"
         label="Search Option"
-        {...wordSearchOption}
+        value={wordSearchOption.value}
+        onChange={(v) => {
+          if (v == "1" || v == "2" || v == "3") {
+            wordSearchOption.onChange(v);
+          }
+        }}
       >
         <Group>
           <Radio 

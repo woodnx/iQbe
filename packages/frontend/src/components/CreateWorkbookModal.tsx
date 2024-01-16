@@ -1,7 +1,7 @@
 import { useIsMobile } from "@/contexts/isMobile"
 import { useWorkbooks } from "@/hooks/useWorkbooks";
 import axios from "@/plugins/axios";
-import { WorkbooksData } from "@/types";
+import { Workbook } from "@/types";
 import { ActionIcon, Button, Group, Modal, TextInput } from "@mantine/core"
 import { useDisclosure } from "@mantine/hooks";
 import { IconSquarePlus2 } from "@tabler/icons-react";
@@ -20,13 +20,13 @@ export default function CreateWorkbookModal() {
       <Icon/>
     </ActionIcon>
     :
-    <Button leftIcon={<Icon/>} onClick={open}>
+    <Button leftSection={<Icon/>} onClick={open}>
       New Quiz List
     </Button>
   );
 
   const create = async () => {
-    const allList = await axios.post<WorkbooksData[]>('/workbooks/new', {
+    const allList = await axios.post<Workbook[]>('/workbooks/new', {
       listName,
     }).then(res => res.data);
     mutate(allList);
@@ -47,7 +47,7 @@ export default function CreateWorkbookModal() {
           onChange={(e) => setListName(e.currentTarget.value)}
           placeholder="New List Name"
         />
-        <Group position="right" mt="md">
+        <Group justify="right" mt="md">
           <Button onClick={() => create()}>
             Create
           </Button>

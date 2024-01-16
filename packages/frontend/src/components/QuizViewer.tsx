@@ -131,7 +131,7 @@ export default function({
           </Group>
         }
         pagination={
-          <Stack spacing={2}>
+          <Stack gap={2}>
             {isHistory ? 
             <>
               <Center mt={0}>

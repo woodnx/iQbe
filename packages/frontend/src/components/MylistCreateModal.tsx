@@ -32,7 +32,7 @@ export default function MylistCreateModal({
         label="Mylist name"
         {...mylistNameProps}
       />
-      <Group mt="xl" position="right">
+      <Group mt="xl" justify="right">
         <Button
           onClick={create}
         >Create</Button>

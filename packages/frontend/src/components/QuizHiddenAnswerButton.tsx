@@ -1,8 +1,8 @@
-import { ActionIcon, Button, DefaultProps } from "@mantine/core";
+import { ActionIcon, Button, BoxProps } from "@mantine/core";
 import { IconEye, IconEyeOff } from "@tabler/icons-react";
 import { useIsMobile } from "@/contexts/isMobile";
 
-interface Props extends DefaultProps {
+interface Props extends BoxProps {
   isHidden: boolean,
   onToggle: (isHidden: boolean) => void,
 }
@@ -24,7 +24,7 @@ export default function QuizHiddenAnswerButton({
   const defaultButton = (
     <Button
       onClick={() => innerOnToggle()}
-      leftIcon={icon}
+      leftSection={icon}
       variant="outline"
       color={color}
       { ...others }

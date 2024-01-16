@@ -1,7 +1,7 @@
-import { Center, DefaultProps, Group, Paper, Space, Text } from "@mantine/core";
+import { Center, Group, Paper, Space, Text } from "@mantine/core";
 import * as icons from '@tabler/icons-react'
 
-interface Props extends DefaultProps{
+interface Props {
   rank: number,
   name: string,
   count: number,
@@ -14,7 +14,7 @@ const defineColor = (rank: number) => {
   else return '#343A40'
 }
 
-export default function ActivityRank({
+export default function ({
   rank,
   name,
   count,
@@ -26,13 +26,13 @@ export default function ActivityRank({
 
   return (
     <Paper h={60} p="sm">
-      <Group position="apart">
+      <Group justify="space-between">
         <Center my="auto">
           { // @ts-ignore 
             <Icon color={defineColor(rank)} size={40}/>
           }
           <Space ml="sm"/>
-          <Text size={20} align="center">{name}</Text>
+          <Text fz={20}>{name}</Text>
         </Center>
         {count}問
       </Group>

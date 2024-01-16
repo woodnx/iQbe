@@ -1,12 +1,12 @@
 import useSWR from 'swr';
 import axios from '../plugins/axios';
-import { WorkbooksData } from '@/types';
+import { Workbook } from '@/types';
 
-const fetcher = (url: string) => axios.get<WorkbooksData[]>(url).then(res => res.data)
+const fetcher = (url: string) => axios.get<Workbook[]>(url).then(res => res.data)
 
-export const useWorkbooks = (shouldFetch = true) => {
+export const useWorkbooks = (path = '', shouldFetch = true) => {
   const { data: workbooks, isLoading, error, mutate } = useSWR(
-    shouldFetch ? '/workbooks/user' : null,
+    shouldFetch ? `/workbooks${path}` : null,
     fetcher
   );
 

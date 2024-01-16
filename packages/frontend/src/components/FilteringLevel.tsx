@@ -1,13 +1,13 @@
 import useSWR from "swr";
-import { Checkbox, DefaultProps, Group } from "@mantine/core";
+import { BoxProps, Checkbox, Group } from "@mantine/core";
 import { fetcher } from "@/fetchers";
 
-interface FilteringLevelProps extends DefaultProps {
+interface FilteringLevelProps extends BoxProps {
   value: string[] | undefined,
   onChange: (value: string[]) => void,
 }
 
-export interface Level{
+export interface Level {
   id: number,
   name: string,
   color: string,
@@ -24,7 +24,6 @@ export default function FilteringLevel({
     <Checkbox.Group
       value={value}
       onChange={onChange}
-      defaultValue={[]}
       label="Select Workbook's Level"
       {...others}
     >

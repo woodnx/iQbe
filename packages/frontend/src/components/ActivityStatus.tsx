@@ -1,18 +1,12 @@
 import { useState } from "react";
-import { Card, Center, DefaultProps, Divider, Group, Loader, Title } from "@mantine/core";
+import { Card, Center, Divider, Group, Loader, Title } from "@mantine/core";
 import { useElementSize } from "@mantine/hooks";
 import { Bar, BarChart, LabelList, Tooltip, XAxis, YAxis } from "recharts";
 import useUserStatus from "@/hooks/useUserStatus";
 import dayjs, { Period } from '@/plugins/dayjs';
 import ActivitySelectRange from "./ActivitySelectRange";
 
-interface Props extends DefaultProps {
-
-}
-
-export default function ActivityStatus({
-
-}: Props) {
+export default function () {
   const now = dayjs().format();
   const { ref, width } = useElementSize();
   const [ period, setPeriod ] = useState<Period>('day');
@@ -21,7 +15,7 @@ export default function ActivityStatus({
   return (
     <>
       <Card ref={ref} >
-        <Group position="apart">
+        <Group justify="space-between">
           <Title size="h2">Status</Title>
           <ActivitySelectRange
             period={period}

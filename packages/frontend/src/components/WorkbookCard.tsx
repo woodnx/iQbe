@@ -1,7 +1,7 @@
-import { Badge, Card, DefaultProps, Divider, Grid, Paper, Text } from "@mantine/core";
+import { Badge, Card, BoxProps, Divider, Grid, Paper, Text } from "@mantine/core";
 import { useNavigate } from "react-router-dom";
 
-interface Props extends DefaultProps {
+interface Props extends BoxProps {
   wid: string,
   title: string,
   color?: string,
@@ -33,8 +33,8 @@ export default function WorkbookCard({
         <Divider/>
       </Card.Section>
       <Grid my={10} justify="space-between">
-        <Grid.Col span={8} sm={7}>
-          <Text weight={700} truncate>{title}</Text>
+        <Grid.Col span={{ base: 8, sm: 7 }} >
+          <Text fw={700} truncate>{title}</Text>
         </Grid.Col>
         <Grid.Col span="content">
           {

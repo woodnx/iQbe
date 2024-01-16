@@ -9,7 +9,7 @@ import { SubmitValue } from "@/types";
 
 export default function CreateDashboard() {
   const isMobile = useIsMobile();
-  const { workbooks } = useWorkbooks(true);
+  const { workbooks } = useWorkbooks('/user');
 
   const submit = ({ question, answer, category, subCategory, workbook, isPublic }: SubmitValue) => {
     axios.post('quizzes', {
@@ -26,17 +26,17 @@ export default function CreateDashboard() {
     <>
       <QuizEditForm mb={16} onSubmit={submit}/>
       <Divider/>
-      <Group position="apart" my="lg">
+      <Group justify="space-between" my="lg">
         <Title fz={isMobile ? 25 : 35}>Editable Quiz List</Title>
         <CreateWorkbookModal/>
       </Group>
       <Grid>
-        <Grid.Col sm={6} lg={3}>
+        <Grid.Col span={{ base: 12, sm: 6, lg: 3 }}>
           <WorkbookCard title="すべてのクイズ" wid="all"/>
         </Grid.Col>
         {
           workbooks?.map(w => (
-            <Grid.Col sm={6} lg={3} key={w.wid}>
+            <Grid.Col key={w.wid} span={{ base: 12, sm: 6, lg: 3 }} >
               <WorkbookCard title={w.name} wid={w.wid}/>
             </Grid.Col>
           ))

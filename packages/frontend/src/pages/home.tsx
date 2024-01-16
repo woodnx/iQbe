@@ -14,7 +14,7 @@ export default function Home() {
         <ResetPasswordModal onSubmit={() => setRequesting(false)} />
       </Modal>
       <Grid>
-        <Grid.Col span={12} md={6}>
+        <Grid.Col span={{ base: 12, md: 6 }}>
           <Card
             style={{
               borderRadius: '20px 20px 0 0'
@@ -40,7 +40,7 @@ export default function Home() {
           </Card>
          
         </Grid.Col>
-        <Grid.Col span={12} md={6}>
+        <Grid.Col span={{ base: 12, md: 6 }}>
           
         </Grid.Col>
       </Grid>
