@@ -1,6 +1,6 @@
 import { useLayoutEffect } from "react";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
-import { ActionIcon, AppShell, Center, Container, Drawer, Group, Loader, } from "@mantine/core";
+import { ActionIcon, AppShell, Center, Container, Drawer, Group, Loader } from "@mantine/core";
 import { IconActivity, IconHistory, IconHome, IconMenu2, IconPencil, IconSchool, IconSearch, IconStar } from "@tabler/icons-react";
 import { useState } from "react";
 import { useDisclosure } from "@mantine/hooks";
@@ -48,7 +48,7 @@ export default function DefaultLayout() {
   }));
 
   const mockdata = [
-    { 
+    {
       label: 'Activity',
       icon: IconActivity,
       link: '/',
@@ -97,7 +97,7 @@ export default function DefaultLayout() {
   ];
 
   const activeIdx = mockdata.findIndex((data) => checkPathname(location.pathname) === data.link);
-  
+
   useLayoutEffect(() => {
     let ignore = false;
 
@@ -105,7 +105,7 @@ export default function DefaultLayout() {
     .then((user) => {
       if (ignore) return;
       if (!user) {
-        navigate('/login') 
+        navigate('/login')
         notifications.show({
           title: 'Require Login',
           message: 'Please login',
@@ -121,17 +121,17 @@ export default function DefaultLayout() {
     }
   }, []);
 
-  const MyNavbarSections = () => (
-    <>
+  const Navbar = () => (
+    <AppShell.Navbar h="100%">
       <AppShell.Section grow p="md">
         <Group justify="space-between">
           <Logo horizonal width={100} mb="xs"/>
         </Group>
         {
-          mockdata.map((i,idx) => 
-            <NavbarLink 
-              {...i} 
-              key={idx} 
+          mockdata.map((i,idx) =>
+            <NavbarLink
+              {...i}
+              key={idx}
               isActive={activeIdx == idx}
               activeLink={activeLink}
               onNavigate={(link, linksIdx) => {
@@ -147,18 +147,20 @@ export default function DefaultLayout() {
       <AppShell.Section p="md">
         <UserLogoutButton/>
       </AppShell.Section>
-    </>
+    </AppShell.Navbar>
   );
 
-  const MyFooter = () => (
-    <>
-      <Group 
+  const Footer = () => (
+    <AppShell.Footer
+      withBorder={false}
+    >
+      <Group
         p="sm"
-        justify="space-between" 
+        justify="space-between"
         align="center"
       >
-        <ActionIcon 
-          size={70} 
+        <ActionIcon
+          size={70}
           radius="xl"
           variant="light"
           color="gray"
@@ -166,50 +168,50 @@ export default function DefaultLayout() {
         >
           <IconMenu2 size="2rem"/>
         </ActionIcon>
-        <ActionIcon 
-          size={70} 
+        <ActionIcon
+          size={70}
           radius="xl"
           variant="light"
           color="gray"
           onClick={() => {
-            setActiveLink("0"); 
+            setActiveLink("0");
             navigate('/');
           }}
         >
           <IconHome size="2rem"/>
         </ActionIcon>
-        <ActionIcon 
-          size={70} 
+        <ActionIcon
+          size={70}
           radius="xl"
           variant="light"
           color="gray"
           onClick={() => {
-            setActiveLink("1"); 
+            setActiveLink("1");
             navigate('/search');
           }}
         >
           <IconSearch size="2rem"/>
         </ActionIcon>
-        <ActionIcon 
-          size={70} 
+        <ActionIcon
+          size={70}
           radius="xl"
           variant="light"
           color="gray"
           onClick={() => {
-            setActiveLink("3"); 
+            setActiveLink("3");
             navigate('/practice');
           }}
         >
           <IconSchool size="2rem"/>
         </ActionIcon>
       </Group>
-    </>
+    </AppShell.Footer>
   )
 
   return (
     <> {
-    loading 
-    ? 
+    loading
+    ?
       <Center h="100vh">
         <Loader variant="dots"/>
       </Center>
@@ -218,9 +220,8 @@ export default function DefaultLayout() {
         padding="md"
         layout="alt"
         navbar={{
-          width: {xs: 250},
-          breakpoint: 'sm',
-          collapsed: { mobile: isMobile }
+          width: 250,
+          breakpoint: 'md',
         }}
         footer={{
           height: 90,
@@ -230,30 +231,24 @@ export default function DefaultLayout() {
           height: headerHeight || 0,
         }}
       >
-        <Drawer 
-          opened={opened} 
-          onClose={close} 
-          size={240}
-          title={<Logo horizonal width={90}/>}
-          withCloseButton={false}
-          pos="absolute"
-        >
-          <Drawer.Body p={0}>
-            <AppShell.Navbar p="md">
-              <MyNavbarSections/>
-            </AppShell.Navbar>
-          </Drawer.Body>
-        </Drawer>
+        {
+          isMobile ?
+          <Drawer
+            opened={opened}
+            onClose={close}
+            size={270}
+            withCloseButton={false}
+            pos="absolute"
+          >
+            <Drawer.Body p={0} m={0}>
+              <Navbar/>
+            </Drawer.Body>
+          </Drawer>
+        :
+          <Navbar/>
+        }
 
-        <AppShell.Navbar>
-          <MyNavbarSections/>
-        </AppShell.Navbar>
-
-        <AppShell.Footer
-          withBorder={false}
-        >
-          <MyFooter/> 
-        </AppShell.Footer>
+        <Footer/>
 
         <AppShell.Main>
           <Container size="lg" px={0}>
