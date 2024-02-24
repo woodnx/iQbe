@@ -4,7 +4,8 @@
   "description": "A powerful tool to enhance your quiz skills more fun and effective. ",
   "workspaces": [
     "packages/frontend",
-    "packages/backend"
+    "packages/backend",
+    "packages/api"
   ],
   "private": true,
   "scripts": {
@@ -13,6 +14,7 @@
     "start": "cd packages/backend/dist && env-cmd -f ../../../.env node index.js",
     "clean": "node ./scripts/clean.mjs",
     "dev": "env-cmd -f .env node ./scripts/dev.mjs",
+    "api": "npm run codegen -w packages/api",
     "migrate:create": "cd packages/backend && env-cmd -f ../../.env npm run migrate:create",
     "migrate:exe": "cd packages/backend && env-cmd -f ../../.env npm run migrate:exe",
     "migrate:status": "cd packages/backend && env-cmd -f ../../.env npm run migrate:status",

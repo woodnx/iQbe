@@ -2,12 +2,13 @@ openapi: "3.0.3"
 
 info:
   title: "iQbe API"
-  version: 3.0.0
+  version: 2.1.0
 
 servers:
-  - url: "http://localhost:9000/api/v3"
+  - url: "http://localhost:9000/api/v2"
 
 tags:
+  - name: analysis
   - name: auth
   - name: categories
   - name: histories
@@ -21,6 +22,173 @@ security:
   - jwt: []
 
 paths:
+  "/analysis/ranking/all/{period}": 
+    get: 
+      tags: 
+        - analysis
+      summary: ユーザの演習問題数のランキング
+      description: 演習問題によるランク済みのユーザリストを取得する
+      parameters:
+        - name: period
+          in: path
+          required: true
+          description: 日 / 週 / 月
+          schema:
+            type: string
+          example: day 
+      responses:
+        "200": 
+          description: 指定範囲のユーザ情報とランク
+          content:
+            application/json:
+              schema: 
+                type: array
+                items: 
+                  $ref: "#/components/schemas/Rank"
+              example:
+                - rank: 1
+                  uid: WI0Nulr6F1dhLUi7A3zYRKs5bu9txaGgT0PqBc 
+                  name: foo
+                  count: 323
+                  compare: 0
+                - rank: 2
+                  uid: 2kYfkh59sP8Qbm1drC7uZXOnBIGRSAoz5hTMN3
+                  name: piyo
+                  count: 234
+                  compare: 1
+                - rank: 3
+                  uid: Kb5F7yQHOhpNb9tnLBx6GJj1IeiucMk0mDw27z
+                  name: bar
+                  count: 103
+                  compare: -1
+                - rank: 4
+                  uid: BapXVEOuLlYb3jHCBpeSzx7cPRrgf1dNTZqE4
+                  name: hoge
+                  count: 234
+                  compare: 1
+        "400":
+          $ref: "#/components/responses/400BadRequest"
+        "401": 
+          $ref: "#/components/responses/401Unauthorized"
+        "403":
+          $ref: "#/components/responses/403Forbidden"
+  "/analysis/ranking/personal/{period}": 
+    get: 
+      tags: 
+        - analysis
+      summary: 個人の演習問題数のランク
+      description: 演習問題によるランクを取得する
+      parameters:
+        - name: period
+          in: path
+          required: true
+          description: 日 / 週 / 月
+          schema:
+            type: string
+          example: day 
+      responses:
+        "200": 
+          description: 指定範囲のランク
+          content:
+            application/json:
+              schema: 
+                $ref: "#/components/schemas/Rank"
+              example:
+                rank: 1
+                uid: WI0Nulr6F1dhLUi7A3zYRKs5bu9txaGgT0PqBc 
+                name: foo
+                count: 323
+                compare: 0
+        "400":
+          $ref: "#/components/responses/400BadRequest"
+        "401": 
+          $ref: "#/components/responses/401Unauthorized"
+        "403":
+          $ref: "#/components/responses/403Forbidden"
+  "/analysis/status/{date}/{period}": 
+    get: 
+      tags: 
+        - analysis
+      summary: 正答/誤答/スルー問題数を取得
+      description: 指定する日時範囲の正答/誤答/スルー問題数を取得
+      parameters:
+        - name: date
+          in: path
+          required: true
+          description: 起算する日にち
+          schema:
+            type: string
+          example: 2023-12-31 
+        - name: period
+          in: path
+          required: true
+          description: 日 / 週 / 月
+          schema:
+            type: string
+          example: day 
+      responses:
+        "200": 
+          description: 正答/誤答/スルーの問題数
+          content:
+            application/json:
+              schema:
+                type: array
+                items: 
+                  type: object
+                  properties:
+                    start: 
+                      type: string
+                    end: 
+                      type: string
+                    right: 
+                      type: number
+                    wrong: 
+                      type: number
+                    through: 
+                      type: number
+                  required:
+                    - start
+                    - end
+                    - right
+                    - wrong
+                    - through
+              example:
+                - start: 2023-12-31 00:00:00
+                  end: 2023-12-31 23:59:59
+                  right: 2
+                  wrong: 1
+                  through: 4
+                - start: 2023-12-30 00:00:00
+                  end: 2023-12-30 23:59:59
+                  right: 10
+                  wrong: 10
+                  through: 40
+                - start: 2023-12-29 00:00:00
+                  end: 2023-12-29 23:59:59
+                  right: 1
+                  wrong: 3
+                  through: 47
+                - start: 2023-12-28 00:00:00
+                  end: 2023-12-28 23:59:59
+                  right: 17
+                  wrong: 12
+                  through: 37
+                - start: 2023-12-27 00:00:00
+                  end: 2023-12-27 23:59:59
+                  right: 18
+                  wrong: 14
+                  through: 34
+                - start: 2023-12-26 00:00:00
+                  end: 2023-12-26 23:59:59
+                  right: 13
+                  wrong: 4
+                  through: 12
+        "400":
+          $ref: "#/components/responses/400BadRequest"
+        "401": 
+          $ref: "#/components/responses/401Unauthorized"
+        "403":
+          $ref: "#/components/responses/403Forbidden"
   "/auth/login": 
     post: 
       tags: 
@@ -51,8 +219,6 @@ paths:
           $ref: "#/components/responses/AuthResponseWithRefreshToken"
         "400":
           $ref: "#/components/responses/400BadRequest"
-        "401": 
-          $ref: "#/components/responses/401Unauthorized"
         "403":
           $ref: "#/components/responses/403Forbidden"                  
   "/auth/signup": 
@@ -90,8 +256,6 @@ paths:
           $ref: "#/components/responses/AuthResponseWithRefreshToken"
         "400":
           $ref: "#/components/responses/400BadRequest"
-        "401": 
-          $ref: "#/components/responses/401Unauthorized"
         "403":
           $ref: "#/components/responses/403Forbidden"
   "/auth/token": 
@@ -124,8 +288,6 @@ paths:
           $ref: "#/components/responses/AuthResponse"
         "400":
           $ref: "#/components/responses/400BadRequest"
-        "401": 
-          $ref: "#/components/responses/401Unauthorized"
         "403":
           $ref: "#/components/responses/403Forbidden"
   "/auth/register": 
@@ -161,8 +323,6 @@ paths:
           $ref: "#/components/responses/AuthResponseWithRefreshToken"
         "400":
           $ref: "#/components/responses/400BadRequest"
-        "401": 
-          $ref: "#/components/responses/401Unauthorized"
         "403":
           $ref: "#/components/responses/403Forbidden"
   "/categories": 
@@ -539,8 +699,39 @@ paths:
       tags: 
         - quizzes
       summary: クイズの新規作成
-      requestBody: 
-        $ref: "#/components/requestBodies/QuizRequestBody"
+      requestBody:
+         required: true
+         content:
+            application/json:
+              schema: 
+                type: object
+                properties:
+                  question: 
+                    type: string
+                  answer: 
+                    type: string
+                  wid:
+                    type: string
+                  category:
+                    type: number
+                  subCategory:
+                    type: number
+                  isPublic: 
+                    type: boolean
+                  limitedUser:
+                    type: array
+                    items: 
+                      type: string
+                required:
+                  - question
+                  - answer
+                example:
+                  question: すい臓にある組織・ランゲルハンス島の発見者であるランゲルハンスは、現在でいうどこの国の病理学者でしょう？
+                  answer: ドイツ
+                  wid: sX8G8W
+                  category: 10
+                  subCategory: 14
+                  isPublic: false
       responses:
         "201":
           $ref: "#/components/responses/QuizResponse"
@@ -554,8 +745,43 @@ paths:
       tags: 
         - quizzes
       summary: クイズの編集
-      requestBody: 
-        $ref: "#/components/requestBodies/QuizRequestBody"
+      requestBody:
+         required: true
+         content:
+            application/json:
+              schema: 
+                type: object
+                properties:
+                  id:
+                    type: number
+                  question: 
+                    type: string
+                  answer: 
+                    type: string
+                  wid:
+                    type: string
+                  category:
+                    type: number
+                  subCategory:
+                    type: number
+                  isPublic: 
+                    type: boolean
+                  limitedUser:
+                    type: array
+                    items: 
+                      type: string
+                required:
+                  - id
+                  - question
+                  - answer
+                example:
+                  id: 1
+                  question: すい臓にある組織・ランゲルハンス島の発見者であるランゲルハンスは、現在でいうどこの国の病理学者でしょう？
+                  answer: ドイツ
+                  wid: sX8G8W
+                  category: 10
+                  subCategory: 14
+                  isPublic: false
       responses:
         "201":
           $ref: "#/components/responses/QuizResponse"
