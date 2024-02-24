@@ -1,0 +1,37 @@
+{
+  "name": "api",
+  "version": "0.1.0",
+  "description": "",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./*": {
+      "import": "./dist/*",
+      "types": "./dist/*"
+    }
+  },
+  "devDependencies": {
+    "@types/glob": "^8.1.0",
+    "typescript": "^5.3.3"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "npm run codegen && tsc -p tsconfig.json -d && tsc-alias -p tsconfig.json",
+    "codegen": "npm run codegen:api && npm run codegen:type-pred",
+    "codegen:api": "rm -rf ./generated | npx openapi2aspida -y",
+    "codegen:type-pred": "npx type-predicates-generator -f './src/generated/@types/index.ts' -o './src/predicates.ts' -a"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@aspida/axios": "^1.14.0",
+    "glob": "^10.3.10",
+    "tsc-alias": "^1.8.8"
+  },
+  "files": [
+    "dist"
+  ]
+}
