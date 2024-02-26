@@ -9,7 +9,7 @@ import { SubmitValue } from "@/types";
 
 export default function CreateDashboard() {
   const isMobile = useIsMobile();
-  const { workbooks } = useWorkbooks('/user');
+  const { workbooks } = useWorkbooks();
 
   const submit = ({ question, answer, category, subCategory, workbook, isPublic }: SubmitValue) => {
     axios.post('quizzes', {

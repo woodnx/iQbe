@@ -33,7 +33,7 @@ export default function DefaultLayout() {
   const navigate = useNavigate();
   const location = useLocation();
   const { mylists } = useMylists(!loading);
-  const { workbooks } = useWorkbooks('/user', !loading);
+  const { workbooks } = useWorkbooks(false, !loading);
   const isMobile = useIsMobile();
   const { headerHeight }= useHeaderHeight();
 

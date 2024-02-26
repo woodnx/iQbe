@@ -27,7 +27,7 @@ export default function QuizEditForm({
 }: Props) {
   const { categories } = useCategories();
   const { subCategories: sct } = useSubCategories();
-  const { workbooks: wkb } = useWorkbooks('/user');
+  const { workbooks: wkb } = useWorkbooks();
 
   const form = useForm({
     initialValues: {
