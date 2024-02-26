@@ -8,9 +8,24 @@
       "import": "./dist/index.js",
       "types": "./dist/index.d.ts"
     },
+    "./predicates": {
+      "import": "./dist/predicates.js",
+      "types": "./dist/predicates.d.ts"
+    },
+    "./types": {
+      "import": "./dist/generated/@types/index.js",
+      "types": "./dist/generated/@types/index.d.ts"
+    },
+    "./openapi": {
+      "import": "./openapi.yaml"
+    },
     "./*": {
-      "import": "./dist/*",
-      "types": "./dist/*"
+      "import": "./dist/generated/*/index.js",
+      "types": "./dist/generated/*/index.d.ts"
+    },
+    "./**": {
+      "import": "./dist/generated/**/index.js",
+      "types": "./dist/generated/**/index.d.ts"
     }
   },
   "devDependencies": {
@@ -21,7 +36,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "npm run codegen && tsc -p tsconfig.json -d && tsc-alias -p tsconfig.json",
     "codegen": "npm run codegen:api && npm run codegen:type-pred",
-    "codegen:api": "rm -rf ./generated | npx openapi2aspida -y",
+    "codegen:api": "rm -rf ./src/generated | npx openapi2aspida -y",
     "codegen:type-pred": "npx type-predicates-generator -f './src/generated/@types/index.ts' -o './src/predicates.ts' -a"
   },
   "author": "",
