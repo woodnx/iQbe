@@ -402,6 +402,19 @@ paths:
         "403":
           $ref: "#/components/responses/403Forbidden"
   "/categories/sub":
+    get: 
+      tags:
+        - categories
+      summary: クイズのサブカテゴリーのリストを取得
+      responses:
+        "200": 
+          $ref: "#/components/responses/SubCategoriesResponse"
+        "400":
+          $ref: "#/components/responses/400BadRequest"
+        "401": 
+          $ref: "#/components/responses/401Unauthorized"
+        "403":
+          $ref: "#/components/responses/403Forbidden"
     post: 
       tags: 
         - categories
@@ -457,7 +470,6 @@ paths:
               required:
                 - id
                 - name
-                - parent_id
             example: 
               id: 1
               name: "文学"
@@ -482,15 +494,17 @@ paths:
         - name: since
           in: path
           required: true
+          description: Unix時間
           schema:
-            type: string
-          example: 2023-12-31 00:00:00
+            type: number
+          example: 1703948400
         - name: until
           in: path
           required: true
+          description: Unix時間
           schema:
-            type: string
-          example: 2023-12-31 23:59:59
+            type: number
+          example: 1704034799
       responses:
         "200": 
           description: 正答/誤答/スルーの問題数
@@ -1587,9 +1601,11 @@ components:
                 - id: 1,
                   name: "日本文学"
                   description: "明治以降の日本の文学・作家"
+                  parent_id: 1
                 - id: 2,
                   name: "古典文学"
                   description: "江戸以前の日本の文学・作家"
+                  parent_id: 1
             - id: 2
               name: "科学"
               description: "いわゆる理系学問"
@@ -1597,9 +1613,11 @@ components:
                 - id: 3,
                   name: "物理"
                   description: "物理学用語・物理学者など"
+                  parent_id: 2
                 - id: 4,
                   name: "化学"
                   description: "科学用語・化学者など"
+                  parent_id: 2
     CategoryResponse: 
       description: カテゴリー情報
       content:
@@ -1614,9 +1632,11 @@ components:
               - id: 1,
                 name: "日本文学"
                 description: "明治以降の日本の文学・作家"
+                parent_id: 1
               - id: 2,
                 name: "古典文学"
                 description: "江戸以前の日本の文学・作家"
+                parent_id: 1
     LevelResponse: 
       description: レベル情報
       content:
@@ -1714,6 +1734,32 @@ components:
               registerdMylist: []
               creator_id: 1
               isPublic: false
+    SubCategoriesResponse:
+      description: サブカテゴリーのリスト
+      content:
+        application/json: 
+          schema:
+            type: array
+            items:
+              type: object
+              $ref: "#/components/schemas/SubCategory"
+          example:
+            - id: 1,
+              name: "日本文学"
+              description: "明治以降の日本の文学・作家"
+              parent_id: 1
+            - id: 2,
+              name: "古典文学"
+              description: "江戸以前の日本の文学・作家"
+              parent_id: 1
+            - id: 3,
+              name: "物理"
+              description: "物理学用語・物理学者など"
+              parent_id: 2
+            - id: 4,
+              name: "化学"
+              description: "科学用語・化学者など"
+              parent_id: 2
     UserResponse:
       description: ユーザ情報
       content:
@@ -1770,7 +1816,6 @@ components:
           readOnly: true
       required:
         - id
-        - name
     Error: 
       type: object
       properties: 
@@ -1781,7 +1826,7 @@ components:
           type: string
           description: エラーの詳細ドキュメントを指すURL
         status:
-          type: string
+          type: number
           description: HTTPステータスコード
         detail: 
           type: string
@@ -1901,9 +1946,11 @@ components:
           type: string
         description: 
           type: string
+        parent_id:
+          type: number
       required:
         - id
-        - name
+        - parent_id
     User: 
       type: object
       properties:
@@ -1937,6 +1984,8 @@ components:
           type: string
         level_id: 
           type: number
+        color: 
+          type: string
         creator_id:
           type: string
       required:
