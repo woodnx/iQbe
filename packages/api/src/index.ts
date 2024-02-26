@@ -1,1 +1,3 @@
-export { default as api } from '@/generated/$api';
+import api from '@/generated/$api';
+
+export default api;
