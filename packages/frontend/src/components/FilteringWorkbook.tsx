@@ -13,7 +13,7 @@ export default function FilteringWorkbook({
   onChange,
   ...others
  }: FilteringWorkbookProps ) {
-  const { workbooks } = useWorkbooks('/color');
+  const { workbooks } = useWorkbooks(true);
   const [ search, setSearch ] = useState('');
   const [ innerValues, setValue ] = useState<string[]>([]);
   const combobox = useCombobox({
@@ -34,14 +34,14 @@ export default function FilteringWorkbook({
   }
   
   const options = workbooks?.filter((item) => 
-    item.label.toLowerCase().includes(search.trim().toLowerCase()
-  )).map(({ wid, label, color }) => (
+    item.name.toLowerCase().includes(search.trim().toLowerCase()
+  )).map(({ wid, name, color }) => (
     <Combobox.Option value={wid} key={wid} active={innerValues.includes(wid)}>
       <Group gap="sm">
         {innerValues.includes(wid) ? <CheckIcon size={12} /> : null}
         <QuizWorkbookBadge
-          workbookName={label}
-          levelColor={color}
+          workbookName={name}
+          levelColor={color || 'gray'}
         />
       </Group>
     </Combobox.Option>
@@ -53,7 +53,7 @@ export default function FilteringWorkbook({
       onRemove={() => handleValueRemove(value)}
       withRemoveButton
     >
-      { workbooks?.filter(({ wid }) => wid == value)[0].label }
+      { workbooks?.filter(({ wid }) => wid == value)[0].name }
     </Pill>
   ))
   

@@ -1,18 +1,14 @@
-import useSWR from 'swr';
-import axios from '../plugins/axios';
-import { MylistInformation } from '../types';
-
-const fetcher = (url: string) => axios.get<MylistInformation[]>(url).then(res => res.data); 
+import useAspidaSWR from '@aspida/swr';
+import api from '@/plugins/api';
 
 export const useMylists = (shouldFetch = true) => {
-  const { data: mylists, isLoading, error, mutate } = useSWR(
-    shouldFetch ? '/mylists' : null, 
-  fetcher);
+  const { data: mylists, error, mutate } = useAspidaSWR(api.mylists, {
+    enabled: shouldFetch
+  });
 
   return {
     mylists,
-    isLoading,
     error,
-    mutate
+    mutate,
   };
 };
