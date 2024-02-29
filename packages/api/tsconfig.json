@@ -4,9 +4,9 @@
     "target": "es2020",
 
     /* Modules */
-    "module": "ESNext",  
+    "module": "Node16",  
     "rootDir": "src",
-    "moduleResolution": "Bundler",
+    "moduleResolution": "Node16",
     "baseUrl": "./",
     "paths": {
       "@/*": ["./src/*", "./dist/*"]
