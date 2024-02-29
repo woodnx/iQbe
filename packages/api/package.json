@@ -2,7 +2,6 @@
   "name": "api",
   "version": "0.1.0",
   "description": "",
-  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "import": "./dist/index.js",
@@ -15,6 +14,14 @@
     "./types": {
       "import": "./dist/generated/@types/index.js",
       "types": "./dist/generated/@types/index.d.ts"
+    },
+    "./schema": {
+      "import": "./dist/generated/schema.js",
+      "types": "./dist/generated/schema.d.ts"
+    },
+    "./schema-null": {
+      "import": "./dist/generated/schema-null.js",
+      "types": "./dist/generated/schema-null.d.ts"
     },
     "./openapi": {
       "import": "./openapi.yaml"
@@ -30,13 +37,15 @@
   },
   "devDependencies": {
     "@types/glob": "^8.1.0",
+    "openapi-typescript": "^6.7.4",
     "typescript": "^5.3.3"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "npm run codegen && tsc -p tsconfig.json -d && tsc-alias -p tsconfig.json",
+    "build": "npm run codegen && npm run build:tsc && node dist/generateAddNullSchema.js && npm run build:tsc",
+    "build:tsc": "tsc -p tsconfig.json -d && tsc-alias -p tsconfig.json",
     "codegen": "npm run codegen:api && npm run codegen:type-pred",
-    "codegen:api": "rm -rf ./src/generated | npx openapi2aspida -y",
+    "codegen:api": "rm -rf ./src/generated | npx openapi2aspida -y && npx openapi-typescript openapi.yaml --output ./src/generated/schema.ts -y",
     "codegen:type-pred": "npx type-predicates-generator -f './src/generated/@types/index.ts' -o './src/predicates.ts' -a"
   },
   "author": "",
