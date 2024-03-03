@@ -35,6 +35,6 @@ const result = ts.transform(sourceFile, [transformer]);
 const printer = ts.createPrinter();
 const transformedSourceCode = printer.printFile(result.transformed[0] as ts.SourceFile);
 
-fs.writeFileSync(path.join(__dirname, '../src/generated/schema-null.ts'), transformedSourceCode)
+fs.writeFileSync(path.join(__dirname, '../src/generated/schema-format.ts'), transformedSourceCode)
 
 console.log("generated schema-null.ts");

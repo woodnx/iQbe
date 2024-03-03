@@ -4,14 +4,17 @@
     "target": "es2020",
 
     /* Modules */
-    "module": "Node16",  
-    "rootDir": "src",
-    "moduleResolution": "Node16",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "rootDir": "./src",
     "baseUrl": "./",
     "paths": {
       "@/*": ["./src/*", "./dist/*"]
     },
     "resolveJsonModule": true,
+    "declaration": true, 
+    "declarationMap": true,
+    "sourceMap": true,
 
     /* Emit */
     "outDir": "dist",
@@ -25,5 +28,10 @@
 
     /* Completeness */
     "skipLibCheck": true
-  }
+  },
+  "exclude": [
+    "./src/formatSchema.ts",
+    "tsup.config.ts"
+  ],
+  "include": ["./src/**/*.ts"]
 }
