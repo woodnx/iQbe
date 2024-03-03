@@ -4,57 +4,45 @@
   "description": "",
   "exports": {
     ".": {
-      "import": "./dist/index.js",
+      "require": "./dist/index.js",
+      "import": "./dist/index.mjs",
       "types": "./dist/index.d.ts"
     },
+    "./types": {
+      "require": "./dist/types.js",
+      "import": "./dist/types.mjs",
+      "types": "./dist/types.d.ts"
+    },
     "./predicates": {
-      "import": "./dist/predicates.js",
+      "require": "./dist/predicates.js",
+      "import": "./dist/predicates.mjs",
       "types": "./dist/predicates.d.ts"
     },
-    "./types": {
-      "import": "./dist/generated/@types/index.js",
-      "types": "./dist/generated/@types/index.d.ts"
-    },
     "./schema": {
-      "import": "./dist/generated/schema.js",
-      "types": "./dist/generated/schema.d.ts"
-    },
-    "./schema-null": {
-      "import": "./dist/generated/schema-null.js",
-      "types": "./dist/generated/schema-null.d.ts"
-    },
-    "./openapi": {
-      "import": "./openapi.yaml"
-    },
-    "./*": {
-      "import": "./dist/generated/*/index.js",
-      "types": "./dist/generated/*/index.d.ts"
-    },
-    "./**": {
-      "import": "./dist/generated/**/index.js",
-      "types": "./dist/generated/**/index.d.ts"
+      "require": "./dist/schema.js",
+      "import": "./dist/schema.mjs",
+      "types": "./dist/schema.d.ts"
     }
   },
   "devDependencies": {
-    "@types/glob": "^8.1.0",
     "openapi-typescript": "^6.7.4",
+    "tsup": "^8.0.2",
+    "tsx": "^4.7.1",
     "typescript": "^5.3.3"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "npm run codegen && npm run build:tsc && node dist/generateAddNullSchema.js && npm run build:tsc",
-    "build:tsc": "tsc -p tsconfig.json -d && tsc-alias -p tsconfig.json",
-    "codegen": "npm run codegen:api && npm run codegen:type-pred",
-    "codegen:api": "rm -rf ./src/generated | npx openapi2aspida -y && npx openapi-typescript openapi.yaml --output ./src/generated/schema.ts -y",
+    "build": "npm run clean && npm run codegen && npm run build:tsup",
+    "build:tsup": "tsup-node --config tsup.config.ts",
+    "clean": "rm -rf dist && rm -rf ./src/generated",
+    "codegen": "npm run codegen:aspida && npm run codegen:openapi-ts && npm run codegen:format && npm run codegen:type-pred",
+    "codegen:aspida": "npx openapi2aspida -y",
+    "codegen:openapi-ts": "npx openapi-typescript openapi.yaml --output ./src/generated/schema.ts -y",
+    "codegen:format": "tsx ./src/formatSchema.ts",
     "codegen:type-pred": "npx type-predicates-generator -f './src/generated/@types/index.ts' -o './src/predicates.ts' -a"
   },
   "author": "",
   "license": "ISC",
-  "dependencies": {
-    "@aspida/axios": "^1.14.0",
-    "glob": "^10.3.10",
-    "tsc-alias": "^1.8.8"
-  },
   "files": [
     "dist"
   ]
