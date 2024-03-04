@@ -1813,9 +1813,9 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/SubCategory"
-          readOnly: true
       required:
         - id
+        - name
     Error: 
       type: object
       properties: 
@@ -1950,6 +1950,7 @@ components:
           type: number
       required:
         - id
+        - name
         - parent_id
     User: 
       type: object
