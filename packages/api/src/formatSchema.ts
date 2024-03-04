@@ -20,7 +20,8 @@ const transformer = <T extends ts.Node>(context: ts.TransformationContext) => (
       if (type) {
         const unionType = ts.factory.createUnionTypeNode([
           type, 
-          ts.factory.createLiteralTypeNode(ts.factory.createNull())
+          ts.factory.createLiteralTypeNode(ts.factory.createNull()),
+          ts.factory.createKeywordTypeNode(ts.SyntaxKind.UndefinedKeyword)
         ]);
         return ts.factory.updatePropertySignature(node, node.modifiers, node.name, node.questionToken, unionType);
       }
