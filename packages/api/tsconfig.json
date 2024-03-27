@@ -30,7 +30,8 @@
     "skipLibCheck": true
   },
   "exclude": [
-    "./src/formatSchema.ts",
+    "src/schemaFormatter.ts",
+    "src/typesIndexFormatter.ts",
     "tsup.config.ts"
   ],
   "include": ["./src/**/*.ts"]

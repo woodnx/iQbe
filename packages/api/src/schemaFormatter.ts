@@ -6,7 +6,7 @@ import * as path from 'path';
 const sourceCode = fs.readFileSync(path.join(__dirname, '../src/generated/schema.ts'), 'utf8');
 
 // TypeScriptのソースファイルを作成
-const sourceFile = ts.createSourceFile(path.join(__dirname, '../src/generated/schema-null.ts'), sourceCode, ts.ScriptTarget.ES2015, true);
+const sourceFile = ts.createSourceFile(path.join(__dirname, '../src/generated/schema.formatted.ts'), sourceCode, ts.ScriptTarget.ES2015, true);
 
 // ASTを操作するための変換関数
 const transformer = <T extends ts.Node>(context: ts.TransformationContext) => (
@@ -20,8 +20,7 @@ const transformer = <T extends ts.Node>(context: ts.TransformationContext) => (
       if (type) {
         const unionType = ts.factory.createUnionTypeNode([
           type, 
-          ts.factory.createLiteralTypeNode(ts.factory.createNull()),
-          ts.factory.createKeywordTypeNode(ts.SyntaxKind.UndefinedKeyword)
+          ts.factory.createLiteralTypeNode(ts.factory.createNull())
         ]);
         return ts.factory.updatePropertySignature(node, node.modifiers, node.name, node.questionToken, unionType);
       }
@@ -36,6 +35,6 @@ const result = ts.transform(sourceFile, [transformer]);
 const printer = ts.createPrinter();
 const transformedSourceCode = printer.printFile(result.transformed[0] as ts.SourceFile);
 
-fs.writeFileSync(path.join(__dirname, '../src/generated/schema-format.ts'), transformedSourceCode)
+fs.writeFileSync(path.join(__dirname, '../src/generated/schema.formatted.ts'), transformedSourceCode)
 
-console.log("generated schema-null.ts");
+console.log("generated /src/generated/schema.formatted.ts");
