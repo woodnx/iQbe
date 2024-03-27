@@ -38,7 +38,7 @@
     "codegen": "npm run codegen:aspida && npm run codegen:openapi-ts && npm run codegen:format && npm run codegen:type-pred",
     "codegen:aspida": "npx openapi2aspida -y",
     "codegen:openapi-ts": "npx openapi-typescript openapi.yaml --output ./src/generated/schema.ts -y",
-    "codegen:format": "tsx ./src/formatSchema.ts",
+    "codegen:format": "tsx ./src/schemaFormatter.ts && tsx ./src/typesIndexFormatter.ts",
     "codegen:type-pred": "npx type-predicates-generator -f './src/generated/@types/index.ts' -o './src/predicates.ts' -a"
   },
   "author": "",
