@@ -549,7 +549,7 @@ paths:
         "403":
           $ref: "#/components/responses/403Forbidden"
   "/invite-code":
-    get:
+    post:
       tags: 
         - auth
       summary: 招待コードを取得
@@ -652,7 +652,7 @@ paths:
               listName: 生活習慣病
       responses:
         "200":
-          $ref: "#/components/responses/MylistsResponse"
+          $ref: "#/components/responses/MylistResponse"
         "400":
           $ref: "#/components/responses/400BadRequest"
         "401": 
@@ -923,9 +923,12 @@ paths:
                   type: number
                 judgement: 
                   type: number
+                pressedWord:
+                  type: number
               required:
                 - quizId
                 - judgement
+                - pressedWord
       responses:
         "201":
           $ref: "#/components/responses/QuizResponse"
@@ -963,6 +966,8 @@ paths:
       tags: 
         - quizzes
       summary: マイリストにクイズを登録
+      parameters:
+        - $ref: "#/components/parameters/mid"
       requestBody:
         required: true
         content:
@@ -972,14 +977,10 @@ paths:
               properties:
                 quizId: 
                   type: number
-                mid: 
-                  type: string
               required:
                 - quizId
-                - mid
             example:
               quizId: 1
-              wid: WI0Nul
       responses:
         "201":
           $ref: "#/components/responses/QuizResponse"
@@ -993,6 +994,8 @@ paths:
       tags:
         - quizzes
       summary: マイリストからクイズを削除
+      parameters:
+        - $ref: "#/components/parameters/mid"
       requestBody: 
         required: true
         content:
@@ -1002,14 +1005,10 @@ paths:
               properties:
                 quizId: 
                   type: number
-                mid: 
-                  type: string
               required:
                 - quizId
-                - mid
             example: 
               quizId: 1
-              wid: WI0Nul
       responses:
         "204": 
           description: "deleted quiz from mylist"
@@ -1024,6 +1023,8 @@ paths:
       tags: 
         - quizzes
       summary: 問題集にクイズを追加
+      parameters:
+        - $ref: "#/components/parameters/wid"
       requestBody:
         required: true
         content:
@@ -1033,14 +1034,10 @@ paths:
               properties:
                 quizId: 
                   type: number
-                wid: 
-                  type: string
               required:
                 - quizId
-                - wid
             example: 
               quizId: 19
-              wid: Kb5F7y
       responses:
         "201":
           $ref: "#/components/responses/QuizResponse"
@@ -1054,6 +1051,8 @@ paths:
       tags:
         - quizzes
       summary: 問題集からクイズを削除
+      parameters:
+        - $ref: "#/components/parameters/wid"
       requestBody: 
         required: true
         content:
@@ -1063,14 +1062,10 @@ paths:
               properties:
                 quizId: 
                   type: number
-                wid: 
-                  type: string
               required:
                 - quizId
-                - wid
             example: 
               quizId: 19
-              wid: Kb5F7y
       responses:
         "204": 
           description: "deleted quiz from workbook"
