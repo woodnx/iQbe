@@ -325,6 +325,39 @@ paths:
           $ref: "#/components/responses/400BadRequest"
         "403":
           $ref: "#/components/responses/403Forbidden"
+  "/auth/available":
+    post:
+      tags: 
+        - auth
+      summary: usernameとして使用できる文字列か
+      security: []
+      requestBody: 
+        required: true
+        content:
+          application/json:
+            schema: 
+              type: object
+              properties:
+                username: 
+                  type: string
+              example: 
+                username: hoge
+      responses:
+        "201":
+          description: usernameとして使用できる文字列か
+          content:
+            application/json:
+              schema: 
+                type: object
+                properties:
+                  available: 
+                    type: boolean
+                example: 
+                  available: true
+        "400":
+          $ref: "#/components/responses/400BadRequest"
+        "403":
+          $ref: "#/components/responses/403Forbidden" 
   "/categories": 
     get: 
       tags:
