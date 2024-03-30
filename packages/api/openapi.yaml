@@ -463,15 +463,15 @@ paths:
                   type: string
                 description:
                   type: string
-                parent_id: 
+                parentId: 
                   type: number
               required:
                 - name
-                - parent_id
+                - parentId
             example: 
               name: "文学"
               description: 小説や童話など文学に関するクイズ
-              parent_id: 1
+              parentId: 1
       responses:
         "200": 
           $ref: "#/components/responses/CategoryResponse"
@@ -498,7 +498,7 @@ paths:
                   type: string
                 description:
                   type: string
-                parent_id: 
+                parentId: 
                   type: number
               required:
                 - id
@@ -507,7 +507,7 @@ paths:
               id: 1
               name: "文学"
               description: 小説や童話など文学に関するクイズ
-              parent_id: 1
+              parentId: 1
       responses:
         "200": 
           $ref: "#/components/responses/CategoryResponse"
@@ -1414,7 +1414,7 @@ components:
       name: levels
       in: query
       required: false
-      description: 検索したいlevel_idのリスト
+      description: 検索したいlevelIdのリスト
       schema: 
         type: array
         items:
@@ -1499,7 +1499,7 @@ components:
             wid: Kb5F7y
             category: 3
             subCategory: 5
-            creator_id: 1
+            creatorId: 1
             isPublic: false
   responses:
     400BadRequest:
@@ -1629,11 +1629,11 @@ components:
                 - id: 1,
                   name: "日本文学"
                   description: "明治以降の日本の文学・作家"
-                  parent_id: 1
+                  parentId: 1
                 - id: 2,
                   name: "古典文学"
                   description: "江戸以前の日本の文学・作家"
-                  parent_id: 1
+                  parentId: 1
             - id: 2
               name: "科学"
               description: "いわゆる理系学問"
@@ -1641,11 +1641,11 @@ components:
                 - id: 3,
                   name: "物理"
                   description: "物理学用語・物理学者など"
-                  parent_id: 2
+                  parentId: 2
                 - id: 4,
                   name: "化学"
                   description: "科学用語・化学者など"
-                  parent_id: 2
+                  parentId: 2
     CategoryResponse: 
       description: カテゴリー情報
       content:
@@ -1660,11 +1660,11 @@ components:
               - id: 1,
                 name: "日本文学"
                 description: "明治以降の日本の文学・作家"
-                parent_id: 1
+                parentId: 1
               - id: 2,
                 name: "古典文学"
                 description: "江戸以前の日本の文学・作家"
-                parent_id: 1
+                parentId: 1
     LevelResponse: 
       description: レベル情報
       content:
@@ -1737,7 +1737,7 @@ components:
             right: 4
             isFavorite: false
             registerdMylist: []
-            creator_id: 1
+            creatorId: 1
             isPublic: false
     QuizzzeResponse:
       description: クイズのリスト
@@ -1760,7 +1760,7 @@ components:
               right: 4
               isFavorite: false
               registerdMylist: []
-              creator_id: 1
+              creatorId: 1
               isPublic: false
     SubCategoriesResponse:
       description: サブカテゴリーのリスト
@@ -1775,19 +1775,19 @@ components:
             - id: 1,
               name: "日本文学"
               description: "明治以降の日本の文学・作家"
-              parent_id: 1
+              parentId: 1
             - id: 2,
               name: "古典文学"
               description: "江戸以前の日本の文学・作家"
-              parent_id: 1
+              parentId: 1
             - id: 3,
               name: "物理"
               description: "物理学用語・物理学者など"
-              parent_id: 2
+              parentId: 2
             - id: 4,
               name: "化学"
               description: "科学用語・化学者など"
-              parent_id: 2
+              parentId: 2
     UserResponse:
       description: ユーザ情報
       content:
@@ -1811,7 +1811,7 @@ components:
           example: 
             wid: sX8G8W
             name: abc the 12th
-            creator_id: 1
+            creatorId: 1
     WorkbooksResponse: 
       description: 問題集のリスト
       content:
@@ -1823,10 +1823,10 @@ components:
           example: 
             - wid: sX8G8W
               name: abc the 12th
-              creator_id: 1
+              creatorId: 1
             - wid: Kb5F7y
               name: abc the tenth
-              creator_id: 1
+              creatorId: 1
   schemas:
     Category: 
       type: object
@@ -1927,7 +1927,7 @@ components:
         registerdMylist:
           type: array 
           readOnly: true
-        creator_id:
+        creatorId:
           type: string
         isPublic: 
           type: boolean
@@ -1944,7 +1944,7 @@ components:
         - right
         - isFavorite
         - registerdMylist
-        - creator_id
+        - creatorId
         - isPublic
     Rank: 
       type: object
@@ -1974,12 +1974,12 @@ components:
           type: string
         description: 
           type: string
-        parent_id:
+        parentId:
           type: number
       required:
         - id
         - name
-        - parent_id
+        - parentId
     User: 
       type: object
       properties:
@@ -2011,16 +2011,16 @@ components:
           type: string
         date: 
           type: string
-        level_id: 
+        levelId: 
           type: number
         color: 
           type: string
-        creator_id:
+        creatorId:
           type: string
       required:
         - wid
         - name
-        - creator_id
+        - creatorId
   securitySchemes:
     jwt:
       type: http
