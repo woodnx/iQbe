@@ -6,7 +6,7 @@ export type Timestamp = ColumnType<Date, Date | string, Date | string>;
 
 export type categories = {
     id: Generated<number>;
-    name: string | null;
+    name: string;
     description: string | null;
 };
 export type favorites = {
@@ -98,7 +98,7 @@ export type SequelizeMeta = {
 export type sub_categories = {
     id: Generated<number>;
     parent_id: number;
-    name: string | null;
+    name: string;
     description: string | null;
 };
 export type test_quizzes = {
@@ -114,15 +114,15 @@ export type users = {
     email: Generated<string>;
     passwd: Generated<string>;
     modified: Timestamp;
-    created: Timestamp | null;
+    created: Timestamp;
 };
 export type workbooks = {
     id: Generated<number>;
-    name: string | null;
+    name: Generated<string>;
     date: Timestamp | null;
     level_id: number | null;
-    wid: string | null;
-    creator_id: number | null;
+    wid: string;
+    creator_id: number;
 };
 export type DB = {
     categories: categories;

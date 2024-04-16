@@ -1,15 +1,8 @@
-import express, { Router } from 'express'
-import { db } from '@/database'
+import express from 'express';
+import LevelsController from '@/controllers/LevelsController';
 
-const router: Router = express.Router()
+const router = express.Router();
 
-router.get('/', async (req, res) => {
-  try {
-    const levels = await db.selectFrom('levels').selectAll().execute();
-    res.status(200).send(levels)
-  } catch(err) {
-    console.error(err)
-  }
-})
+router.get('/', LevelsController.get);
 
-module.exports = router
+module.exports = router;

@@ -1,14 +1,10 @@
-import dayjs, { extend } from 'dayjs'
-import duration from 'dayjs/plugin/duration'
+import dayjs from 'dayjs'
 import 'dayjs/locale/ja'
-import type { ManipulateType } from 'dayjs'
+import type { Dayjs, ManipulateType } from 'dayjs'
 
-extend(duration)
-dayjs.locale('ja')
+export type Period = 'day' | 'week' | 'month'
 
-type Period = 'day' | 'week' | 'month'
-
-function generateRange(basicDate: string, period: ManipulateType){
+export const generateRange = (basicDate: string, period: ManipulateType) => {
   const date = dayjs(basicDate)
 
   const ranges = Array(7).fill([]).map((_, idx) => {
@@ -20,9 +16,8 @@ function generateRange(basicDate: string, period: ManipulateType){
   return ranges
 }
 
-export default dayjs
-
-export {
-  generateRange,
-  Period
+export const format = (day: Date) => {
+  return dayjs(day).format('YYYY-MM-DD HH:mm:ss');
 }
+
+export default dayjs
