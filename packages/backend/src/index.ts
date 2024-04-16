@@ -3,6 +3,7 @@ import fs from 'fs';
 import path from 'path';
 import cors from 'cors';
 import verifyAuthToken from '@/middleware/verifyAuthToken';
+import { errorHandler } from '@/middleware/error';
 import server from './allowed-server';
 
 const app = express(); // expressをインスタンス化
@@ -16,7 +17,7 @@ app.use(cors({
 }));
 app.use(express.json()); 
 app.use(express.static(path.join(__dirname, 'public'))); 
-app.use(express.static(path.join(__dirname, 'web'))); 
+app.use(express.static(path.join(__dirname, 'web')));
 
 // router import
 const filenames = fs.readdirSync(path.join(__dirname, 'routes'));
@@ -39,6 +40,8 @@ app.get('/api/*', (req, res) => {
 app.get('/*', (req, res) => {
   res.sendFile(path.join(__dirname, 'web', 'index.html'));
 });
+
+app.use(errorHandler);
 
 app.listen(port);
 
