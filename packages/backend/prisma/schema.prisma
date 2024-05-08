@@ -32,6 +32,7 @@ model categories {
   id                 BigInt               @id @default(autoincrement())
   name               String               @db.VarChar(125)
   description        String?              @db.VarChar(256)
+  quizzes            quizzes[]
   quizzes_categories quizzes_categories[]
   sub_categories     sub_categories[]
 }
@@ -160,10 +161,14 @@ model quizzes {
   total_wrng_ans     Int?
   total_through_ans  Int?
   creator_id         BigInt?              @db.UnsignedBigInt 
+  category_id        BigInt?
+  sub_category_id    BigInt?
   favorites          favorites[]
   histories          histories[]
   mylists_quizzes    mylists_quizzes[]
   quiz_visible_users quiz_visible_users[]
+  categories         categories?          @relation(fields: [category_id], references: [id])
+  sub_categories     sub_categories?      @relation(fields: [sub_category_id], references: [id])
   users              users?               @relation(fields: [creator_id], references: [id], onUpdate: Cascade, onDelete: Cascade)
 }
 
@@ -193,6 +198,7 @@ model sub_categories {
   parent_id          BigInt
   name               String               @db.VarChar(125)
   description        String?              @db.VarChar(256)
+  quizzes            quizzes[]
   quizzes_categories quizzes_categories[]
   categories         categories           @relation(fields: [parent_id], references: [id], onUpdate: Restrict, map: "sub_categories_ibfk_1")
 
