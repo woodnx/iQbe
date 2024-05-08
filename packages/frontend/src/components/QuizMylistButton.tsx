@@ -4,7 +4,7 @@ import { useDisclosure } from "@mantine/hooks";
 import { IconPlaylistAdd, IconPlus } from "@tabler/icons-react";
 import classes from "./styles/QuizMylistButton.module.css";
 import { MylistInformation } from "@/types";
-import axios from "@/plugins/axios";
+import api from "@/plugins/api";
 import { useIsMobile } from "@/contexts/isMobile";
 import MylistCreateModal from "./MylistCreateModal";
 
@@ -24,30 +24,34 @@ export default function QuizMylistButton({
   const isMobile = useIsMobile();
 
   const createMylist = async (mylistname: string) => {
-    const newMyList = await axios.post<MylistInformation>('/mylists', {
-      listName: mylistname,
-    }).then(res => res.data);
-
-    await axios.put('/mylists/quiz', {
-      quizId,
-      mid: newMyList.mid,
-    })
+    try {
+      const { mid } = await api.mylists.$post({ body: {
+        listName: mylistname,
+      }});
+      api.quizzes.mylist._mid(mid).$post({ body: {
+        quizId,
+      }})
+    } catch(e) {
+      return;
+    }
   }
 
   const saveToList = async (mid: string, arrayIdx: number) => {
-    if (!selectedMyListIdx.includes(arrayIdx)) { // add to mylist
-      await axios.put('/mylists/quiz', {
-        quizId,
-        mid,
-      });
-      setSelectedMylistIdx([...selectedMyListIdx, arrayIdx]);
-    } else {
-      await axios.delete('/mylists/quiz', {
-        data: {
+    try {
+      if (!selectedMyListIdx.includes(arrayIdx)) { // add quiz into mylist
+        await api.quizzes.mylist._mid(mid).$post({ body: {
           quizId,
-          mid,
-      }});
-      setSelectedMylistIdx(selectedMyListIdx.filter(idx => idx != arrayIdx));
+        }});
+        setSelectedMylistIdx([...selectedMyListIdx, arrayIdx]);
+      } 
+      else {  // delete quiz from mylist
+        await api.quizzes.mylist._mid(mid).$delete({ body: {
+          quizId,
+        }});
+        setSelectedMylistIdx(selectedMyListIdx.filter(idx => idx != arrayIdx));
+      }
+    } catch(e) {
+      return;
     }
   }
 

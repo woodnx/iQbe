@@ -10,9 +10,9 @@ import { PracticeQuizInfo } from "@/components/PracticeQuizInfo";
 import { PracticeQuizController } from "@/components/PracticeQuizController";
 import PracticeQuitModal from "@/components/PracticeQuitModal";
 import PracticeResultModal  from "@/components/PracticeResultModal";
-import axios from "@/plugins/axios";
 import { useTimer, useTypewriter } from "@/hooks";
 import useQuizzes from "@/hooks/useQuizzes";
+import api from '@/plugins/api';
 
 interface Props {
   quizzes?: Quiz[],
@@ -107,19 +107,18 @@ export default function({
   }
 
   const record = async (judgement: number) => {
-    if (judgement == 1) {
-      await axios.post('/answers', {
-        quizId: quiz?.id,
-        length: pressedWord,
-      });
-      const addId = quiz?.id
-      !!addId ? setRightList([ ...rightList, addId ]) : null;
-    }
+    if (!quiz) return;
 
-    await axios.post('/histories', {
+    api.quizzes.history.$post({ body: {
       quizId: quiz?.id,
       judgement,
-    });
+      pressedWord,
+    }});
+
+    if (judgement == 1) {
+      const addId = quiz.id
+      !!addId ? setRightList([ ...rightList, addId ]) : null;
+    }
   }
 
   const judgeQuiz = (judgement: number) => {
