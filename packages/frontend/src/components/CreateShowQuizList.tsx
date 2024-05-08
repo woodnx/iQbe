@@ -2,7 +2,6 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, Group, Text, getGradient, useMantineTheme } from "@mantine/core";
 import api from "@/plugins/api";
-import { useInput } from "@/hooks";
 import useQuizzes from "@/hooks/useQuizzes";
 import MylistDeleteModal from "@/components/MylistDeleteModal";
 import MylistEditModal from "@/components/MylistEditModal";
@@ -20,7 +19,6 @@ export default function({ wid }: Props) {
   const { workbooks, mutate } = useWorkbooks(true);
   
   const workbooksName = isAll ? 'すべてのクイズ' : workbooks?.find(list => list.wid == wid)?.name;
-  const [ newNameProps ] = useInput(workbooksName || '');
 
   const theme = useMantineTheme();
 
@@ -31,10 +29,10 @@ export default function({ wid }: Props) {
     })
   }, [])
 
-  const toEdit = async () => {
+  const toEdit = async (newWorkbookName: string) => {
     const body = {
       wid,
-      newWorkbookName: newNameProps.value,
+      newWorkbookName,
     };
 
     api.workbooks.put({ body })
@@ -42,7 +40,7 @@ export default function({ wid }: Props) {
     const newList = workbooks?.map((w) => {
       if (w.wid !== wid) return w;
 
-      w.name = newNameProps.value;
+      w.name = newWorkbookName;
       return w;
     })
     mutate(newList);
@@ -73,7 +71,7 @@ export default function({ wid }: Props) {
         {
           !isAll ? <Group gap="md">
             <MylistEditModal
-              newNameProps={newNameProps}
+              mylistName={workbooksName || ''}
               onSave={toEdit}
             />
             <MylistDeleteModal
