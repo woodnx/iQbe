@@ -1926,6 +1926,8 @@ components:
           readOnly: true
         registerdMylist:
           type: array 
+          items: 
+            type: string
           readOnly: true
         creatorId:
           type: string
