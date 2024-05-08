@@ -83,12 +83,12 @@ export default function QuizCard({
           }
           <QuizDetailsMenu
             quizId={quiz.id}
-            creatorId={quiz.creator}
+            creatorId={quiz.creatorId}
             question={quiz.question}
             answer={quiz.answer}
             workbook={quiz.wid}
-            category={String(quiz.category)}
-            subCategory={String(quiz.subCategory)}
+            category={quiz.category}
+            subCategory={quiz.subCategory}
             isPublic={!!quiz.isPublic}
           />
         </Group>

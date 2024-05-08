@@ -5,7 +5,7 @@ import { useForm, isNotEmpty, matchesField, isEmail } from '@mantine/form';
 import { notifications } from "@mantine/notifications";
 import { IconAlertTriangle, IconCheck } from "@tabler/icons-react";
 import { signupUser } from "@/plugins/auth";
-import axios from "@/plugins/axios";
+import api from "@/plugins/api";
 
 interface SubmitValue {
   username: string,
@@ -41,12 +41,11 @@ export function UserSignupModal() {
   });
 
   useEffect(() => {
-    axios.post('/auth/available', {
+    api.auth.available.$post({ body: {
       username: form.values.username
-    }).then(res => res.data)
-    .then(data => !!data.available)
-    .then(available => { 
-      setAvailable(available);
+    }})
+    .then((available) => {
+      setAvailable(!!available);
       if (!available && form.values.username.length > 0) form.setFieldError('username', errormes);
     });
   }, [ form.values.username ]);

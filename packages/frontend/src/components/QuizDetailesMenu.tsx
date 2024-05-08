@@ -8,8 +8,8 @@ interface Props {
   question: string,
   answer: string,
   workbook: string,
-  category: string,
-  subCategory: string,
+  category?: number | null,
+  subCategory?: number | null,
   isPublic: boolean,
 }
 

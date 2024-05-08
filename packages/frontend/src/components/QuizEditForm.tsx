@@ -9,8 +9,8 @@ interface Props extends BoxProps {
   question?: string,
   answer?: string,
   workbook?: string,
-  category?: string | null,
-  subCategory?: string | null,
+  category?: number,
+  subCategory?: number,
   isPublic?: boolean,
   onSubmit?: (v: SubmitValue) => void,
 }
@@ -44,7 +44,7 @@ export default function QuizEditForm({
     },
   });
 
-  const subCategories = sct?.filter(c => c.parent_id === Number(form.values.category)).map(c => ({ ...c, value: String(c.id), label: c.name}));
+  const subCategories = sct?.filter(c => c.parentId === Number(form.values.category)).map(c => ({ ...c, value: String(c.id), label: c.name}));
   const workbooks = wkb?.map(w => ({ ...w, value: w.wid, label: w.name}));
 
   const submit = (v: SubmitValue) => {
@@ -86,8 +86,8 @@ export default function QuizEditForm({
           <Grid.Col span={{ md: 9 }}>
             <CategorySelector
               label="Genre"
-              data={categories}
-              onClear={() => form.setFieldValue('subCategory', null)}
+              data={categories || []}
+              onClear={() => form.setFieldValue('subCategory', undefined)}
               {...form.getInputProps('category')}
             />
           </Grid.Col>

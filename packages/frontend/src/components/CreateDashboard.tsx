@@ -4,22 +4,22 @@ import WorkbookCard from "@/components/WorkbookCard";
 import { useIsMobile } from "@/contexts/isMobile";
 import { Divider, Grid, Group, Title } from "@mantine/core";
 import { useWorkbooks } from "@/hooks/useWorkbooks";
-import axios from "@/plugins/axios";
 import { SubmitValue } from "@/types";
+import api from '@/plugins/api';
 
 export default function CreateDashboard() {
   const isMobile = useIsMobile();
   const { workbooks } = useWorkbooks();
 
   const submit = ({ question, answer, category, subCategory, workbook, isPublic }: SubmitValue) => {
-    axios.post('quizzes', {
+    api.quizzes.$post({ body: {
       question,
       answer,
       category,
       subCategory,
-      workbook,
-      visible: isPublic ? 1 : 0,
-    });
+      wid: workbook,
+      isPublic,
+    }})
   }
 
   return (
