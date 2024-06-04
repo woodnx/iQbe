@@ -3,6 +3,7 @@ import { JsonWebTokenError, TokenExpiredError } from 'jsonwebtoken';
 import { verifyAccessToken } from '@/plugins/jsonwebtoken';
 import { createError } from '@/plugins/createError';
 import { db } from '@/database';
+import ApiError from '@/domains/ApiError';
 
 // ユーザ認証ミドルウェア
 export default async function (req: Request, res: Response, next: NextFunction) {
@@ -29,10 +30,10 @@ export default async function (req: Request, res: Response, next: NextFunction) 
     next();
   } catch(e) {
     if (e instanceof TokenExpiredError) {
-      next(createError.expiredToken());
+      next(new ApiError().expiredToken());
     }
     else if (e instanceof JsonWebTokenError) {
-      next(createError.invalidToken());
+      next(new ApiError().invalidToken());
     }
   }
 }

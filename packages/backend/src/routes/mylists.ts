@@ -1,14 +1,26 @@
 import express from 'express';
+
 import { db } from '@/database';
+import MylistService from '@/domains/Mylist/MylistService';
+import MylistController from '@/interfaces/controllers/MylistController';
+import KyselyClientManager from '@/interfaces/infra/kysely/KyselyClientManager';
+import MylistInfra from '@/interfaces/infra/MylistInfra';
 import dayjs from '@/plugins/day';
-import MylistsController from '@/controllers/MylistsController';
+
+const clientManager = new KyselyClientManager();
+const mylistInfra = new MylistInfra(clientManager);
+
+const mylistController = new MylistController(
+  mylistInfra,
+  new MylistService(),
+);
 
 const router = express.Router();
 
-router.get('/', MylistsController.get);
-router.post('/', MylistsController.post);
-router.put('/', MylistsController.put);
-router.delete('/', MylistsController.delete);
+router.get('/', mylistController.get());
+router.post('/', mylistController.post());
+router.put('/', mylistController.put());
+router.delete('/', mylistController.delete());
 
 router.put('/quiz', async (req, res) => {
   const quiz_id = req.body.quizId;
