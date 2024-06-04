@@ -1,9 +1,6 @@
 import useSWR from 'swr'
 import axios from '../plugins/axios'
-import { QuizRequestParams } from '../types'
-import useAspidaSWR from '@aspida/swr'
-import api from '@/plugins/api'
-import { Quiz } from 'api/types'
+import { Quiz, QuizRequestParams } from '../types'
 
 const fetcher = (url: string, params: string) => (
   axios.get<Quiz[]>(`${url}?${params}`).then(res => res.data)
@@ -41,7 +38,7 @@ const createFilter = ({
     params.append("until", String(until));
   }
 
-  if (!!judgements) judgements.forEach(j => { params.append('judgement[]', String(j)) });
+  if (!!judgements) judgements.forEach(j => { params.append('judement[]', String(j)) });
 
   // if (!(crctAnsRatio[0] == 0 && crctAnsRatio[1] == 100)) crctAnsRatio.forEach(ratio => { params.append('crctAnsRatio[]', ratio) }) 
   // params.append('userId', rootState.user.id)
@@ -50,7 +47,7 @@ const createFilter = ({
 }
 
 const useQuizzes = (
-  path = '',
+  path: string = '',
   initialParams: QuizRequestParams = { perPage: 100 },
   shouldFetch = true,
 ) => {
@@ -61,8 +58,6 @@ const useQuizzes = (
     shouldFetch ? [`/quizzes${path}`, filter ] : null,
     ([url, filter]) => fetcher(url, filter)
   );
-
-  useAspidaSWR(api.quizzes)
 
   return {
     quizzes,

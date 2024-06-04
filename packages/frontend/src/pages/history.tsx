@@ -4,7 +4,7 @@ import useQuizzes from "@/hooks/useQuizzes";
 import dayjs from "@/plugins/dayjs";
  
 export default function History() {
-  const { setParams } = useQuizzes();
+  const { setParams } = useQuizzes('/history');
   const dates = [
     dayjs().startOf('day').valueOf(),
     dayjs().endOf('day').valueOf(),
