@@ -6,7 +6,7 @@ import { QuizWorkbookBadge } from "./QuizWorkbookBadge";
 import QuizMylistButton from "./QuizMylistButton";
 
 interface Props extends BoxProps {
-  quizId?: number,
+  qid?: string,
   answer?: string,
   workbook?: string,
   level?: string,
@@ -17,7 +17,7 @@ interface Props extends BoxProps {
 }
 
 export function PracticeQuizInfo({
-  quizId = 0,
+  qid = "",
   answer = "",
   workbook = "",
   level = "",
@@ -38,17 +38,17 @@ export function PracticeQuizInfo({
           fw="bold"
         >{answer}</Text>
         <QuizFavoriteButton 
-          quizId={quizId}
+          qid={qid}
           isFavorite={isFavorite}
-          key={quizId}
+          key={qid}
         />
       </Group>
       <Group justify="space-between" m={0} mt="sm">
         <QuizMylistButton
-          quizId={quizId}
+          qid={qid}
           registerdMylistId={registeredMylist}
           mylists={mylists || []}
-          key={quizId}
+          key={qid}
         />
         {
           (!!workbook && !!level && !!date) 

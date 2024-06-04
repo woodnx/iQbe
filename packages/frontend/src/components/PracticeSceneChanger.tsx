@@ -10,9 +10,9 @@ import { PracticeQuizInfo } from "@/components/PracticeQuizInfo";
 import { PracticeQuizController } from "@/components/PracticeQuizController";
 import PracticeQuitModal from "@/components/PracticeQuitModal";
 import PracticeResultModal  from "@/components/PracticeResultModal";
-import axios from "@/plugins/axios";
 import { useTimer, useTypewriter } from "@/hooks";
 import useQuizzes from "@/hooks/useQuizzes";
+import api from '@/plugins/api';
 
 interface Props {
   quizzes?: Quiz[],
@@ -34,7 +34,7 @@ export default function({
   const navigator = useNavigate();
 
   const { params, setParams } = useQuizzes();
-  const [ rightList, setRightList ] = useState<number[]>([]);
+  const [ rightList, setRightList ] = useState<string[]>([]);
   const [ pressedWord, setPressedWord ] = useState(0);
   const quiz = !!quizzes ? quizzes[shuffledList[nowNumber]] : null;
   const maxQuizSize = quizzes?.length || 0;
@@ -107,19 +107,18 @@ export default function({
   }
 
   const record = async (judgement: number) => {
+    if (!quiz) return;
+
+    api.quizzes.history.$post({ body: {
+      qid: quiz?.qid,
+      judgement,
+      pressedWord,
+    }});
+
     if (judgement == 1) {
-      await axios.post('/answers', {
-        quizId: quiz?.id,
-        length: pressedWord,
-      });
-      const addId = quiz?.id
+      const addId = quiz.qid
       !!addId ? setRightList([ ...rightList, addId ]) : null;
     }
-
-    await axios.post('/histories', {
-      quizId: quiz?.id,
-      judgement,
-    });
   }
 
   const judgeQuiz = (judgement: number) => {
@@ -198,7 +197,7 @@ export default function({
           countlimit={4000}
         />
         <PracticeQuizInfo 
-          quizId={quiz?.id}
+          qid={quiz?.qid}
           answer={quiz?.answer}
           workbook={quiz?.workbook }
           level={quiz?.level}

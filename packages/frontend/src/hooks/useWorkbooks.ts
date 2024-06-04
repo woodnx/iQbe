@@ -1,18 +1,14 @@
-import useSWR from 'swr';
-import axios from '../plugins/axios';
-import { Workbook } from '@/types';
+import useAspidaSWR from '@aspida/swr';
+import api from '@/plugins/api';
 
-const fetcher = (url: string) => axios.get<Workbook[]>(url).then(res => res.data)
-
-export const useWorkbooks = (path = '', shouldFetch = true) => {
-  const { data: workbooks, isLoading, error, mutate } = useSWR(
-    shouldFetch ? `/workbooks${path}` : null,
-    fetcher
-  );
+export const useWorkbooks = (isAll = false, shouldFetch = true) => {
+  const { data: workbooks, error, mutate } = useAspidaSWR(
+    isAll ? api.workbooks.all : api.workbooks, {
+    enabled: shouldFetch,
+  });
 
   return {
     workbooks,
-    isLoading,
     error,
     mutate,
   }

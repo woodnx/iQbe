@@ -1,52 +1,26 @@
 import express from 'express';
-import { randomUUID } from 'crypto';
-import { db } from '@/database';
-import dayjs from '@/plugins/day';
-import nodemailer from '@/plugins/nodemailer';
+import ResetPasswordController from '@/interfaces/controllers/ResetPasswordController';
+import ResetPasswordUseCase from '@/applications/usecases/ResetPasswordUseCase';
+import KyselyClientManager from '@/interfaces/infra/kysely/KyselyClientManager';
+import KyselyTransactionManager from '@/interfaces/infra/kysely/KyselyTransactionManager';
+import AuthService from '@/domains/Auth/AuthService';
+import ResetPasswordService from '@/domains/ResetPassword/ResetPasswordService';
+import ResetPasswordInfra from '@/interfaces/infra/ResetPasswordInfra';
+import UserInfra from '@/interfaces/infra/UserInfra';
+
+const kyselyClientManager = new KyselyClientManager();
+const resetPasswordController = new ResetPasswordController(
+  new ResetPasswordUseCase(
+    new KyselyTransactionManager(kyselyClientManager),
+    new AuthService(),
+    new ResetPasswordService(),
+    new ResetPasswordInfra(kyselyClientManager),
+    new UserInfra(kyselyClientManager),
+  )
+);
 
 const router = express.Router();
 
-router.post('/', async (req, res) => {
-  const email = String(req.body.email);
-  const username = String(req.body.username);
-  const expDate = dayjs().add(1, 'h').toDate()
-
-  try {
-    db.transaction().execute(async (trx) => {
-      const user = await trx
-      .selectFrom('users')
-      .selectAll()
-      .where('username', '=', username)
-      .executeTakeFirstOrThrow();
-      
-      if (email !== user.email) {
-        res.status(400).send('no match your email')
-        return;
-      }
-    
-      const passwordResetToken = randomUUID();
-      await trx.insertInto('password_reset_tokens')
-      .values({
-        user_id: user.id,
-        token: passwordResetToken,
-        expDate,
-      }).execute();
-      
-      const resetUrl = `${process.env.URL}/reset-password?token=${passwordResetToken}`;
-      await nodemailer.sendMail({
-        from: process.env.MAIL_USER,
-        to: user.email,
-        subject: 'Password reset request',
-        html: `
-        <p>パスワードリセットをリクエストしました。以下のリンクをクリックしてパスワードをリセットしてください。<\p>
-        <a href="${resetUrl}">${resetUrl}<\a>
-        <p>このリクエストを行っていない場合は、このメールを無視してください。<\p>
-        `,
-      })
-    });
-  } catch(e) {
-    console.error(e);
-  }
-});
+router.post('/', resetPasswordController.request());
 
 module.exports = router;

@@ -1,0 +1,49 @@
+{
+  "name": "api",
+  "version": "0.1.0",
+  "description": "",
+  "exports": {
+    ".": {
+      "require": "./dist/index.js",
+      "import": "./dist/index.mjs",
+      "types": "./dist/index.d.ts"
+    },
+    "./types": {
+      "require": "./dist/types.js",
+      "import": "./dist/types.mjs",
+      "types": "./dist/types.d.ts"
+    },
+    "./predicates": {
+      "require": "./dist/predicates.js",
+      "import": "./dist/predicates.mjs",
+      "types": "./dist/predicates.d.ts"
+    },
+    "./schema": {
+      "require": "./dist/schema.js",
+      "import": "./dist/schema.mjs",
+      "types": "./dist/schema.d.ts"
+    }
+  },
+  "devDependencies": {
+    "openapi-typescript": "^6.7.4",
+    "tsup": "^8.0.2",
+    "tsx": "^4.7.1",
+    "typescript": "^5.3.3"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "npm run clean && npm run codegen && npm run build:tsup",
+    "build:tsup": "tsup-node --config tsup.config.ts",
+    "clean": "rm -rf dist && rm -rf ./src/generated",
+    "codegen": "npm run codegen:aspida && npm run codegen:openapi-ts && npm run codegen:format && npm run codegen:type-pred",
+    "codegen:aspida": "npx openapi2aspida -y",
+    "codegen:openapi-ts": "npx openapi-typescript openapi.yaml --output ./src/generated/schema.ts -y",
+    "codegen:format": "tsx ./src/schemaFormatter.ts && tsx ./src/typesIndexFormatter.ts",
+    "codegen:type-pred": "npx type-predicates-generator -f './src/generated/@types/index.ts' -o './src/predicates.ts' -a"
+  },
+  "author": "",
+  "license": "ISC",
+  "files": [
+    "dist"
+  ]
+}

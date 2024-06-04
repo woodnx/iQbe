@@ -1,20 +1,14 @@
 .button {
   border-radius: var(--mantine-radius-xl);
-  background-color: var(--mantine-color-white);
+  background-color: var(--mantine-color-body);
   &:hover {
-    background-color: light-dark(
-      var(--mantine-color-dark-5),
-      var(--mantine-color-gray-0)
-    );
+    background-color: var(--mantine-color-default-hover);
   }
 }
 
 .mobileButton {
-  background-color: var(--mantine-color-white);
+  background-color: var(--mantine-color-body);
   &:hover {
-    background-color: light-dark(
-      var(--mantine-color-dark-5),
-      var(--mantine-color-gray-0)
-    );
+    background-color: var(--mantine-color-default-hover);
   }
 }

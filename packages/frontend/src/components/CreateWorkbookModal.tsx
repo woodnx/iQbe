@@ -1,16 +1,15 @@
-import { useIsMobile } from "@/contexts/isMobile"
-import { useWorkbooks } from "@/hooks/useWorkbooks";
-import axios from "@/plugins/axios";
-import { Workbook } from "@/types";
+import { useState } from "react";
 import { ActionIcon, Button, Group, Modal, TextInput } from "@mantine/core"
 import { useDisclosure } from "@mantine/hooks";
 import { IconSquarePlus2 } from "@tabler/icons-react";
-import { useState } from "react";
+import api from "@/plugins/api";
+import { useIsMobile } from "@/contexts/isMobile"
+import { useWorkbooks } from "@/hooks/useWorkbooks";
 
 export default function CreateWorkbookModal() {
   const [ listName, setListName ] = useState('');
   const [ opened, { open, close }] = useDisclosure();
-  const { mutate } = useWorkbooks();
+  const { workbooks, mutate } = useWorkbooks(true);
   const isMobile = useIsMobile();
   const Icon = () => <IconSquarePlus2/>;
   const ResponsiveButton = () => (
@@ -26,10 +25,13 @@ export default function CreateWorkbookModal() {
   );
 
   const create = async () => {
-    const allList = await axios.post<Workbook[]>('/workbooks/new', {
-      listName,
-    }).then(res => res.data);
-    mutate(allList);
+    const body = {
+      workbookName: listName,
+    };
+    const created = (await api.workbooks.post({ body })).body;
+    const newList = [ ...workbooks || [], created ];
+    
+    mutate(newList);
     close();
   }
 
