@@ -1,7 +1,7 @@
 // Globalなtypeを定義
 
 export interface Quiz {
-  id: number,
+  qid: string,
   question: string,
   answer: string,
   workbook: string,
@@ -14,7 +14,7 @@ export interface Quiz {
   registerdMylist: string[],
   size: number,
   judgement?: Judgement,
-  creator: string,
+  creatorId: string,
   category?: number,
   subCategory?: number,
   isPublic?: boolean,
@@ -31,7 +31,6 @@ export interface QuizRequestParams {
   since?: number,
   until?: number,
   judgements?: Judgement[],
-  mid?: string,
 }
 
 export type KeywordOption = "1" | "2" | "3";
@@ -82,10 +81,10 @@ export interface SubCategory extends Category {
 }
 
 export interface SubmitValue {
-  question?: string | null,
-  answer?: string | null,
-  category?: string | null,
-  subCategory?: string | null,
-  workbook?: string | null,
-  isPublic?: boolean | null,
+  question: string,
+  answer: string,
+  category?: number,
+  subCategory?: number,
+  workbook?: string,
+  isPublic?: boolean,
 }

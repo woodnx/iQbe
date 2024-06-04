@@ -17,18 +17,17 @@ const createFilter = ({
   since,
   until,
   judgements,
-  mid,
 } : QuizRequestParams) => {
   const params = new URLSearchParams();
 
   if(!!page && !!perPage) {
     params.append('page', String(page))
-    params.append('perPage', String(perPage))
+    params.append('maxView', String(perPage))
   }
   if(!!seed) params.append('seed', String(seed))
 
-  if (!!workbooks && workbooks.length !== 0) workbooks.forEach(id => { params.append('workbook[]', id) })
-  if (!!levels    && levels.length !== 0)    levels.forEach(id => { params.append('level[]', id) })
+  if (!!workbooks && workbooks.length !== 0) workbooks.forEach(id => { params.append('workbooks[]', id) })
+  if (!!levels    && levels.length !== 0)    levels.forEach(id => { params.append('levels[]', id) })
   if (!!keyword   && keyword.trim().length !== 0 && !!keywordOption) { 
     params.append("keyword", keyword) 
     params.append("keywordOption", keywordOption)
@@ -39,9 +38,7 @@ const createFilter = ({
     params.append("until", String(until));
   }
 
-  if (!!judgements) judgements.forEach(j => { params.append('judgement[]', String(j)) });
-
-  if (!!mid) params.append('mylistId', mid);
+  if (!!judgements) judgements.forEach(j => { params.append('judement[]', String(j)) });
 
   // if (!(crctAnsRatio[0] == 0 && crctAnsRatio[1] == 100)) crctAnsRatio.forEach(ratio => { params.append('crctAnsRatio[]', ratio) }) 
   // params.append('userId', rootState.user.id)
@@ -50,7 +47,7 @@ const createFilter = ({
 }
 
 const useQuizzes = (
-  path = '',
+  path: string = '',
   initialParams: QuizRequestParams = { perPage: 100 },
   shouldFetch = true,
 ) => {

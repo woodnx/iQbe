@@ -1,15 +1,16 @@
-import express, { Router } from 'express'
-import { db } from '@/database'
+import express from 'express';
 
-const router: Router = express.Router()
+import LevelController from '@/interfaces/controllers/LevelController';
+import KyselyClientManager from '@/interfaces/infra/kysely/KyselyClientManager';
+import LevelInfra from '@/interfaces/infra/LevelInfra';
 
-router.get('/', async (req, res) => {
-  try {
-    const levels = await db.selectFrom('levels').selectAll().execute();
-    res.status(200).send(levels)
-  } catch(err) {
-    console.error(err)
-  }
-})
+const clientManager = new KyselyClientManager();
+const levelController = new LevelController(
+  new LevelInfra(clientManager),
+);
 
-module.exports = router
+const router = express.Router();
+
+router.get('/', levelController.get());
+
+module.exports = router;

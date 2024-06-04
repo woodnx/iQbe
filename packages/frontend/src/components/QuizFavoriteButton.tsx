@@ -1,26 +1,38 @@
 import { useState } from "react";
 import { ActionIcon } from "@mantine/core";
 import { IconStar, IconStarFilled } from "@tabler/icons-react";
-import axios from "@/plugins/axios";
+import api from "@/plugins/api";
 
 interface QuizFavoriteButtonProps {
   isFavorite: boolean,
-  quizId: number
+  qid: string
 }
 
 export default function QuizFavoriteButton({ 
   isFavorite: innerIsFavorite, 
-  quizId 
+  qid,
 }: QuizFavoriteButtonProps) {
   const [ isFavorite, setFavorite ] = useState(innerIsFavorite)
-
+  
   const addFavoriteList = async () => {
     if (isFavorite) {
-      const status = await axios.delete('/favorites', { data: { quizId } }).then(res => res.status)
-      if (status === 204) setFavorite(!isFavorite)
+      try {
+        await api.quizzes.favorite.$delete({ body: {
+          qid,
+        }})
+        setFavorite(!isFavorite);
+      } catch(e) {
+        return;
+      }
     }else {
-      const status = await axios.post('/favorites', { quizId }).then(res => res.status)
-      if (status === 201) setFavorite(!isFavorite)
+      try {
+        await api.quizzes.favorite.$post({ body: {
+          qid
+        }});
+        setFavorite(!isFavorite);
+      } catch(e) {
+        return;
+      }
     }
   }
 

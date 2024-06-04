@@ -1,14 +1,9 @@
-import axios from "../plugins/axios";
-import useSWR from 'swr';
-import { Period } from "../plugins/dayjs";
-import { Rank } from "../types";
-
-const fetcher = (url: string) => (
-  axios.get(url).then(res => res.data)
-)
+import useAspidaSWR from "@aspida/swr";
+import api from "@/plugins/api";
+import { Period } from "@/plugins/dayjs";
 
 export const useAllUserRanking = (period: Period) => {
-  const { data: allUserRanking, isLoading, error } = useSWR<Rank[]>(`analysis/ranking/all/${period}`, fetcher);
+  const { data: allUserRanking, isLoading, error } = useAspidaSWR(api.analysis.ranking.all._period(period));
   
   return {
     allUserRanking,
@@ -18,7 +13,7 @@ export const useAllUserRanking = (period: Period) => {
 }
 
 export const usePersonalRank = (period: Period) => {
-  const { data: personalRank, isLoading, error } = useSWR<Rank>(`analysis/ranking/personal/${period}`, fetcher);
+  const { data: personalRank, isLoading, error } = useAspidaSWR(api.analysis.ranking.personal._period(period));
   
   return {
     personalRank,

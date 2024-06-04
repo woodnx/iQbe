@@ -3,10 +3,11 @@ import { sql } from 'kysely';
 import { db } from '@/database';
 import type { Period } from '@/plugins/day';
 import dayjs, { generateRange } from '@/plugins/day';
+import { typedWrapper } from '@/utils/wrappers';
 
 const router = express.Router();
 
-router.get('/status/:date/:period', async (req, res) => {
+router.get('/status/:date/:period', typedWrapper<"/analysis/status/{date}/{period}", "get">(async (req, res, next) => {
   const userId = req.userId;
   const date = req.params.date;
   const _period = req.params.period;
@@ -16,10 +17,14 @@ router.get('/status/:date/:period', async (req, res) => {
 
   try {
     const results = await Promise.all(
-      ranges.map(async (range) => ({
-        start: range[0],
-        end: range[1],
-        right: (await db
+      ranges.map(async (range) => {
+      const start = dayjs(range[0]).format('YYYY-MM-DD hh:mm:ss');
+      const end = dayjs(range[1]).format('YYYY-MM-DD hh:mm:ss');
+
+      return {
+        start,
+        end,
+        right: Number((await db
           .selectFrom('histories')
           .select(({ fn }) => [ fn.count('quiz_id').as('count') ])
           .where(({ eb, and, between }) => and([
@@ -28,9 +33,9 @@ router.get('/status/:date/:period', async (req, res) => {
             between('practiced', range[0], range[1]),
           ]))
           .executeTakeFirst()
-        )?.count,
+        )?.count) || 0,
 
-        wrong: (await db
+        wrong: Number((await db
           .selectFrom('histories')
           .select(({ fn }) => [ fn.count('quiz_id').as('count') ])
           .where(({ eb, and, between }) => and([
@@ -39,9 +44,9 @@ router.get('/status/:date/:period', async (req, res) => {
             between('practiced', range[0], range[1]),
           ]))
           .executeTakeFirst()
-        )?.count,
+        )?.count) || 0,
 
-        through: (await db
+        through: Number((await db
           .selectFrom('histories')
           .select(({ fn }) => [ fn.count('quiz_id').as('count') ])
           .where(({ eb, and, between }) => and([
@@ -50,15 +55,14 @@ router.get('/status/:date/:period', async (req, res) => {
             between('practiced', range[0], range[1]),
           ]))
           .executeTakeFirst()
-        )?.count,
-      }))
-    );
+        )?.count) || 0,
+    }}));
+
     res.status(200).send(results);
   } catch(e) {
-    console.error(e)
-    res.send('An Error Occured')
+    next(e);
   }
-})
+}));
 
 router.get('/ranking/all/:period', async (req, res) => {
   const _period = req.params.period;

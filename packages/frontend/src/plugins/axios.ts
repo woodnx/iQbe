@@ -1,5 +1,6 @@
 import _axios, { AxiosError } from "axios";
 import { getIdToken } from "./auth";
+import { Error } from "api/types";
 
 const axios = _axios.create({
   baseURL: '/api',
@@ -27,9 +28,8 @@ axios.interceptors.request.use(async (request) => {
 axios.interceptors.response.use((responce) => {
   return responce;
 },
-(error: AxiosError) => {
-  // @ts-ignore
-  if (error.response?.data.message === 'invalid authorization'){
+(error: AxiosError<Error>) => {
+  if (error.response?.data.title === 'EXPIRED_TOKEN'){
     getIdToken().then(token => {
       localStorage.setItem('accessToken', token || "");
     });

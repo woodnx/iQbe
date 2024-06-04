@@ -1,11 +1,6 @@
-import useSWR from 'swr';
-import axios from '../plugins/axios';
-import { UserStatus } from '../types';
-import dayjs, { Period } from '../plugins/dayjs';
-
-const fetcher = (url: string) => (
-  axios.get<UserStatus[]>(`${url}`).then(res => res.data)
-);
+import useAspidaSWR from '@aspida/swr';
+import api from '@/plugins/api';
+import dayjs, { Period } from '@/plugins/dayjs';
 
 const defineLabel = (start: string, period: Period): string => {
   if (period === 'month'){
@@ -19,7 +14,7 @@ const defineLabel = (start: string, period: Period): string => {
 }
 
 const useUserStatus = (date: string, period: Period) => {
-  const { data, isLoading, error } = useSWR(`analysis/status/${date}/${period}`, fetcher);
+  const { data, isLoading, error } = useAspidaSWR(api.analysis.status._date(date)._period(period));
 
   const userStatus = data?.map(status => {
     const label = defineLabel(status.start, period);

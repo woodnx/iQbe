@@ -3,18 +3,18 @@ import { IconDots } from "@tabler/icons-react";
 import { modals } from "@mantine/modals";
 
 interface Props {
-  quizId: number,
+  qid: string,
   creatorId: string,
   question: string,
   answer: string,
   workbook: string,
-  category: string,
-  subCategory: string,
+  category?: number,
+  subCategory?: number,
   isPublic: boolean,
 }
 
 export default function({
-  quizId,
+  qid,
   creatorId,
   question,
   answer,
@@ -42,7 +42,7 @@ export default function({
               modal: 'quizEdit',
               title: 'Edit Quiz',
               innerProps: {
-                quizId,
+                qid,
                 question,
                 answer,
                 workbook,

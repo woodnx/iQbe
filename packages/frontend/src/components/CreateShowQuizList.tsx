@@ -1,12 +1,10 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, Group, Text, getGradient, useMantineTheme } from "@mantine/core";
-import { Workbook } from "@/types";
+import api from "@/plugins/api";
 import useQuizzes from "@/hooks/useQuizzes";
 import MylistDeleteModal from "@/components/MylistDeleteModal";
 import MylistEditModal from "@/components/MylistEditModal";
-import { useInput } from "@/hooks";
-import axios from "@/plugins/axios";
 import { useWorkbooks } from "@/hooks/useWorkbooks";
 import QuizViewer from "./QuizViewer";
 
@@ -18,10 +16,9 @@ export default function({ wid }: Props) {
   const isAll = (wid == 'all');
   const navigator = useNavigate();
   const { setParams } = useQuizzes("/create");
-  const { workbooks, mutate } = useWorkbooks();
+  const { workbooks, mutate } = useWorkbooks(true);
   
   const workbooksName = isAll ? 'すべてのクイズ' : workbooks?.find(list => list.wid == wid)?.name;
-  const [ newNameProps ] = useInput(workbooksName || '');
 
   const theme = useMantineTheme();
 
@@ -32,22 +29,31 @@ export default function({ wid }: Props) {
     })
   }, [])
 
-  const toEdit = async () => {
-    const newlist = await axios.put<Workbook[]>('/workbooks/rename', {
+  const toEdit = async (newWorkbookName: string) => {
+    const body = {
       wid,
-      newName: newNameProps.value,
-    }).then(res => res.data);
-    mutate(newlist);
+      newWorkbookName,
+    };
+
+    api.workbooks.put({ body })
+
+    const newList = workbooks?.map((w) => {
+      if (w.wid !== wid) return w;
+
+      w.name = newWorkbookName;
+      return w;
+    })
+    mutate(newList);
   }
 
   const toDelete = async () => {
-    const newlist = await axios.delete<Workbook[]>('/workbooks', {
-      data: {
-        wid
-      }
-    }).then(res => res.data);
+    const body = { wid };
+    api.workbooks.delete({ body });
+
+    const newList = workbooks?.filter(w => w.wid !== wid);
+    mutate(newList);
+
     navigator('/create');
-    mutate(newlist);
   }
 
   const CreateCard = () => (
@@ -65,7 +71,7 @@ export default function({ wid }: Props) {
         {
           !isAll ? <Group gap="md">
             <MylistEditModal
-              newNameProps={newNameProps}
+              mylistName={workbooksName || ''}
               onSave={toEdit}
             />
             <MylistDeleteModal

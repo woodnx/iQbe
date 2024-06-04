@@ -67,7 +67,6 @@ export default function HistoryDateRange({
           <DatePicker 
             type="range" 
             allowSingleDateInRange
-            // @ts-ignore
             value={innerDates}
             onChange={setDates} 
           />

@@ -1,7 +1,7 @@
-import { Quiz } from "@/types"
 import { useMylists } from "@/hooks/useMylists";
 import QuizCard from "./QuizCard"
 import { Center, Loader } from "@mantine/core";
+import { Quiz } from "@/types";
 
 interface QuizListProps {
   quizzes?: Quiz[],

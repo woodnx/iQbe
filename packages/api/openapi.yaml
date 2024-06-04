@@ -1,0 +1,2031 @@
+openapi: "3.0.3"
+
+info:
+  title: "iQbe API"
+  version: 2.1.0
+
+servers:
+  - url: "http://localhost:9000/api/v2"
+
+tags:
+  - name: analysis
+  - name: auth
+  - name: categories
+  - name: histories
+  - name: levels
+  - name: mylists
+  - name: quizzes
+  - name: users
+  - name: workbooks
+
+security:
+  - jwt: []
+
+paths:
+  "/analysis/ranking/all/{period}": 
+    get: 
+      tags: 
+        - analysis
+      summary: ユーザの演習問題数のランキング
+      description: 演習問題によるランク済みのユーザリストを取得する
+      parameters:
+        - name: period
+          in: path
+          required: true
+          description: 日 / 週 / 月
+          schema:
+            type: string
+          example: day 
+      responses:
+        "200": 
+          description: 指定範囲のユーザ情報とランク
+          content:
+            application/json:
+              schema: 
+                type: array
+                items: 
+                  $ref: "#/components/schemas/Rank"
+              example:
+                - rank: 1
+                  uid: WI0Nulr6F1dhLUi7A3zYRKs5bu9txaGgT0PqBc 
+                  name: foo
+                  count: 323
+                  compare: 0
+                - rank: 2
+                  uid: 2kYfkh59sP8Qbm1drC7uZXOnBIGRSAoz5hTMN3
+                  name: piyo
+                  count: 234
+                  compare: 1
+                - rank: 3
+                  uid: Kb5F7yQHOhpNb9tnLBx6GJj1IeiucMk0mDw27z
+                  name: bar
+                  count: 103
+                  compare: -1
+                - rank: 4
+                  uid: BapXVEOuLlYb3jHCBpeSzx7cPRrgf1dNTZqE4
+                  name: hoge
+                  count: 234
+                  compare: 1
+        "400":
+          $ref: "#/components/responses/400BadRequest"
+        "401": 
+          $ref: "#/components/responses/401Unauthorized"
+        "403":
+          $ref: "#/components/responses/403Forbidden"
+  "/analysis/ranking/personal/{period}": 
+    get: 
+      tags: 
+        - analysis
+      summary: 個人の演習問題数のランク
+      description: 演習問題によるランクを取得する
+      parameters:
+        - name: period
+          in: path
+          required: true
+          description: 日 / 週 / 月
+          schema:
+            type: string
+          example: day 
+      responses:
+        "200": 
+          description: 指定範囲のランク
+          content:
+            application/json:
+              schema: 
+                $ref: "#/components/schemas/Rank"
+              example:
+                rank: 1
+                uid: WI0Nulr6F1dhLUi7A3zYRKs5bu9txaGgT0PqBc 
+                name: foo
+                count: 323
+                compare: 0
+        "400":
+          $ref: "#/components/responses/400BadRequest"
+        "401": 
+          $ref: "#/components/responses/401Unauthorized"
+        "403":
+          $ref: "#/components/responses/403Forbidden"
+  "/analysis/status/{date}/{period}": 
+    get: 
+      tags: 
+        - analysis
+      summary: 正答/誤答/スルー問題数を取得
+      description: 指定する日時範囲の正答/誤答/スルー問題数を取得
+      parameters:
+        - name: date
+          in: path
+          required: true
+          description: 起算する日にち
+          schema:
+            type: string
+          example: 2023-12-31 
+        - name: period
+          in: path
+          required: true
+          description: 日 / 週 / 月
+          schema:
+            type: string
+          example: day 
+      responses:
+        "200": 
+          description: 正答/誤答/スルーの問題数
+          content:
+            application/json:
+              schema:
+                type: array
+                items: 
+                  type: object
+                  properties:
+                    start: 
+                      type: string
+                    end: 
+                      type: string
+                    right: 
+                      type: number
+                    wrong: 
+                      type: number
+                    through: 
+                      type: number
+                  required:
+                    - start
+                    - end
+                    - right
+                    - wrong
+                    - through
+              example:
+                - start: 2023-12-31 00:00:00
+                  end: 2023-12-31 23:59:59
+                  right: 2
+                  wrong: 1
+                  through: 4
+                - start: 2023-12-30 00:00:00
+                  end: 2023-12-30 23:59:59
+                  right: 10
+                  wrong: 10
+                  through: 40
+                - start: 2023-12-29 00:00:00
+                  end: 2023-12-29 23:59:59
+                  right: 1
+                  wrong: 3
+                  through: 47
+                - start: 2023-12-28 00:00:00
+                  end: 2023-12-28 23:59:59
+                  right: 17
+                  wrong: 12
+                  through: 37
+                - start: 2023-12-27 00:00:00
+                  end: 2023-12-27 23:59:59
+                  right: 18
+                  wrong: 14
+                  through: 34
+                - start: 2023-12-26 00:00:00
+                  end: 2023-12-26 23:59:59
+                  right: 13
+                  wrong: 4
+                  through: 12
+        "400":
+          $ref: "#/components/responses/400BadRequest"
+        "401": 
+          $ref: "#/components/responses/401Unauthorized"
+        "403":
+          $ref: "#/components/responses/403Forbidden"
+  "/auth/login": 
+    post: 
+      tags: 
+        - auth
+      summary: ユーザのログイン
+      description: ユーザのログインを行う
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: 
+              type: object
+              properties: 
+                username: 
+                  type: string
+                password: 
+                  type: string
+              required:
+                - username
+                - password
+            example: 
+              uid: BapXVEOuLlYb3jHCBpeSzx7cPRrgf1dNTZqE4
+              username: hoge
+              nickname: huga
+      responses:
+        "201":
+          $ref: "#/components/responses/AuthResponseWithRefreshToken"
+        "400":
+          $ref: "#/components/responses/400BadRequest"
+        "403":
+          $ref: "#/components/responses/403Forbidden"                  
+  "/auth/signup": 
+    post: 
+      tags: 
+        - auth
+      summary: ユーザの新規登録
+      description: ユーザの新規登録を行う．クローズドなインスタンスであれば招待コードが必要．
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: 
+              type: object
+              properties: 
+                username: 
+                  type: string
+                password: 
+                  type: string
+                email: 
+                  type: string
+                inviteCode: 
+                  type: string
+              required:
+                - username
+                - password
+            example: 
+              username: hoge
+              password: p@ssw0rd
+              email: hoge@example.com
+              inviteCode: 9197DD99-5504-10D0-E529-4EC60EEA978A
+      responses:
+        "201":
+          $ref: "#/components/responses/AuthResponseWithRefreshToken"
+        "400":
+          $ref: "#/components/responses/400BadRequest"
+        "403":
+          $ref: "#/components/responses/403Forbidden"
+  "/auth/token": 
+    post: 
+      tags: 
+        - auth
+      summary: 認証トークンの取得
+      description: リフレッシュトークンをもとに認証トークンを発行する
+      deprecated: false
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                refreshToken:
+                  type: string
+                uid:
+                  type: string
+              required:
+                - refreshToken
+                - uid
+            example: 
+              refreshToken: DDAFC07B-E55A-9B7A-740B-9F6125E11113
+              uid: BapXVEOuLlYb3jHCBpeSzx7cPRrgf1dNTZqE4
+      responses:
+        "201":
+          $ref: "#/components/responses/AuthResponse"
+        "400":
+          $ref: "#/components/responses/400BadRequest"
+        "403":
+          $ref: "#/components/responses/403Forbidden"
+  "/auth/register": 
+    post: 
+      tags:
+        - auth
+      summary: ユーザの再登録
+      description: emailだけで登録していたユーザを再登録する．usernameとパスワードを求める．
+      security: []
+      requestBody: 
+        required: true
+        content:
+          application/json:
+            schema: 
+              type: object
+              properties: 
+                username: 
+                  type: string
+                password: 
+                  type: string
+                email: 
+                  type: string
+              required:
+                - username
+                - password
+                - email
+            example: 
+              username: hoge
+              password: p@ssw0rd
+              email: hoge@example.com
+      responses:
+        "201":
+          $ref: "#/components/responses/AuthResponseWithRefreshToken"
+        "400":
+          $ref: "#/components/responses/400BadRequest"
+        "403":
+          $ref: "#/components/responses/403Forbidden"
+  "/auth/available":
+    post:
+      tags: 
+        - auth
+      summary: usernameとして使用できる文字列か
+      security: []
+      requestBody: 
+        required: true
+        content:
+          application/json:
+            schema: 
+              type: object
+              properties:
+                username: 
+                  type: string
+              example: 
+                username: hoge
+      responses:
+        "201":
+          description: usernameとして使用できる文字列か
+          content:
+            application/json:
+              schema: 
+                type: object
+                properties:
+                  available: 
+                    type: boolean
+                example: 
+                  available: true
+        "400":
+          $ref: "#/components/responses/400BadRequest"
+        "403":
+          $ref: "#/components/responses/403Forbidden" 
+  "/categories": 
+    get: 
+      tags:
+        - categories
+      summary: クイズのカテゴリーのリストを取得
+      responses:
+        "200": 
+          $ref: "#/components/responses/CategoriesResponse"
+        "400":
+          $ref: "#/components/responses/400BadRequest"
+        "401": 
+          $ref: "#/components/responses/401Unauthorized"
+        "403":
+          $ref: "#/components/responses/403Forbidden"
+    post: 
+      tags: 
+        - categories
+      summary: カテゴリーの新規作成
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: 
+              type: object
+              properties:
+                name: 
+                  type: string
+                description:
+                  type: string
+              required:
+                - name
+            example: 
+              name: "文学"
+              description: 小説や童話など文学に関するクイズ
+      responses:
+        "200": 
+          $ref: "#/components/responses/CategoryResponse"
+        "400":
+          $ref: "#/components/responses/400BadRequest"
+        "401": 
+          $ref: "#/components/responses/401Unauthorized"
+        "403":
+          $ref: "#/components/responses/403Forbidden"
+    put: 
+      tags: 
+        - categories
+      summary: カテゴリーの編集
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: 
+              type: object
+              properties:
+                id: 
+                  type: number
+                name: 
+                  type: string
+                description:
+                  type: string
+              required:
+                - id
+                - name
+            example: 
+              id: 1
+              name: "文学"
+              description: 小説や童話など文学に関するクイズ
+      responses:
+        "200": 
+          $ref: "#/components/responses/CategoryResponse"
+        "400":
+          $ref: "#/components/responses/400BadRequest"
+        "401": 
+          $ref: "#/components/responses/401Unauthorized"
+        "403":
+          $ref: "#/components/responses/403Forbidden"
+  "/categories/sub":
+    get: 
+      tags:
+        - categories
+      summary: クイズのサブカテゴリーのリストを取得
+      responses:
+        "200": 
+          $ref: "#/components/responses/SubCategoriesResponse"
+        "400":
+          $ref: "#/components/responses/400BadRequest"
+        "401": 
+          $ref: "#/components/responses/401Unauthorized"
+        "403":
+          $ref: "#/components/responses/403Forbidden"
+    post: 
+      tags: 
+        - categories
+      summary: サブカテゴリーの新規作成
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: 
+              type: object
+              properties:
+                name: 
+                  type: string
+                description:
+                  type: string
+                parentId: 
+                  type: number
+              required:
+                - name
+                - parentId
+            example: 
+              name: "文学"
+              description: 小説や童話など文学に関するクイズ
+              parentId: 1
+      responses:
+        "200": 
+          $ref: "#/components/responses/CategoryResponse"
+        "400":
+          $ref: "#/components/responses/400BadRequest"
+        "401": 
+          $ref: "#/components/responses/401Unauthorized"
+        "403":
+          $ref: "#/components/responses/403Forbidden"
+    put: 
+      tags: 
+        - categories
+      summary: サブカテゴリーの編集
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: 
+              type: object
+              properties:
+                id: 
+                  type: number
+                name: 
+                  type: string
+                description:
+                  type: string
+                parentId: 
+                  type: number
+              required:
+                - id
+                - name
+            example: 
+              id: 1
+              name: "文学"
+              description: 小説や童話など文学に関するクイズ
+              parentId: 1
+      responses:
+        "200": 
+          $ref: "#/components/responses/CategoryResponse"
+        "400":
+          $ref: "#/components/responses/400BadRequest"
+        "401": 
+          $ref: "#/components/responses/401Unauthorized"
+        "403":
+          $ref: "#/components/responses/403Forbidden"
+  "/histories/{since}/{until}":
+    get: 
+      tags: 
+        - histories
+      summary: 正答/誤答/スルー問題数を取得
+      description: 指定する日時範囲の正答/誤答/スルー問題数を取得
+      parameters:
+        - name: since
+          in: path
+          required: true
+          description: Unix時間
+          schema:
+            type: number
+          example: 1703948400
+        - name: until
+          in: path
+          required: true
+          description: Unix時間
+          schema:
+            type: number
+          example: 1704034799
+      responses:
+        "200": 
+          description: 正答/誤答/スルーの問題数
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  right: 
+                    type: number
+                  wrong: 
+                    type: number
+                  through: 
+                    type: number
+                required:
+                  - right
+                  - wrong
+                  - through
+              example:
+                right: 2
+                wrong: 10
+                through: 40
+        "400":
+          $ref: "#/components/responses/400BadRequest"
+        "401": 
+          $ref: "#/components/responses/401Unauthorized"
+        "403":
+          $ref: "#/components/responses/403Forbidden"
+  "/i": 
+    get: 
+      tags: 
+        - users
+      summary: ユーザ情報を取得
+      description: 自分のユーザ情報を取得する
+      responses:
+        "200":
+          $ref: "#/components/responses/UserResponse"
+        "400":
+          $ref: "#/components/responses/400BadRequest"
+        "401": 
+          $ref: "#/components/responses/401Unauthorized"
+        "403":
+          $ref: "#/components/responses/403Forbidden"
+  "/invite-code":
+    post:
+      tags: 
+        - auth
+      summary: 招待コードを取得
+      description: 招待コードを取得する
+      responses:
+        "200":
+          description: 招待コードを取得
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code: 
+                    type: string
+                required:
+                  - code
+              example:
+                code: 96892E7B-3B19-4BF9-96AA-5C55F4E8BCAC
+        "400":
+          $ref: "#/components/responses/400BadRequest"
+        "401": 
+          $ref: "#/components/responses/401Unauthorized"
+        "403":
+          $ref: "#/components/responses/403Forbidden"
+  "/levels":
+    get: 
+      tags: 
+        - levels
+      summary: レベルリストを取得
+      description: 全てのレベルのリストを取得する
+      responses:
+        "200":
+          $ref: "#/components/responses/LevelsResponse"
+        "400":
+          $ref: "#/components/responses/400BadRequest"
+        "401": 
+          $ref: "#/components/responses/401Unauthorized"
+        "403":
+          $ref: "#/components/responses/403Forbidden"
+  "/mylists":
+    get:
+      tags:
+        - mylists
+      summary: ユーザの全マイリストを取得
+      description: ユーザが作成した全てのマイリストを取得する
+      responses:
+        "200":
+          $ref: "#/components/responses/MylistsResponse"
+        "400":
+          $ref: "#/components/responses/400BadRequest"
+        "401": 
+          $ref: "#/components/responses/401Unauthorized"
+        "403":
+          $ref: "#/components/responses/403Forbidden"
+    post:
+      tags:
+        - mylists
+      summary: マイリストの新規作成
+      description: 任意のタイトルのマイリストを新規作成する
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:  
+              type: object
+              properties:
+                listName:
+                  type: string
+              required:
+                - listName
+      responses:
+        "200":
+          $ref: "#/components/responses/MylistResponse"
+        "400":
+          $ref: "#/components/responses/400BadRequest"
+        "401": 
+          $ref: "#/components/responses/401Unauthorized"
+        "403":
+          $ref: "#/components/responses/403Forbidden"
+    put: 
+      tags:
+        - mylists
+      summary: マイリストの編集
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:  
+              type: object
+              properties:
+                mid: 
+                  type: string
+                listName:
+                  type: string
+              required:
+                - mid
+                - listName
+            example: 
+              mid: WI0Nul
+              listName: 生活習慣病
+      responses:
+        "200":
+          $ref: "#/components/responses/MylistResponse"
+        "400":
+          $ref: "#/components/responses/400BadRequest"
+        "401": 
+          $ref: "#/components/responses/401Unauthorized"
+        "403":
+          $ref: "#/components/responses/403Forbidden"
+    delete:
+      tags: 
+        - mylists
+      summary: マイリストの削除
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                mid: 
+                  type: string
+              required:
+                - mid
+            example: 
+              mid: WI0Nul
+      responses:
+        "200":
+          $ref: "#/components/responses/MylistsResponse"
+        "400":
+          $ref: "#/components/responses/400BadRequest"
+        "401": 
+          $ref: "#/components/responses/401Unauthorized"
+        "403":
+          $ref: "#/components/responses/403Forbidden"
+  "/quizzes":
+    get:
+      tags:
+        - quizzes
+      summary: クイズリストを取得
+      description: クエリパラメータをもとに，クイズリストを取得する
+      parameters:
+        - $ref: "#/components/parameters/page"
+        - $ref: "#/components/parameters/maxView"
+        - $ref: "#/components/parameters/seed"
+        - $ref: "#/components/parameters/workbooks"
+        - $ref: "#/components/parameters/levels"
+        - $ref: "#/components/parameters/keyword"
+        - $ref: "#/components/parameters/keywordOption"
+        - $ref: "#/components/parameters/crctAnsRatio"
+      responses:
+        "200":
+          $ref: "#/components/responses/QuizzzeResponse"
+        "400":
+          $ref: "#/components/responses/400BadRequest"
+        "401": 
+          $ref: "#/components/responses/401Unauthorized"
+        "403":
+          $ref: "#/components/responses/403Forbidden"
+    post: 
+      tags: 
+        - quizzes
+      summary: クイズの新規作成
+      requestBody:
+         required: true
+         content:
+            application/json:
+              schema: 
+                type: object
+                properties:
+                  question: 
+                    type: string
+                  answer: 
+                    type: string
+                  wid:
+                    type: string
+                  category:
+                    type: number
+                  subCategory:
+                    type: number
+                  isPublic: 
+                    type: boolean
+                  limitedUser:
+                    type: array
+                    items: 
+                      type: string
+                required:
+                  - question
+                  - answer
+                example:
+                  question: すい臓にある組織・ランゲルハンス島の発見者であるランゲルハンスは、現在でいうどこの国の病理学者でしょう？
+                  answer: ドイツ
+                  wid: sX8G8W
+                  category: 10
+                  subCategory: 14
+                  isPublic: false
+      responses:
+        "201":
+          $ref: "#/components/responses/QuizResponse"
+        "400":
+          $ref: "#/components/responses/400BadRequest"
+        "401": 
+          $ref: "#/components/responses/401Unauthorized"
+        "403":
+          $ref: "#/components/responses/403Forbidden"
+    put: 
+      tags: 
+        - quizzes
+      summary: クイズの編集
+      requestBody:
+         required: true
+         content:
+            application/json:
+              schema: 
+                type: object
+                properties:
+                  qid:
+                    type: string
+                  question: 
+                    type: string
+                  answer: 
+                    type: string
+                  wid:
+                    type: string
+                  category:
+                    type: number
+                  subCategory:
+                    type: number
+                  isPublic: 
+                    type: boolean
+                  limitedUser:
+                    type: array
+                    items: 
+                      type: string
+                required:
+                  - qid
+                  - question
+                  - answer
+                example:
+                  id: DG8ED3bx7y0McbistuLx
+                  question: すい臓にある組織・ランゲルハンス島の発見者であるランゲルハンスは、現在でいうどこの国の病理学者でしょう？
+                  answer: ドイツ
+                  wid: sX8G8W
+                  category: 10
+                  subCategory: 14
+                  isPublic: false
+      responses:
+        "201":
+          $ref: "#/components/responses/QuizResponse"
+        "400":
+          $ref: "#/components/responses/400BadRequest"
+        "401": 
+          $ref: "#/components/responses/401Unauthorized"
+        "403":
+          $ref: "#/components/responses/403Forbidden"
+  "/quizzes/favorite":
+    get:
+      tags:
+        - quizzes
+      summary: お気に入りクイズリストを取得
+      description: お気に入りに登録したクイズのクイズリストを取得する
+      parameters:
+        - $ref: "#/components/parameters/page"
+        - $ref: "#/components/parameters/maxView"
+        - $ref: "#/components/parameters/seed"
+        - $ref: "#/components/parameters/workbooks"
+        - $ref: "#/components/parameters/levels"
+        - $ref: "#/components/parameters/keyword"
+        - $ref: "#/components/parameters/keywordOption"
+        - $ref: "#/components/parameters/crctAnsRatio"
+      responses:
+        "200":
+          $ref: "#/components/responses/QuizzzeResponse"
+        "400":
+          $ref: "#/components/responses/400BadRequest"
+        "401": 
+          $ref: "#/components/responses/401Unauthorized"
+        "403":
+          $ref: "#/components/responses/403Forbidden"
+    post: 
+      tags: 
+        - quizzes
+      summary: お気に入りにクイズを登録
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                qid: 
+                  type: string
+              required:
+                - qid
+            example: 
+              qid: DG8ED3bx7y0McbistuLx
+      responses:
+        "201":
+          $ref: "#/components/responses/QuizResponse"
+        "400":
+          $ref: "#/components/responses/400BadRequest"
+        "401": 
+          $ref: "#/components/responses/401Unauthorized"
+        "403":
+          $ref: "#/components/responses/403Forbidden"
+    delete: 
+      tags:
+        - quizzes
+      summary: お気に入りからクイズを削除
+      requestBody: 
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                qid: 
+                  type: string
+              required:
+                - qid
+            example: 
+              qid: DG8ED3bx7y0McbistuLx
+      responses:
+        "204": 
+          description: deleted quiz from favorite
+        "400":
+          $ref: "#/components/responses/400BadRequest"
+        "401": 
+          $ref: "#/components/responses/401Unauthorized"
+        "403":
+          $ref: "#/components/responses/403Forbidden"
+  "/quizzes/history":
+    get:
+      tags:
+        - quizzes
+      summary: 指定した日時範囲のクイズリストを取得
+      description: 指定した日時範囲のクイズのリストを，正誤答とともに取得する
+      parameters:
+        - $ref: "#/components/parameters/page"
+        - $ref: "#/components/parameters/maxView"
+        - $ref: "#/components/parameters/seed"
+        - $ref: "#/components/parameters/workbooks"
+        - $ref: "#/components/parameters/levels"
+        - $ref: "#/components/parameters/keyword"
+        - $ref: "#/components/parameters/keywordOption"
+        - $ref: "#/components/parameters/crctAnsRatio"
+        - $ref: "#/components/parameters/since"
+        - $ref: "#/components/parameters/until"
+        - $ref: "#/components/parameters/judgement"
+      responses:
+        "200":
+          $ref: "#/components/responses/QuizzzeResponse"
+        "400":
+          $ref: "#/components/responses/400BadRequest"
+        "401": 
+          $ref: "#/components/responses/401Unauthorized"
+        "403":
+          $ref: "#/components/responses/403Forbidden"
+    post: 
+      tags: 
+        - quizzes
+      summary: クイズを履歴に追加
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                qid: 
+                  type: string
+                judgement: 
+                  type: number
+                pressedWord:
+                  type: number
+              required:
+                - qid
+                - judgement
+                - pressedWord
+      responses:
+        "201":
+          $ref: "#/components/responses/QuizResponse"
+        "400":
+          $ref: "#/components/responses/400BadRequest"
+        "401": 
+          $ref: "#/components/responses/401Unauthorized"
+        "403":
+          $ref: "#/components/responses/403Forbidden"
+  "/quizzes/mylist/{mid}":
+    get:
+      tags:
+        - quizzes
+      summary: 指定するマイリストのクイズリストを取得
+      parameters:
+        - $ref: "#/components/parameters/page"
+        - $ref: "#/components/parameters/maxView"
+        - $ref: "#/components/parameters/seed"
+        - $ref: "#/components/parameters/workbooks"
+        - $ref: "#/components/parameters/levels"
+        - $ref: "#/components/parameters/keyword"
+        - $ref: "#/components/parameters/keywordOption"
+        - $ref: "#/components/parameters/crctAnsRatio"
+        - $ref: "#/components/parameters/mid"
+      responses:
+        "200":
+          $ref: "#/components/responses/QuizzzeResponse"
+        "400":
+          $ref: "#/components/responses/400BadRequest"
+        "401": 
+          $ref: "#/components/responses/401Unauthorized"
+        "403":
+          $ref: "#/components/responses/403Forbidden"
+    post: 
+      tags: 
+        - quizzes
+      summary: マイリストにクイズを登録
+      parameters:
+        - $ref: "#/components/parameters/mid"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                qid: 
+                  type: string
+              required:
+                - qid
+            example:
+              qid: DG8ED3bx7y0McbistuLx
+      responses:
+        "201":
+          $ref: "#/components/responses/QuizResponse"
+        "400":
+          $ref: "#/components/responses/400BadRequest"
+        "401": 
+          $ref: "#/components/responses/401Unauthorized"
+        "403":
+          $ref: "#/components/responses/403Forbidden"
+    delete: 
+      tags:
+        - quizzes
+      summary: マイリストからクイズを削除
+      parameters:
+        - $ref: "#/components/parameters/mid"
+      requestBody: 
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                qid: 
+                  type: string
+              required:
+                - qid
+            example: 
+              qid: DG8ED3bx7y0McbistuLx
+      responses:
+        "204": 
+          description: "deleted quiz from mylist"
+        "400":
+          $ref: "#/components/responses/400BadRequest"
+        "401": 
+          $ref: "#/components/responses/401Unauthorized"
+        "403":
+          $ref: "#/components/responses/403Forbidden"
+  "/quizzes/workbook/{wid}":
+    post: 
+      tags: 
+        - quizzes
+      summary: 問題集にクイズを追加
+      parameters:
+        - $ref: "#/components/parameters/wid"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                qid: 
+                  type: string
+              required:
+                - qid
+            example: 
+              qid: DG8ED3bx7y0McbistuLx
+      responses:
+        "201":
+          $ref: "#/components/responses/QuizResponse"
+        "400":
+          $ref: "#/components/responses/400BadRequest"
+        "401": 
+          $ref: "#/components/responses/401Unauthorized"
+        "403":
+          $ref: "#/components/responses/403Forbidden"
+    delete: 
+      tags:
+        - quizzes
+      summary: 問題集からクイズを削除
+      parameters:
+        - $ref: "#/components/parameters/wid"
+      requestBody: 
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                qid: 
+                  type: string
+              required:
+                - qid
+            example: 
+              qid: DG8ED3bx7y0McbistuLx
+      responses:
+        "204": 
+          description: "deleted quiz from workbook"
+        "400":
+          $ref: "#/components/responses/400BadRequest"
+        "401": 
+          $ref: "#/components/responses/401Unauthorized"
+        "403":
+          $ref: "#/components/responses/403Forbidden"
+  "/request-reset-password":
+    post: 
+      tags: 
+        - auth
+      summary: パスワードリセットを要求
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: 
+              type: object
+              properties:
+                username: 
+                  type: string
+                email: 
+                  type: string
+              required:
+                - username
+                - email
+            example: 
+              username: hoge
+              email: hoge@example.com
+      responses:
+        "201": 
+          description: 成功
+          content:
+            application/json:
+              schema: 
+                type: string
+              example: "send email"
+        "400":
+          $ref: "#/components/responses/400BadRequest"
+        "401": 
+          $ref: "#/components/responses/401Unauthorized"
+        "403":
+          $ref: "#/components/responses/403Forbidden"
+  "/reset-password": 
+    post: 
+      tags:
+        - auth
+      summary: パスワードリセットを実行
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: 
+              type: object
+              properties:
+                token: 
+                  type: string
+                newPassword:
+                  type: string
+              required:
+                - token
+                - newPassword
+            example: 
+              token: 78FE38FF-8AC7-4625-BF54-D4695EB30EE2
+              newPassword: newP@ssw0rd
+      responses:
+        "200":
+          description: リセット成功
+          content:
+            application/json:
+              schema: 
+                type: string
+              example: "succeed reset password"
+        "400":
+          $ref: "#/components/responses/400BadRequest"
+        "401": 
+          $ref: "#/components/responses/401Unauthorized"
+        "403":
+          $ref: "#/components/responses/403Forbidden"
+  "/users": 
+    post: 
+      tags: 
+        - users
+      summary: ユーザの新規登録
+      description: ユーザの新規登録を行う．クローズドなインスタンスであれば招待コードが必要．
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: 
+              type: object
+              properties: 
+                username: 
+                  type: string
+                password: 
+                  type: string
+                email: 
+                  type: string
+                inviteCode: 
+                  type: string
+              required:
+                - username
+                - password
+            example: 
+              username: hoge
+              password: p@ssw0rd
+              email: hoge@example.com
+              inviteCode: 9197DD99-5504-10D0-E529-4EC60EEA978A
+      responses:
+        "201":
+          $ref: "#/components/responses/AuthResponseWithRefreshToken"
+        "400":
+          $ref: "#/components/responses/400BadRequest"
+        "401": 
+          $ref: "#/components/responses/401Unauthorized"
+        "403":
+          $ref: "#/components/responses/403Forbidden"
+  "/users/ranking": 
+    get: 
+      tags: 
+        - users
+      summary: ユーザの演習問題数のランキング
+      description: 演習問題によるランク済みのユーザリストを取得する
+      parameters:
+        - $ref: "#/components/parameters/since"
+        - $ref: "#/components/parameters/until"
+      responses:
+        "200": 
+          description: 指定範囲のユーザ情報とランク
+          content:
+            application/json:
+              schema: 
+                type: array
+                items: 
+                  $ref: "#/components/schemas/Rank"
+              example:
+                - rank: 1
+                  uid: WI0Nulr6F1dhLUi7A3zYRKs5bu9txaGgT0PqBc 
+                  name: foo
+                  count: 323
+                  compare: 0
+                - rank: 2
+                  uid: 2kYfkh59sP8Qbm1drC7uZXOnBIGRSAoz5hTMN3
+                  name: piyo
+                  count: 234
+                  compare: 1
+                - rank: 3
+                  uid: Kb5F7yQHOhpNb9tnLBx6GJj1IeiucMk0mDw27z
+                  name: bar
+                  count: 103
+                  compare: -1
+                - rank: 4
+                  uid: BapXVEOuLlYb3jHCBpeSzx7cPRrgf1dNTZqE4
+                  name: hoge
+                  count: 234
+                  compare: 1
+        "400":
+          $ref: "#/components/responses/400BadRequest"
+        "401": 
+          $ref: "#/components/responses/401Unauthorized"
+        "403":
+          $ref: "#/components/responses/403Forbidden"
+  "/workbooks":
+    get: 
+      tags:
+        - workbooks
+      summary: 自分が作った問題集のリストを取得
+      responses:
+        "200":
+          $ref: "#/components/responses/WorkbooksResponse"
+    post:
+      tags:
+        - workbooks
+      summary: 問題集を新規作成
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:  
+              type: object
+              properties:
+                workbookName:
+                  type: string
+              required:
+                - wid
+                - workbookName
+            example: 
+              workbookName: abc the 12th
+      responses:
+        "200":
+          $ref: "#/components/responses/WorkbookResponse"
+        "400":
+          $ref: "#/components/responses/400BadRequest"
+        "401": 
+          $ref: "#/components/responses/401Unauthorized"
+        "403":
+          $ref: "#/components/responses/403Forbidden"
+    put: 
+      tags:
+        - workbooks
+      summary: 問題集を編集
+      description: リクエストボディに指定した問題集を編集します．編集できる項目は問題集名のみです．
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:  
+              type: object
+              properties:
+                wid: 
+                  type: string
+                newWorkbookName:
+                  type: string
+              required:
+                - wid
+                - newWorkbookName
+            example: 
+              wid: sX8G8W
+              workbookName: abc the 12th
+      responses:
+        "200":
+          $ref: "#/components/responses/WorkbookResponse"
+        "400":
+          $ref: "#/components/responses/400BadRequest"
+        "401": 
+          $ref: "#/components/responses/401Unauthorized"
+        "403":
+          $ref: "#/components/responses/403Forbidden"
+    delete:
+      tags: 
+        - workbooks
+      summary: 問題集を削除
+      description: リクエストボディに指定した問題集を削除します．削除する問題集に登録されたクイズは削除されません．
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                wid: 
+                  type: string
+              required:
+                - wid
+            example: 
+              wid: 1i7qaa
+      responses:
+        "200":
+          $ref: "#/components/responses/WorkbooksResponse"
+        "400":
+          $ref: "#/components/responses/400BadRequest"
+        "401": 
+          $ref: "#/components/responses/401Unauthorized"
+        "403":
+          $ref: "#/components/responses/403Forbidden"      
+  "/workbooks/all":
+    get:
+      tags:
+        - workbooks
+      summary: 取得できるすべての問題集のリストを取得
+      description: 公開された問題集，閲覧権限のある問題集，そして自分が作った問題集のリストを取得します．
+      responses:
+        "200":
+          $ref: "#/components/responses/WorkbooksResponse"
+        "401": 
+          $ref: "#/components/responses/401Unauthorized"
+        "403":
+          $ref: "#/components/responses/403Forbidden"
+components:
+  parameters:
+    page:
+      name: page
+      in: query
+      required: false
+      description: ページネーションでの現在のページ
+      schema:
+        type: number
+      example: 1
+    maxView:
+      name: maxView
+      in: query
+      required: false
+      description: ページネーションでの1ページあたりのクイズ数
+      schema:
+        type: number
+        maximum: 100
+        minimum: 0
+      example: 100
+    seed:
+      name: seed
+      in: query
+      required: false
+      description: シャッフル時のシード値
+      schema: 
+        type: number
+      example: 520004
+    workbooks:
+      name: workbooks
+      in: query
+      required: false
+      description: 検索したいwidのリスト
+      schema: 
+        type: array
+        items: 
+          type: string
+      example: 
+        - WI0Nul
+        - qS3dmK
+    levels:
+      name: levels
+      in: query
+      required: false
+      description: 検索したいlevelIdのリスト
+      schema: 
+        type: array
+        items:
+          type: number
+      example: 
+        - 1
+        - 2
+    keyword:
+      name: keyword
+      in: query
+      required: false
+      description: 検索したいキーワード（部分一致）
+      schema: 
+        type: string
+      example: 
+        テスト
+    keywordOption:
+      name: keywordOption
+      in: query
+      required: false
+      description: "キーワード検索の範囲を設定（1: 問題文と解答，2: 問題文のみ，3: 解答のみ）"
+      schema:
+        type: number
+        example: 1
+    crctAnsRatio: 
+      name: crctAnsRatio
+      in: query
+      required: false
+      description: クイズの正答率の絞り込み
+      schema:
+        type: array
+        items:
+          type: number
+      example:
+        - 1
+        - 100
+    since:
+      name: since
+      in: query
+      required: false
+      schema:
+        type: string
+    until:
+      name: until
+      in: query
+      required: false
+      schema: 
+        type: string
+    judgement:
+      name: judement
+      in: query
+      required: false
+      schema: 
+        type: array
+        description: 0(wrong) or 1(right) or 2(through)
+        items:
+          type: number
+          example: [0, 1]
+    mid: 
+      name: mid
+      in: path
+      required: true
+      schema: 
+        type: string 
+    wid: 
+      name: wid
+      in: path
+      required: true
+      schema: 
+        type: string 
+  requestBodies:
+    QuizRequestBody:
+      required: true
+      content:
+        application/json:
+          schema: 
+            $ref: "#/components/schemas/Quiz"
+          example:
+            id: 3
+            question: 能楽の『唐船(とうせん)』が出典である、何かしようと思ったらすぐに着手するべきであるという意味のことわざは何でしょう？
+            answer: 思い立ったが吉日
+            wid: Kb5F7y
+            category: 3
+            subCategory: 5
+            creatorId: 1
+            isPublic: false
+  responses:
+    400BadRequest:
+      description: パラメータの不備
+      content:
+        application/problem+json:
+          schema: 
+            $ref: "#/components/schemas/Error"
+          examples:
+            Invaild parameter: 
+              value:
+                title: INVAILD_PARAMS
+                type: "about:blank"
+                status: 400
+                detail: "This request contains invaild parameter. Please correct to the right ones."
+    401Unauthorized: 
+      description: JWTトークンの不備（期限切れ，無効，存在しない）
+      content:
+        application/problem+json:
+          schema: 
+            $ref: "#/components/schemas/Error"
+          examples: 
+            Expired token:
+              value:
+                title: EXPIRED_TOKEN
+                type: "about:blank"
+                status: 401
+                detail: "This authorization token have expired. Please refetch token."
+            Invalid token:
+              value:
+                code: INVAILD_TOKEN
+                type: "about:blank"
+                status: 401
+                detail: "This authorization token is invalid."
+            No token:
+              value:
+                code: NoToken
+                type: "about:blank"
+                status: 401
+                message: "Authorization token was not found. Please set authorization header."
+    403Forbidden: 
+      description: アクセス権限がない
+      content:
+        application/problem+json:
+          schema: 
+            $ref: "#/components/schemas/Error"
+          examples:
+            Access denied:
+              value: 
+                title: ACCESS_DENIED
+                type: "about:blank"
+                status: 403
+                detail: "Access denied. Insufficient rights to access the resource."
+    500InternalError: 
+      description: サーバ内部での問題
+      content:
+        application/problem+json:
+          schema: 
+            $ref: "#/components/schemas/Error"
+          examples:
+            Internal error:
+              value: 
+                title: INTERNAL_ERROR
+                type: "about:blank"
+                status: 500
+                detail: "Internal error occurred."
+    AuthResponse: 
+      description: ユーザ情報と認証トークン
+      content:
+        application/json:
+          schema: 
+            type: object
+            properties:
+              accessToken:
+                type: string
+                example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJCYXBYVkVPdUxsWWIzakhDQnBlU3p4N2NQUnJnZjFkTlRacUU0IiwibmFtZSI6ImhvZ2UiLCJpYXQiOjE1MTYyMzkwMjJ9.vpt-SA6QoVJmG9cy32Lq-twd1anEuYKCzlLUMavMqyQ
+              user: 
+                type: object
+                $ref: "#/components/schemas/User"
+            required:
+              - accessToken
+              - user
+    AuthResponseWithRefreshToken: 
+      description: ユーザ情報と認証トークン
+      content:
+        application/json:
+          schema: 
+            type: object
+            properties:
+              accessToken:
+                type: string
+              refreshToken:
+                type: string
+                
+              user: 
+                type: object
+                $ref: "#/components/schemas/User"
+            required:
+              - accessToken
+              - refreshToken
+              - user
+          example:
+            accessToken: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJCYXBYVkVPdUxsWWIzakhDQnBlU3p4N2NQUnJnZjFkTlRacUU0IiwibmFtZSI6ImhvZ2UiLCJpYXQiOjE1MTYyMzkwMjJ9.vpt-SA6QoVJmG9cy32Lq-twd1anEuYKCzlLUMavMqyQ
+            refreshToken: DDAFC07B-E55A-9B7A-740B-9F6125E11113
+            user:
+              uid: BapXVEOuLlYb3jHCBpeSzx7cPRrgf1dNTZqE4
+              username: hoge
+              nickname: huga
+              email: hoge@example.com
+              modified: 2023-12-22
+              created: 2023-12-01
+              photoURL: /photo/hoge
+    CategoriesResponse: 
+      description: カテゴリーのリスト
+      content:
+        application/json: 
+          schema:
+            type: array
+            items:
+              type: object
+              $ref: "#/components/schemas/Category"
+          example:
+            - id: 1
+              name: "文学"
+              description: "小説や童話など文学に関するクイズ"
+              sub: 
+                - id: 1,
+                  name: "日本文学"
+                  description: "明治以降の日本の文学・作家"
+                  parentId: 1
+                - id: 2,
+                  name: "古典文学"
+                  description: "江戸以前の日本の文学・作家"
+                  parentId: 1
+            - id: 2
+              name: "科学"
+              description: "いわゆる理系学問"
+              sub: 
+                - id: 3,
+                  name: "物理"
+                  description: "物理学用語・物理学者など"
+                  parentId: 2
+                - id: 4,
+                  name: "化学"
+                  description: "科学用語・化学者など"
+                  parentId: 2
+    CategoryResponse: 
+      description: カテゴリー情報
+      content:
+        application/json: 
+          schema:
+            $ref: "#/components/schemas/Category"
+          example:
+            id: 1
+            name: "文学"
+            description: "小説や童話など文学に関するクイズ"
+            sub: 
+              - id: 1,
+                name: "日本文学"
+                description: "明治以降の日本の文学・作家"
+                parentId: 1
+              - id: 2,
+                name: "古典文学"
+                description: "江戸以前の日本の文学・作家"
+                parentId: 1
+    LevelResponse: 
+      description: レベル情報
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Level"
+          example:
+            id: 1
+            name: 簡単
+            value: easy
+            color: orange
+    LevelsResponse: 
+      description: レベルのリスト
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: "#/components/schemas/Level"
+          example:
+            - id: 1
+              name: 簡単
+              value: easy
+              color: orange
+            - id: 2
+              name: 難しい
+              value: difficult
+              color: red
+    MylistResponse: 
+      description: マイリスト情報
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Mylist"
+          example: 
+            mid: WI0Nul
+            name: 医学系問題
+            created: 2023-12-24
+    MylistsResponse: 
+      description: マイリストのリスト
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: "#/components/schemas/Mylist"
+          example: 
+            - mid: WI0Nul
+              name: 医学系問題
+              created: 2023-12-24
+            - mid: qS3dmK
+              name: 情報系問題
+              created: 2023-12-25
+    QuizResponse:
+      description: クイズ情報
+      content:
+        application/json:
+          schema: 
+            $ref: "#/components/schemas/Quiz"
+          example:
+            id: 1
+            question: すい臓にある組織・ランゲルハンス島の発見者であるランゲルハンスは、現在でいうどこの国の病理学者でしょう？
+            answer: ドイツ
+            workbook: abc the 12th
+            wid: sX8G8W
+            level: 1
+            category: 10
+            subCategory: 14
+            total: 10
+            right: 4
+            isFavorite: false
+            registerdMylist: []
+            creatorId: 1
+            isPublic: false
+    QuizzzeResponse:
+      description: クイズのリスト
+      content:
+        application/json:
+          schema: 
+            type: array
+            items:
+              $ref: "#/components/schemas/Quiz"
+          example:
+            - id: 1
+              question: すい臓にある組織・ランゲルハンス島の発見者であるランゲルハンスは、現在でいうどこの国の病理学者でしょう？
+              answer: ドイツ
+              workbook: abc the 12th
+              wid: sX8G8W
+              level: 1
+              category: 10
+              subCategory: 14
+              total: 10
+              right: 4
+              isFavorite: false
+              registerdMylist: []
+              creatorId: 1
+              isPublic: false
+    SubCategoriesResponse:
+      description: サブカテゴリーのリスト
+      content:
+        application/json: 
+          schema:
+            type: array
+            items:
+              type: object
+              $ref: "#/components/schemas/SubCategory"
+          example:
+            - id: 1,
+              name: "日本文学"
+              description: "明治以降の日本の文学・作家"
+              parentId: 1
+            - id: 2,
+              name: "古典文学"
+              description: "江戸以前の日本の文学・作家"
+              parentId: 1
+            - id: 3,
+              name: "物理"
+              description: "物理学用語・物理学者など"
+              parentId: 2
+            - id: 4,
+              name: "化学"
+              description: "科学用語・化学者など"
+              parentId: 2
+    UserResponse:
+      description: ユーザ情報
+      content:
+        application/json:
+          schema: 
+            $ref: "#/components/schemas/User"
+          example:
+            uid: BapXVEOuLlYb3jHCBpeSzx7cPRrgf1dNTZqE4
+            username: hoge
+            nickname: huga
+            email: hoge@example.com
+            modified: 2023-12-22
+            created: 2023-12-01
+            photoURL: /photo/hoge
+    WorkbookResponse: 
+      description: 問題集のリスト
+      content:
+        application/json:
+          schema: 
+            $ref: "#/components/schemas/Workbook"
+          example: 
+            wid: sX8G8W
+            name: abc the 12th
+            creatorId: 1
+    WorkbooksResponse: 
+      description: 問題集のリスト
+      content:
+        application/json:
+          schema: 
+            type: array
+            items:
+              $ref: "#/components/schemas/Workbook"
+          example: 
+            - wid: sX8G8W
+              name: abc the 12th
+              creatorId: 1
+            - wid: Kb5F7y
+              name: abc the tenth
+              creatorId: 1
+  schemas:
+    Category: 
+      type: object
+      properties:
+        id: 
+          type: number
+        name: 
+          type: string
+        description:
+          type: string
+        sub: 
+          type: array
+          items:
+            $ref: "#/components/schemas/SubCategory"
+      required:
+        - id
+        - name
+    Error: 
+      type: object
+      properties: 
+        title:
+          type: string
+          description: エラーを簡潔に表現したコード
+        type: 
+          type: string
+          description: エラーの詳細ドキュメントを指すURL
+        status:
+          type: number
+          description: HTTPステータスコード
+        detail: 
+          type: string
+          description: 開発者向けの詳細文
+      required:
+        - title
+        - type
+        - status
+        - detail
+    Level: 
+      type: object
+      properties:
+        id: 
+          type: number
+        name: 
+          type: string
+        value: 
+          type: string
+        color: 
+          type: string
+      required:
+        - id
+        - name
+        - value
+        - color
+    Mylist: 
+      type: object
+      properties:
+        mid: 
+          type: string
+        name: 
+          type: string
+        created:
+          type: string
+          readOnly: true
+      required:
+        - mid
+        - name
+        - created
+    Quiz: 
+      type: object
+      properties:
+        qid: 
+          type: string
+        question:
+          type: string
+        answer: 
+          type: string
+        workbook:
+          type: string
+          readOnly: true
+        wid: 
+          type: string
+        level:
+          type: string
+          readOnly: true
+        category:
+          type: number
+        subCategory:
+          type: number
+        total: 
+          type: number
+          readOnly: true
+        right: 
+          type: number
+          readOnly: true
+        isFavorite:
+          type: boolean
+          readOnly: true
+        registerdMylist:
+          type: array 
+          items: 
+            type: string
+          readOnly: true
+        creatorId:
+          type: string
+        isPublic: 
+          type: boolean
+        limitedUser:
+          type: array
+          items:
+            type: number
+          writeOnly: true
+      required:
+        - id
+        - question
+        - answer
+        - total
+        - right
+        - isFavorite
+        - registerdMylist
+        - creatorId
+        - isPublic
+    Rank: 
+      type: object
+      properties:
+        rank:
+          type: number
+        uid: 
+          type: string
+        name:
+          type: string
+        count: 
+          type: number
+        compare: 
+          type: number
+      required:
+        - rank
+        - uid
+        - name 
+        - count 
+        - compare 
+    SubCategory: 
+      type: object
+      properties:
+        id: 
+          type: number
+        name: 
+          type: string
+        description: 
+          type: string
+        parentId:
+          type: number
+      required:
+        - id
+        - name
+        - parentId
+    User: 
+      type: object
+      properties:
+        uid: 
+          type: string
+        username: 
+          type: string
+        nickname: 
+          type: string
+        email:
+          type: string
+        modified:
+          type: string
+        created:
+          type: string
+        photoURL:
+          type: string
+      required:
+        - uid
+        - username
+        - modified
+        - created
+    Workbook:
+      type: object
+      properties:
+        wid: 
+          type: string
+        name: 
+          type: string
+        date: 
+          type: string
+        levelId: 
+          type: number
+        color: 
+          type: string
+        creatorId:
+          type: string
+      required:
+        - wid
+        - name
+        - creatorId
+  securitySchemes:
+    jwt:
+      type: http
+      description: Credentials or access token for API
+      scheme: bearer
+      bearerFormat: JWT

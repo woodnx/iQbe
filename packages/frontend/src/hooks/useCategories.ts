@@ -1,11 +1,8 @@
-import axios from "@/plugins/axios"
-import { Category, SubCategory } from "@/types";
-import useSWR from "swr"
-
-const fetcher = <T>(url: string) => axios.get<T>(url).then(res => res.data)
+import useAspidaSWR from '@aspida/swr';
+import api from '@/plugins/api';
 
 export const useCategories = () => {
-  const { data: categories, isLoading, error } = useSWR<Category[]>(`/categories`, fetcher);
+  const { data: categories, isLoading, error } = useAspidaSWR(api.categories);
 
   return {
     categories,
@@ -15,7 +12,7 @@ export const useCategories = () => {
 }
 
 export const useSubCategories = () => {
-  const { data: subCategories, isLoading, error } = useSWR<SubCategory[]>(`/categories/sub`, fetcher);
+  const { data: subCategories, isLoading, error } = useAspidaSWR(api.categories.sub);
 
   return {
     subCategories,
