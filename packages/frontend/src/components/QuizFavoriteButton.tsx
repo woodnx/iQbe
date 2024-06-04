@@ -5,20 +5,20 @@ import api from "@/plugins/api";
 
 interface QuizFavoriteButtonProps {
   isFavorite: boolean,
-  quizId: number
+  qid: string
 }
 
 export default function QuizFavoriteButton({ 
   isFavorite: innerIsFavorite, 
-  quizId 
+  qid,
 }: QuizFavoriteButtonProps) {
   const [ isFavorite, setFavorite ] = useState(innerIsFavorite)
-
+  
   const addFavoriteList = async () => {
     if (isFavorite) {
       try {
         await api.quizzes.favorite.$delete({ body: {
-          quizId,
+          qid,
         }})
         setFavorite(!isFavorite);
       } catch(e) {
@@ -27,7 +27,7 @@ export default function QuizFavoriteButton({
     }else {
       try {
         await api.quizzes.favorite.$post({ body: {
-          quizId
+          qid
         }});
         setFavorite(!isFavorite);
       } catch(e) {

@@ -1,7 +1,7 @@
 // Globalなtypeを定義
 
 export interface Quiz {
-  id: number,
+  qid: string,
   question: string,
   answer: string,
   workbook: string,

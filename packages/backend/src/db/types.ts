@@ -69,6 +69,7 @@ export type quiz_visible_users = {
 };
 export type quizzes = {
     id: Generated<number>;
+    qid: Generated<string>;
     workbook_id: number | null;
     que: string;
     ans: string;
@@ -78,6 +79,8 @@ export type quizzes = {
     total_wrng_ans: number | null;
     total_through_ans: number | null;
     creator_id: number | null;
+    category_id: number | null;
+    sub_category_id: number | null;
 };
 export type quizzes_categories = {
     quiz_id: number;
