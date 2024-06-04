@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE `quizzes` ADD COLUMN `qid` VARCHAR(64) NOT NULL DEFAULT '';

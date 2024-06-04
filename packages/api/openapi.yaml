@@ -799,8 +799,8 @@ paths:
               schema: 
                 type: object
                 properties:
-                  id:
-                    type: number
+                  qid:
+                    type: string
                   question: 
                     type: string
                   answer: 
@@ -818,11 +818,11 @@ paths:
                     items: 
                       type: string
                 required:
-                  - id
+                  - qid
                   - question
                   - answer
                 example:
-                  id: 1
+                  id: DG8ED3bx7y0McbistuLx
                   question: すい臓にある組織・ランゲルハンス島の発見者であるランゲルハンスは、現在でいうどこの国の病理学者でしょう？
                   answer: ドイツ
                   wid: sX8G8W
@@ -873,12 +873,12 @@ paths:
             schema:
               type: object
               properties:
-                quizId: 
-                  type: number
+                qid: 
+                  type: string
               required:
-                - quizId
+                - qid
             example: 
-              quizId: 19
+              qid: DG8ED3bx7y0McbistuLx
       responses:
         "201":
           $ref: "#/components/responses/QuizResponse"
@@ -899,12 +899,12 @@ paths:
             schema:
               type: object
               properties:
-                quizId: 
-                  type: number
+                qid: 
+                  type: string
               required:
-                - quizId
+                - qid
             example: 
-              quizId: 19
+              qid: DG8ED3bx7y0McbistuLx
       responses:
         "204": 
           description: deleted quiz from favorite
@@ -952,14 +952,14 @@ paths:
             schema:
               type: object
               properties:
-                quizId: 
-                  type: number
+                qid: 
+                  type: string
                 judgement: 
                   type: number
                 pressedWord:
                   type: number
               required:
-                - quizId
+                - qid
                 - judgement
                 - pressedWord
       responses:
@@ -1008,12 +1008,12 @@ paths:
             schema:
               type: object
               properties:
-                quizId: 
-                  type: number
+                qid: 
+                  type: string
               required:
-                - quizId
+                - qid
             example:
-              quizId: 1
+              qid: DG8ED3bx7y0McbistuLx
       responses:
         "201":
           $ref: "#/components/responses/QuizResponse"
@@ -1036,12 +1036,12 @@ paths:
             schema:
               type: object
               properties:
-                quizId: 
-                  type: number
+                qid: 
+                  type: string
               required:
-                - quizId
+                - qid
             example: 
-              quizId: 1
+              qid: DG8ED3bx7y0McbistuLx
       responses:
         "204": 
           description: "deleted quiz from mylist"
@@ -1065,12 +1065,12 @@ paths:
             schema:
               type: object
               properties:
-                quizId: 
-                  type: number
+                qid: 
+                  type: string
               required:
-                - quizId
+                - qid
             example: 
-              quizId: 19
+              qid: DG8ED3bx7y0McbistuLx
       responses:
         "201":
           $ref: "#/components/responses/QuizResponse"
@@ -1093,12 +1093,12 @@ paths:
             schema:
               type: object
               properties:
-                quizId: 
-                  type: number
+                qid: 
+                  type: string
               required:
-                - quizId
+                - qid
             example: 
-              quizId: 19
+              qid: DG8ED3bx7y0McbistuLx
       responses:
         "204": 
           description: "deleted quiz from workbook"
@@ -1897,8 +1897,8 @@ components:
     Quiz: 
       type: object
       properties:
-        id: 
-          type: number
+        qid: 
+          type: string
         question:
           type: string
         answer: 

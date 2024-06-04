@@ -152,6 +152,7 @@ model quiz_visible_users {
 
 model quizzes {
   id                 BigInt               @id @default(autoincrement()) @db.UnsignedBigInt
+  qid                String               @db.VarChar(64) @default("")
   workbook_id        Int?
   que                String               @db.VarChar(2048)
   ans                String               @db.VarChar(256)

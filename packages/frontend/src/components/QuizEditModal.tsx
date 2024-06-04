@@ -5,7 +5,7 @@ import axios from '@/plugins/axios';
 import useQuizzes from '@/hooks/useQuizzes';
 
 interface Props {
-  quizId: number,
+  qid: string,
   question: string,
   answer: string,
   workbook?: string,
@@ -15,16 +15,17 @@ interface Props {
 }
 
 export default function({ context, id, innerProps }: ContextModalProps<Props>) {
-  const { quizId, ...formProps } = innerProps;
+  const { qid, ...formProps } = innerProps;
+  console.log(qid)
   const { mutate } = useQuizzes();
   const submit = async ({ question, answer, category, subCategory, workbook, isPublic }: SubmitValue) => {
     await axios.put('/quizzes', {
-      id: quizId,
+      qid,
       question,
       answer,
       category: category,
       subCategory: subCategory,
-      workbook,
+      wid: workbook,
       visible: isPublic ? 1 : 0,
     });
     context.closeModal(id);

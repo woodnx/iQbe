@@ -30,7 +30,7 @@ export default function QuizCard({
 }: Props) {
   const [ innerIsHidden, setInnerIsHidden ] = useState(isHidden);
   const color = coloring && quiz.judgement != null ? defineColor(quiz.judgement) : undefined;
-
+  
   const hiddenButton = (
     <Button 
       size="compact-xs" 
@@ -51,7 +51,8 @@ export default function QuizCard({
         <Text>No.{index}</Text>
         <QuizFavoriteButton
           isFavorite={quiz.isFavorite}
-          quizId={quiz.id}
+          qid={quiz.qid}
+          key={quiz.qid}
         />
       </Group>
       <Text pt={10}>{quiz.question}</Text>
@@ -65,7 +66,7 @@ export default function QuizCard({
         align="center"
       >
         <QuizMylistButton
-          quizId={quiz.id}
+          qid={quiz.qid}
           registerdMylistId={quiz.registerdMylist}
           mylists={mylists}
         />
@@ -82,7 +83,7 @@ export default function QuizCard({
             null 
           }
           <QuizDetailsMenu
-            quizId={quiz.id}
+            qid={quiz.qid}
             creatorId={quiz.creatorId}
             question={quiz.question}
             answer={quiz.answer}

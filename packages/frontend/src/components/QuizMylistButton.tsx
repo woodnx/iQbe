@@ -9,13 +9,13 @@ import { useIsMobile } from "@/contexts/isMobile";
 import MylistCreateModal from "./MylistCreateModal";
 
 interface Props extends ComponentProps<typeof Button> {
-  quizId: number,
+  qid: string,
   registerdMylistId: string[],
   mylists: MylistInformation[],
 }
 
 export default function QuizMylistButton({
-  quizId,
+  qid,
   registerdMylistId,
   mylists,
 }: Props) {
@@ -29,7 +29,7 @@ export default function QuizMylistButton({
         listName: mylistname,
       }});
       api.quizzes.mylist._mid(mid).$post({ body: {
-        quizId,
+        qid,
       }})
     } catch(e) {
       return;
@@ -40,13 +40,13 @@ export default function QuizMylistButton({
     try {
       if (!selectedMyListIdx.includes(arrayIdx)) { // add quiz into mylist
         await api.quizzes.mylist._mid(mid).$post({ body: {
-          quizId,
+          qid,
         }});
         setSelectedMylistIdx([...selectedMyListIdx, arrayIdx]);
       } 
       else {  // delete quiz from mylist
         await api.quizzes.mylist._mid(mid).$delete({ body: {
-          quizId,
+          qid,
         }});
         setSelectedMylistIdx(selectedMyListIdx.filter(idx => idx != arrayIdx));
       }
