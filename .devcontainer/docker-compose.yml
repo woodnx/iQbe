@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  app:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    command: sleep infinity
+    network_mode: service:db
+    volumes:
+      - ../:/iQbe:cached
+    
+  db:
+    image: mariadb:11
+    container_name: iqbe-mariadb
+    restart: unless-stopped
+    volumes:
+      - mariadb-data:/var/lib/mariadb/data
+    environment:
+      MYSQL_ROOT_PASSWORD: iqbe
+      MARIADB_USER: iqbe
+      MARIADB_PASSWORD: iqbe
+      MARIADB_DATABASE: iqbe
+    
+volumes:
+  mariadb-data:

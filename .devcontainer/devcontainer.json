@@ -1,0 +1,21 @@
+{
+  "name": "iQbe",
+	"dockerComposeFile": "docker-compose.yml",
+	"service": "app",
+	"workspaceFolder": "/iQbe",
+  "forwardPorts": [
+    5173,
+    3306
+  ],
+	"postCreateCommand": "sudo chmod 755 .devcontainer/init.sh && .devcontainer/init.sh",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "prisma.prisma",
+        "prisma.prisma-insider",
+        "knisterpeter.vscode-commitizen",
+        "mhutchie.git-graph"
+      ]
+    }
+  }
+}
