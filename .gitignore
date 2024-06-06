@@ -1,7 +1,6 @@
 node_modules
 
-package-lock.json
-
 backup
 
 .env
+global.env
