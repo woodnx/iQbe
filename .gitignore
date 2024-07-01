@@ -2,5 +2,6 @@ node_modules
 
 backup
 
+.devcontainer/dev.env
 .env
 global.env
