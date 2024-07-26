@@ -1,5 +1,11 @@
 import type { Knex } from "knex";
-import db_info from '@/db-info.json'
+
+const db_info = {
+  database: process.env.MARIADB_DATABASE,
+  user: process.env.MARIADB_USER,
+  password: process.env.MARIADB_PASSWORD,
+  host: process.env.MARIADB_HOST,
+}
 
 // Update with your config settings.
 

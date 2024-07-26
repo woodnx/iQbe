@@ -1,40 +1,14 @@
 import { DB } from  './db/types';
 import { createPool } from 'mysql2';
-import { DatabaseIntrospector, Dialect, DialectAdapter, Driver, Kysely, MysqlAdapter, MysqlDialectConfig, MysqlDriver, MysqlIntrospector, MysqlQueryCompiler, QueryCompiler } from 'kysely';
-import db_info from './db-info.json';
+import { Kysely, MysqlDialect } from 'kysely';
 
-class MariaDBAdapter extends MysqlAdapter {
-  get supportsReturning(): boolean {
-    return true
-  }
-}
-
-class MariaDBDialect implements Dialect {
-  readonly #config: MysqlDialectConfig
-
-  constructor(config: MysqlDialectConfig) {
-    this.#config = config
-  }
-
-  createDriver(): Driver {
-    return new MysqlDriver(this.#config)
-  }
-
-  createQueryCompiler(): QueryCompiler {
-    return new MysqlQueryCompiler()
-  }
-
-  createAdapter(): DialectAdapter {
-    return new MariaDBAdapter()
-  }
-
-  createIntrospector(db: Kysely<any>): DatabaseIntrospector {
-    return new MysqlIntrospector(db)
-  }
-}
-
-const dialect = new MariaDBDialect({
-  pool: createPool(db_info),
+const dialect = new MysqlDialect({
+  pool: createPool({
+    database: process.env.MARIADB_DATABASE,
+    user: process.env.MARIADB_USER,
+    password: process.env.MARIADB_PASSWORD,
+    host: process.env.MARIADB_HOST,
+  }),
 });
 
 export const db = new Kysely<DB>({

@@ -4,7 +4,7 @@ import path from 'path';
 import cors from 'cors';
 import verifyAuthToken from '@/middleware/verifyAuthToken';
 import { errorHandler } from '@/middleware/error';
-import server from './allowed-server';
+import server from './allowed-server.json';
 
 const app = express(); // expressをインスタンス化
 const port = 9000;

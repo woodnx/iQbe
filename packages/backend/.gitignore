@@ -6,7 +6,7 @@ src/public
 src/db-info.json
 
 # cors option
-src/allowed-server.ts
+src/allowed-server.json
 
 # firebase-admin
 src/service-account.json
