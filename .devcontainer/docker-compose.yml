@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  app:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    command: sleep infinity
+    network_mode: service:db
+    volumes:
+      - ../:/iQbe:cached
+    
+  db:
+    image: mariadb:11
+    container_name: iqbe-db
+    restart: unless-stopped
+    volumes:
+      - mariadb-data:/var/lib/mariadb/data
+    env_file:
+      - dev.env
+    
+volumes:
+  mariadb-data:
