@@ -1,5 +1,6 @@
+import { ApiError } from 'api';
+
 import IQuizQueryService from '@/applications/queryservices/IQuizQueryService';
-import ApiError from '@/domains/ApiError';
 import FavoriteService from '@/domains/Favorite/FavoriteService';
 import HistoryService from '@/domains/History/HistoryServise';
 import Quiz from '@/domains/Quiz';

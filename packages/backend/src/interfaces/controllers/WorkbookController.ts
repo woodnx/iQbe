@@ -1,4 +1,5 @@
-import ApiError from '@/domains/ApiError';
+import { ApiError } from 'api';
+
 import Workbook from '@/domains/Workbook';
 import IWorkbookRepository from '@/domains/Workbook/IWorkbookRepository';
 import WorkbookService from '@/domains/Workbook/WorkbookService';

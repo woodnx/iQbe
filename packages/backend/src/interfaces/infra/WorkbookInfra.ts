@@ -1,7 +1,9 @@
-import Workbook from "@/domains/Workbook";
-import IWorkbookRepository from "@/domains/Workbook/IWorkbookRepository";
-import KyselyClientManager from "./kysely/KyselyClientManager";
-import ApiError from "@/domains/ApiError";
+import { ApiError } from 'api';
+
+import Workbook from '@/domains/Workbook';
+import IWorkbookRepository from '@/domains/Workbook/IWorkbookRepository';
+
+import KyselyClientManager from './kysely/KyselyClientManager';
 
 export default class WorkbookInfra implements IWorkbookRepository {
   constructor(

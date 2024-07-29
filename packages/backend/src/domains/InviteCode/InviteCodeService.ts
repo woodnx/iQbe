@@ -1,6 +1,7 @@
-import InviteCode from ".";
-import ApiError from "../ApiError";
-import IInviteCodeRepository from "./IInviteCodeRepository";
+import { ApiError } from 'api';
+
+import InviteCode from './';
+import IInviteCodeRepository from './IInviteCodeRepository';
 
 export default class InviteCodeService {
   constructor(

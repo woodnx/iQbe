@@ -1,7 +1,7 @@
-import { AuthResponseWithRefreshToken as AuthDTO, AuthResponse as TokenDTO } from 'api/types';
+import { ApiError } from 'api';
+import { AuthResponse as TokenDTO, AuthResponseWithRefreshToken as AuthDTO } from 'api/types';
 
 import AccessToken from '@/domains/AccessToken';
-import ApiError from '@/domains/ApiError';
 import AuthService from '@/domains/Auth/AuthService';
 import InviteCode from '@/domains/InviteCode';
 import IInviteCodeRepository from '@/domains/InviteCode/IInviteCodeRepository';

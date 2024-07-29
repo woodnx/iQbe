@@ -1,9 +1,10 @@
-import ApiError from "@/domains/ApiError";
-import Mylist from "@/domains/Mylist";
-import IMylistRepository from "@/domains/Mylist/IMylistRepository";
-import MylistService from "@/domains/Mylist/MylistService";
-import { format } from "@/plugins/day";
-import { typedAsyncWrapper } from "@/utils";
+import { ApiError } from 'api';
+
+import Mylist from '@/domains/Mylist';
+import IMylistRepository from '@/domains/Mylist/IMylistRepository';
+import MylistService from '@/domains/Mylist/MylistService';
+import { format } from '@/plugins/day';
+import { typedAsyncWrapper } from '@/utils';
 
 export default class MylistController {
   constructor(
