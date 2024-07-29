@@ -12,14 +12,14 @@ export default function QuizFavoriteButton({
   isFavorite: innerIsFavorite, 
   qid,
 }: QuizFavoriteButtonProps) {
-  const [ isFavorite, setFavorite ] = useState(innerIsFavorite)
+  const [ isFavorite, setFavorite ] = useState(innerIsFavorite);
   
   const addFavoriteList = async () => {
     if (isFavorite) {
       try {
         await api.quizzes.favorite.$delete({ body: {
           qid,
-        }})
+        }});
         setFavorite(!isFavorite);
       } catch(e) {
         return;
@@ -34,7 +34,7 @@ export default function QuizFavoriteButton({
         return;
       }
     }
-  }
+  };
 
   return (
     <ActionIcon 
@@ -44,5 +44,5 @@ export default function QuizFavoriteButton({
     >
       {isFavorite ? <IconStarFilled/> : <IconStar/>}
     </ActionIcon>
-  )
+  );
 }

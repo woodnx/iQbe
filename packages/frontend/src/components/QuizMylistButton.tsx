@@ -30,11 +30,11 @@ export default function QuizMylistButton({
       }});
       api.quizzes.mylist._mid(mid).$post({ body: {
         qid,
-      }})
+      }});
     } catch(e) {
       return;
     }
-  }
+  };
 
   const saveToList = async (mid: string, arrayIdx: number) => {
     try {
@@ -53,7 +53,7 @@ export default function QuizMylistButton({
     } catch(e) {
       return;
     }
-  }
+  };
 
   const defaultButton = (
     <Button
