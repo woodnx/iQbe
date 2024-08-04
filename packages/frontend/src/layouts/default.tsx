@@ -104,8 +104,13 @@ export default function DefaultLayout() {
     checkAuth()
     .then((user) => {
       if (ignore) return;
-      if (!user) {
-        navigate('/login')
+
+      if(user == "please-move-welcome-page") {
+        navigate('/welcome');
+        return;
+      }
+      else if (!user) {
+        navigate('/login');
         notifications.show({
           title: 'Require Login',
           message: 'Please login',

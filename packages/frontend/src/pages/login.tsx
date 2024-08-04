@@ -14,7 +14,7 @@ export default function Login() {
   
   useLayoutEffect(() => {
     checkAuth().then(user => {
-      if(!!user) {
+      if (!!user) {
         navigate('/');
         return;
       }
