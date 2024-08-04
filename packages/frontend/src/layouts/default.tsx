@@ -24,7 +24,7 @@ const checkPathname = (pathname: string) => {
   else if (pathname.includes('create')) return '/create';
   else if (pathname.includes('mylist')) return '/mylist';
   else return '';
-}
+};
 
 export default function DefaultLayout() {
   const [ activeLink, setActiveLink ] = useState<string>("0");
@@ -118,7 +118,7 @@ export default function DefaultLayout() {
     });
     return () => {
       ignore = true;
-    }
+    };
   }, []);
 
   const Navbar = () => (
@@ -206,7 +206,7 @@ export default function DefaultLayout() {
         </ActionIcon>
       </Group>
     </AppShell.Footer>
-  )
+  );
 
   return (
     <> {
