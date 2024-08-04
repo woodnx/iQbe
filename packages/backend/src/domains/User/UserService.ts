@@ -9,4 +9,8 @@ export default class UserService {
   generateUid(): string {
     return uid(28);
   }
+
+  async checkFirstStart(): Promise<boolean> {
+    return !(await this.usersRepository.existAnyUsers())
+  }
 }

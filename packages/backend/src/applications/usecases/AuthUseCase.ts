@@ -45,6 +45,14 @@ export default class AuthUseCase {
           detail: "You need reregistragion."
         });
       } 
+      else if (await this.userService.checkFirstStart()) {
+        throw new ApiError({
+          title: "NO_ANY_USERS",
+          detail: "This instance is first start",
+          status: 400,
+          type: "about:blank"
+        })
+      }
       else {
         throw new ApiError().noUser();
       }
@@ -87,8 +95,11 @@ export default class AuthUseCase {
     const refreshToken = new RefreshToken(this.refreshTokenService.generateToken(), uid);
     const accessToken = new AccessToken(user);
 
+    const requiredInviteCode = (process.env.REQUIRE_INVITE_CODE !== 'false') ? true : false;
+    const isFirstUser = await this.userService.checkFirstStart();
+
     await this.transactionManager.begin(async () => {      
-      if (process.env.REQUIRE_INVITE_CODE) {
+      if (requiredInviteCode && !isFirstUser) {
         if (!inviteCode || !inviteCode.trim()) {
           throw new ApiError({
             title: "NO_INVITE_CODE",
@@ -111,7 +122,7 @@ export default class AuthUseCase {
           });
         }
         
-        code?.markUsed();
+        code.markUsed();
         await this.inviteCodeRepository.update(code);
       }
 
@@ -139,7 +150,19 @@ export default class AuthUseCase {
   ): Promise<TokenDTO>  {
     const user = await this.userRepository.findByUid(uid);
 
-    if (!user) throw new ApiError().noUser();
+    if (!user) { 
+      if (await this.userService.checkFirstStart()) {
+        throw new ApiError({
+          title: "NO_ANY_USERS",
+          detail: "This instance is first start",
+          status: 400,
+          type: "about:blank"
+        });
+      }
+      else {
+        throw new ApiError().noUser();
+      }
+    };
 
     const token = await this.refreshTokensRepostiory.findByUid(user.uid);
     const accessToken = new AccessToken(user);
