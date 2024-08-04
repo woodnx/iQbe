@@ -46,15 +46,10 @@ export default class InviteCodeInfra implements IInviteCodeRepository {
   async save(code: string): Promise<void> {
     const client = this.clientManager.getClient();
 
-    const data = await client.insertInto('invite_codes')
+    await client.insertInto('invite_codes')
     .values({
       code
     })
-    .returning([
-      'id',
-      'code',
-      'used'
-    ])
     .executeTakeFirstOrThrow();
   }
 
@@ -66,11 +61,6 @@ export default class InviteCodeInfra implements IInviteCodeRepository {
       code: inviteCode.code,
       used: inviteCode.used,
     })
-    .returning([
-      'id',
-      'code',
-      'used'
-    ])
     .where('code', '=', inviteCode.code)
     .executeTakeFirstOrThrow();
   }
