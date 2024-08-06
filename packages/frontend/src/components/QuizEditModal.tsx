@@ -16,7 +16,6 @@ interface Props {
 
 export default function({ context, id, innerProps }: ContextModalProps<Props>) {
   const { qid, ...formProps } = innerProps;
-  console.log(qid)
   const { mutate } = useQuizzes();
   const submit = async ({ question, answer, category, subCategory, workbook, isPublic }: SubmitValue) => {
     await axios.put('/quizzes', {
