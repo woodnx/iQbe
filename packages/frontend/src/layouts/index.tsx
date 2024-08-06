@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { Route, Routes, useLocation } from "react-router-dom";
 import Home from "@/pages/home";
+import Welcome from "@/pages/welcome";
 import Login from "@/pages/login";
 import Search from "@/pages/search";
 import Practice from "@/pages/practice";
@@ -23,12 +24,14 @@ const defineTitle = (pathname: string) => {
   else if (pathname.includes('mylist')) return 'Mylist';
   else if (pathname === '/login') return 'Login';
   else if (pathname === '/reset-password') return 'Reset password';
+  else if (pathname === '/welcome') return 'Welcome';
   else return '';
 }
 
 const requireDraftLayoutPages = [
   '/login',
-  '/reset-password'
+  '/reset-password',
+  '/welcome',
 ];
 
 export default function Root() {
@@ -44,6 +47,7 @@ export default function Root() {
     <Routes>
       <Route path="/" element={<Layout/>}>
         <Route index element={<Home />}/>
+        <Route path="/welcome" element={<Welcome />}/>
         <Route path="/search" element={<Search />}/>
         <Route path="/practice" element={<Practice />}/>
         <Route path="/favorite" element={<Favorite />}/>

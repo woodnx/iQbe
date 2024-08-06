@@ -30,10 +30,6 @@ export default class AuthInfra implements AuthRepository {
       token: sql<Buffer>`UNHEX(REPLACE(${auth.refreshToken.token}, '-', ''))`,
       expDate,
     })
-    .returning([
-      'token',
-      'expired'
-    ])
     .execute();
   }
 }

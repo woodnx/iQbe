@@ -1,9 +1,11 @@
+import cors from 'cors';
 import express from 'express';
 import fs from 'fs';
 import path from 'path';
-import cors from 'cors';
-import verifyAuthToken from '@/middleware/verifyAuthToken';
+
 import { errorHandler } from '@/middleware/error';
+import verifyAuthToken from '@/middleware/verifyAuthToken';
+
 import server from './allowed-server.json';
 
 const app = express(); // expressをインスタンス化
@@ -20,15 +22,18 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.static(path.join(__dirname, 'web')));
 
 // router import
-const filenames = fs.readdirSync(path.join(__dirname, 'routes'));
+const filenames = fs.readdirSync(path.join(__dirname, 'routes')).filter(n => !n.includes(".map"))
 const nonVerifyRoutes = [
   'auth',
 ];
 
 filenames.forEach(filename => {
   const name = filename.replace('.js', '');
-  if (nonVerifyRoutes.includes(name)) app.use(`/api/${name}`, require(`./routes/${name}`));
-  else app.use(`/api/${name}`, verifyAuthToken, require(`./routes/${name}`));
+  const route_path = `${__dirname}/routes/${name}.js`
+  const route = require(route_path)
+
+  if (nonVerifyRoutes.includes(name)) app.use(`/api/${name}`, route);
+  else app.use(`/api/${name}`, verifyAuthToken, route);
 });
 
 

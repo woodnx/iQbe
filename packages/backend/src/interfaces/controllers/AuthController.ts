@@ -1,5 +1,6 @@
+import { ApiError } from 'api';
+
 import AuthUseCase from '@/applications/usecases/AuthUseCase';
-import ApiError from '@/domains/ApiError';
 import { typedAsyncWrapper } from '@/utils';
 
 export default class AuthController {

@@ -1,6 +1,7 @@
-import ApiError from "@/domains/ApiError";
-import { typedAsyncWrapper } from "@/utils";
-import ResetPasswordUseCase from "@/applications/usecases/ResetPasswordUseCase";
+import { ApiError } from 'api';
+
+import ResetPasswordUseCase from '@/applications/usecases/ResetPasswordUseCase';
+import { typedAsyncWrapper } from '@/utils';
 
 export default class ResetPasswordController {
   constructor(

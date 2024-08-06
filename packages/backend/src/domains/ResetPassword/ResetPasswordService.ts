@@ -1,6 +1,8 @@
-import ResetPassword from ".";
-import ApiError from "../ApiError";
+import { ApiError } from 'api';
+
 import dayjs from '@/plugins/day';
+
+import ResetPassword from './';
 
 export default class ResetPasswordService {
   constructor() {}

@@ -43,27 +43,17 @@ export default class InviteCodeInfra implements IInviteCodeRepository {
     return new InviteCode(data.code, data.used);
   }
   
-  async save(code: string): Promise<InviteCode> {
+  async save(code: string): Promise<void> {
     const client = this.clientManager.getClient();
 
-    const data = await client.insertInto('invite_codes')
+    await client.insertInto('invite_codes')
     .values({
       code
     })
-    .returning([
-      'id',
-      'code',
-      'used'
-    ])
     .executeTakeFirstOrThrow();
-
-    return new InviteCode(data.code, data.used);
   }
 
-  // async update(id: number, updateData: Partial<InviteCode>): Promise<InviteCode> {
-
-  // }
-  async update(inviteCode: InviteCode): Promise<InviteCode> {
+  async update(inviteCode: InviteCode): Promise<void> {
     const client = this.clientManager.getClient();
 
     const data = await client.updateTable('invite_codes')
@@ -71,14 +61,7 @@ export default class InviteCodeInfra implements IInviteCodeRepository {
       code: inviteCode.code,
       used: inviteCode.used,
     })
-    .returning([
-      'id',
-      'code',
-      'used'
-    ])
     .where('code', '=', inviteCode.code)
     .executeTakeFirstOrThrow();
-
-    return new InviteCode(data.code, data.used);
   }
 }

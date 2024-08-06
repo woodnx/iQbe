@@ -56,10 +56,6 @@ export default class RefreshTokensInfra implements IRefreshTokensRepository {
       token: sql<Buffer>`UNHEX(REPLACE(${refreshToken.token}, '-', ''))`,
       expDate,
     })
-    .returning([
-      'token',
-      'expired'
-    ])
     .execute();
 
     return;

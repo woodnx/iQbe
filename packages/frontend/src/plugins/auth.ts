@@ -1,4 +1,4 @@
-// import axios from "./axios";
+import { AxiosError } from 'axios';
 import api from './api';
 
 export interface User {
@@ -20,9 +20,11 @@ export async function loginWithUsername(username: string, password: string) {
     localStorage.setItem('uid', user.uid);
 
     return user;
-  } catch(e: any) {
-    if (e?.title == "REQUIRE_REREGISTRATION") {
-      return 'please do re-registration';
+  } catch(e) {
+    if (e instanceof AxiosError) {
+      if (e?.response?.data.title == "REQUIRE_REREGISTRATION") {
+        return 'please do re-registration';
+      }
     }
   }
 }
@@ -36,6 +38,7 @@ export async function loginOldUser(username: string, email: string, password: st
     }});
 
     const { accessToken, refreshToken, user } = data;
+    
     localStorage.setItem('refreshToken', refreshToken);
     localStorage.setItem('accessToken', accessToken);
     localStorage.setItem('uid', user.uid);
@@ -46,14 +49,16 @@ export async function loginOldUser(username: string, email: string, password: st
   }
 }
 
-export async function signupUser(username: string, password: string, requiredInviteCode?: boolean, inviteCode?: string) {
+export async function signupUser(username: string, password: string, inviteCode?: string) {
   try{ 
     const data = await api.auth.signup.$post({ body: {
       username,
       password,
       inviteCode,
     }});
+
     const { accessToken, refreshToken, user } = data;
+
     localStorage.setItem('refreshToken', refreshToken);
     localStorage.setItem('accessToken', accessToken);
     localStorage.setItem('uid', user.uid);
@@ -89,7 +94,14 @@ export async function checkAuth() {
     localStorage.setItem('accessToken', accessToken);
 
     return user;
-  } catch(e) {
+  } 
+  catch(e) {
+    if (e instanceof AxiosError) {
+      if (e?.response?.data.title == "NO_ANY_USERS") {
+        return "please-move-welcome-page";
+      }
+    }
+
     return;
   }
 }
@@ -111,33 +123,10 @@ export async function getIdToken() {
     const { accessToken } = data;
     localStorage.setItem('accessToken', accessToken);
     return accessToken;
-  } catch(e) {
+  } 
+  catch(e) {
     return;
   }
-
-  // return new Promise<string | undefined>((resolve, reject) => {
-  //   const refreshToken = localStorage.getItem('refreshToken');
-  //   const uid = localStorage.getItem('uid');
-    
-  //   if (!refreshToken || refreshToken == 'undefined' || !uid) {
-  //     resolve(undefined);
-  //     return;
-  //   }
-    
-    
-  //   axios.post<User>('/auth/token',  {
-  //     refreshToken,
-  //     uid,
-  //   })
-  //   .then(res => res.data)
-  //   .then(data => { 
-  //     // @ts-ignore
-  //     const { accessToken, user } = data;
-  //     localStorage.setItem('accessToken', accessToken);
-  //     resolve(accessToken);
-  //   })
-  //   .catch(e => reject(e));
-  // });
 }
 
 export function logoutUser() {

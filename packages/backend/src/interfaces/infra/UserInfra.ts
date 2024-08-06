@@ -134,19 +134,33 @@ export default class UserInfra implements IUsersRepository {
     return data;
   }
 
+  async existAnyUsers(): Promise<boolean> {
+    const client = this.clientManager.getClient();
+
+    const data = await client.selectFrom('users')
+    .select(({ fn, val, ref }) => [
+      fn.count<number>('id').as('count')
+    ])
+    .executeTakeFirst()
+    .then(d => d?.count);
+
+    return !!data;
+  }
+
   async save(user: User): Promise<void> {
     const client = this.clientManager.getClient();
-    
+
     await client.insertInto('users')
     .values({
       username: user.username,
+      uid: user.uid,
       passwd: user.passwd,
       nickname: user.nickname || undefined,
       email: user.email,
       created: user.created,
       modified: user.modified,
     })
-    .executeTakeFirstOrThrow();
+    .executeTakeFirst();
   }
 
   async update(user: User): Promise<void> {
@@ -161,6 +175,6 @@ export default class UserInfra implements IUsersRepository {
       email: user.email,
     })
     .where('uid', '=', user.uid)
-    .executeTakeFirstOrThrow();
+    .executeTakeFirst();
   }
 }

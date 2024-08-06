@@ -11,7 +11,11 @@ import App from './App.tsx';
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
-    <MantineProvider>
+    <MantineProvider
+      theme={{
+        fontFamily: 'Noto Sans JP',
+      }}
+    >
       <IsMobileProvider>
         <RequestResetPasswordProvider>
           <App />

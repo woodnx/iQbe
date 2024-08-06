@@ -3,7 +3,8 @@
     /* Visit https://aka.ms/tsconfig to read more about this file */
 
     /* Language and Environment */
-    "target": "ESNext",
+    "lib": ["es2020"],
+    "target": "ES2020",
     
     /* Modules */
     "module": "Node16",
@@ -17,6 +18,9 @@
       "./src/types",
     ],
     "resolveJsonModule": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "sourceMap": true,
 
     /* Emit */
     "outDir": "./dist",

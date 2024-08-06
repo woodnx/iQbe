@@ -24,7 +24,7 @@ const checkPathname = (pathname: string) => {
   else if (pathname.includes('create')) return '/create';
   else if (pathname.includes('mylist')) return '/mylist';
   else return '';
-}
+};
 
 export default function DefaultLayout() {
   const [ activeLink, setActiveLink ] = useState<string>("0");
@@ -104,8 +104,13 @@ export default function DefaultLayout() {
     checkAuth()
     .then((user) => {
       if (ignore) return;
-      if (!user) {
-        navigate('/login')
+
+      if(user == "please-move-welcome-page") {
+        navigate('/welcome');
+        return;
+      }
+      else if (!user) {
+        navigate('/login');
         notifications.show({
           title: 'Require Login',
           message: 'Please login',
@@ -118,7 +123,7 @@ export default function DefaultLayout() {
     });
     return () => {
       ignore = true;
-    }
+    };
   }, []);
 
   const Navbar = () => (
@@ -206,7 +211,7 @@ export default function DefaultLayout() {
         </ActionIcon>
       </Group>
     </AppShell.Footer>
-  )
+  );
 
   return (
     <> {

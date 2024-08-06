@@ -62,7 +62,7 @@ export function UserSignupModal() {
           <Flex align="center">
             <IconCheck size={14} color="green"/>
             <Space w={5}/>
-            <Text span color="green"> Can use this name </Text>
+            <Text span c="green"> Can use this name </Text>
           </Flex>
         : null
       }
@@ -81,7 +81,7 @@ export function UserSignupModal() {
 
   const submit = async (values: SubmitValue) => {
     try { 
-      await signupUser(values.username, values.password, requiredInviteCode, values.inviteCode)
+      await signupUser(values.username, values.password, values.inviteCode)
       .then(async (_user) => {
         navigate('/');
       });

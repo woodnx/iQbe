@@ -9,7 +9,7 @@ sudo npm install -g env-cmd
 cp -f .devcontainer/dev.env .env
 cp -f .devcontainer/allowed-server.dev.json packages/backend/src/allowed-server.json
 
-echo -n "JWT_SEACRET_KEY=" >> .env
+echo -n "JWT_SECRET_KEY=" >> .env
 node -e "console.log(require('crypto').randomBytes(32).toString('hex'));" >> .env
 
 npm install

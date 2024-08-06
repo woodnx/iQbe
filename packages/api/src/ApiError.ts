@@ -1,4 +1,4 @@
-import { Error as ErrorSchema } from "api/types";
+import { Error as ErrorSchema } from "@/generated/@types";
 
 export default class ApiError extends Error {
   private _schema: ErrorSchema;
@@ -6,7 +6,7 @@ export default class ApiError extends Error {
   constructor(_schema?: ErrorSchema) {
     super(_schema?.title);
     this.name = new.target.name;
-    this._schema = _schema || this.internalProblems().getSchema();
+    this._schema = _schema || this.internalProblems().schema;
 
     if (Error.captureStackTrace) {
       Error.captureStackTrace(this, this.constructor);
@@ -76,7 +76,23 @@ export default class ApiError extends Error {
     });
   }
 
-  public getSchema() {
+  get schema(): ErrorSchema {
     return this._schema;
+  }
+
+  get title(): string {
+    return this._schema.title;
+  }
+
+  get type(): string {
+    return this._schema.title;
+  }
+
+  get status(): number {
+    return this._schema.status;
+  }
+
+  get detail(): string {
+    return this._schema.detail;
   }
 }
