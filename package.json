@@ -1,6 +1,6 @@
 {
   "name": "iqbe",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "description": "A powerful tool to enhance your quiz skills more fun and effective. ",
   "workspaces": [
     "packages/frontend",
