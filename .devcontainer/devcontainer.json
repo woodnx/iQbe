@@ -13,7 +13,8 @@
         "knisterpeter.vscode-commitizen",
         "mhutchie.git-graph",
         "ms-azuretools.vscode-docker",
-        "mike-co.import-sorter"
+        "mike-co.import-sorter",
+        "github.vscode-github-actions"
       ]
     }
   }
