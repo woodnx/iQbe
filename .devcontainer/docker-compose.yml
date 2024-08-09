@@ -15,7 +15,7 @@ services:
     container_name: iqbe-db
     restart: unless-stopped
     volumes:
-      - mariadb-data:/var/lib/mariadb/data
+      - mariadb-data:/var/lib/mysql
     env_file:
       - dev.env
     
