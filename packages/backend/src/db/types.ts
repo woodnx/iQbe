@@ -116,6 +116,7 @@ export type users = {
     username: Generated<string>;
     email: Generated<string>;
     passwd: Generated<string>;
+    permission: Generated<string>;
     modified: Timestamp;
     created: Timestamp;
 };
