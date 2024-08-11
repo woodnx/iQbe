@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.1.0](https://github.com/woodnx/iQbe/compare/v3.0.0...v3.1.0) (2024-08-11)
+
+
+### Features
+
+* Add permission to user ([#74](https://github.com/woodnx/iQbe/issues/74)) ([1998164](https://github.com/woodnx/iQbe/commit/1998164abda58cd04c1158d25160a865d32ec628))
+
 ## [3.0.0](https://github.com/woodnx/iQbe/compare/v2.2.1...v3.0.0) (2024-08-08)
 
 
