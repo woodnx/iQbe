@@ -4,9 +4,10 @@ export default class User {
     private _passwd: string,
     private _username: string,
     private _email: string,
-    private _nickname: string | null,
     private _created: Date,
     private _modified: Date,
+    private _nickname?: string,
+    private _permission?: string,
   ) {}
 
   reconstruct(
@@ -14,19 +15,19 @@ export default class User {
     passwd: string,
     username: string,
     email: string,
-    nickname: string | null,
     created: Date,
     modified: Date,
-  ): User {
-    return new User(
-      uid,
-      passwd,
-      username,
-      email,
-      nickname,
-      created,
-      modified,
-    );
+    nickname?: string,
+    permission?: string,
+  ): void {
+    this._uid = uid;
+    this._passwd = passwd;
+    this._username = username;
+    this._email = email;
+    this._created = created;
+    this._modified = modified;
+    this._nickname = nickname;
+    this._permission = permission;
   }
 
   resetPasswd(passwd: string) {
@@ -49,8 +50,12 @@ export default class User {
     return this._email;
   }
 
-  get nickname(): string | null {
+  get nickname(): string | undefined {
     return this._nickname;
+  }
+
+  get permission(): string | undefined {
+    return this._permission;
   }
 
   get created(): Date {
