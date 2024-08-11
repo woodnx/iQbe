@@ -18,6 +18,7 @@ export default class UserInfra implements IUsersRepository {
       'nickname',
       'created',
       'modified',
+      'permission',
     ])
     .where('uid', '=', uid)
     .executeTakeFirst();
@@ -31,9 +32,10 @@ export default class UserInfra implements IUsersRepository {
       data.passwd, 
       data.username, 
       data.email, 
-      data.nickname, 
       data.created, 
       data.modified,
+      data.nickname,
+      data.permission,
     );
   }
 
@@ -50,6 +52,7 @@ export default class UserInfra implements IUsersRepository {
       'nickname',
       'created',
       'modified',
+      'permission',
     ])
     .where('username', '=', username)
     .executeTakeFirst();
@@ -63,9 +66,10 @@ export default class UserInfra implements IUsersRepository {
       data.passwd, 
       data.username, 
       data.email, 
-      data.nickname, 
       data.created, 
       data.modified,
+      data.nickname,
+      data.permission,
     );
   }
 
@@ -82,6 +86,7 @@ export default class UserInfra implements IUsersRepository {
       'nickname',
       'created',
       'modified',
+      'permission',
     ])
     .where('email', '=', email)
     .executeTakeFirst();
@@ -95,9 +100,10 @@ export default class UserInfra implements IUsersRepository {
       data.passwd, 
       data.username, 
       data.email, 
-      data.nickname, 
       data.created, 
       data.modified, 
+      data.nickname, 
+      data.permission,
     );
   }
 
@@ -159,6 +165,7 @@ export default class UserInfra implements IUsersRepository {
       email: user.email,
       created: user.created,
       modified: user.modified,
+      permission: user.permission,
     })
     .executeTakeFirst();
   }
@@ -173,6 +180,7 @@ export default class UserInfra implements IUsersRepository {
       nickname: user.nickname || undefined,
       modified: user.modified,
       email: user.email,
+      permission: user.permission,
     })
     .where('uid', '=', user.uid)
     .executeTakeFirst();

@@ -91,7 +91,7 @@ export default class AuthUseCase {
     const passwd = this.authService.generateHashedPassword(password);
     const created = dayjs().toDate();
 
-    const user = new User(uid, passwd, username, email, null, created, created);
+    const user = new User(uid, passwd, username, email, created, created);
     const refreshToken = new RefreshToken(this.refreshTokenService.generateToken(), uid);
     const accessToken = new AccessToken(user);
 
@@ -124,6 +124,19 @@ export default class AuthUseCase {
         
         code.markUsed();
         await this.inviteCodeRepository.update(code);
+      }
+
+      if (isFirstUser) {
+        user.reconstruct(
+          uid,
+          passwd,
+          username,
+          email,
+          user.created,
+          user.modified,
+          undefined,
+          'SUPER_USER',
+        );
       }
 
       await this.userRepository.save(user);
@@ -212,7 +225,6 @@ export default class AuthUseCase {
       passwd,
       username,
       email,
-      null,
       user.created,
       user.modified,
     );
