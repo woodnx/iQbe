@@ -58,11 +58,6 @@ export type quiz_reports = {
     reason: Generated<string | null>;
     registered: Timestamp | null;
 };
-export type quiz_tags = {
-    id: Generated<number>;
-    label: string;
-    color: string | null;
-};
 export type quiz_visible_users = {
     quiz_id: number;
     user_id: number;
@@ -104,6 +99,20 @@ export type sub_categories = {
     name: string;
     description: string | null;
 };
+export type tagging = {
+    tag_id: number;
+    quiz_id: number;
+    registered: Timestamp;
+};
+export type tags = {
+    id: Generated<number>;
+    tid: string;
+    label: string;
+    color: string | null;
+    created: Timestamp;
+    modified: Timestamp;
+    creator_id: number;
+};
 export type test_quizzes = {
     id: Generated<number>;
     original_quiz_id: number;
@@ -138,13 +147,14 @@ export type DB = {
     mylists_quizzes: mylists_quizzes;
     password_reset_tokens: password_reset_tokens;
     quiz_reports: quiz_reports;
-    quiz_tags: quiz_tags;
     quiz_visible_users: quiz_visible_users;
     quizzes: quizzes;
     quizzes_categories: quizzes_categories;
     refresh_tokens: refresh_tokens;
     SequelizeMeta: SequelizeMeta;
     sub_categories: sub_categories;
+    tagging: tagging;
+    tags: tags;
     test_quizzes: test_quizzes;
     users: users;
     workbooks: workbooks;
