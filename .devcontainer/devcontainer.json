@@ -14,7 +14,8 @@
         "mhutchie.git-graph",
         "ms-azuretools.vscode-docker",
         "mike-co.import-sorter",
-        "github.vscode-github-actions"
+        "github.vscode-github-actions",
+        "42Crunch.vscode-openapi"
       ]
     }
   }
