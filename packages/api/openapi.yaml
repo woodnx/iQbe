@@ -15,6 +15,7 @@ tags:
   - name: levels
   - name: mylists
   - name: quizzes
+  - name: tags
   - name: users
   - name: workbooks
 
@@ -1180,6 +1181,131 @@ paths:
           $ref: "#/components/responses/401Unauthorized"
         "403":
           $ref: "#/components/responses/403Forbidden"
+  "/tags":
+    get: 
+      tags:
+        - tags
+      summary: ユーザ自身の作成したタグのリストを取得
+      responses:
+        "200":
+          $ref: "#/components/responses/TagsResponse"
+        "400":
+          $ref: "#/components/responses/400BadRequest"
+        "401": 
+          $ref: "#/components/responses/401Unauthorized"
+        "403":
+          $ref: "#/components/responses/403Forbidden"
+    post: 
+      tags:
+        - tags
+      summary: タグの追加
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: 
+              type: object
+              properties:
+                label: 
+                  type: string
+                color:
+                  type: string
+              required:
+                - label
+            example: 
+              label: 時事
+              color: gray
+      responses:
+        "200":
+          $ref: "#/components/responses/TagResponse"
+        "400":
+          $ref: "#/components/responses/400BadRequest"
+        "401": 
+          $ref: "#/components/responses/401Unauthorized"
+        "403":
+          $ref: "#/components/responses/403Forbidden"
+    put: 
+      tags:
+        - tags
+      summary: タグの編集
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: 
+              type: object
+              properties: 
+                tid:
+                  type: string
+                label: 
+                  type: string
+                color: 
+                  type: string
+              required:
+                - tid
+                - label
+            example: 
+              tid: UaHxXrGKQM
+              label: 時事
+              color: gray
+      responses:
+        "200":
+          $ref: "#/components/responses/TagResponse"
+        "400":
+          $ref: "#/components/responses/400BadRequest"
+        "401": 
+          $ref: "#/components/responses/401Unauthorized"
+        "403":
+          $ref: "#/components/responses/403Forbidden"
+    delete: 
+      tags:
+        - tags
+      summary: タグの削除
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: 
+              type: object
+              properties: 
+                tid:
+                  type: string
+              required:
+                - tid
+            example: 
+              tid: UaHxXrGKQM
+      responses:
+        "204":
+          description: deleted tag
+        "400":
+          $ref: "#/components/responses/400BadRequest"
+        "401": 
+          $ref: "#/components/responses/401Unauthorized"
+        "403":
+          $ref: "#/components/responses/403Forbidden"
+  "/tags/{tid}":
+    get: 
+      tags:
+        - tags
+      summary: tid からタグ情報を取得
+      parameters:
+        - name: tid
+          in: path
+          required: true
+          description: タグid
+          schema:
+            type: string
+          example: UaHxXrGKQM
+      responses:
+        "200":
+          $ref: "#/components/responses/TagResponse"
+        "400":
+          $ref: "#/components/responses/400BadRequest"
+        "401": 
+          $ref: "#/components/responses/401Unauthorized"
+        "403":
+          $ref: "#/components/responses/403Forbidden"
+
   "/users": 
     post: 
       tags: 
@@ -1788,6 +1914,35 @@ components:
               name: "化学"
               description: "科学用語・化学者など"
               parentId: 2
+    TagResponse:
+      description: タグ情報
+      content:
+        application/json:
+          schema: 
+            $ref: "#/components/schemas/Tag"
+          example:
+            tid: UaHxXrGKQM
+            label: hoge
+            color: orange
+            creatorUid: BapXVEOuLlYb3jHCBpeSzx7cPRrgf1dNTZqE4
+            modified: 2023-12-22
+            created: 2023-12-01
+    TagsResponse:
+      description: タグ群の情報
+      content:
+        application/json:
+          schema: 
+            type: array
+            items:
+              type: object
+              $ref: "#/components/schemas/Tag"
+            example:
+              - tid: UaHxXrGKQM
+                label: 時事
+                color: gray
+                creatorUid: BapXVEOuLlYb3jHCBpeSzx7cPRrgf1dNTZqE4
+                modified: 2023-12-22
+                created: 2023-12-01
     UserResponse:
       description: ユーザ情報
       content:
@@ -1982,6 +2137,27 @@ components:
         - id
         - name
         - parentId
+    Tag: 
+      type: object
+      properties:
+        tid: 
+          type: string
+        label: 
+          type: string
+        color: 
+          type: string
+        created: 
+          type: string
+        modified:
+          type: string
+        creatorUid:
+          type: string
+      required:
+        - tid
+          label
+          created
+          modified
+          creatorUid
     User: 
       type: object
       properties:
