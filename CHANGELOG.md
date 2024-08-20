@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.2.0](https://github.com/woodnx/iQbe/compare/v3.1.0...v3.2.0) (2024-08-20)
+
+
+### Features
+
+* **backend:** Add tag feature ([#79](https://github.com/woodnx/iQbe/issues/79)) ([bcc9144](https://github.com/woodnx/iQbe/commit/bcc9144668e29593aa0fa128f260e92da86f5fc1))
+
 ## [3.1.0](https://github.com/woodnx/iQbe/compare/v3.0.0...v3.1.0) (2024-08-11)
 
 
