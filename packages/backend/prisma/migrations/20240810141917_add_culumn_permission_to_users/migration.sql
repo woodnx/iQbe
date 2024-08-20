@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE `users` ADD COLUMN `permission` VARCHAR(64) NOT NULL DEFAULT 'USER';

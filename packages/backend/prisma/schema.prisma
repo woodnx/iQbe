@@ -168,6 +168,7 @@ model quizzes {
   histories          histories[]
   mylists_quizzes    mylists_quizzes[]
   quiz_visible_users quiz_visible_users[]
+  tagging            tagging[]
   categories         categories?          @relation(fields: [category_id], references: [id])
   sub_categories     sub_categories?      @relation(fields: [sub_category_id], references: [id])
   users              users?               @relation(fields: [creator_id], references: [id], onUpdate: Cascade, onDelete: Cascade)
@@ -206,10 +207,31 @@ model sub_categories {
   @@index([parent_id], map: "parent_id")
 }
 
-model quiz_tags {
-  id    BigInt  @id @default(autoincrement())
-  label String  @db.VarChar(128)
-  color String? @db.VarChar(64)
+model tagging {
+  tag_id     BigInt
+  quiz_id    BigInt   @db.UnsignedBigInt
+  registered DateTime @db.DateTime(0)
+
+  tags    tags    @relation(fields: [tag_id], references: [id], onDelete: Cascade, map: "tagging_ibfk_1")
+  quizzes quizzes @relation(fields: [quiz_id], references: [id], onDelete: Cascade, map: "tagging_ibfk_2")
+
+  @@id([tag_id, quiz_id])
+  @@index([tag_id], map: "tag_id")
+  @@index([quiz_id], map: "quiz_id")
+}
+
+model tags {
+  id         BigInt    @id @default(autoincrement())
+  tid        String    @db.VarChar(256)
+  label      String    @db.VarChar(128)
+  color      String?   @db.VarChar(64)
+  created    DateTime  @db.DateTime(0)
+  modified   DateTime  @db.DateTime(0)
+  creator_id BigInt    @db.UnsignedBigInt
+  tagging tagging[]
+
+  users      users     @relation(fields: [creator_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
 }
 
 /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
@@ -246,10 +268,11 @@ model tests_results {
 model users {
   id                    BigInt           @id @default(autoincrement()) @db.UnsignedBigInt
   uid                   String           @unique(map: "uid") @default("") @db.VarChar(255)
-  nickname              String           @default("") @db.VarChar(255)
-  username              String           @default("") @db.VarChar(255)
-  email                 String           @default("") @db.VarChar(255)
-  passwd                String           @default("") @db.Char(60) 
+  nickname              String           @default("")     @db.VarChar(255)
+  username              String           @default("")     @db.VarChar(255)
+  email                 String           @default("")     @db.VarChar(255)
+  passwd                String           @default("")     @db.Char(60) 
+  permission            String           @default("USER") @db.VarChar(64)
   modified              DateTime         @db.DateTime(0)
   created               DateTime         @db.DateTime(0)
   answer_logs           answer_logs[]    @ignore
@@ -261,6 +284,7 @@ model users {
   quiz_visible_users    quiz_visible_users[]
   quizzes               quizzes[]
   refresh_tokens        refresh_tokens[]
+  tags                  tags[]
   tests_results         tests_results[]  @ignore
   users_settings        users_settings[] @ignore
   workbooks             workbooks[]
