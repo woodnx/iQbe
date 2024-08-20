@@ -123,7 +123,7 @@ export default class QuizInfra implements IQuizRepository, IQuizQueryService {
       quizzes.map(async q => {
         const { id: quizId, ...quiz } = q;
         
-        const [ isFavorite, registerdMylist, visibleUser ] = await Promise.all([
+        const [ isFavorite, registerdMylist, tags, visibleUser ] = await Promise.all([
           client.selectFrom('favorites')
           .select('quiz_id')
           .where(({eb, and}) => and([
@@ -141,6 +141,16 @@ export default class QuizInfra implements IQuizRepository, IQuizQueryService {
           ]))
           .execute()
           .then(mylists => mylists.map(m => m?.mid || '')),
+
+          client.selectFrom('tagging')
+          .innerJoin('tags', 'tagging.tag_id', 'tags.id')
+          .select('tags.tid as tid')
+          .where(({eb, and}) => and([
+            eb('tagging.quiz_id', '=', quizId),
+            eb('tags.creator_id', '=', userId)
+          ]))
+          .execute()
+          .then(tags => tags.map(t => t.tid)),
   
           client.selectFrom('quiz_visible_users')
           .innerJoin('users', 'users.id', 'quiz_visible_users.user_id')
@@ -156,6 +166,7 @@ export default class QuizInfra implements IQuizRepository, IQuizQueryService {
           right: quiz.right || 0,
           isFavorite: !!isFavorite,
           registerdMylist,
+          tags,
           isPublic: !visibleUser,
         };
     }));

@@ -2084,6 +2084,11 @@ components:
           items: 
             type: string
           readOnly: true
+        tags:
+          type: array
+          items:
+            type: string
+          readOnly: true
         creatorId:
           type: string
         isPublic: 
