@@ -1052,6 +1052,86 @@ paths:
           $ref: "#/components/responses/401Unauthorized"
         "403":
           $ref: "#/components/responses/403Forbidden"
+  "/quizzes/tag/{tid}":
+    get:
+      tags:
+        - quizzes
+      summary: 指定するタグが付与されたクイズリストを取得
+      parameters:
+        - $ref: "#/components/parameters/page"
+        - $ref: "#/components/parameters/maxView"
+        - $ref: "#/components/parameters/seed"
+        - $ref: "#/components/parameters/workbooks"
+        - $ref: "#/components/parameters/levels"
+        - $ref: "#/components/parameters/keyword"
+        - $ref: "#/components/parameters/keywordOption"
+        - $ref: "#/components/parameters/crctAnsRatio"
+        - $ref: "#/components/parameters/tid"
+      responses:
+        "200":
+          $ref: "#/components/responses/QuizzzeResponse"
+        "400":
+          $ref: "#/components/responses/400BadRequest"
+        "401": 
+          $ref: "#/components/responses/401Unauthorized"
+        "403":
+          $ref: "#/components/responses/403Forbidden"
+    post: 
+      tags: 
+        - quizzes
+      summary: クイズにタグを登録
+      parameters:
+        - $ref: "#/components/parameters/tid"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                qid: 
+                  type: string
+              required:
+                - qid
+            example:
+              qid: DG8ED3bx7y0McbistuLx
+      responses:
+        "201":
+          $ref: "#/components/responses/QuizResponse"
+        "400":
+          $ref: "#/components/responses/400BadRequest"
+        "401": 
+          $ref: "#/components/responses/401Unauthorized"
+        "403":
+          $ref: "#/components/responses/403Forbidden"
+    delete: 
+      tags:
+        - quizzes
+      summary: クイズからタグを削除
+      parameters:
+        - $ref: "#/components/parameters/tid"
+      requestBody: 
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                qid: 
+                  type: string
+              required:
+                - qid
+            example: 
+              qid: DG8ED3bx7y0McbistuLx
+      responses:
+        "204": 
+          description: "deleted quiz from mylist"
+        "400":
+          $ref: "#/components/responses/400BadRequest"
+        "401": 
+          $ref: "#/components/responses/401Unauthorized"
+        "403":
+          $ref: "#/components/responses/403Forbidden"
   "/quizzes/workbook/{wid}":
     post: 
       tags: 
@@ -1611,6 +1691,12 @@ components:
       required: true
       schema: 
         type: string 
+    tid:
+      name: tid
+      in: path
+      required: true
+      schema:
+        type: string
   requestBodies:
     QuizRequestBody:
       required: true
@@ -2082,6 +2168,11 @@ components:
         registerdMylist:
           type: array 
           items: 
+            type: string
+          readOnly: true
+        tags:
+          type: array
+          items:
             type: string
           readOnly: true
         creatorId:

@@ -9,6 +9,7 @@ import QuizService from '@/domains/Quiz/QuizService';
 import RegisteredQuizService from '@/domains/RegisteredQuiz/ResisteredQuizService';
 import dayjs from '@/plugins/day';
 import { typedAsyncWrapper } from '@/utils';
+import TaggedQuizService from '@/domains/TaggedQuiz/TaggedQuizService';
 
 type QuizzesPath = '' | '/favorite' | '/history' | '/mylist/{mid}';
 
@@ -20,6 +21,7 @@ export default class QuizController {
     private favoriteService: FavoriteService,
     private historyService: HistoryService,
     private registeredQuizService: RegisteredQuizService,
+    private taggedQuizService: TaggedQuizService,
   ) {}
 
   get(path: QuizzesPath = '') {
@@ -189,6 +191,28 @@ export default class QuizController {
       const mid = req.params.mid;
 
       this.registeredQuizService.add(mid, qid);
+
+      res.status(201).send();
+    });
+  }
+
+  tagging() {
+    return typedAsyncWrapper<"/quizzes/tag/{tid}", "post">(async (req, res) => {
+      const qid = req.body.qid;
+      const tid = req.params.tid;
+
+      this.taggedQuizService.add(tid, qid);
+
+      res.status(201).send();
+    });
+  }
+
+  untagging() {
+    return typedAsyncWrapper<"/quizzes/tag/{tid}", "delete">(async (req, res) => {
+      const qid = req.body.qid;
+      const tid = req.params.tid;
+
+      this.taggedQuizService.delete(tid, qid);
 
       res.status(201).send();
     });
