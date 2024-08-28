@@ -30,7 +30,7 @@ export type ExactPathByHttpMethod<Method extends HttpMethod> =
 // ex) GetNestedValue<{ a: { b: { c: { someKey: someValue } } } }, ['a', 'b', 'c']> is { someKey: someValue }
 type GetNestedValue<
   T extends Record<string, any>,
-  Keys extends (string | number)[]
+  Keys extends (string | number | symbol)[]
 > = 0 extends Keys["length"]
   ? T
   : Keys extends [infer First, ...infer Rest]

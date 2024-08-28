@@ -5,7 +5,8 @@ import { useForm, isNotEmpty, matchesField, isEmail } from '@mantine/form';
 import { notifications } from "@mantine/notifications";
 import { IconAlertTriangle, IconCheck } from "@tabler/icons-react";
 import { signupUser } from "@/plugins/auth";
-import api from "@/plugins/api";
+import { $api } from "@/utils/client";
+// import api from "@/plugins/api";
 
 interface SubmitValue {
   username: string,
@@ -16,6 +17,7 @@ interface SubmitValue {
 const requiredInviteCode = import.meta.env.VITE_REQUIRED_INVITE_CODE !== 'false' ? true : false;
 
 export function UserSignupModal() {
+  const { mutate } = $api.useMutation('post', '/auth/available')
   const [ available, setAvailable ] = useState(false);
   const navigate = useNavigate();
   const form = useForm({
@@ -41,12 +43,20 @@ export function UserSignupModal() {
   });
 
   useEffect(() => {
-    api.auth.available.$post({ body: {
-      username: form.values.username
-    }})
-    .then((available) => {
-      setAvailable(!!available);
-      if (!available && form.values.username.length > 0) form.setFieldError('username', errormes);
+    // api.auth.available.$post({ body: {
+    //   username: form.values.username
+    // }})
+    // .then((available) => {
+    //   setAvailable(!!available);
+    //   if (!available && form.values.username.length > 0) form.setFieldError('username', errormes);
+    // });
+    mutate(
+      { body: { username: form.values.username }},
+      { onSuccess({ available }) {
+        setAvailable(!!available);
+        if (!available && form.values.username.length > 0) 
+          form.setFieldError('username', errormes);
+      }
     });
   }, [ form.values.username ]);
 

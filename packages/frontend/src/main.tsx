@@ -8,6 +8,9 @@ import { MantineProvider } from '@mantine/core';
 import { IsMobileProvider } from './contexts/isMobile'
 import { RequestResetPasswordProvider } from './contexts/requestResetPassword';
 import App from './App.tsx';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+
+const queryClient = new QueryClient();
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
@@ -16,11 +19,13 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
         fontFamily: 'Noto Sans JP',
       }}
     >
-      <IsMobileProvider>
-        <RequestResetPasswordProvider>
-          <App />
-        </RequestResetPasswordProvider>
-      </IsMobileProvider>
+      <QueryClientProvider client={queryClient}>
+        <IsMobileProvider>
+          <RequestResetPasswordProvider>
+            <App />
+          </RequestResetPasswordProvider>
+        </IsMobileProvider>
+      </QueryClientProvider>
     </MantineProvider>
   </React.StrictMode>,
 );

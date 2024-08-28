@@ -1,4 +1,6 @@
-import { Error } from "api/types"
+import { components } from 'api/schema';
+
+type Error = components["schemas"]["Error"];
 
 export const createError = {
   invalidParams: (detail?: string): Error => {

@@ -1,11 +1,18 @@
-import useAspidaSWR from '@aspida/swr';
-import api from '@/plugins/api';
+import { $api } from '@/utils/client';
 
 export const useHistories = (since: number, until: number) => {
-  const { data: histories, error } = useAspidaSWR(api.histories._since(since)._until(until));
+  const  { data: histories, error, isLoading } = $api.useQuery("get", "/histories/{since}/{until}", {
+    params: {
+      path: {
+        since,
+        until,
+      },
+    },
+  });
 
   return {
     histories,
     error,
+    isLoading,
   }
 }

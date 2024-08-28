@@ -1,10 +1,15 @@
-import useAspidaSWR from "@aspida/swr";
-import api from "@/plugins/api";
 import { Period } from "@/plugins/dayjs";
+import { $api } from "@/utils/client";
 
 export const useAllUserRanking = (period: Period) => {
-  const { data: allUserRanking, isLoading, error } = useAspidaSWR(api.analysis.ranking.all._period(period));
-  
+  const { data: allUserRanking, error, isLoading } = $api.useQuery("get", "/analysis/ranking/all/{period}", {
+    params: {
+      path: {
+        period,
+      }
+    }
+  });
+
   return {
     allUserRanking,
     isLoading,
@@ -13,8 +18,14 @@ export const useAllUserRanking = (period: Period) => {
 }
 
 export const usePersonalRank = (period: Period) => {
-  const { data: personalRank, isLoading, error } = useAspidaSWR(api.analysis.ranking.personal._period(period));
-  
+  const { data: personalRank, error, isLoading } = $api.useQuery("get", "/analysis/ranking/personal/{period}", {
+    params: {
+      path: {
+        period,
+      },
+    },
+  });
+
   return {
     personalRank,
     isLoading,

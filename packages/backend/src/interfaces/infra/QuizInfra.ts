@@ -1,4 +1,4 @@
-import { Quiz as QuizDTO } from 'api/types';
+import { components } from 'api/schema';
 import { sql } from 'kysely';
 import { isEqual, sortBy, uniq } from 'lodash';
 
@@ -7,6 +7,8 @@ import Quiz from '@/domains/Quiz';
 import IQuizRepository from '@/domains/Quiz/IQuizRepository';
 
 import KyselyClientManager from './kysely/KyselyClientManager';
+
+type QuizDTO = components["schemas"]["Quiz"];
 
 export default class QuizInfra implements IQuizRepository, IQuizQueryService {
   constructor(
