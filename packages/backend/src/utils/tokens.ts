@@ -1,6 +1,8 @@
-import { User } from 'api/types';
+import { components } from 'api/schema';
 import { randomUUID } from 'crypto';
 import jwt, { Secret, SignOptions } from 'jsonwebtoken';
+
+type User = components["schemas"]["User"];
 
 /* 定数設定 */
 const jwtSecret: Secret = process.env.JWT_SECRET_KEY || "";

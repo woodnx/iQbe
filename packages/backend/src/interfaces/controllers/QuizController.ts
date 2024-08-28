@@ -39,7 +39,7 @@ export default class QuizController {
       const since = ('since' in req.query) ? Number(req.query.since) || undefined : undefined;
       const until = ('until' in req.query) ? Number(req.query.until) || undefined : undefined;
       const judgements = ('judement' in req.query) ? req.query.judement || undefined : undefined;
-      const mid = ('mid' in req.params) ? req.params.mid || undefined : undefined;
+      const mid = req.params && ('mid' in req.params) ? req.params.mid || undefined : undefined;
       
       const quizzes = await this.quizQueryService.findMany(uid, {
         page,
@@ -186,11 +186,11 @@ export default class QuizController {
   }
 
   unregister() {
-    return typedAsyncWrapper<"/quizzes/mylist/{mid}", "post">(async (req, res) => {
+    return typedAsyncWrapper<"/quizzes/mylist/{mid}", "delete">(async (req, res) => {
       const qid = req.body.qid;
       const mid = req.params.mid;
 
-      this.registeredQuizService.add(mid, qid);
+      this.registeredQuizService.delete(mid, qid);
 
       res.status(201).send();
     });

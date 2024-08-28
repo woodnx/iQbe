@@ -1,4 +1,6 @@
-import { Quiz as QuizDTO } from "api/types";
+import { components } from 'api/schema';
+
+type QuizDTO = components["schemas"]["Quiz"];
 
 export type findOption = Partial<{
   page: number,
