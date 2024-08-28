@@ -5,21 +5,22 @@ import { useIsMobile } from "@/contexts/isMobile";
 import { Divider, Grid, Group, Title } from "@mantine/core";
 import { useWorkbooks } from "@/hooks/useWorkbooks";
 import { SubmitValue } from "@/types";
-import api from '@/plugins/api';
+import { $api } from "@/utils/client";
 
 export default function CreateDashboard() {
   const isMobile = useIsMobile();
   const { workbooks } = useWorkbooks();
+  const { mutate } = $api.useMutation("post", "/quizzes")
 
   const submit = ({ question, answer, category, subCategory, workbook, isPublic }: SubmitValue) => {
-    api.quizzes.$post({ body: {
+    mutate({ body: {
       question,
       answer,
       category,
       subCategory,
       wid: workbook,
       isPublic,
-    }})
+    }});
   }
 
   return (

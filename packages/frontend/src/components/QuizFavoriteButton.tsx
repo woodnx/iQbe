@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { ActionIcon } from "@mantine/core";
 import { IconStar, IconStarFilled } from "@tabler/icons-react";
-import api from "@/plugins/api";
+import { $api } from "@/utils/client";
 
 interface QuizFavoriteButtonProps {
   isFavorite: boolean,
@@ -13,11 +13,13 @@ export default function QuizFavoriteButton({
   qid,
 }: QuizFavoriteButtonProps) {
   const [ isFavorite, setFavorite ] = useState(innerIsFavorite);
+  const { mutate: like } = $api.useMutation("post", "/quizzes/favorite");
+  const { mutate: unlike } = $api.useMutation("delete", "/quizzes/favorite");
   
   const addFavoriteList = async () => {
     if (isFavorite) {
       try {
-        await api.quizzes.favorite.$delete({ body: {
+        unlike({ body: {
           qid,
         }});
         setFavorite(!isFavorite);
@@ -26,8 +28,8 @@ export default function QuizFavoriteButton({
       }
     }else {
       try {
-        await api.quizzes.favorite.$post({ body: {
-          qid
+        like({ body: {
+          qid,
         }});
         setFavorite(!isFavorite);
       } catch(e) {
