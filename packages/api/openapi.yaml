@@ -11,6 +11,7 @@ tags:
   - name: analysis
   - name: auth
   - name: categories
+  - name: file
   - name: histories
   - name: levels
   - name: mylists
@@ -512,6 +513,45 @@ paths:
       responses:
         "200": 
           $ref: "#/components/responses/CategoryResponse"
+        "400":
+          $ref: "#/components/responses/400BadRequest"
+        "401": 
+          $ref: "#/components/responses/401Unauthorized"
+        "403":
+          $ref: "#/components/responses/403Forbidden"
+  "/csv/parse":
+    post: 
+      tags:
+        - file
+      requestBody:
+        content:
+          text/csv:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        "200":
+          description: 問題文と解答
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    question: 
+                      type: string
+                    answer: 
+                      type: string
+                  required:
+                    - question
+                    - answer
+              example:
+                - question: すい臓にある組織・ランゲルハンス島の発見者であるランゲルハンスは、現在でいうどこの国の病理学者でしょう？
+                  answer: ドイツ
         "400":
           $ref: "#/components/responses/400BadRequest"
         "401": 
