@@ -9,6 +9,9 @@ const printer = ts.createPrinter();
 const BLOB = ts.factory.createTypeReferenceNode(
   ts.factory.createIdentifier("Blob")
 );
+const DATE = ts.factory.createTypeReferenceNode(
+  ts.factory.createIdentifier("Date")
+);
 const NULL = ts.factory.createLiteralTypeNode(ts.factory.createNull());
 
 openapiTS(schema, {
@@ -17,6 +20,12 @@ openapiTS(schema, {
       return schemaObject.nullable 
         ? ts.factory.createUnionTypeNode([BLOB, NULL])
         : BLOB;
+    }
+
+    if (schemaObject.format === "date-time") {
+      return schemaObject.nullable
+        ? ts.factory.createUnionTypeNode([DATE, NULL])
+        : DATE;
     }
   }
 })
