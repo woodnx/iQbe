@@ -546,6 +546,8 @@ paths:
                       type: string
                     answer: 
                       type: string
+                    anotherAnswer:
+                      type: string
                   required:
                     - question
                     - answer
@@ -798,6 +800,8 @@ paths:
                     type: string
                   answer: 
                     type: string
+                  anotherAnswer:
+                    type: string
                   wid:
                     type: string
                   category:
@@ -843,6 +847,8 @@ paths:
                   qid:
                     type: string
                   question: 
+                    type: string
+                  anotherAnswer:
                     type: string
                   answer: 
                     type: string
@@ -2183,6 +2189,8 @@ components:
         question:
           type: string
         answer: 
+          type: string
+        anotherAnswer:
           type: string
         workbook:
           type: string

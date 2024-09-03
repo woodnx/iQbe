@@ -24,6 +24,7 @@ export default class CsvImportInfra implements ICsvImportRepository {
     const result = parsed.map(c => new CsvImport(
       c.question,
       c.answer,
+      c.anotherAnswer,
     ));
 
     return result;

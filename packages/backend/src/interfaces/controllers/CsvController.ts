@@ -24,7 +24,8 @@ export default class CsvController {
 
       const sendCsv = csv.map(c => ({
         question: c.question,
-        answer: c.answer
+        answer: c.answer,
+        anotherAnswer: c.anotherAnswer,
       }));
       
       res.send(sendCsv);

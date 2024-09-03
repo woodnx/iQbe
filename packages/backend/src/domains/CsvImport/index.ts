@@ -1,7 +1,8 @@
 export default class CsvImport {
   constructor(
     private _question: string,
-    private _answer: string
+    private _answer: string,
+    private _anotherAnswer: string | null,
   ) {}
 
   get question() {
@@ -10,5 +11,9 @@ export default class CsvImport {
 
   get answer() {
     return this._answer
+  }
+
+  get anotherAnswer() {
+    return this._anotherAnswer;
   }
 }
