@@ -1535,13 +1535,15 @@ paths:
             schema:  
               type: object
               properties:
-                workbookName:
+                name:
                   type: string
+                published: 
+                  type: string
+                  format: date-time
               required:
-                - wid
-                - workbookName
+                - name
             example: 
-              workbookName: abc the 12th
+              name: abc the 12th
       responses:
         "200":
           $ref: "#/components/responses/WorkbookResponse"
@@ -1555,7 +1557,7 @@ paths:
       tags:
         - workbooks
       summary: 問題集を編集
-      description: リクエストボディに指定した問題集を編集します．編集できる項目は問題集名のみです．
+      description: リクエストボディに指定した問題集を編集します．
       requestBody:
         required: true
         content:
@@ -1565,14 +1567,17 @@ paths:
               properties:
                 wid: 
                   type: string
-                newWorkbookName:
+                name:
                   type: string
+                published:
+                  type: string
+                  format: date-time
               required:
                 - wid
-                - newWorkbookName
+                - name
             example: 
               wid: sX8G8W
-              workbookName: abc the 12th
+              name: abc the 12th
       responses:
         "200":
           $ref: "#/components/responses/WorkbookResponse"
