@@ -63,6 +63,7 @@ export default class QuizController {
     return typedAsyncWrapper<"/quizzes", "put">(async (req, res) => {
       const question: string | undefined = req.body.question;
       const answer:   string | undefined = req.body.answer;
+      const anotherAnswer = req.body.anotherAnswer;
       const category = req.body.category || null;
       const subCategory = category !== 0 && !!req.body.subCategory ? Number(req.body.subCategory) : null;
       const wid = req.body.wid || null;
@@ -79,6 +80,7 @@ export default class QuizController {
         qid,
         question,
         answer,
+        anotherAnswer || null,
         wid,
         category,
         subCategory,
@@ -97,6 +99,7 @@ export default class QuizController {
       const qid = req.body.qid;
       const question: string | undefined = req.body.question;
       const answer: string | undefined = req.body.answer;
+      const anotherAnswer = req.body.anotherAnswer;
       const category = req.body.category || null;
       const subCategory = category !== 0 ? req.body.subCategory || null : 0;
       const wid = req.body.wid || null;
@@ -116,6 +119,7 @@ export default class QuizController {
         quiz.qid,
         question,
         answer,
+        anotherAnswer || null,
         wid,
         category,
         subCategory,
@@ -236,6 +240,7 @@ export default class QuizController {
         quiz.qid,
         quiz.question,
         quiz.answer,
+        quiz.anotherAnswer,
         wid,
         quiz.categoryId,
         quiz.subCategoryId,
@@ -264,6 +269,7 @@ export default class QuizController {
         quiz.qid,
         quiz.question,
         quiz.answer,
+        quiz.anotherAnswer,
         null,
         quiz.categoryId,
         quiz.subCategoryId,

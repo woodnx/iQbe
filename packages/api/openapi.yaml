@@ -11,6 +11,7 @@ tags:
   - name: analysis
   - name: auth
   - name: categories
+  - name: file
   - name: histories
   - name: levels
   - name: mylists
@@ -518,6 +519,47 @@ paths:
           $ref: "#/components/responses/401Unauthorized"
         "403":
           $ref: "#/components/responses/403Forbidden"
+  "/csv/parse":
+    post: 
+      tags:
+        - file
+      requestBody:
+        content:
+          text/csv:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        "200":
+          description: 問題文と解答
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    question: 
+                      type: string
+                    answer: 
+                      type: string
+                    anotherAnswer:
+                      type: string
+                  required:
+                    - question
+                    - answer
+              example:
+                - question: すい臓にある組織・ランゲルハンス島の発見者であるランゲルハンスは、現在でいうどこの国の病理学者でしょう？
+                  answer: ドイツ
+        "400":
+          $ref: "#/components/responses/400BadRequest"
+        "401": 
+          $ref: "#/components/responses/401Unauthorized"
+        "403":
+          $ref: "#/components/responses/403Forbidden"
   "/histories/{since}/{until}":
     get: 
       tags: 
@@ -758,6 +800,8 @@ paths:
                     type: string
                   answer: 
                     type: string
+                  anotherAnswer:
+                    type: string
                   wid:
                     type: string
                   category:
@@ -803,6 +847,8 @@ paths:
                   qid:
                     type: string
                   question: 
+                    type: string
+                  anotherAnswer:
                     type: string
                   answer: 
                     type: string
@@ -1489,13 +1535,15 @@ paths:
             schema:  
               type: object
               properties:
-                workbookName:
+                name:
                   type: string
+                published: 
+                  type: string
+                  format: date-time
               required:
-                - wid
-                - workbookName
+                - name
             example: 
-              workbookName: abc the 12th
+              name: abc the 12th
       responses:
         "200":
           $ref: "#/components/responses/WorkbookResponse"
@@ -1509,7 +1557,7 @@ paths:
       tags:
         - workbooks
       summary: 問題集を編集
-      description: リクエストボディに指定した問題集を編集します．編集できる項目は問題集名のみです．
+      description: リクエストボディに指定した問題集を編集します．
       requestBody:
         required: true
         content:
@@ -1519,14 +1567,17 @@ paths:
               properties:
                 wid: 
                   type: string
-                newWorkbookName:
+                name:
                   type: string
+                published:
+                  type: string
+                  format: date-time
               required:
                 - wid
-                - newWorkbookName
+                - name
             example: 
               wid: sX8G8W
-              workbookName: abc the 12th
+              name: abc the 12th
       responses:
         "200":
           $ref: "#/components/responses/WorkbookResponse"
@@ -1610,9 +1661,11 @@ components:
       required: false
       description: 検索したいwidのリスト
       schema: 
-        type: array
-        items: 
-          type: string
+        oneOf:
+          - type: array
+            items: 
+              type: string
+          - type: string
       example: 
         - WI0Nul
         - qS3dmK
@@ -2143,6 +2196,8 @@ components:
         question:
           type: string
         answer: 
+          type: string
+        anotherAnswer:
           type: string
         workbook:
           type: string

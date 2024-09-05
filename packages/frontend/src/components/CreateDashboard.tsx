@@ -1,16 +1,17 @@
-import QuizEditForm from "@/components/QuizEditForm";
-import CreateWorkbookModal from "@/components/CreateWorkbookModal";
-import WorkbookCard from "@/components/WorkbookCard";
-import { useIsMobile } from "@/contexts/isMobile";
-import { Divider, Grid, Group, Title } from "@mantine/core";
-import { useWorkbooks } from "@/hooks/useWorkbooks";
-import { SubmitValue } from "@/types";
+import QuizEditForm from '@/components/QuizEditForm';
 import { $api } from "@/utils/client";
+import { SubmitValue } from '@/types';
+import { Tabs } from '@mantine/core';
+import CsvFileImporter from './CsvFileImporter';
+
+export interface Element {
+  question: string,
+  answer: string,
+  anotherAnswer?: string | null,
+}
 
 export default function CreateDashboard() {
-  const isMobile = useIsMobile();
-  const { workbooks } = useWorkbooks();
-  const { mutate } = $api.useMutation("post", "/quizzes")
+  const { mutate } = $api.useMutation("post", "/quizzes");
 
   const submit = ({ question, answer, category, subCategory, workbook, isPublic }: SubmitValue) => {
     mutate({ body: {
@@ -21,28 +22,24 @@ export default function CreateDashboard() {
       wid: workbook,
       isPublic,
     }});
-  }
+  };
 
   return (
     <>
-      <QuizEditForm mb={16} onSubmit={submit}/>
-      <Divider/>
-      <Group justify="space-between" my="lg">
-        <Title fz={isMobile ? 25 : 35}>Editable Quiz List</Title>
-        <CreateWorkbookModal/>
-      </Group>
-      <Grid>
-        <Grid.Col span={{ base: 12, sm: 6, lg: 3 }}>
-          <WorkbookCard title="すべてのクイズ" wid="all"/>
-        </Grid.Col>
-        {
-          workbooks?.map(w => (
-            <Grid.Col key={w.wid} span={{ base: 12, sm: 6, lg: 3 }} >
-              <WorkbookCard title={w.name} wid={w.wid}/>
-            </Grid.Col>
-          ))
-        }
-      </Grid>
+      <Tabs defaultValue="single">
+        <Tabs.List grow>
+          <Tabs.Tab value="single">Single</Tabs.Tab>
+          <Tabs.Tab value="file">CSV file</Tabs.Tab>
+        </Tabs.List>
+
+        <Tabs.Panel value="single" pt="xs">
+          <QuizEditForm mb={16} onSubmit={submit}/>
+        </Tabs.Panel>
+        <Tabs.Panel value="file" pt="xs">
+          <CsvFileImporter />
+        </Tabs.Panel>
+      </Tabs>
+      
     </>
   )
 }

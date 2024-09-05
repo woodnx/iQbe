@@ -8,7 +8,7 @@ export type findOption = Partial<{
   seed: number,
   keyword: string,
   keywordOption: number,
-  wids: string[],
+  wids: string | string[],
   levelIds: number[],
   since: Date,
   until: Date,

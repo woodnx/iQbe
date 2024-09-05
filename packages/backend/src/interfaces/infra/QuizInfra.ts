@@ -34,6 +34,7 @@ export default class QuizInfra implements IQuizRepository, IQuizQueryService {
       'quizzes.qid as qid',
       'quizzes.que as question',
       'quizzes.ans as answer',
+      'quizzes.anoans as anotherAnswer',
       'workbooks.wid as wid', 
       'workbooks.name as workbook',
       'levels.color as level',
@@ -50,7 +51,10 @@ export default class QuizInfra implements IQuizRepository, IQuizQueryService {
     ]));
 
     if (!!option.wids && option.wids.length)
-      query = query.where('workbooks.wid', 'in', option.wids);
+      if (Array.isArray(option.wids)) 
+        query = query.where('workbooks.wid', 'in', option.wids);
+      else
+        query = query.where('workbooks.wid', '=', option.wids);
     if (!!option.levelIds && option.levelIds.length) 
       query = query.where('levels.id', 'in', option.levelIds);
     if (!!option.seed)     query = query.orderBy(sql`RAND(${option.seed})`);
@@ -185,6 +189,7 @@ export default class QuizInfra implements IQuizRepository, IQuizQueryService {
       'quizzes.qid as qid',
       'quizzes.que as question',
       'quizzes.ans as answer',
+      'quizzes.anoans as anotherAnswer',
       'workbooks.wid as wid', 
       'users.uid as creatorUid',
       'quizzes.category_id as categoryId',
@@ -211,6 +216,7 @@ export default class QuizInfra implements IQuizRepository, IQuizQueryService {
       quiz.qid,
       quiz.question,
       quiz.answer,
+      quiz.anotherAnswer,
       quiz.wid,
       quiz.categoryId,
       quiz.subCategoryId,
@@ -240,6 +246,7 @@ export default class QuizInfra implements IQuizRepository, IQuizQueryService {
         qid: quiz.qid,
         que: quiz.question,
         ans: quiz.answer,
+        anoans: quiz.anotherAnswer,
         workbook_id: workbookId || null,
         creator_id: userId,
         category_id: quiz.categoryId,
@@ -303,6 +310,7 @@ export default class QuizInfra implements IQuizRepository, IQuizQueryService {
       .set({
         que: quiz.question,
         ans: quiz.answer,
+        anoans: quiz.anotherAnswer,
         workbook_id: workbookId,
         creator_id: userId,
         category_id: quiz.categoryId,
