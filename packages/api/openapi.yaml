@@ -1661,9 +1661,11 @@ components:
       required: false
       description: 検索したいwidのリスト
       schema: 
-        type: array
-        items: 
-          type: string
+        oneOf:
+          - type: array
+            items: 
+              type: string
+          - type: string
       example: 
         - WI0Nul
         - qS3dmK

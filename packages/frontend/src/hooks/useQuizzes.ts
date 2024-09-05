@@ -1,69 +1,44 @@
-import useSWR from 'swr'
-import axios from '../plugins/axios'
-import { Quiz, QuizRequestParams } from '../types'
+import { QuizRequestParams } from '../types'
+import { $api } from '@/utils/client'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 
-const fetcher = (url: string, params: string) => (
-  axios.get<Quiz[]>(`${url}?${params}`).then(res => res.data)
-)
-
-const createFilter = ({
-  page,
-  perPage,
-  seed,
-  workbooks,
-  levels,
-  keyword,
-  keywordOption,
-  since,
-  until,
-  judgements,
-} : QuizRequestParams) => {
-  const params = new URLSearchParams();
-
-  if(!!page && !!perPage) {
-    params.append('page', String(page))
-    params.append('maxView', String(perPage))
-  }
-  if(!!seed) params.append('seed', String(seed))
-
-  if (!!workbooks && workbooks.length !== 0) workbooks.forEach(id => { params.append('workbooks[]', id) })
-  if (!!levels    && levels.length !== 0)    levels.forEach(id => { params.append('levels[]', id) })
-  if (!!keyword   && keyword.trim().length !== 0 && !!keywordOption) { 
-    params.append("keyword", keyword) 
-    params.append("keywordOption", keywordOption)
-  }
-
-  if (!!since && !!until) { 
-    params.append("since", String(since));
-    params.append("until", String(until));
-  }
-
-  if (!!judgements) judgements.forEach(j => { params.append('judement[]', String(j)) });
-
-  // if (!(crctAnsRatio[0] == 0 && crctAnsRatio[1] == 100)) crctAnsRatio.forEach(ratio => { params.append('crctAnsRatio[]', ratio) }) 
-  // params.append('userId', rootState.user.id)
-
-  return params
-}
+export type QuizzesPath = '/favorite' | '/history' | '/mylist/{mid}' | '';
 
 const useQuizzes = (
-  path: string = '',
+  path: QuizzesPath = '',
   initialParams: QuizRequestParams = { perPage: 100 },
   shouldFetch = true,
 ) => {
-  const { data: params, mutate: setParams } = useSWR<QuizRequestParams>('params', null, { fallbackData: initialParams});
-  const filter = createFilter(params || {}).toString();
+  const { data: params, } = useQuery({
+    queryKey: ['params'],
+    initialData: initialParams,
+  });
+  const queryClient = useQueryClient();
+  const setParams = (v: QuizRequestParams) => {
+    queryClient.setQueryData(['params'], v);
+  };
 
-  const { data: quizzes, isLoading, error, mutate } = useSWR(
-    shouldFetch ? [`/quizzes${path}`, filter ] : null,
-    ([url, filter]) => fetcher(url, filter)
-  );
+  const { data: quizzes, error, isLoading } = $api.useQuery('get', `/quizzes${path}`, {
+    params: {
+      query: params &&  {
+        page: params.page,
+        maxView: params.perPage,
+        seed: params.seed,
+        workbooks: params.workbooks,
+        keyword: params.keyword,
+        keywordOption: Number(params.keywordOption),
+        judement: params.judgements,
+        since: params.since,
+        until: params.until
+      }
+    },
+    enabled: shouldFetch,
+  })
 
   return {
     quizzes,
     isLoading,
     error,
-    mutate,
     params,
     setParams,
   }

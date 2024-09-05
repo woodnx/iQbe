@@ -51,7 +51,10 @@ export default class QuizInfra implements IQuizRepository, IQuizQueryService {
     ]));
 
     if (!!option.wids && option.wids.length)
-      query = query.where('workbooks.wid', 'in', option.wids);
+      if (Array.isArray(option.wids)) 
+        query = query.where('workbooks.wid', 'in', option.wids);
+      else
+        query = query.where('workbooks.wid', '=', option.wids);
     if (!!option.levelIds && option.levelIds.length) 
       query = query.where('levels.id', 'in', option.levelIds);
     if (!!option.seed)     query = query.orderBy(sql`RAND(${option.seed})`);
