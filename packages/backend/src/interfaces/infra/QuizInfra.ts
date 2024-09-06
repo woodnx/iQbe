@@ -275,6 +275,16 @@ export default class QuizInfra implements IQuizRepository, IQuizQueryService {
     });
   }
 
+  async saveMany(quizzes: Quiz[]): Promise<void> {
+    const client = this.clientManager.getClient();
+
+    client.transaction().execute(async (trx) => {
+      for (const quiz of quizzes) {
+        await this.save(quiz);
+      }
+    });
+  }
+
   async update(quiz: Quiz): Promise<void> {
     const client = this.clientManager.getClient();
 

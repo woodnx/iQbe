@@ -36,7 +36,10 @@ export default function CsvEditor({
 
   const SaveButton = () => (
     <Button
-      onClick={() => onSave(elements, wid)}
+      onClick={() => {
+        onSave(elements, wid);
+        close();
+      }}
     >
       保存
     </Button>

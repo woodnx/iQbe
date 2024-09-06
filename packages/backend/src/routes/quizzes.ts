@@ -65,6 +65,7 @@ router.get('/mylist/:mid', quizController.get('/mylist/{mid}'));
 router.get('/create', quizController.get());
 
 router.post('/', quizController.post());
+router.post('/multiple', quizController.multiplePost());
 router.post('/favorite', quizController.favorite());
 router.post('/history', quizController.practice());
 router.post('/mylist/:mid', quizController.register());
