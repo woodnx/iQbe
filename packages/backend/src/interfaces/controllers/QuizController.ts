@@ -60,7 +60,7 @@ export default class QuizController {
   }
 
   post() {
-    return typedAsyncWrapper<"/quizzes", "put">(async (req, res) => {
+    return typedAsyncWrapper<"/quizzes", "post">(async (req, res) => {
       const question: string | undefined = req.body.question;
       const answer:   string | undefined = req.body.answer;
       const anotherAnswer = req.body.anotherAnswer;
@@ -89,6 +89,37 @@ export default class QuizController {
       );
 
       await this.quizRepository.save(quiz);
+
+      res.status(201).send();
+    });
+  }
+
+  multiplePost() {
+    return typedAsyncWrapper<"/quizzes/multiple", "post">(async (req, res) => {
+      const records = req.body.records;
+      const uid = req.uid;
+
+      if (!records) {
+        throw new ApiError().invalidParams();
+      }
+
+      const quizzes = records.map(record => {
+        const qid = this.quizService.generateQid();
+
+        return new Quiz(
+          qid,
+          record.question,
+          record.answer,
+          record.anotherAnswer || null,
+          record.wid || null,
+          record.category || null,
+          record.subCategory || null,
+          uid,
+          record.limitedUser || [],
+        );
+      });
+
+      await this.quizRepository.saveMany(quizzes);
 
       res.status(201).send();
     });

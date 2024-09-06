@@ -4,11 +4,12 @@ import CsvDropzone from "./CsvDropzone";
 import { $api, client } from "@/utils/client";
 import { useState } from "react";
 import CsvEditor from "./CsvEditor";
+import { notifications } from "@mantine/notifications";
 
 export default function CsvFileImporter() {
   const [ parsedCsv, setPasedCsv ] = useState<Element[]>([]);
   const [ isLoading, setIsLoading ] = useState(false);
-  const { mutateAsync: addQuiz } = $api.useMutation('post', '/quizzes');
+  const { mutateAsync: addQuizzes } = $api.useMutation('post', '/quizzes/multiple');
 
   const parseCsv = async (files: FileWithPath[]) => {
     setIsLoading(true);
@@ -27,19 +28,24 @@ export default function CsvFileImporter() {
   }
 
   const saveQuizzes = async (quizzes: Element[], wid: string | null) => {
-    setIsLoading(true);
+    const _quizzes = quizzes.map(quiz => ({
+      question: quiz.question,
+      answer: quiz.answer,
+      anotherAnswer: quiz.anotherAnswer,
+      wid
+    }));
 
-    for (const quiz of quizzes) {
-      await addQuiz({
-        body: {
-          question: quiz.question,
-          answer: quiz.answer,
-          anotherAnswer: quiz.anotherAnswer,
-          wid,
-        }
-      });
-    }
-    setIsLoading(false);
+    await addQuizzes({
+      body: {
+        records: _quizzes
+      }
+    });
+    
+    notifications.show({
+      title: `クイズのインポートが完了しました`,
+      message: `クイズを${_quizzes.length}問インポートしました`,
+      position: 'top-right',
+    });
   }
 
   return (

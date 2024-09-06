@@ -778,7 +778,7 @@ paths:
         - $ref: "#/components/parameters/crctAnsRatio"
       responses:
         "200":
-          $ref: "#/components/responses/QuizzzeResponse"
+          $ref: "#/components/responses/QuizzesResponse"
         "400":
           $ref: "#/components/responses/400BadRequest"
         "401": 
@@ -902,7 +902,7 @@ paths:
         - $ref: "#/components/parameters/crctAnsRatio"
       responses:
         "200":
-          $ref: "#/components/responses/QuizzzeResponse"
+          $ref: "#/components/responses/QuizzesResponse"
         "400":
           $ref: "#/components/responses/400BadRequest"
         "401": 
@@ -981,7 +981,7 @@ paths:
         - $ref: "#/components/parameters/judgement"
       responses:
         "200":
-          $ref: "#/components/responses/QuizzzeResponse"
+          $ref: "#/components/responses/QuizzesResponse"
         "400":
           $ref: "#/components/responses/400BadRequest"
         "401": 
@@ -1018,6 +1018,67 @@ paths:
           $ref: "#/components/responses/401Unauthorized"
         "403":
           $ref: "#/components/responses/403Forbidden"
+  "/quizzes/multiple":
+    post: 
+      tags: 
+        - quizzes
+      summary: クイズの新規作成
+      requestBody:
+         required: true
+         content:
+            application/json:
+              schema: 
+                type: object
+                properties:
+                  records: 
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        question: 
+                          type: string
+                        answer: 
+                          type: string
+                        anotherAnswer:
+                          type: string
+                        wid:
+                          type: string
+                        category:
+                          type: number
+                        subCategory:
+                          type: number
+                        isPublic: 
+                          type: boolean
+                        limitedUser:
+                          type: array
+                          items: 
+                            type: string
+                      required:
+                        - question
+                        - answer
+                example:
+                  type: object
+                  properties:
+                    records:
+                      type: array
+                      items:
+                        - type: object
+                          properties:
+                            question: すい臓にある組織・ランゲルハンス島の発見者であるランゲルハンスは、現在でいうどこの国の病理学者でしょう？
+                            answer: ドイツ
+                            wid: sX8G8W
+                            category: 10
+                            subCategory: 14
+                            isPublic: false
+      responses:
+        "201":
+          $ref: "#/components/responses/QuizzesResponse"
+        "400":
+          $ref: "#/components/responses/400BadRequest"
+        "401": 
+          $ref: "#/components/responses/401Unauthorized"
+        "403":
+          $ref: "#/components/responses/403Forbidden"
   "/quizzes/mylist/{mid}":
     get:
       tags:
@@ -1035,7 +1096,7 @@ paths:
         - $ref: "#/components/parameters/mid"
       responses:
         "200":
-          $ref: "#/components/responses/QuizzzeResponse"
+          $ref: "#/components/responses/QuizzesResponse"
         "400":
           $ref: "#/components/responses/400BadRequest"
         "401": 
@@ -1115,7 +1176,7 @@ paths:
         - $ref: "#/components/parameters/tid"
       responses:
         "200":
-          $ref: "#/components/responses/QuizzzeResponse"
+          $ref: "#/components/responses/QuizzesResponse"
         "400":
           $ref: "#/components/responses/400BadRequest"
         "401": 
@@ -2004,7 +2065,7 @@ components:
             registerdMylist: []
             creatorId: 1
             isPublic: false
-    QuizzzeResponse:
+    QuizzesResponse:
       description: クイズのリスト
       content:
         application/json:
