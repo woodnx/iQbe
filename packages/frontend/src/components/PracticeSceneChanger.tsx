@@ -29,6 +29,7 @@ export default function({
 }: Props) {
   const [ nowNumber, setNowNumber ] = useState(0);
   const [ scene, setScene ] = useState(0);
+  const [ startTrigger, setStartTrigger ] = useState(isTransfer);
   const [ filtering, filter ] = useDisclosure(false);
   const [ resulted, result ] = useDisclosure(false);
   const navigator = useNavigate();
@@ -104,6 +105,7 @@ export default function({
     filter.close();
     onFilter();
     setNowNumber(0);
+    setStartTrigger(true);
     setScene(0);
   }
 
@@ -150,7 +152,7 @@ export default function({
         scene == 0 ? 
           <Overlay fixed center>
             { 
-              !quiz ? 
+              !quiz || !startTrigger ? 
                 <Loader variant="dots"/> 
               : 
                 <PracticeQuizIntro 
