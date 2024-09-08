@@ -12,6 +12,10 @@ export default class Workbook {
     this._name = name;
   }
 
+  setDate(date: Date | null) {
+    this._date = date;
+  }
+
   get wid(): string {
     return this._wid;
   }

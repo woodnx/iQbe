@@ -11,6 +11,7 @@ tags:
   - name: analysis
   - name: auth
   - name: categories
+  - name: file
   - name: histories
   - name: levels
   - name: mylists
@@ -518,6 +519,47 @@ paths:
           $ref: "#/components/responses/401Unauthorized"
         "403":
           $ref: "#/components/responses/403Forbidden"
+  "/csv/parse":
+    post: 
+      tags:
+        - file
+      requestBody:
+        content:
+          text/csv:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        "200":
+          description: 問題文と解答
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    question: 
+                      type: string
+                    answer: 
+                      type: string
+                    anotherAnswer:
+                      type: string
+                  required:
+                    - question
+                    - answer
+              example:
+                - question: すい臓にある組織・ランゲルハンス島の発見者であるランゲルハンスは、現在でいうどこの国の病理学者でしょう？
+                  answer: ドイツ
+        "400":
+          $ref: "#/components/responses/400BadRequest"
+        "401": 
+          $ref: "#/components/responses/401Unauthorized"
+        "403":
+          $ref: "#/components/responses/403Forbidden"
   "/histories/{since}/{until}":
     get: 
       tags: 
@@ -736,7 +778,7 @@ paths:
         - $ref: "#/components/parameters/crctAnsRatio"
       responses:
         "200":
-          $ref: "#/components/responses/QuizzzeResponse"
+          $ref: "#/components/responses/QuizzesResponse"
         "400":
           $ref: "#/components/responses/400BadRequest"
         "401": 
@@ -757,6 +799,8 @@ paths:
                   question: 
                     type: string
                   answer: 
+                    type: string
+                  anotherAnswer:
                     type: string
                   wid:
                     type: string
@@ -803,6 +847,8 @@ paths:
                   qid:
                     type: string
                   question: 
+                    type: string
+                  anotherAnswer:
                     type: string
                   answer: 
                     type: string
@@ -856,7 +902,7 @@ paths:
         - $ref: "#/components/parameters/crctAnsRatio"
       responses:
         "200":
-          $ref: "#/components/responses/QuizzzeResponse"
+          $ref: "#/components/responses/QuizzesResponse"
         "400":
           $ref: "#/components/responses/400BadRequest"
         "401": 
@@ -935,7 +981,7 @@ paths:
         - $ref: "#/components/parameters/judgement"
       responses:
         "200":
-          $ref: "#/components/responses/QuizzzeResponse"
+          $ref: "#/components/responses/QuizzesResponse"
         "400":
           $ref: "#/components/responses/400BadRequest"
         "401": 
@@ -972,6 +1018,67 @@ paths:
           $ref: "#/components/responses/401Unauthorized"
         "403":
           $ref: "#/components/responses/403Forbidden"
+  "/quizzes/multiple":
+    post: 
+      tags: 
+        - quizzes
+      summary: クイズの新規作成
+      requestBody:
+         required: true
+         content:
+            application/json:
+              schema: 
+                type: object
+                properties:
+                  records: 
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        question: 
+                          type: string
+                        answer: 
+                          type: string
+                        anotherAnswer:
+                          type: string
+                        wid:
+                          type: string
+                        category:
+                          type: number
+                        subCategory:
+                          type: number
+                        isPublic: 
+                          type: boolean
+                        limitedUser:
+                          type: array
+                          items: 
+                            type: string
+                      required:
+                        - question
+                        - answer
+                example:
+                  type: object
+                  properties:
+                    records:
+                      type: array
+                      items:
+                        - type: object
+                          properties:
+                            question: すい臓にある組織・ランゲルハンス島の発見者であるランゲルハンスは、現在でいうどこの国の病理学者でしょう？
+                            answer: ドイツ
+                            wid: sX8G8W
+                            category: 10
+                            subCategory: 14
+                            isPublic: false
+      responses:
+        "201":
+          $ref: "#/components/responses/QuizzesResponse"
+        "400":
+          $ref: "#/components/responses/400BadRequest"
+        "401": 
+          $ref: "#/components/responses/401Unauthorized"
+        "403":
+          $ref: "#/components/responses/403Forbidden"
   "/quizzes/mylist/{mid}":
     get:
       tags:
@@ -989,7 +1096,7 @@ paths:
         - $ref: "#/components/parameters/mid"
       responses:
         "200":
-          $ref: "#/components/responses/QuizzzeResponse"
+          $ref: "#/components/responses/QuizzesResponse"
         "400":
           $ref: "#/components/responses/400BadRequest"
         "401": 
@@ -1030,6 +1137,86 @@ paths:
       summary: マイリストからクイズを削除
       parameters:
         - $ref: "#/components/parameters/mid"
+      requestBody: 
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                qid: 
+                  type: string
+              required:
+                - qid
+            example: 
+              qid: DG8ED3bx7y0McbistuLx
+      responses:
+        "204": 
+          description: "deleted quiz from mylist"
+        "400":
+          $ref: "#/components/responses/400BadRequest"
+        "401": 
+          $ref: "#/components/responses/401Unauthorized"
+        "403":
+          $ref: "#/components/responses/403Forbidden"
+  "/quizzes/tag/{tid}":
+    get:
+      tags:
+        - quizzes
+      summary: 指定するタグが付与されたクイズリストを取得
+      parameters:
+        - $ref: "#/components/parameters/page"
+        - $ref: "#/components/parameters/maxView"
+        - $ref: "#/components/parameters/seed"
+        - $ref: "#/components/parameters/workbooks"
+        - $ref: "#/components/parameters/levels"
+        - $ref: "#/components/parameters/keyword"
+        - $ref: "#/components/parameters/keywordOption"
+        - $ref: "#/components/parameters/crctAnsRatio"
+        - $ref: "#/components/parameters/tid"
+      responses:
+        "200":
+          $ref: "#/components/responses/QuizzesResponse"
+        "400":
+          $ref: "#/components/responses/400BadRequest"
+        "401": 
+          $ref: "#/components/responses/401Unauthorized"
+        "403":
+          $ref: "#/components/responses/403Forbidden"
+    post: 
+      tags: 
+        - quizzes
+      summary: クイズにタグを登録
+      parameters:
+        - $ref: "#/components/parameters/tid"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                qid: 
+                  type: string
+              required:
+                - qid
+            example:
+              qid: DG8ED3bx7y0McbistuLx
+      responses:
+        "201":
+          $ref: "#/components/responses/QuizResponse"
+        "400":
+          $ref: "#/components/responses/400BadRequest"
+        "401": 
+          $ref: "#/components/responses/401Unauthorized"
+        "403":
+          $ref: "#/components/responses/403Forbidden"
+    delete: 
+      tags:
+        - quizzes
+      summary: クイズからタグを削除
+      parameters:
+        - $ref: "#/components/parameters/tid"
       requestBody: 
         required: true
         content:
@@ -1409,13 +1596,15 @@ paths:
             schema:  
               type: object
               properties:
-                workbookName:
+                name:
                   type: string
+                published: 
+                  type: string
+                  format: date-time
               required:
-                - wid
-                - workbookName
+                - name
             example: 
-              workbookName: abc the 12th
+              name: abc the 12th
       responses:
         "200":
           $ref: "#/components/responses/WorkbookResponse"
@@ -1429,7 +1618,7 @@ paths:
       tags:
         - workbooks
       summary: 問題集を編集
-      description: リクエストボディに指定した問題集を編集します．編集できる項目は問題集名のみです．
+      description: リクエストボディに指定した問題集を編集します．
       requestBody:
         required: true
         content:
@@ -1439,14 +1628,17 @@ paths:
               properties:
                 wid: 
                   type: string
-                newWorkbookName:
+                name:
                   type: string
+                published:
+                  type: string
+                  format: date-time
               required:
                 - wid
-                - newWorkbookName
+                - name
             example: 
               wid: sX8G8W
-              workbookName: abc the 12th
+              name: abc the 12th
       responses:
         "200":
           $ref: "#/components/responses/WorkbookResponse"
@@ -1530,9 +1722,11 @@ components:
       required: false
       description: 検索したいwidのリスト
       schema: 
-        type: array
-        items: 
-          type: string
+        oneOf:
+          - type: array
+            items: 
+              type: string
+          - type: string
       example: 
         - WI0Nul
         - qS3dmK
@@ -1611,6 +1805,12 @@ components:
       required: true
       schema: 
         type: string 
+    tid:
+      name: tid
+      in: path
+      required: true
+      schema:
+        type: string
   requestBodies:
     QuizRequestBody:
       required: true
@@ -1865,7 +2065,7 @@ components:
             registerdMylist: []
             creatorId: 1
             isPublic: false
-    QuizzzeResponse:
+    QuizzesResponse:
       description: クイズのリスト
       content:
         application/json:
@@ -2058,6 +2258,8 @@ components:
           type: string
         answer: 
           type: string
+        anotherAnswer:
+          type: string
         workbook:
           type: string
           readOnly: true
@@ -2082,6 +2284,11 @@ components:
         registerdMylist:
           type: array 
           items: 
+            type: string
+          readOnly: true
+        tags:
+          type: array
+          items:
             type: string
           readOnly: true
         creatorId:

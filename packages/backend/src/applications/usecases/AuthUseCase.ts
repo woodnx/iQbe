@@ -1,6 +1,5 @@
 import { ApiError } from 'api';
-import { AuthResponse as TokenDTO, AuthResponseWithRefreshToken as AuthDTO } from 'api/types';
-
+import { components } from 'api/schema';
 import AccessToken from '@/domains/AccessToken';
 import AuthService from '@/domains/Auth/AuthService';
 import InviteCode from '@/domains/InviteCode';
@@ -15,6 +14,9 @@ import UsersService from '@/domains/User/UserService';
 import dayjs, { format } from '@/plugins/day';
 
 import ITransactionManager from '../shared/ITransactionManager';
+
+type TokenDTO = components["responses"]["AuthResponse"]["content"]["application/json"];
+type AuthDTO = components["responses"]["AuthResponseWithRefreshToken"]["content"]["application/json"];
 
 export default class AuthUseCase {
   constructor(

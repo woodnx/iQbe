@@ -1,15 +1,14 @@
-import useAspidaSWR from '@aspida/swr';
-import api from '@/plugins/api';
+import { $api } from '@/utils/client';
 
 export const useWorkbooks = (isAll = false, shouldFetch = true) => {
-  const { data: workbooks, error, mutate } = useAspidaSWR(
-    isAll ? api.workbooks.all : api.workbooks, {
+  const { data: workbooks, error, isLoading } = $api.useQuery("get", 
+    isAll ? "/workbooks/all" : "/workbooks", {}, {
     enabled: shouldFetch,
   });
 
   return {
     workbooks,
     error,
-    mutate,
+    isLoading,
   }
 }

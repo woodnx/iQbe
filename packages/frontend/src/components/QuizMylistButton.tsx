@@ -4,9 +4,9 @@ import { useDisclosure } from "@mantine/hooks";
 import { IconPlaylistAdd, IconPlus } from "@tabler/icons-react";
 import classes from "./styles/QuizMylistButton.module.css";
 import { MylistInformation } from "@/types";
-import api from "@/plugins/api";
 import { useIsMobile } from "@/contexts/isMobile";
 import MylistCreateModal from "./MylistCreateModal";
+import { $api } from "@/utils/client";
 
 interface Props extends ComponentProps<typeof Button> {
   qid: string,
@@ -22,15 +22,22 @@ export default function QuizMylistButton({
   const [ creating, create ] = useDisclosure(false);
   const [ selectedMyListIdx, setSelectedMylistIdx ] = useState(registerdMylistId.map(id => mylists?.findIndex(list => list.mid == id)));
   const isMobile = useIsMobile();
+  const { mutate: addMylist } = $api.useMutation("post", "/mylists");
+  const { mutate: addQuizToMylist } = $api.useMutation("post", "/quizzes/mylist/{mid}");
+  const { mutate: deleteQuizFromMylist } = $api.useMutation("delete", "/quizzes/mylist/{mid}")
 
   const createMylist = async (mylistname: string) => {
     try {
-      const { mid } = await api.mylists.$post({ body: {
+      addMylist({ body: {
         listName: mylistname,
-      }});
-      api.quizzes.mylist._mid(mid).$post({ body: {
-        qid,
-      }});
+      }}, {
+        onSuccess: (({ mid }) => {
+          addQuizToMylist({ 
+            params: { path: { mid } },
+            body: { qid },
+          });
+        }),
+      });
     } catch(e) {
       return;
     }
@@ -39,15 +46,17 @@ export default function QuizMylistButton({
   const saveToList = async (mid: string, arrayIdx: number) => {
     try {
       if (!selectedMyListIdx.includes(arrayIdx)) { // add quiz into mylist
-        await api.quizzes.mylist._mid(mid).$post({ body: {
-          qid,
-        }});
+        addQuizToMylist({ 
+          params: { path: { mid } },
+          body: { qid },
+        });
         setSelectedMylistIdx([...selectedMyListIdx, arrayIdx]);
       } 
       else {  // delete quiz from mylist
-        await api.quizzes.mylist._mid(mid).$delete({ body: {
-          qid,
-        }});
+        deleteQuizFromMylist({ 
+          params: { path: { mid } }, 
+          body: { qid },
+        });
         setSelectedMylistIdx(selectedMyListIdx.filter(idx => idx != arrayIdx));
       }
     } catch(e) {
