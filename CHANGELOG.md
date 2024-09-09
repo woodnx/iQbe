@@ -1,5 +1,19 @@
 # Changelog
 
+## [3.3.0](https://github.com/woodnx/iQbe/compare/v3.2.0...v3.3.0) (2024-09-09)
+
+
+### Features
+
+* Add ability to add multiple quizzes ([#91](https://github.com/woodnx/iQbe/issues/91)) ([c63ca0c](https://github.com/woodnx/iQbe/commit/c63ca0c898363fa8a85d6977c3c0eea558acf369)), closes [#90](https://github.com/woodnx/iQbe/issues/90)
+* **backend:** Add tag info to quiz ([#84](https://github.com/woodnx/iQbe/issues/84)) ([2ba2f56](https://github.com/woodnx/iQbe/commit/2ba2f56653d30d064f35d6eb96fbbcbd450332dc))
+* Quiz Import from CSV file ([#89](https://github.com/woodnx/iQbe/issues/89)) ([fcb194e](https://github.com/woodnx/iQbe/commit/fcb194ec59545443f3bf9d023ff69864a9cf9aa4))
+
+
+### Bug Fixes
+
+* **frontend:** problems that start automatically in practice ([#94](https://github.com/woodnx/iQbe/issues/94)) ([ce7f8b0](https://github.com/woodnx/iQbe/commit/ce7f8b0416d1e963c17513988685143cfd1f1e79)), closes [#92](https://github.com/woodnx/iQbe/issues/92)
+
 ## [3.2.0](https://github.com/woodnx/iQbe/compare/v3.1.0...v3.2.0) (2024-08-20)
 
 
