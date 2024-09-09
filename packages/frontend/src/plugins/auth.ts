@@ -1,5 +1,5 @@
-import { client } from '@/utils/client';
 import { AxiosError } from 'axios';
+import api from './api';
 
 export interface User {
   uid: string,
@@ -9,14 +9,10 @@ export interface User {
 
 export async function loginWithUsername(username: string, password: string) {
   try {
-    const { data } = await client.POST("/auth/login", {
-      body: {
-        username,
-        password,
-      }
-    });
-
-    if (!data) return undefined;
+    const data = await api.auth.login.$post({ body: {
+      username,
+      password
+    }});
 
     const { accessToken, refreshToken, user } = data;
     localStorage.setItem('refreshToken', refreshToken);
@@ -35,15 +31,11 @@ export async function loginWithUsername(username: string, password: string) {
 
 export async function loginOldUser(username: string, email: string, password: string) {
   try {
-    const { data } = await client.POST("/auth/register", {
-      body: {
-        username,
-        email,
-        password,
-      }
-    });
-
-    if (!data) return undefined;
+    const data = await api.auth.register.$post({ body: {
+      username,
+      email,
+      password,
+    }});
 
     const { accessToken, refreshToken, user } = data;
     
@@ -59,15 +51,11 @@ export async function loginOldUser(username: string, email: string, password: st
 
 export async function signupUser(username: string, password: string, inviteCode?: string) {
   try{ 
-    const { data } = await client.POST("/auth/signup", {
-      body: {
-        username,
-        password,
-        inviteCode,
-      }
-    });
-
-    if (!data) return undefined;
+    const data = await api.auth.signup.$post({ body: {
+      username,
+      password,
+      inviteCode,
+    }});
 
     const { accessToken, refreshToken, user } = data;
 
@@ -97,14 +85,10 @@ export async function checkAuth() {
   }
 
   try {
-    const { data } = await client.POST("/auth/token", {
-      body: {
-        refreshToken,
-        uid,
-      }
-    });
-
-    if (!data) return undefined;
+    const data = await api.auth.token.$post({ body: {
+      refreshToken,
+      uid,
+    }});
 
     const { accessToken, user } = data;
     localStorage.setItem('accessToken', accessToken);
@@ -131,14 +115,10 @@ export async function getIdToken() {
   }
 
   try {
-    const { data } = await client.POST("/auth/token", {
-      body: {
-        refreshToken,
-        uid,
-      }
-    });
-
-    if (!data) return undefined;
+    const data = await api.auth.token.$post({ body: {
+      refreshToken,
+      uid,
+    }});
 
     const { accessToken } = data;
     localStorage.setItem('accessToken', accessToken);

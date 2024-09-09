@@ -2,15 +2,15 @@ import { useState } from "react";
 import { ActionIcon, Button, Group, Modal, TextInput } from "@mantine/core"
 import { useDisclosure } from "@mantine/hooks";
 import { IconSquarePlus2 } from "@tabler/icons-react";
-import { $api } from "@/utils/client";
+import api from "@/plugins/api";
 import { useIsMobile } from "@/contexts/isMobile"
+import { useWorkbooks } from "@/hooks/useWorkbooks";
 
 export default function CreateWorkbookModal() {
   const [ listName, setListName ] = useState('');
   const [ opened, { open, close }] = useDisclosure();
-  const { mutate } = $api.useMutation("post", "/workbooks");
+  const { workbooks, mutate } = useWorkbooks(true);
   const isMobile = useIsMobile();
-
   const Icon = () => <IconSquarePlus2/>;
   const ResponsiveButton = () => (
     isMobile
@@ -28,8 +28,10 @@ export default function CreateWorkbookModal() {
     const body = {
       workbookName: listName,
     };
+    const created = (await api.workbooks.post({ body })).body;
+    const newList = [ ...workbooks || [], created ];
     
-    mutate({ body });
+    mutate(newList);
     close();
   }
 

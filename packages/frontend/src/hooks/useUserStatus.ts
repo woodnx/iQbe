@@ -1,5 +1,6 @@
+import useAspidaSWR from '@aspida/swr';
+import api from '@/plugins/api';
 import dayjs, { Period } from '@/plugins/dayjs';
-import { $api } from '@/utils/client';
 
 const defineLabel = (start: string, period: Period): string => {
   if (period === 'month'){
@@ -13,14 +14,7 @@ const defineLabel = (start: string, period: Period): string => {
 }
 
 const useUserStatus = (date: string, period: Period) => {
-  const { data, error, isLoading } = $api.useQuery("get", "/analysis/status/{date}/{period}", {
-    params: {
-      path: {
-        date,
-        period,
-      }
-    }
-  });
+  const { data, isLoading, error } = useAspidaSWR(api.analysis.status._date(date)._period(period));
 
   const userStatus = data?.map(status => {
     const label = defineLabel(status.start, period);

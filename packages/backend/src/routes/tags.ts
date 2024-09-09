@@ -16,4 +16,4 @@ router.post('/', tagController.post());
 router.put('/', tagController.put());
 router.delete('/', tagController.delete());
 
-module.exports = router;
+export default router;

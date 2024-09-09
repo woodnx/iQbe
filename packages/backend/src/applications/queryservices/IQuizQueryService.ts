@@ -1,6 +1,4 @@
-import { components } from 'api/schema';
-
-type QuizDTO = components["schemas"]["Quiz"];
+import { Quiz as QuizDTO } from "api/types";
 
 export type findOption = Partial<{
   page: number,
@@ -8,7 +6,7 @@ export type findOption = Partial<{
   seed: number,
   keyword: string,
   keywordOption: number,
-  wids: string | string[],
+  wids: string[],
   levelIds: number[],
   since: Date,
   until: Date,

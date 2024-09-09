@@ -47,14 +47,13 @@ export default class WorkbookController {
   post() {
     return typedAsyncWrapper<"/workbooks", "post">(async (req, res) => {
       const uid = req.uid;
-      const name = req.body.name;
-      const date = req.body.published || null;
+      const name = req.body.workbookName;
 
       const wid = this.workbookService.generateWid();
       const workbook = new Workbook(
         wid,
         name,
-        date,
+        null,
         uid,
         null,
         null,
@@ -65,7 +64,7 @@ export default class WorkbookController {
       res.status(200).send({
         wid,
         name,
-        date: date ? format(date) : null,
+        date: null,
         creatorId: uid,
         levelId: null,
         color: null,
@@ -77,14 +76,12 @@ export default class WorkbookController {
     return typedAsyncWrapper<"/workbooks", "put">(async (req, res) => {
       const uid = req.uid;
       const wid = req.body.wid;
-      const name = req.body.name;
-      const date = req.body.published || null;
+      const name = req.body.newWorkbookName;
 
       const workbook = await this.workbookRepository.findByWid(wid);
       if (!workbook) throw new ApiError().invalidParams();
 
       workbook.rename(name);
-      workbook.setDate(date);
 
       await this.workbookRepository.update(workbook);
 

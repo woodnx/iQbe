@@ -1,7 +1,5 @@
 import { CloseButton, Combobox, Input, InputBase, ScrollArea, Text, useCombobox } from "@mantine/core";
-import type { components } from 'api/schema';
-
-type Category = components["schemas"]["Category"]
+import { Category } from 'api/types';
 
 interface Props {
   data: Category[] | undefined,

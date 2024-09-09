@@ -6,16 +6,14 @@ import MylistEditModal from '@/components/MylistEditModal';
 import QuizViewer from '@/components/QuizViewer';
 import { useMylists } from '@/hooks/useMylists';
 import useQuizzes from '@/hooks/useQuizzes';
+import api from '@/plugins/api';
 import { Card, getGradient, Group, Text, useMantineTheme } from '@mantine/core';
-import { $api } from '@/utils/client';
 
 export default function Mylist(){
   const { mid } = useParams();
   const { setParams } = useQuizzes(`/mylist/${mid}`);
   const navigator = useNavigate();
-  const { mylists } = useMylists();
-  const { mutate: editMylist } = $api.useMutation("put", "/mylists");
-  const { mutate: deleteMylist } = $api.useMutation("delete", "/mylists");
+  const { mylists, mutate } = useMylists();
 
   const mylistName = mylists?.find(list => list.mid == mid)?.name;
 
@@ -33,17 +31,19 @@ export default function Mylist(){
   }
 
   const toEdit = async (listName: string) => {
-    editMylist({ body: {
+    const list = await api.mylists.$put({ body: {
       mid,
       listName,
     }});
+    mutate([ ...(mylists || []), list ]);
   }
 
   const toDelete = async () => {
-    deleteMylist({ body: {
+    const list = await api.mylists.$delete({ body: {
       mid,
     }});
     navigator('/');
+    mutate(list);
   }
 
   const MylistCard = () => (

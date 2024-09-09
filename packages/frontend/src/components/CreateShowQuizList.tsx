@@ -1,12 +1,12 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, Group, Text, getGradient, useMantineTheme } from "@mantine/core";
+import api from "@/plugins/api";
 import useQuizzes from "@/hooks/useQuizzes";
 import MylistDeleteModal from "@/components/MylistDeleteModal";
 import MylistEditModal from "@/components/MylistEditModal";
 import { useWorkbooks } from "@/hooks/useWorkbooks";
 import QuizViewer from "./QuizViewer";
-import { $api } from "@/utils/client";
 
 interface Props {
   wid: string,
@@ -16,9 +16,7 @@ export default function({ wid }: Props) {
   const isAll = (wid == 'all');
   const navigator = useNavigate();
   const { setParams } = useQuizzes("/create");
-  const { workbooks } = useWorkbooks(true);
-  const { mutate: updateMutate } = $api.useMutation("put", "/workbooks");
-  const { mutate: deleteMutate } = $api.useMutation("delete", "/workbooks");
+  const { workbooks, mutate } = useWorkbooks(true);
   
   const workbooksName = isAll ? 'すべてのクイズ' : workbooks?.find(list => list.wid == wid)?.name;
 
@@ -36,15 +34,24 @@ export default function({ wid }: Props) {
       wid,
       newWorkbookName,
     };
-    updateMutate({ body });
+
+    api.workbooks.put({ body })
+
+    const newList = workbooks?.map((w) => {
+      if (w.wid !== wid) return w;
+
+      w.name = newWorkbookName;
+      return w;
+    })
+    mutate(newList);
   }
 
   const toDelete = async () => {
     const body = { wid };
-    // api.workbooks.delete({ body });
+    api.workbooks.delete({ body });
 
-    // const newList = workbooks?.filter(w => w.wid !== wid);
-    deleteMutate({ body });
+    const newList = workbooks?.filter(w => w.wid !== wid);
+    mutate(newList);
 
     navigator('/create');
   }
