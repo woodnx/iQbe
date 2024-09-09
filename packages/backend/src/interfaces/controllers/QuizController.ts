@@ -9,7 +9,6 @@ import QuizService from '@/domains/Quiz/QuizService';
 import RegisteredQuizService from '@/domains/RegisteredQuiz/ResisteredQuizService';
 import dayjs from '@/plugins/day';
 import { typedAsyncWrapper } from '@/utils';
-import TaggedQuizService from '@/domains/TaggedQuiz/TaggedQuizService';
 
 type QuizzesPath = '' | '/favorite' | '/history' | '/mylist/{mid}';
 
@@ -21,7 +20,6 @@ export default class QuizController {
     private favoriteService: FavoriteService,
     private historyService: HistoryService,
     private registeredQuizService: RegisteredQuizService,
-    private taggedQuizService: TaggedQuizService,
   ) {}
 
   get(path: QuizzesPath = '') {
@@ -39,7 +37,7 @@ export default class QuizController {
       const since = ('since' in req.query) ? Number(req.query.since) || undefined : undefined;
       const until = ('until' in req.query) ? Number(req.query.until) || undefined : undefined;
       const judgements = ('judement' in req.query) ? req.query.judement || undefined : undefined;
-      const mid = req.params && ('mid' in req.params) ? req.params.mid || undefined : undefined;
+      const mid = ('mid' in req.params) ? req.params.mid || undefined : undefined;
       
       const quizzes = await this.quizQueryService.findMany(uid, {
         page,
@@ -60,10 +58,9 @@ export default class QuizController {
   }
 
   post() {
-    return typedAsyncWrapper<"/quizzes", "post">(async (req, res) => {
+    return typedAsyncWrapper<"/quizzes", "put">(async (req, res) => {
       const question: string | undefined = req.body.question;
       const answer:   string | undefined = req.body.answer;
-      const anotherAnswer = req.body.anotherAnswer;
       const category = req.body.category || null;
       const subCategory = category !== 0 && !!req.body.subCategory ? Number(req.body.subCategory) : null;
       const wid = req.body.wid || null;
@@ -80,7 +77,6 @@ export default class QuizController {
         qid,
         question,
         answer,
-        anotherAnswer || null,
         wid,
         category,
         subCategory,
@@ -94,43 +90,11 @@ export default class QuizController {
     });
   }
 
-  multiplePost() {
-    return typedAsyncWrapper<"/quizzes/multiple", "post">(async (req, res) => {
-      const records = req.body.records;
-      const uid = req.uid;
-
-      if (!records) {
-        throw new ApiError().invalidParams();
-      }
-
-      const quizzes = records.map(record => {
-        const qid = this.quizService.generateQid();
-
-        return new Quiz(
-          qid,
-          record.question,
-          record.answer,
-          record.anotherAnswer || null,
-          record.wid || null,
-          record.category || null,
-          record.subCategory || null,
-          uid,
-          record.limitedUser || [],
-        );
-      });
-
-      await this.quizRepository.saveMany(quizzes);
-
-      res.status(201).send();
-    });
-  }
-
   put() {
     return typedAsyncWrapper<"/quizzes", "put">(async (req, res) => {
       const qid = req.body.qid;
       const question: string | undefined = req.body.question;
       const answer: string | undefined = req.body.answer;
-      const anotherAnswer = req.body.anotherAnswer;
       const category = req.body.category || null;
       const subCategory = category !== 0 ? req.body.subCategory || null : 0;
       const wid = req.body.wid || null;
@@ -150,7 +114,6 @@ export default class QuizController {
         quiz.qid,
         question,
         answer,
-        anotherAnswer || null,
         wid,
         category,
         subCategory,
@@ -221,33 +184,11 @@ export default class QuizController {
   }
 
   unregister() {
-    return typedAsyncWrapper<"/quizzes/mylist/{mid}", "delete">(async (req, res) => {
+    return typedAsyncWrapper<"/quizzes/mylist/{mid}", "post">(async (req, res) => {
       const qid = req.body.qid;
       const mid = req.params.mid;
 
-      this.registeredQuizService.delete(mid, qid);
-
-      res.status(201).send();
-    });
-  }
-
-  tagging() {
-    return typedAsyncWrapper<"/quizzes/tag/{tid}", "post">(async (req, res) => {
-      const qid = req.body.qid;
-      const tid = req.params.tid;
-
-      this.taggedQuizService.add(tid, qid);
-
-      res.status(201).send();
-    });
-  }
-
-  untagging() {
-    return typedAsyncWrapper<"/quizzes/tag/{tid}", "delete">(async (req, res) => {
-      const qid = req.body.qid;
-      const tid = req.params.tid;
-
-      this.taggedQuizService.delete(tid, qid);
+      this.registeredQuizService.add(mid, qid);
 
       res.status(201).send();
     });
@@ -271,7 +212,6 @@ export default class QuizController {
         quiz.qid,
         quiz.question,
         quiz.answer,
-        quiz.anotherAnswer,
         wid,
         quiz.categoryId,
         quiz.subCategoryId,
@@ -300,7 +240,6 @@ export default class QuizController {
         quiz.qid,
         quiz.question,
         quiz.answer,
-        quiz.anotherAnswer,
         null,
         quiz.categoryId,
         quiz.subCategoryId,

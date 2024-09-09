@@ -9,14 +9,14 @@ import QuizPagination from '@/components/QuizPagination';
 import QuizShuffleButton from '@/components/QuizShuffleButton';
 import QuizHiddenAnswerButton from '@/components/QuizHiddenAnswerButton';
 import { Judgement, KeywordOption, QuizRequestParams } from '@/types';
-import useQuizzes, { QuizzesPath } from '@/hooks/useQuizzes';
+import useQuizzes from '@/hooks/useQuizzes';
 import { useHistories } from "@/hooks/useHistories";
 import HistorySelectJudgement from './HistorySelectJudgement';
 import HistoryDateRange from './HistoryDateRange';
 import QuizTransfarButton from './QuizTransfarButton';
 
 interface Props {
-  path?: QuizzesPath,
+  path?: string,
   headerCard?: ReactNode,
   isHistory?: boolean,
   initialParams?: QuizRequestParams,

@@ -1,8 +1,6 @@
 import _axios, { AxiosError } from "axios";
 import { getIdToken } from "./auth";
-import { components } from "api/schema";
-
-type Error = components["schemas"]["Error"];
+import { Error } from "api/types";
 
 const axios = _axios.create({
   baseURL: '/api',

@@ -1,5 +1,4 @@
-import type { components } from "@/gen/schema";
-type ErrorSchema = components["schemas"]["Error"]
+import { Error as ErrorSchema } from "@/generated/@types";
 
 export default class ApiError extends Error {
   private _schema: ErrorSchema;

@@ -4,7 +4,6 @@ import Workbook from '@/domains/Workbook';
 import IWorkbookRepository from '@/domains/Workbook/IWorkbookRepository';
 
 import KyselyClientManager from './kysely/KyselyClientManager';
-import { format } from '@/plugins/day';
 
 export default class WorkbookInfra implements IWorkbookRepository {
   constructor(
@@ -108,7 +107,7 @@ export default class WorkbookInfra implements IWorkbookRepository {
     .values({
       wid: workbook.wid,
       name: workbook.name,
-      date: workbook.date && format(workbook.date),
+      date: workbook.date,
       creator_id: userId,
       level_id: workbook.levelId,
     })

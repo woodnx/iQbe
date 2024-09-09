@@ -15,26 +15,22 @@ export default function FilteringWorkbook({
  }: FilteringWorkbookProps ) {
   const { workbooks } = useWorkbooks(true);
   const [ search, setSearch ] = useState('');
-  const [ innerValues, setValue ] = useState<string[]>(values || []);
+  const [ innerValues, setValue ] = useState<string[]>([]);
   const combobox = useCombobox({
     onDropdownClose: () => combobox.resetSelectedOption(),
     onDropdownOpen: () => combobox.updateSelectedOptionIndex('active'),
   });
 
-  const handleValueSelect = (value: string) => {
-    setValue((current) => {
-      const values = current.includes(value) ? current.filter((v) => v !== value) : [...current, value];
-      onChange(values);
-      return values;
-    });
+  const handleValueSelect = (val: string) => {
+    setValue((current) =>
+      current.includes(val) ? current.filter((v) => v !== val) : [...current, val]
+    );
+    onChange(innerValues);
   }
 
-  const handleValueRemove = (value: string) => {
-    setValue((current) => { 
-      const values = current.filter((v) => v !== value);
-      onChange(values);
-      return values;
-    });
+  const handleValueRemove = (val: string) => {
+    setValue((current) => current.filter((v) => v !== val));
+    onChange(innerValues);
   }
   
   const options = workbooks?.filter((item) => 

@@ -1,4 +1,4 @@
-import { components } from 'api/schema';
+import { Quiz as QuizDTO } from 'api/types';
 import { sql } from 'kysely';
 import { isEqual, sortBy, uniq } from 'lodash';
 
@@ -7,8 +7,6 @@ import Quiz from '@/domains/Quiz';
 import IQuizRepository from '@/domains/Quiz/IQuizRepository';
 
 import KyselyClientManager from './kysely/KyselyClientManager';
-
-type QuizDTO = components["schemas"]["Quiz"];
 
 export default class QuizInfra implements IQuizRepository, IQuizQueryService {
   constructor(
@@ -34,7 +32,6 @@ export default class QuizInfra implements IQuizRepository, IQuizQueryService {
       'quizzes.qid as qid',
       'quizzes.que as question',
       'quizzes.ans as answer',
-      'quizzes.anoans as anotherAnswer',
       'workbooks.wid as wid', 
       'workbooks.name as workbook',
       'levels.color as level',
@@ -51,10 +48,7 @@ export default class QuizInfra implements IQuizRepository, IQuizQueryService {
     ]));
 
     if (!!option.wids && option.wids.length)
-      if (Array.isArray(option.wids)) 
-        query = query.where('workbooks.wid', 'in', option.wids);
-      else
-        query = query.where('workbooks.wid', '=', option.wids);
+      query = query.where('workbooks.wid', 'in', option.wids);
     if (!!option.levelIds && option.levelIds.length) 
       query = query.where('levels.id', 'in', option.levelIds);
     if (!!option.seed)     query = query.orderBy(sql`RAND(${option.seed})`);
@@ -129,7 +123,7 @@ export default class QuizInfra implements IQuizRepository, IQuizQueryService {
       quizzes.map(async q => {
         const { id: quizId, ...quiz } = q;
         
-        const [ isFavorite, registerdMylist, tags, visibleUser ] = await Promise.all([
+        const [ isFavorite, registerdMylist, visibleUser ] = await Promise.all([
           client.selectFrom('favorites')
           .select('quiz_id')
           .where(({eb, and}) => and([
@@ -147,16 +141,6 @@ export default class QuizInfra implements IQuizRepository, IQuizQueryService {
           ]))
           .execute()
           .then(mylists => mylists.map(m => m?.mid || '')),
-
-          client.selectFrom('tagging')
-          .innerJoin('tags', 'tagging.tag_id', 'tags.id')
-          .select('tags.tid as tid')
-          .where(({eb, and}) => and([
-            eb('tagging.quiz_id', '=', quizId),
-            eb('tags.creator_id', '=', userId)
-          ]))
-          .execute()
-          .then(tags => tags.map(t => t.tid)),
   
           client.selectFrom('quiz_visible_users')
           .innerJoin('users', 'users.id', 'quiz_visible_users.user_id')
@@ -172,7 +156,6 @@ export default class QuizInfra implements IQuizRepository, IQuizQueryService {
           right: quiz.right || 0,
           isFavorite: !!isFavorite,
           registerdMylist,
-          tags,
           isPublic: !visibleUser,
         };
     }));
@@ -189,7 +172,6 @@ export default class QuizInfra implements IQuizRepository, IQuizQueryService {
       'quizzes.qid as qid',
       'quizzes.que as question',
       'quizzes.ans as answer',
-      'quizzes.anoans as anotherAnswer',
       'workbooks.wid as wid', 
       'users.uid as creatorUid',
       'quizzes.category_id as categoryId',
@@ -216,7 +198,6 @@ export default class QuizInfra implements IQuizRepository, IQuizQueryService {
       quiz.qid,
       quiz.question,
       quiz.answer,
-      quiz.anotherAnswer,
       quiz.wid,
       quiz.categoryId,
       quiz.subCategoryId,
@@ -246,7 +227,6 @@ export default class QuizInfra implements IQuizRepository, IQuizQueryService {
         qid: quiz.qid,
         que: quiz.question,
         ans: quiz.answer,
-        anoans: quiz.anotherAnswer,
         workbook_id: workbookId || null,
         creator_id: userId,
         category_id: quiz.categoryId,
@@ -271,16 +251,6 @@ export default class QuizInfra implements IQuizRepository, IQuizQueryService {
           })
           .execute();
         }
-      }
-    });
-  }
-
-  async saveMany(quizzes: Quiz[]): Promise<void> {
-    const client = this.clientManager.getClient();
-
-    client.transaction().execute(async (trx) => {
-      for (const quiz of quizzes) {
-        await this.save(quiz);
       }
     });
   }
@@ -320,7 +290,6 @@ export default class QuizInfra implements IQuizRepository, IQuizQueryService {
       .set({
         que: quiz.question,
         ans: quiz.answer,
-        anoans: quiz.anotherAnswer,
         workbook_id: workbookId,
         creator_id: userId,
         category_id: quiz.categoryId,

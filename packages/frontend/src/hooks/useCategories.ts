@@ -1,7 +1,8 @@
-import { $api } from '@/utils/client';
+import useAspidaSWR from '@aspida/swr';
+import api from '@/plugins/api';
 
 export const useCategories = () => {
-  const  { data: categories, error, isLoading } = $api.useQuery("get", "/categories");
+  const { data: categories, isLoading, error } = useAspidaSWR(api.categories);
 
   return {
     categories,
@@ -11,7 +12,7 @@ export const useCategories = () => {
 }
 
 export const useSubCategories = () => {
-  const  { data: subCategories, error, isLoading } = $api.useQuery("get", "/categories/sub");
+  const { data: subCategories, isLoading, error } = useAspidaSWR(api.categories.sub);
 
   return {
     subCategories,
