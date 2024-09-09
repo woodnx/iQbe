@@ -25,21 +25,18 @@
     }
   },
   "devDependencies": {
-    "openapi-typescript": "^6.7.4",
+    "openapi-typescript": "^7.3.0",
     "tsup": "^8.0.2",
     "tsx": "^4.7.1",
-    "typescript": "^5.3.3"
+    "typescript": "^5.5.4"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "npm run clean && npm run codegen && npm run build:tsup",
     "build:tsup": "tsup-node --config tsup.config.ts",
-    "clean": "rm -rf dist && rm -rf ./src/generated",
-    "codegen": "npm run codegen:aspida && npm run codegen:openapi-ts && npm run codegen:format && npm run codegen:type-pred",
-    "codegen:aspida": "npx -y openapi2aspida",
-    "codegen:openapi-ts": "npx -y openapi-typescript openapi.yaml --output ./src/generated/schema.ts",
-    "codegen:format": "tsx ./src/schemaFormatter.ts && tsx ./src/typesIndexFormatter.ts",
-    "codegen:type-pred": "npx -y type-predicates-generator -f './src/generated/@types/index.ts' -o './src/predicates.ts' -a"
+    "clean": "rm -rf dist && rm -rf ./src/gen",
+    "codegen": "npm run codegen:openapi-ts",
+    "codegen:openapi-ts": "tsx ./src/transform.ts"
   },
   "author": "",
   "license": "ISC",

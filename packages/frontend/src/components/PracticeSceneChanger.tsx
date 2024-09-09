@@ -12,7 +12,7 @@ import PracticeQuitModal from "@/components/PracticeQuitModal";
 import PracticeResultModal  from "@/components/PracticeResultModal";
 import { useTimer, useTypewriter } from "@/hooks";
 import useQuizzes from "@/hooks/useQuizzes";
-import api from '@/plugins/api';
+import { $api } from "@/utils/client";
 
 interface Props {
   quizzes?: Quiz[],
@@ -29,11 +29,13 @@ export default function({
 }: Props) {
   const [ nowNumber, setNowNumber ] = useState(0);
   const [ scene, setScene ] = useState(0);
+  const [ startTrigger, setStartTrigger ] = useState(isTransfer);
   const [ filtering, filter ] = useDisclosure(false);
   const [ resulted, result ] = useDisclosure(false);
   const navigator = useNavigate();
 
   const { params, setParams } = useQuizzes();
+  const { mutate } = $api.useMutation("post", "/quizzes/history");
   const [ rightList, setRightList ] = useState<string[]>([]);
   const [ pressedWord, setPressedWord ] = useState(0);
   const quiz = !!quizzes ? quizzes[shuffledList[nowNumber]] : null;
@@ -103,13 +105,20 @@ export default function({
     filter.close();
     onFilter();
     setNowNumber(0);
+    setStartTrigger(true);
     setScene(0);
   }
 
   const record = async (judgement: number) => {
     if (!quiz) return;
 
-    api.quizzes.history.$post({ body: {
+    // api.quizzes.history.$post({ body: {
+    //   qid: quiz?.qid,
+    //   judgement,
+    //   pressedWord,
+    // }});
+
+    mutate({ body: {
       qid: quiz?.qid,
       judgement,
       pressedWord,
@@ -143,7 +152,7 @@ export default function({
         scene == 0 ? 
           <Overlay fixed center>
             { 
-              !quiz ? 
+              !quiz || !startTrigger ? 
                 <Loader variant="dots"/> 
               : 
                 <PracticeQuizIntro 

@@ -6,6 +6,7 @@ export default class Quiz {
     private _qid: string,
     private _question: string,
     private _answer: string,
+    private _anotherAnswer: string | null,
     private _wid: string | null,
     private _categoryId: number | null,
     private _subCategoryId: number | null,
@@ -20,6 +21,7 @@ export default class Quiz {
     qid: string,
     question: string,
     answer: string,
+    anotherAnswer: string | null,
     wid: string | null,
     categoryId: number | null,
     subCategoryId: number | null,
@@ -30,6 +32,7 @@ export default class Quiz {
       qid,
       question,
       answer,
+      anotherAnswer,
       wid,
       categoryId,
       subCategoryId,
@@ -60,6 +63,10 @@ export default class Quiz {
 
   get answer(): string {
     return this._answer;
+  }
+
+  get anotherAnswer(): string | null {
+    return this._anotherAnswer;
   }
 
   get wid(): string | null {
