@@ -1,8 +1,7 @@
 import { ContextModalProps } from '@mantine/modals';
 import QuizEditForm from "./QuizEditForm";
 import { SubmitValue } from '@/types';
-import axios from '@/plugins/axios';
-import useQuizzes from '@/hooks/useQuizzes';
+import { $api } from '@/utils/client';
 
 interface Props {
   qid: string,
@@ -16,19 +15,18 @@ interface Props {
 
 export default function({ context, id, innerProps }: ContextModalProps<Props>) {
   const { qid, ...formProps } = innerProps;
-  const { mutate } = useQuizzes();
+  const { mutate } = $api.useMutation("put", "/quizzes");
   const submit = async ({ question, answer, category, subCategory, workbook, isPublic }: SubmitValue) => {
-    await axios.put('/quizzes', {
+    mutate({ body: {
       qid,
       question,
       answer,
       category: category,
       subCategory: subCategory,
       wid: workbook,
-      visible: isPublic ? 1 : 0,
-    });
+      isPublic,
+    }});
     context.closeModal(id);
-    mutate();
   }
 
   return (
