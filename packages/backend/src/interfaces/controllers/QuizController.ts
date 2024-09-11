@@ -199,7 +199,7 @@ export default class QuizController {
       const pressedWord = req.body.pressedWord;
       const uid = req.uid;
 
-      if (!qid || !judgement) {
+      if (!qid || (judgement !== 0 && !judgement)) {
         throw new ApiError().invalidParams();
       }
 
