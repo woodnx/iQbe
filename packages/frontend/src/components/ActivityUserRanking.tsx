@@ -13,10 +13,10 @@ export default function ActivityUserRanking(){
   allUserRanking?.map((r) => {
     return (
       <ActivityRank
-        name={r.name}
+        name={r.nickname || r.username}
         rank={r.rank}
         count={r.count}
-        key={r.userId}
+        key={r.uid}
       />
     )
   }) 

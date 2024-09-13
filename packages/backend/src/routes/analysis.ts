@@ -78,8 +78,9 @@ router.get('/ranking/all/:period', async (req, res) => {
     .innerJoin('users', 'user_id', 'users.id')
     .select(({ fn }) => [
       sql<number>`ROW_NUMBER() OVER(ORDER BY count DESC)`.as('rank'),
-      'histories.user_id as userId',
+      'users.uid as uid',
       'users.nickname as nickname',
+      'users.username as username',
       fn.count('histories.quiz_id').as('count'),
     ])
     .where(({ between }) => between('practiced', ranges[0][0], ranges[0][1]))
@@ -92,8 +93,9 @@ router.get('/ranking/all/:period', async (req, res) => {
     .innerJoin('users', 'user_id', 'users.id')
     .select(({ fn }) => [
       sql<number>`ROW_NUMBER() OVER(ORDER BY count DESC)`.as('rank'),
-      'histories.user_id as userId',
+      'users.uid as uid',
       'users.nickname as nickname',
+      'users.username as username',
       fn.count('histories.quiz_id').as('count'),
     ])
     .where(({ between }) => between('practiced', ranges[5][0], ranges[5][1]))
@@ -103,7 +105,7 @@ router.get('/ranking/all/:period', async (req, res) => {
     .execute();
 
     const ranking = nowRanking.map(n => {
-      const prev = prevRanking.filter(p => p.userId === n.userId)[0]
+      const prev = prevRanking.filter(p => p.uid === n.uid)[0]
       const compare = !!prev ? n.rank - prev.rank : 1
 
       return {
@@ -134,7 +136,8 @@ router.get('/ranking/personal/:period', async (req, res) => {
       .selectFrom('histories')
       .innerJoin('users', 'histories.user_id', 'users.id')
       .select(({ fn }) => [
-        'users.nickname as name',
+        'users.nickname as nickname',
+        'users.username as username',
         fn.count('histories.quiz_id').as('count'),
       ])
       .where(({ eb, and, between }) => and([
@@ -148,7 +151,8 @@ router.get('/ranking/personal/:period', async (req, res) => {
       .selectFrom('histories')
       .innerJoin('users', 'histories.user_id', 'users.id')
       .select(({ fn }) => [
-        'users.nickname as name',
+        'users.nickname as nickname',
+        'users.username as username',
         fn.count('histories.quiz_id').as('count'),
       ])
       .where(({ eb, and, between }) => and([
@@ -162,7 +166,8 @@ router.get('/ranking/personal/:period', async (req, res) => {
 
     const ranking = {
       rank: nowRank.length,
-      name: isNodata ? '' : nowRank[0].name,
+      username: isNodata ? '' : nowRank[0].username,
+      nickname: isNodata ? '' : nowRank[0].nickname,
       count: isNodata ? 0 : nowRank[0].count,
       compare: nowRank.length - prevRank.length,
       userId,
