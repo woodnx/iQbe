@@ -51,6 +51,7 @@ export default function({
                 isPublic,
               },
               size: 'xl',
+              zIndex: 100
           })}
         >Edit</Menu.Item>
       </Menu.Dropdown>
