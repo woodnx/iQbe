@@ -1,12 +1,5 @@
 # Changelog
 
-## [3.4.0](https://github.com/woodnx/iQbe/compare/v3.3.0...v3.4.0) (2024-09-13)
-
-
-### Features
-
-* **backend:** Add route `/i` ([#106](https://github.com/woodnx/iQbe/issues/106)) ([354031c](https://github.com/woodnx/iQbe/commit/354031c451cf888f1117b279b7e828a9db7b5497))
-
 ## [3.3.0](https://github.com/woodnx/iQbe/compare/v3.2.0...v3.3.0) (2024-09-09)
 
 
