@@ -1,9 +1,9 @@
-import { Button, Card, BoxProps, Grid, Group, Select, Switch, Textarea } from "@mantine/core";
+import { Button, Card, BoxProps, Grid, Group, Switch, Textarea } from "@mantine/core";
 import { isNotEmpty, useForm } from "@mantine/form"
 import { useCategories, useSubCategories } from "@/hooks/useCategories";
-import { useWorkbooks } from "@/hooks/useWorkbooks";
 import { SubmitValue } from "@/types";
 import CategorySelector from "./CategorySelector";
+import WorkbookCreateAndSelector from "./WorkbookCreateAndSelector";
 
 interface Props extends BoxProps {
   question?: string,
@@ -27,7 +27,6 @@ export default function QuizEditForm({
 }: Props) {
   const { categories } = useCategories();
   const { subCategories: sct } = useSubCategories();
-  const { workbooks: wkb } = useWorkbooks();
 
   const form = useForm({
     initialValues: {
@@ -45,7 +44,6 @@ export default function QuizEditForm({
   });
 
   const subCategories = sct?.filter(c => c.parentId === Number(form.values.category)).map(c => ({ ...c, value: String(c.id), label: c.name}));
-  const workbooks = wkb?.map(w => ({ ...w, value: w.wid, label: w.name}));
 
   const submit = (v: SubmitValue) => {
     onSubmit(v);
@@ -57,43 +55,42 @@ export default function QuizEditForm({
       <form onSubmit={form.onSubmit(v => submit(v))}>
         <Textarea
           {...form.getInputProps('question')}
-          placeholder="Question"
-          label="Question"
+          placeholder="問題文を入力"
+          label="問題文"
           variant="filled"
           autosize
           minRows={2}
+          mb="md"
         />
         <Textarea
           {...form.getInputProps('answer')}
-          placeholder="Answer"
-          label="Answer"
+          placeholder="解答を入力"
+          label="解答"
           variant="filled"
           autosize
-          my="sm"
+          mb="md"
         />
-
-        <Grid grow columns={24}>
-          <Grid.Col span={{ md: 6 }}>
-            <Select
+        <Grid>
+          <Grid.Col span={{ base: 12, xs: 6 }}>
+            <WorkbookCreateAndSelector
+              mb="md"
               {...form.getInputProps('workbook')}
-              defaultValue={initialWorkbook}
-              data={workbooks || []} 
-              label="Workbook"
-              clearable
-              searchable
             />
           </Grid.Col>
-          <Grid.Col span={{ md: 9 }}>
+        </Grid>
+        <Grid>
+          <Grid.Col span={6}>
             <CategorySelector
-              label="Genre"
+              label="ジャンル"
               data={categories || []}
               onClear={() => form.setFieldValue('subCategory', undefined)}
               {...form.getInputProps('category')}
             />
           </Grid.Col>
-          <Grid.Col span={{ md: 9 }}>
+          <Grid.Col span={6}>
             <CategorySelector
-              label="Sub genre"
+              label="サブジャンル"
+              placeholder="サブジャンルを選択"
               key={form.values.category}
               data={subCategories || []} 
               {...form.getInputProps('subCategory')}
@@ -103,7 +100,7 @@ export default function QuizEditForm({
         <Group justify="space-between" mt="sm">
           <Switch
             {...form.getInputProps('isPublic', {type: 'checkbox'})}
-            label="Publish quiz"
+            label="クイズを公開する"
             my="sm"
           />
           <Button
