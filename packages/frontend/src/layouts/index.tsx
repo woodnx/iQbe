@@ -13,6 +13,7 @@ import Create from "@/pages/create";
 import Mylist from "@/pages/mylists";
 import ResetPassword from "@/pages/reset-password"
 import Error from "@/pages/error";
+import Setting from "@/pages/setting";
 
 const defineTitle = (pathname: string) => {
   if (pathname === '/') return 'Home';
@@ -20,6 +21,7 @@ const defineTitle = (pathname: string) => {
   else if (pathname === '/practice') return 'Practice';
   else if (pathname === '/favorite') return 'Favorite';
   else if (pathname === '/history') return 'History';
+  else if (pathname === '/setting') return 'Setting';
   else if (pathname.includes('/create')) return 'Create';
   else if (pathname.includes('mylist')) return 'Mylist';
   else if (pathname === '/login') return 'Login';
@@ -54,6 +56,7 @@ export default function Root() {
         <Route path="/history" element={<History />}/>
         <Route path="/create/:wid?" element={<Create />}/>
         <Route path="/mylist/:mid" element={<Mylist />}/>
+        <Route path="/setting" element={<Setting />}/>
         <Route path="/login" element={<Login />}/>
         <Route path="/reset-password" element={<ResetPassword />}/>
         <Route path="*" element={<Error />} />
