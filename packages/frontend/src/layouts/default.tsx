@@ -5,7 +5,6 @@ import { IconActivity, IconHistory, IconHome, IconMenu2, IconPencil, IconSchool,
 import { useState } from "react";
 import { useDisclosure } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
-import UserLogoutButton from "../components/UserLogoutButton";
 import { useMylists } from "../hooks/useMylists";
 import Logo from "../components/Logo";
 import { checkAuth } from "../plugins/auth";
@@ -14,6 +13,7 @@ import NavbarLink from "@/components/NavbarLink";
 import { IconBooks } from "@tabler/icons-react";
 import { useIsMobile } from "@/contexts/isMobile";
 import useHeaderHeight from "@/hooks/useHeaderHeight";
+import UserInfoMenu from "@/components/UserInfoMenu";
 
 const checkPathname = (pathname: string) => {
   if (pathname === '/') return '/';
@@ -21,6 +21,7 @@ const checkPathname = (pathname: string) => {
   else if (pathname === '/practice') return '/practice';
   else if (pathname === '/favorite') return '/favorite';
   else if (pathname === '/history') return '/history';
+  else if (pathname === '/setting') return '/setting';
   else if (pathname.includes('create')) return '/create';
   else if (pathname.includes('mylist')) return '/mylist';
   else return '';
@@ -150,7 +151,7 @@ export default function DefaultLayout() {
         }
       </AppShell.Section>
       <AppShell.Section p="md">
-        <UserLogoutButton/>
+        <UserInfoMenu />
       </AppShell.Section>
     </AppShell.Navbar>
   );
