@@ -22,6 +22,7 @@ export default class IController {
         nickname: i.nickname,
         created: format(i.created),
         modified: format(i.modified),
+        permission: i.permission,
       })
     });
   }

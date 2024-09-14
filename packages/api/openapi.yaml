@@ -2382,6 +2382,8 @@ components:
           type: string
         photoURL:
           type: string
+        permission: 
+          type: string
       required:
         - uid
         - username
