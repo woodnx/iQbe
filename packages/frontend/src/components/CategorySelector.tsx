@@ -67,7 +67,7 @@ export default function({
           onClick={() => combobox.toggleDropdown()}
           rightSectionPointerEvents={value == null ? 'none' : 'all'}
         >
-          { display || <Input.Placeholder>{placeholder || 'Pick value'}</Input.Placeholder>}
+          { display || <Input.Placeholder>{placeholder || 'ジャンルを選択'}</Input.Placeholder>}
         </InputBase>
       </Combobox.Target>
 

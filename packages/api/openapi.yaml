@@ -2317,7 +2317,9 @@ components:
           type: number
         uid: 
           type: string
-        name:
+        username:
+          type: string
+        nickname:
           type: string
         count: 
           type: number
@@ -2326,7 +2328,7 @@ components:
       required:
         - rank
         - uid
-        - name 
+        - username
         - count 
         - compare 
     SubCategory: 
