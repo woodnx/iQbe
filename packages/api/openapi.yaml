@@ -624,6 +624,37 @@ paths:
           $ref: "#/components/responses/401Unauthorized"
         "403":
           $ref: "#/components/responses/403Forbidden"
+    put:
+      tags: 
+        - users
+      summary: ユーザ情報の編集
+      description: ユーザ情報の編集を行う．
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: 
+              type: object
+              properties: 
+                username: 
+                  type: string
+                nickname:
+                  type: string
+              required:
+                - username
+            example: 
+              username: hoge
+              nickname: huga
+      responses:
+        "201":
+          $ref: "#/components/responses/UserResponse"
+        "400":
+          $ref: "#/components/responses/400BadRequest"
+        "401": 
+          $ref: "#/components/responses/401Unauthorized"
+        "403":
+          $ref: "#/components/responses/403Forbidden"
   "/invite-code":
     post:
       tags: 

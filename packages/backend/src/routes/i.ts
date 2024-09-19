@@ -10,5 +10,6 @@ const userInfra = new UserInfra(kyselyClientManager);
 const iController = new IController(userInfra);
 
 router.get("/", iController.get());
+router.put("/", iController.put());
 
 module.exports = router;
