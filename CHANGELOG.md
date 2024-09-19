@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.5.0](https://github.com/woodnx/iQbe/compare/v3.4.0...v3.5.0) (2024-09-19)
+
+
+### Features
+
+* Add user settings ([#116](https://github.com/woodnx/iQbe/issues/116)) ([b46b436](https://github.com/woodnx/iQbe/commit/b46b4366080532b37bfee8663ca01ffa116129cd)), closes [#50](https://github.com/woodnx/iQbe/issues/50)
+
 ## [3.3.0](https://github.com/woodnx/iQbe/compare/v3.2.0...v3.3.0) (2024-09-09)
 
 
