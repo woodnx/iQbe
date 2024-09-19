@@ -30,6 +30,14 @@ export default class User {
     this._permission = permission;
   }
 
+  editUsername(username: string) {
+    this._username = username;
+  }
+
+  editNickname(nickname?: string) {
+    this._nickname = nickname;
+  }
+
   resetPasswd(passwd: string) {
     this._passwd = passwd;
   }

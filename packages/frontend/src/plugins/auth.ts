@@ -1,5 +1,6 @@
 import { client } from '@/utils/client';
 import { AxiosError } from 'axios';
+import store from 'storejs';
 
 export interface User {
   uid: string,
@@ -19,9 +20,15 @@ export async function loginWithUsername(username: string, password: string) {
     if (!data) return undefined;
 
     const { accessToken, refreshToken, user } = data;
+
     localStorage.setItem('refreshToken', refreshToken);
     localStorage.setItem('accessToken', accessToken);
     localStorage.setItem('uid', user.uid);
+    store.set('loginedUser', {
+      ...user,
+      accessToken,
+      refreshToken,
+    });
 
     return user;
   } catch(e) {
@@ -50,6 +57,11 @@ export async function loginOldUser(username: string, email: string, password: st
     localStorage.setItem('refreshToken', refreshToken);
     localStorage.setItem('accessToken', accessToken);
     localStorage.setItem('uid', user.uid);
+    store.set('loginedUser', {
+      ...user,
+      accessToken,
+      refreshToken,
+    });
 
     return user;
   } catch(e) {
@@ -74,6 +86,11 @@ export async function signupUser(username: string, password: string, inviteCode?
     localStorage.setItem('refreshToken', refreshToken);
     localStorage.setItem('accessToken', accessToken);
     localStorage.setItem('uid', user.uid);
+    store.set('loginedUser', {
+      ...user,
+      accessToken,
+      refreshToken,
+    });
 
     return user;
   } catch(e) {
@@ -108,6 +125,11 @@ export async function checkAuth() {
 
     const { accessToken, user } = data;
     localStorage.setItem('accessToken', accessToken);
+    store.set('loginedUser', {
+      ...user,
+      accessToken,
+      refreshToken,
+    });
 
     return user;
   } 
@@ -140,8 +162,14 @@ export async function getIdToken() {
 
     if (!data) return undefined;
 
-    const { accessToken } = data;
+    const { accessToken, user } = data;
     localStorage.setItem('accessToken', accessToken);
+    store.set('loginedUser', {
+      ...user,
+      accessToken,
+      refreshToken,
+    });
+
     return accessToken;
   } 
   catch(e) {
@@ -153,5 +181,6 @@ export function logoutUser() {
   localStorage.setItem('refreshToken', '');
   localStorage.setItem('accessToken', '');
   localStorage.setItem('uid', '');
+  store.remove('loginedUser');
   location.reload();
 }
