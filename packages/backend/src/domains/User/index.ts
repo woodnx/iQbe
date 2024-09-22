@@ -8,6 +8,7 @@ export default class User {
     private _modified: Date,
     private _nickname?: string,
     private _permission?: string,
+    private _photoUrl?: string
   ) {}
 
   reconstruct(
@@ -19,6 +20,7 @@ export default class User {
     modified: Date,
     nickname?: string,
     permission?: string,
+    photoUrl?: string
   ): void {
     this._uid = uid;
     this._passwd = passwd;
@@ -28,6 +30,7 @@ export default class User {
     this._modified = modified;
     this._nickname = nickname;
     this._permission = permission;
+    this._photoUrl = photoUrl;
   }
 
   editUsername(username: string) {
@@ -40,6 +43,10 @@ export default class User {
 
   resetPasswd(passwd: string) {
     this._passwd = passwd;
+  }
+
+  setPhotoUrl(photoUrl: string | undefined) {
+    this._photoUrl = photoUrl;
   }
   
   get passwd(): string {
@@ -64,6 +71,10 @@ export default class User {
 
   get permission(): string | undefined {
     return this._permission;
+  }
+
+  get photoUrl(): string | undefined {
+    return this._photoUrl;
   }
 
   get created(): Date {
