@@ -118,6 +118,13 @@ model password_reset_tokens {
   users   users    @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
 }
 
+model profile {
+  user_id  BigInt  @id @db.UnsignedBigInt
+  nickname String? @db.VarChar(255)
+  photoUrl String? @db.VarChar(255)
+  users    users   @relation(fields: [user_id], references: [id], onUpdate: Cascade, onDelete: Cascade)
+}
+
 /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 model questions_staging {
   workbook_id    Int?
@@ -280,6 +287,7 @@ model users {
   histories             histories[]
   mylists               mylists[]
   password_reset_tokens password_reset_tokens[]
+  profile               profile[]
   quiz_reports          quiz_reports[]
   quiz_visible_users    quiz_visible_users[]
   quizzes               quizzes[]

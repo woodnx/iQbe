@@ -78,6 +78,7 @@ export default class AuthUseCase {
         modified: format(user.modified),
         created: format(user.created),
         permission: user.permission,
+        photoURL: user.photoUrl,
       },
       refreshToken: refreshToken.token, 
       accessToken: accessToken.toToken(),
@@ -155,6 +156,7 @@ export default class AuthUseCase {
         modified: format(user.modified),
         created: format(user.created),
         permission: user.permission,
+        photoURL: user.photoUrl,
       },
       refreshToken: refreshToken.token, 
       accessToken: accessToken.toToken(),
@@ -198,6 +200,7 @@ export default class AuthUseCase {
         modified: format(user.modified),
         created: format(user.created),
         permission: user.permission,
+        photoURL: user.photoUrl,
       },
       accessToken: accessToken.toToken(),
     };
