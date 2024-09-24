@@ -1,5 +1,13 @@
 # Changelog
 
+## [3.6.0](https://github.com/woodnx/iQbe/compare/v3.5.0...v3.6.0) (2024-09-24)
+
+
+### Features
+
+* **backend:** Add photoUrl property to User domain ([#119](https://github.com/woodnx/iQbe/issues/119)) ([69f92c9](https://github.com/woodnx/iQbe/commit/69f92c90261864276d4e79f8132d75fce37b6b93))
+* プロフィール画像の編集 ([#120](https://github.com/woodnx/iQbe/issues/120)) ([f66cebb](https://github.com/woodnx/iQbe/commit/f66cebba37893ab2cba840d665b38dc97cac5c19)), closes [#118](https://github.com/woodnx/iQbe/issues/118)
+
 ## [3.5.0](https://github.com/woodnx/iQbe/compare/v3.4.0...v3.5.0) (2024-09-19)
 
 
