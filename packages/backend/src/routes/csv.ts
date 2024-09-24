@@ -14,6 +14,7 @@ const csvController = new CsvController(
 
 router.post('/parse', 
   upload.single('file'), 
-  csvController.parse());
+  csvController.parse(),
+);
 
 module.exports = router;

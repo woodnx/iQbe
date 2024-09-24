@@ -1,6 +1,6 @@
 import IUserRepository from "@/domains/User/IUserRepository";
 import { format } from "@/plugins/day";
-import { typedAsyncWrapper } from "@/utils";
+import { asyncWrapper, typedAsyncWrapper } from "@/utils";
 import { ApiError } from "api";
 
 export default class IController {
@@ -23,6 +23,7 @@ export default class IController {
         created: format(i.created),
         modified: format(i.modified),
         permission: i.permission,
+        photoURL: i.photoUrl,
       })
     });
   }
@@ -49,7 +50,43 @@ export default class IController {
         created: format(i.created),
         modified: format(i.modified),
         permission: i.permission,
+        photoURL: i.photoUrl,
       });
     })
+  }
+
+  registerProfileImage() {
+    return asyncWrapper(async (req, res) => {
+      const file = req.file;
+      const uid = req.uid;
+      
+      if (!file) {
+        throw new ApiError({
+          title: "NO_FILE",
+          detail: "No file uploaded.",
+          type: "about:blank",
+          status: 400
+        });
+      }
+      const filename = file.filename;
+
+      const i = await this.userRepository.findByUid(uid);
+      if (!i) throw new ApiError().invalidParams();
+
+      const photoUrl = `/images/${filename}`;
+
+      i.setPhotoUrl(photoUrl);
+      await this.userRepository.update(i);
+
+      res.send({
+        uid,
+        username: i.username,
+        nickname: i.nickname,
+        created: format(i.created),
+        modified: format(i.modified),
+        permission: i.permission,
+        photoUrl,
+      });
+    });
   }
 }
