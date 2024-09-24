@@ -1,0 +1,15 @@
+.cropContainer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 80px;
+  height: 300px;
+}
+
+.controls {
+  position: relative;
+  top: 300px;
+  padding: 20px 10px;
+  align-items: center;
+}

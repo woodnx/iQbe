@@ -655,6 +655,38 @@ paths:
           $ref: "#/components/responses/401Unauthorized"
         "403":
           $ref: "#/components/responses/403Forbidden"
+  "/i/image":
+    post: 
+      tags:
+        - user
+      description: プロフィール画像の編集
+      security: []
+      requestBody:
+        required: true
+        content:
+          image/png:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+          image/jpeg:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        "201":
+          $ref: "#/components/responses/UserResponse"
+        "400":
+          $ref: "#/components/responses/400BadRequest"
+        "401": 
+          $ref: "#/components/responses/401Unauthorized"
+        "403":
+          $ref: "#/components/responses/403Forbidden"
   "/invite-code":
     post:
       tags: 

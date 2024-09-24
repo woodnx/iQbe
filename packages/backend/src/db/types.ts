@@ -52,6 +52,11 @@ export type password_reset_tokens = {
     expDate: Timestamp;
     used: Generated<number>;
 };
+export type profile = {
+    user_id: number;
+    nickname: string | null;
+    photoUrl: string | null;
+};
 export type quiz_reports = {
     quiz_id: number;
     user_id: number;
@@ -146,6 +151,7 @@ export type DB = {
     mylists: mylists;
     mylists_quizzes: mylists_quizzes;
     password_reset_tokens: password_reset_tokens;
+    profile: profile;
     quiz_reports: quiz_reports;
     quiz_visible_users: quiz_visible_users;
     quizzes: quizzes;
