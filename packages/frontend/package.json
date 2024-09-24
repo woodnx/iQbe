@@ -28,6 +28,7 @@
     "react": "^18.2.0",
     "react-circular-progressbar": "^2.1.0",
     "react-dom": "^18.2.0",
+    "react-easy-crop": "^5.0.8",
     "react-router-dom": "^6.21.2",
     "recharts": "^2.10.4",
     "storejs": "^2.1.0",

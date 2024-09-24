@@ -8,6 +8,10 @@ import verifyAuthToken from '@/middleware/verifyAuthToken';
 
 import server from './allowed-server.json';
 
+if (!fs.existsSync(path.join(__dirname, 'public', 'images'))){
+  fs.mkdirSync(path.join(__dirname, 'public', 'images'), { recursive: true });
+}
+
 const app = express(); // expressをインスタンス化
 const port = 9000;
 
