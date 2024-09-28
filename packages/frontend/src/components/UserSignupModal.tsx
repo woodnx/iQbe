@@ -3,10 +3,10 @@ import { useNavigate } from "react-router-dom";
 import { Button, Flex, Paper, PasswordInput, Space, Text, TextInput } from "@mantine/core";
 import { useForm, isNotEmpty, matchesField, isEmail } from '@mantine/form';
 import { notifications } from "@mantine/notifications";
-import { IconAlertTriangle, IconCheck } from "@tabler/icons-react";
+import { IconAlertTriangle } from "@tabler/icons-react";
 import { signupUser } from "@/plugins/auth";
 import { $api } from "@/utils/client";
-// import api from "@/plugins/api";
+import UsernameInput from "./UsernameInput";
 
 interface SubmitValue {
   username: string,
@@ -43,13 +43,6 @@ export function UserSignupModal() {
   });
 
   useEffect(() => {
-    // api.auth.available.$post({ body: {
-    //   username: form.values.username
-    // }})
-    // .then((available) => {
-    //   setAvailable(!!available);
-    //   if (!available && form.values.username.length > 0) form.setFieldError('username', errormes);
-    // });
     mutate(
       { body: { username: form.values.username }},
       { onSuccess({ available }) {
@@ -59,25 +52,6 @@ export function UserSignupModal() {
       }
     });
   }, [ form.values.username ]);
-
-  const discription = (
-    <>
-      <Flex align="center">
-        <IconAlertTriangle size={14}/>
-        <Space w={5}/>
-        <Text>Cannot be changed later</Text>
-      </Flex>
-      { 
-        available && form.isValid('username') ? 
-          <Flex align="center">
-            <IconCheck size={14} color="green"/>
-            <Space w={5}/>
-            <Text span c="green"> Can use this name </Text>
-          </Flex>
-        : null
-      }
-    </>
-  );
 
   const errormes = (
     <>
@@ -110,16 +84,15 @@ export function UserSignupModal() {
   return (
     <Paper>
       <form onSubmit={form.onSubmit(v => submit(v))}>
-        <TextInput 
+        <UsernameInput 
           {...form.getInputProps('username')}
+          isValid={form.isValid('username')}
           placeholder="Username"
-          description={discription}
           label="Username"
           radius="xl"
           size="md"
           inputWrapperOrder={['label', 'input', 'description', 'error']}
-        >
-        </TextInput>
+        />
         <TextInput 
           {...form.getInputProps('email')}
           placeholder="Email"

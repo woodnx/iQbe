@@ -1,7 +1,7 @@
 import { useLoginedUser } from "@/hooks/useLoginedUser";
 import { $api } from "@/utils/client";
 import { Button, Grid, Group, Modal, TextInput } from "@mantine/core";
-import { isNotEmpty, useForm } from "@mantine/form";
+import { useForm } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
 import ImageCropper from "./ImageCropper";
 import { useState } from "react";
@@ -9,6 +9,7 @@ import ButtonWithFileInput from "./ButtonWithFileInput";
 import { Area } from "react-easy-crop";
 import getCroppedImg from "@/utils/getCroppedImage";
 import { notifications } from "@mantine/notifications";
+import UsernameInput from "./UsernameInput";
 
 export default function SettingProfile() {
   const [ opened, { open, close } ] = useDisclosure(false);
@@ -22,8 +23,14 @@ export default function SettingProfile() {
       nickname: i.nickname || undefined,
     },
     validate: {
-      username: isNotEmpty(),
-    }
+      username: (value) => 
+        !(/^[a-zA-Z0-9_]+$/.test(value)) 
+        ? 'ユーザ名の文字には a~z, A~Z, 0~9, _ が使用できます'
+        // : !available
+        // ? ''
+        : null,
+    },
+    validateInputOnChange: true,
   });
 
   const loadImage = (image: string) => {
@@ -99,9 +106,8 @@ export default function SettingProfile() {
           </Grid.Col>
 
           <Grid.Col span={9}>
-            <TextInput 
-              withAsterisk
-              label="ユーザ名"
+            <UsernameInput 
+              isValid={form.isValid('username')}
               key={form.key('username')}
               {...form.getInputProps('username')}
             />

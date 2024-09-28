@@ -261,7 +261,7 @@ export default class AuthUseCase {
   }
 
   async available(username: string): Promise<boolean> {
-    const user = this.userRepository.findByUsername(username);
+    const user = await this.userRepository.findByUsername(username);
 
     return !user;
   }
