@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.7.0](https://github.com/woodnx/iQbe/compare/v3.6.0...v3.7.0) (2024-09-28)
+
+
+### Features
+
+* usernameを入力するときにdebounceを設ける ([#123](https://github.com/woodnx/iQbe/issues/123)) ([5f07fcf](https://github.com/woodnx/iQbe/commit/5f07fcf6976e93ee8190648067fc328445e739be)), closes [#58](https://github.com/woodnx/iQbe/issues/58)
+
 ## [3.6.0](https://github.com/woodnx/iQbe/compare/v3.5.0...v3.6.0) (2024-09-24)
 
 
