@@ -1460,6 +1460,8 @@ paths:
                   type: string
                 color:
                   type: string
+                description:
+                  type: string
               required:
                 - label
             example: 
@@ -1490,6 +1492,8 @@ paths:
                 label: 
                   type: string
                 color: 
+                  type: string
+                description:
                   type: string
               required:
                 - tid
@@ -2416,6 +2420,8 @@ components:
           type: string
         label: 
           type: string
+        description:
+          type: string
         color: 
           type: string
         created: 
@@ -2426,10 +2432,10 @@ components:
           type: string
       required:
         - tid
-          label
-          created
-          modified
-          creatorUid
+        - label
+        - created
+        - modified
+        - creatorUid
     User: 
       type: object
       properties:

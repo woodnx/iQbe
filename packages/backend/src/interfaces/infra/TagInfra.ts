@@ -16,8 +16,9 @@ export default class TagInfra implements ITagRepository {
       'tid',
       'label',
       'color',
-      'created',
-      'modified',
+      'description',
+      'tags.created as created',
+      'tags.modified as modified',
       'users.uid as creator_uid',
     ])
     .where('tid', '=', tid)
@@ -29,6 +30,7 @@ export default class TagInfra implements ITagRepository {
       tag.tid,
       tag.label,
       tag.color,
+      tag.description,
       tag.created,
       tag.modified,
       tag.creator_uid,
@@ -44,8 +46,9 @@ export default class TagInfra implements ITagRepository {
       'tid',
       'label',
       'color',
-      'created',
-      'modified',
+      'description',
+      'tags.created as created',
+      'tags.modified as modified',
       'users.uid as creator_uid',
     ])
     .where('users.uid', '=', uid)
@@ -55,6 +58,7 @@ export default class TagInfra implements ITagRepository {
       tag.tid,
       tag.label,
       tag.color,
+      tag.description,
       tag.created,
       tag.modified,
       tag.creator_uid,
@@ -77,6 +81,7 @@ export default class TagInfra implements ITagRepository {
       tid: tag.tid,
       label: tag.label,
       color: tag.color,
+      description: tag.description,
       created: tag.created,
       modified: tag.modified,
       creator_id: userId,
@@ -91,16 +96,19 @@ export default class TagInfra implements ITagRepository {
     .set({
       label: tag.label,
       color: tag.color,
+      description: tag.description,
       created: tag.created,
       modified: tag.modified,
     })
-    .where('tid', '=', tag.tid);
+    .where('tid', '=', tag.tid)
+    .execute();
   }
 
   async delete(tid: string): Promise<void> {
     const client = this.clientManager.getClient();
 
     await client.deleteFrom('tags')
-    .where('tid', '=', tid);
+    .where('tid', '=', tid)
+    .execute();
   }
 }
