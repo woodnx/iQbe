@@ -26,7 +26,7 @@ export default function ButtonWithFileInput({
       style={{ border: 'none', cursor: 'pointer' }}
     > 
       <Stack align="center" justify="center" gap="xs">
-        <Avatar size="xl" src={image}/>
+        <Avatar size={100} src={image}/>
         <Text c="gray" fz="sm">変更する</Text>
       </Stack>
     </Paper>
