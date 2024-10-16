@@ -114,6 +114,7 @@ export type tags = {
     tid: string;
     label: string;
     color: string | null;
+    description: string | null;
     created: Timestamp;
     modified: Timestamp;
     creator_id: number;

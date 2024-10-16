@@ -1,6 +1,6 @@
 import { useLoginedUser } from "@/hooks/useLoginedUser";
 import { $api } from "@/utils/client";
-import { Button, Grid, Group, Modal, TextInput } from "@mantine/core";
+import { Button, Center, Grid, Group, Modal, TextInput } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
 import ImageCropper from "./ImageCropper";
@@ -98,14 +98,16 @@ export default function SettingProfile() {
       
       <form onSubmit={form.onSubmit((values) => submit(values))}>
         <Grid m="md">
-          <Grid.Col span={3} mt="xs">
-            <ButtonWithFileInput 
-              image={`http://localhost:9000${i.photoURL}` || undefined}
-              onLoad={loadImage}
-            />
+          <Grid.Col span={{ base: 4, md: 3 }} mt="xs">
+            <Center>
+              <ButtonWithFileInput 
+                image={`http://localhost:9000${i.photoURL}` || undefined}
+                onLoad={loadImage}
+              />
+            </Center>
           </Grid.Col>
 
-          <Grid.Col span={9}>
+          <Grid.Col span={{ base: 8, md: 9 }}>
             <UsernameInput 
               isValid={form.isValid('username')}
               key={form.key('username')}

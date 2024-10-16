@@ -21,6 +21,7 @@ export default class TagController {
         tid: tag.tid,
         label: tag.label,
         color: tag.color,
+        description: tag.description,
         created: format(tag.created),
         modified: format(tag.modified),
         creatorUid: tag.creatorUid,
@@ -33,6 +34,7 @@ export default class TagController {
   post() {
     return typedAsyncWrapper<"/tags", "post">(async (req, res) => {
       const label = req.body.label;
+      const description = req.body.description;
       const color = req.body.color;
       const uid = req.uid;
 
@@ -43,6 +45,7 @@ export default class TagController {
         tid,
         label,
         color || null,
+        description || null,
         now,
         now,
         uid,
@@ -54,6 +57,7 @@ export default class TagController {
         tid: tag.tid,
         label: tag.label,
         color: tag.color,
+        description: tag.description,
         created: format(tag.created),
         modified: format(tag.modified),
         creatorUid: tag.creatorUid,
@@ -65,6 +69,7 @@ export default class TagController {
     return typedAsyncWrapper<"/tags", "put">(async (req, res) => {
       const tid = req.body.tid;
       const label = req.body.label;
+      const description = req.body.description || null;
       const color = req.body.color || null;
 
       const tag = await this.tagRepository.findByTid(tid);
@@ -78,6 +83,7 @@ export default class TagController {
 
       tag.editLabel(label);
       tag.editColor(color);
+      tag.editDescription(description);
 
       await this.tagRepository.update(tag);
 
@@ -85,6 +91,7 @@ export default class TagController {
         tid: tag.tid,
         label: tag.label,
         color: tag.color,
+        description: tag.description,
         created: format(tag.created),
         modified: format(tag.modified),
         creatorUid: tag.creatorUid,

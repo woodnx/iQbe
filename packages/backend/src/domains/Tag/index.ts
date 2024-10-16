@@ -5,6 +5,7 @@ export default class Tag {
     private _tid: string,
     private _label: string,
     private _color: string | null,
+    private _description: string | null,
     private _created: Date,
     private _modified: Date,
     private _creatorUid: string,
@@ -24,6 +25,13 @@ export default class Tag {
     this._modified = now;
   }
 
+  editDescription(description: string | null) {
+    const now = dayjs().toDate();
+
+    this._description = description;
+    this._modified = now;
+  }
+
   get tid(): string {
     return this._tid;
   }
@@ -34,6 +42,10 @@ export default class Tag {
 
   get color(): string | null {
     return this._color;
+  }
+
+  get description(): string | null {
+    return this._description;
   }
 
   get created(): Date {
