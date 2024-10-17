@@ -4,10 +4,10 @@ import { Kysely, MysqlDialect } from 'kysely';
 
 const dialect = new MysqlDialect({
   pool: createPool({
-    database: process.env.MARIADB_DATABASE,
-    user: process.env.MARIADB_USER,
-    password: process.env.MARIADB_PASSWORD,
-    host: process.env.MARIADB_HOST,
+    database: process.env.MYSQL_DATABASE,
+    user: process.env.MYSQL_USER,
+    password: process.env.MYSQL_PASSWORD,
+    host: process.env.MYSQL_HOST,
   }),
 });
 

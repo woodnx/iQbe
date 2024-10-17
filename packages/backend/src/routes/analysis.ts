@@ -77,11 +77,11 @@ router.get('/ranking/all/:period', async (req, res) => {
     const nowRanking = await db.selectFrom('histories')
     .innerJoin('users', 'user_id', 'users.id')
     .select(({ fn }) => [
-      sql<number>`ROW_NUMBER() OVER(ORDER BY count DESC)`.as('rank'),
       'users.uid as uid',
       'users.nickname as nickname',
       'users.username as username',
       fn.count('histories.quiz_id').as('count'),
+      sql<number>`RANK() OVER(ORDER BY COUNT(histories.quiz_id) DESC)`.as('rank'),
     ])
     .where(({ between }) => between('practiced', ranges[0][0], ranges[0][1]))
     .groupBy('user_id')
@@ -92,11 +92,11 @@ router.get('/ranking/all/:period', async (req, res) => {
     const prevRanking = await db.selectFrom('histories')
     .innerJoin('users', 'user_id', 'users.id')
     .select(({ fn }) => [
-      sql<number>`ROW_NUMBER() OVER(ORDER BY count DESC)`.as('rank'),
       'users.uid as uid',
       'users.nickname as nickname',
       'users.username as username',
       fn.count('histories.quiz_id').as('count'),
+      sql<number>`RANK() OVER(ORDER BY COUNT(histories.quiz_id) DESC)`.as('rank'),
     ])
     .where(({ between }) => between('practiced', ranges[5][0], ranges[5][1]))
     .groupBy('user_id')

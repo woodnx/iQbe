@@ -15,7 +15,7 @@ services:
       - /node_modules
       - .:iQbe
   db:
-    image: mariadb:11
+    image: mysql:9.1
     container_name: iqbe-db
     restart: always
     env_file:
@@ -23,7 +23,7 @@ services:
     ports:
       - "3306:3306"
     volumes:
-      - ./iqbe-data:/var/lib/mysql/data
+      - iqbe-data:/var/lib/mysql
     networks:
       - iqbe-network
 
