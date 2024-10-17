@@ -99,28 +99,18 @@ export async function signupUser(username: string, password: string, inviteCode?
 }
 
 export async function checkAuth() {
-  const refreshToken = localStorage.getItem('refreshToken');
-  const uid = localStorage.getItem('uid');
-
-  if (
-    !refreshToken || 
-    !uid || 
-    refreshToken === 'undefined' || 
-    uid === 'undefined' ||
-    refreshToken == '' ||
-    uid == ''
-  ) {
-    return undefined;
-  }
+  const refreshToken = localStorage.getItem('refreshToken') || '';
+  const uid = localStorage.getItem('uid') || '';
 
   try {
-    const { data } = await client.POST("/auth/token", {
+    const { data, error } = await client.POST("/auth/token", {
       body: {
         refreshToken,
         uid,
       }
     });
 
+    if (error) throw error;
     if (!data) return undefined;
 
     const { accessToken, user } = data;
@@ -134,10 +124,9 @@ export async function checkAuth() {
     return user;
   } 
   catch(e) {
-    if (e instanceof AxiosError) {
-      if (e?.response?.data.title == "NO_ANY_USERS") {
-        return "please-move-welcome-page";
-      }
+    // @ts-ignore
+    if (e?.title == "NO_ANY_USERS") {
+      return "please-move-welcome-page";
     }
 
     return;
