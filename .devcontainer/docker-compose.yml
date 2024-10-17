@@ -11,13 +11,14 @@ services:
       - ../:/iQbe:cached
     
   db:
-    image: mariadb:11
+    image: mysql:9.1
     container_name: iqbe-db
     restart: unless-stopped
     volumes:
-      - mariadb-data:/var/lib/mysql
+      - mysql-data:/var/lib/mysql
+      - ../db/conf.d:/etc/mysql/conf.d
     env_file:
       - dev.env
     
 volumes:
-  mariadb-data:
+  mysql-data:
