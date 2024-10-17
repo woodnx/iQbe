@@ -165,80 +165,76 @@ export default class UserInfra implements IUsersRepository {
 
   async save(user: User): Promise<void> {
     const client = this.clientManager.getClient();
+    
+    await client.insertInto('users')
+    .values({
+      username: user.username,
+      uid: user.uid,
+      passwd: user.passwd,
+      nickname: user.nickname || undefined,
+      email: user.email,
+      created: user.created,
+      modified: user.modified,
+      permission: user.permission,
+    })
+    .executeTakeFirst();
 
-    await client.transaction().execute(async trx => {
-      await trx.insertInto('users')
-      .values({
-        username: user.username,
-        uid: user.uid,
-        passwd: user.passwd,
-        nickname: user.nickname || undefined,
-        email: user.email,
-        created: user.created,
-        modified: user.modified,
-        permission: user.permission,
-      })
-      .executeTakeFirst();
+    const userId = await client.selectFrom('users')
+    .select('id')
+    .where('uid', '=', user.uid)
+    .executeTakeFirstOrThrow()
+    .then(user => user.id);
 
-      const userId = await trx.selectFrom('users')
-      .select('id')
-      .where('uid', '=', user.uid)
-      .executeTakeFirstOrThrow()
-      .then(user => user.id);
-
-      await trx.insertInto('profile')
-      .values({
-        user_id: userId,
-      })
-      .execute();
-    }); 
+    await client.insertInto('profile')
+    .values({
+      user_id: userId,
+    })
+    .execute();
   }
 
   async update(user: User): Promise<void> {
     const client = this.clientManager.getClient();
 
-    await client.transaction().execute(async trx => {
-      await client.updateTable('users')
+    await client.updateTable('users')
+    .set({
+      username: user.username,
+      passwd: user.passwd,
+      nickname: user.nickname || undefined,
+      modified: user.modified,
+      email: user.email,
+      permission: user.permission,
+    })
+    .where('uid', '=', user.uid)
+    .executeTakeFirst();
+
+    const userId = await client.selectFrom('users')
+    .select('id')
+    .where('uid', '=', user.uid)
+    .executeTakeFirstOrThrow()
+    .then(user => user.id);
+
+    const profile = await client.selectFrom('profile')
+    .select('user_id')
+    .where('user_id', '=', userId)
+    .executeTakeFirst();
+
+    if (!!profile) {
+      await client.updateTable('profile')
       .set({
-        username: user.username,
-        passwd: user.passwd,
-        nickname: user.nickname || undefined,
-        modified: user.modified,
-        email: user.email,
-        permission: user.permission,
+        nickname: user.nickname,
+        photoUrl: user.photoUrl,
       })
-      .where('uid', '=', user.uid)
-      .executeTakeFirst();
-
-      const userId = await client.selectFrom('users')
-      .select('id')
-      .where('uid', '=', user.uid)
-      .executeTakeFirstOrThrow()
-      .then(user => user.id);
-
-      const profile = await client.selectFrom('profile')
-      .select('user_id')
       .where('user_id', '=', userId)
-      .executeTakeFirst();
-
-      if (!!profile) {
-        await client.updateTable('profile')
-        .set({
-          nickname: user.nickname,
-          photoUrl: user.photoUrl,
-        })
-        .where('user_id', '=', userId)
-        .execute();
-      }
-      else {
-        await trx.insertInto('profile')
-        .values({
-          user_id: userId,
-          nickname: user.nickname,
-          photoUrl: user.photoUrl,
-        })
-        .execute();
-      }
-    }); 
+      .execute();
+    }
+    else {
+      await client.insertInto('profile')
+      .values({
+        user_id: userId,
+        nickname: user.nickname,
+        photoUrl: user.photoUrl,
+      })
+      .execute();
+    }
   }
 }
