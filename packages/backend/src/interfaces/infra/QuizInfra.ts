@@ -240,39 +240,41 @@ export default class QuizInfra implements IQuizRepository, IQuizQueryService {
     .executeTakeFirstOrThrow()
     .then(u => u.id);
 
-    client.transaction().execute(async trx => {
-      const quizId = await trx.insertInto('quizzes')
-      .values({
-        qid: quiz.qid,
-        que: quiz.question,
-        ans: quiz.answer,
-        anoans: quiz.anotherAnswer,
-        workbook_id: workbookId || null,
-        creator_id: userId,
-        category_id: quiz.categoryId,
-        sub_category_id: quiz.subCategoryId,
-      })
-      .returning('id')
-      .executeTakeFirstOrThrow()
-      .then(quiz => quiz.id);
+    await client.insertInto('quizzes')
+    .values({
+      qid: quiz.qid,
+      que: quiz.question,
+      ans: quiz.answer,
+      anoans: quiz.anotherAnswer,
+      workbook_id: workbookId || null,
+      creator_id: userId,
+      category_id: quiz.categoryId,
+      sub_category_id: quiz.subCategoryId,
+    })
+    .execute();
+
+    const quizId = await client.selectFrom('quizzes')
+    .select('id')
+    .where('qid', '=', quiz.qid)
+    .executeTakeFirstOrThrow()
+    .then(quiz => quiz.id);
+    // Visibleなユーザの処理
+    if (!quiz.isPublic()) {
+      const visibleUser = !!quiz.visibleUids.length
+      ? await Promise.all(quiz.visibleUids.map(async (user) => {
+        return (await client.selectFrom('users').select('id').where('uid', '=', user).executeTakeFirstOrThrow()).id
+      }))
+      : [ userId ];
   
-      if (!quiz.isPublic()) {
-        const visibleUser = !!quiz.visibleUids.length
-        ? await Promise.all(quiz.visibleUids.map(async (user) => {
-          return (await client.selectFrom('users').select('id').where('uid', '=', user).executeTakeFirstOrThrow()).id
-        }))
-        : [ userId ];
-  
-        for (const user of visibleUser) {
-          await trx.insertInto('quiz_visible_users')
-          .values({
-            quiz_id: quizId,
-            user_id: user,
-          })
-          .execute();
-        }
+      for (const user of visibleUser) {
+        await client.insertInto('quiz_visible_users')
+        .values({
+          quiz_id: quizId,
+          user_id: user,
+        })
+        .execute();
       }
-    });
+    }
   }
 
   async saveMany(quizzes: Quiz[]): Promise<void> {
@@ -315,57 +317,54 @@ export default class QuizInfra implements IQuizRepository, IQuizQueryService {
 
     const isChangedVisibleUser = isEqual(uniq(sortBy(visibleUserIds)), uniq(sortBy(oldVisibleUserIds)));
 
-    client.transaction().execute(async trx => {
-      await client.updateTable('quizzes')
-      .set({
-        que: quiz.question,
-        ans: quiz.answer,
-        anoans: quiz.anotherAnswer,
-        workbook_id: workbookId,
-        creator_id: userId,
-        category_id: quiz.categoryId,
-        sub_category_id: quiz.subCategoryId,
-      })
-      .where('qid', '=', quiz.qid)
-      .executeTakeFirstOrThrow()
-      
-      const quizId = await client.selectFrom('quizzes')
-      .select('id')
-      .where('qid', '=', quiz.qid)
-      .executeTakeFirstOrThrow()
-      .then(quiz => quiz.id);
+    await client.updateTable('quizzes')
+    .set({
+      que: quiz.question,
+      ans: quiz.answer,
+      anoans: quiz.anotherAnswer,
+      workbook_id: workbookId,
+      creator_id: userId,
+      category_id: quiz.categoryId,
+      sub_category_id: quiz.subCategoryId,
+    })
+    .where('qid', '=', quiz.qid)
+    .executeTakeFirstOrThrow()
+    
+    const quizId = await client.selectFrom('quizzes')
+    .select('id')
+    .where('qid', '=', quiz.qid)
+    .executeTakeFirstOrThrow()
+    .then(quiz => quiz.id);
 
-      if (isChangedVisibleUser) {
-        if (quiz.isPublic()) { // limited / private -> publicに変更
-          await trx.deleteFrom('quiz_visible_users')
-          .where('quiz_id', '=', quizId)
+    if (isChangedVisibleUser) {
+      if (quiz.isPublic()) { // limited / private -> publicに変更
+        await client.deleteFrom('quiz_visible_users')
+        .where('quiz_id', '=', quizId)
+        .execute();
+      }
+      else { // public -> private / limited or private -> limited
+        const visibleUser = visibleUserIds.filter(u => oldVisibleUserIds.includes(u));
+        const unVisibleUser = oldVisibleUserIds.filter(u => visibleUserIds.includes(u));
+  
+        for (const user of visibleUser) {
+          await client.insertInto('quiz_visible_users')
+          .values({
+            quiz_id: quizId,
+            user_id: user,
+          })
           .execute();
         }
-        else { // public -> private / limited or private -> limited
-          const visibleUser = visibleUserIds.filter(u => oldVisibleUserIds.includes(u));
-          const unVisibleUser = oldVisibleUserIds.filter(u => visibleUserIds.includes(u));
-    
-          for (const user of visibleUser) {
-            await trx
-            .insertInto('quiz_visible_users')
-            .values({
-              quiz_id: quizId,
-              user_id: user,
-            })
-            .execute();
-          }
-    
-          for (const user of unVisibleUser) {
-            await trx.deleteFrom('quiz_visible_users')
-            .where(({ eb, and }) => and([
-              eb('quiz_id', '=', quizId),
-              eb('user_id', '=', user),
-            ]))
-            .execute();
-          }
+  
+        for (const user of unVisibleUser) {
+          await client.deleteFrom('quiz_visible_users')
+          .where(({ eb, and }) => and([
+            eb('quiz_id', '=', quizId),
+            eb('user_id', '=', user),
+          ]))
+          .execute();
         }
       }
-    });
+    }
   }
 
   async delete(qid: string): Promise<void> {
