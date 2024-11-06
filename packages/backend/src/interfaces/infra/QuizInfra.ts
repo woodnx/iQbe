@@ -228,17 +228,19 @@ export default class QuizInfra implements IQuizRepository, IQuizQueryService {
   async save(quiz: Quiz): Promise<void> {
     const client = this.clientManager.getClient();
 
-    const workbookId = await client.selectFrom('workbooks')
-    .select('id')
-    .where('wid', '=', quiz.wid)
-    .executeTakeFirst()
-    .then(w => w?.id);
+    const [ workbookId, userId ] = await Promise.all([
+      client.selectFrom('workbooks')
+      .select('id')
+      .where('wid', '=', quiz.wid)
+      .executeTakeFirst()
+      .then(w => w?.id),
 
-    const userId = await client.selectFrom('users')
-    .select('id')
-    .where('uid', '=', quiz.creatorUid)
-    .executeTakeFirstOrThrow()
-    .then(u => u.id);
+      client.selectFrom('users')
+      .select('id')
+      .where('uid', '=', quiz.creatorUid)
+      .executeTakeFirstOrThrow()
+      .then(u => u.id),
+    ]);
 
     await client.insertInto('quizzes')
     .values({
@@ -290,21 +292,29 @@ export default class QuizInfra implements IQuizRepository, IQuizQueryService {
   async update(quiz: Quiz): Promise<void> {
     const client = this.clientManager.getClient();
 
-    const workbookId = await client.selectFrom('workbooks')
-    .select('id')
-    .where('wid', '=', quiz.wid)
-    .executeTakeFirst()
-    .then(w => w?.id) || null;
+    const [ workbookId, userId ] = await Promise.all([
+      client.selectFrom('workbooks')
+      .select('id')
+      .where('wid', '=', quiz.wid)
+      .executeTakeFirst()
+      .then(w => w?.id),
 
-    const userId = await client.selectFrom('users')
-    .select('id')
-    .where('uid', '=', quiz.creatorUid)
-    .executeTakeFirstOrThrow()
-    .then(u => u.id);
+      client.selectFrom('users')
+      .select('id')
+      .where('uid', '=', quiz.creatorUid)
+      .executeTakeFirstOrThrow()
+      .then(u => u.id),
+    ]);
 
     const visibleUserIds = !!quiz.visibleUids.length
     ? await Promise.all(quiz.visibleUids.map(async (user) => {
-      return (await client.selectFrom('users').select('id').where('uid', '=', user).executeTakeFirstOrThrow()).id
+      return (
+        client.selectFrom('users')
+        .select('id')
+        .where('uid', '=', user)
+        .executeTakeFirstOrThrow()
+        .then(user => user.id)
+      )
     }))
     : [ userId ];
 
