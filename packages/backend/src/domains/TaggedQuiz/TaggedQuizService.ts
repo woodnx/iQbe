@@ -1,6 +1,8 @@
 import TaggedQuiz from ".";
 import IQuizRepository from "../Quiz/IQuizRepository";
+import Tag from "../Tag";
 import ITagRepository from "../Tag/ITagRepository";
+import TagService from "../Tag/TagService";
 import ITaggedQuizRepository from "./ITaggedQuizRepository";
 
 export default class TaggedQuizService {
@@ -10,35 +12,51 @@ export default class TaggedQuizService {
     private taggedQuizRepository: ITaggedQuizRepository,
   ) {}
 
-  async add(tid: string, qid: string) {
-    const [ tag, quiz ] = await Promise.all([
-      this.tagRepository.findByTid(tid),
+  async add(label: string, qid: string) {
+    const tagService = new TagService(this.tagRepository);
+
+    const [ exist, quiz ] = await Promise.all([
+      tagService.existTagByLabel(label),
       this.quizRepository.findByQid(qid),
     ]);
 
-    const now = new Date();
-
-    if (!tag || !quiz) {
-      throw new Error('Mylist or quiz not found');
+    if (!quiz) {
+      throw new Error('No quiz exists for such qid');
     }
 
-    const taggedQuiz = new TaggedQuiz(tag, quiz, now);
+    if (exist) {
+      await this.tagRepository.save(new Tag(label))
+    }
+
+    const tag = await this.tagRepository.findByLabel(label);
+
+    if (!tag) {
+      throw new Error('No tag exists for such label');
+    }
+
+    const taggedQuiz = new TaggedQuiz(qid, tag);
     return this.taggedQuizRepository.insert(taggedQuiz);
   }
 
-  async delete(tid: string, qid: string) {
+  async delete(label: string, qid: string) {
+    const tagService = new TagService(this.tagRepository);
+
     const [ tag, quiz ] = await Promise.all([
-      this.tagRepository.findByTid(tid),
+      this.tagRepository.findByLabel(label),
       this.quizRepository.findByQid(qid),
     ]);
 
     if (!tag || !quiz) {
-      throw new Error('Mylist or quiz not found');
+      throw new Error('No quiz exists for such qid');
     }
 
-    const now = new Date();
+    const registeredQuiz = new TaggedQuiz(qid, tag);
+    this.taggedQuizRepository.delete(registeredQuiz);
 
-    const registeredQuiz = new TaggedQuiz(tag, quiz, now);
-    return this.taggedQuizRepository.delete(registeredQuiz);
+    const exist = await tagService.existTagByLabel(label);
+
+    if (!exist) {
+      this.tagRepository.delete(label);
+    }
   }
 }

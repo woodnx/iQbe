@@ -13,11 +13,12 @@ export interface Element {
 export default function CreateDashboard() {
   const { mutate } = $api.useMutation("post", "/quizzes");
 
-  const submit = ({ question, answer, category, subCategory, workbook, isPublic }: SubmitValue) => {
+  const submit = ({ question, answer, category, tags, subCategory, workbook, isPublic }: SubmitValue) => {
     mutate({ body: {
       question,
       answer,
       category,
+      tags,
       subCategory,
       wid: workbook,
       isPublic,

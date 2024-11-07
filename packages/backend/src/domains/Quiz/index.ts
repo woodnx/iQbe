@@ -7,6 +7,7 @@ export default class Quiz {
     private _question: string,
     private _answer: string,
     private _anotherAnswer: string | null,
+    private _tagLabels: string[],
     private _wid: string | null,
     private _categoryId: number | null,
     private _subCategoryId: number | null,
@@ -17,28 +18,40 @@ export default class Quiz {
     this._right = 0;
   }
 
-  reconstruct(
-    qid: string,
-    question: string,
-    answer: string,
-    anotherAnswer: string | null,
-    wid: string | null,
-    categoryId: number | null,
-    subCategoryId: number | null,
-    creatorUid: string,
-    visibleUids: string[],
-  ) {
-    return new Quiz(
-      qid,
-      question,
-      answer,
-      anotherAnswer,
-      wid,
-      categoryId,
-      subCategoryId,
-      creatorUid,
-      visibleUids,
-    );
+  editQuestion(question: string) {
+    this._question = question;
+  }
+
+  editAnswer(answer: string) {
+    this._answer = answer;
+  }
+
+  editAnotherAnswer(anotherAnswer: string | null) {
+    this._anotherAnswer = anotherAnswer
+  }
+
+  editCategoryId(categoryId: number | null) {
+    this._categoryId = categoryId;
+  }
+
+  editSubCategoryId(subCategoryId: number | null) {
+    this._subCategoryId = subCategoryId;
+  }
+
+  editWid(wid: string | null) {
+    this._wid = wid;
+  }
+
+  editTags(tagLabels: string[]) {
+    this._tagLabels = tagLabels;
+  }
+
+  addTagLabel(tagLabel: string): string[] {
+    return [...this._tagLabels, tagLabel];
+  }
+
+  removeTagLabel(tagLabel: string): string[] {
+    return this._tagLabels.filter(label => label !== tagLabel);
   }
 
   isPublic(): boolean {
@@ -71,6 +84,10 @@ export default class Quiz {
 
   get wid(): string | null {
     return this._wid;
+  }
+
+  get tagLabels(): string[] {
+    return this._tagLabels;
   }
 
   get categoryId(): number | null {

@@ -1,114 +1,54 @@
 import ITagRepository from "@/domains/Tag/ITagRepository";
 import KyselyClientManager from "./kysely/KyselyClientManager";
 import Tag from "@/domains/Tag";
+import { sql } from "kysely";
 
 export default class TagInfra implements ITagRepository {
   constructor(
     private clientManager: KyselyClientManager,
   ) {}
 
-  async findByTid(tid: string): Promise<Tag | null> {
+  async findByLabel(label: string): Promise<Tag | null> {
     const client = this.clientManager.getClient();
 
     const tag = await client.selectFrom('tags')
-    .innerJoin('users', 'tags.creator_id', 'users.id')
-    .select([
-      'tid',
-      'label',
-      'color',
-      'description',
-      'tags.created as created',
-      'tags.modified as modified',
-      'users.uid as creator_uid',
-    ])
-    .where('tid', '=', tid)
+    .select(['label'])
+    .where('label', '=', label)
     .executeTakeFirst();
 
     if (!tag) return null;
 
-    return new Tag(
-      tag.tid,
-      tag.label,
-      tag.color,
-      tag.description,
-      tag.created,
-      tag.modified,
-      tag.creator_uid,
-    );
+    return new Tag(tag.label);
   }
 
-  async findOwn(uid: string): Promise<Tag[]> {
+  async search(q?: string): Promise<Tag[]> {
     const client = this.clientManager.getClient();
 
     const tags = await client.selectFrom('tags')
-    .innerJoin('users', 'tags.creator_id', 'users.id')
-    .select([
-      'tid',
-      'label',
-      'color',
-      'description',
-      'tags.created as created',
-      'tags.modified as modified',
-      'users.uid as creator_uid',
-    ])
-    .where('users.uid', '=', uid)
+    .select(['label'])
+    .where(sql`MATCH (label) AGAINST (${q} IN NATURAL LANGUAGE MODE)`)
     .execute();
 
-    const result = tags.map((tag) => new Tag(
-      tag.tid,
-      tag.label,
-      tag.color,
-      tag.description,
-      tag.created,
-      tag.modified,
-      tag.creator_uid,
-    ));
-
-    return result;
+    return tags.map(tag => new Tag(tag.label));
   }
 
   async save(tag: Tag): Promise<void> {
     const client = this.clientManager.getClient();
 
-    const userId = await client.selectFrom('users')
-    .select('id')
-    .where('uid', '=', tag.creatorUid)
-    .executeTakeFirstOrThrow()
-    .then(user => user.id);
-
     await client.insertInto('tags')
     .values({
-      tid: tag.tid,
       label: tag.label,
-      color: tag.color,
-      description: tag.description,
       created: tag.created,
-      modified: tag.modified,
-      creator_id: userId,
+      modified: tag.created,
     })
     .execute();
   }
 
-  async update(tag: Tag): Promise<void> {
-    const client = this.clientManager.getClient();
-
-    await client.updateTable('tags')
-    .set({
-      label: tag.label,
-      color: tag.color,
-      description: tag.description,
-      created: tag.created,
-      modified: tag.modified,
-    })
-    .where('tid', '=', tag.tid)
-    .execute();
-  }
-
-  async delete(tid: string): Promise<void> {
+  async delete(label: string): Promise<void> {
     const client = this.clientManager.getClient();
 
     await client.deleteFrom('tags')
-    .where('tid', '=', tid)
+    .where('label', '=', label)
     .execute();
   }
 }

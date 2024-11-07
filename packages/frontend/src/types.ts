@@ -8,6 +8,7 @@ export interface Quiz {
   wid: string,
   level: string,
   date: string,
+  tags: string[],
   total: number,
   right: number,
   isFavorite: boolean,
@@ -83,6 +84,7 @@ export interface SubCategory extends Category {
 export interface SubmitValue {
   question: string,
   answer: string,
+  tags: string[],
   category?: number,
   subCategory?: number,
   workbook?: string,
