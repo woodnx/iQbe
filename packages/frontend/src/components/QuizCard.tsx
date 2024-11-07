@@ -87,6 +87,7 @@ export default function QuizCard({
             creatorId={quiz.creatorId}
             question={quiz.question}
             answer={quiz.answer}
+            tags={quiz.tags}
             workbook={quiz.wid}
             category={quiz.category}
             subCategory={quiz.subCategory}

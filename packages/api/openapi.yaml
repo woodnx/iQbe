@@ -865,6 +865,10 @@ paths:
                     type: string
                   anotherAnswer:
                     type: string
+                  tags:
+                    type: array
+                    items:
+                      type: string
                   wid:
                     type: string
                   category:
@@ -915,6 +919,10 @@ paths:
                     type: string
                   answer: 
                     type: string
+                  tags: 
+                    type: array
+                    items:
+                      type: string
                   wid:
                     type: string
                   category:
@@ -1104,6 +1112,10 @@ paths:
                           type: string
                         anotherAnswer:
                           type: string
+                        tags: 
+                          type: array
+                          items:
+                            type: string
                         wid:
                           type: string
                         category:
@@ -1435,6 +1447,14 @@ paths:
     get: 
       tags:
         - tags
+      parameters:
+        - name: q
+          in: query
+          required: false
+          description: 検索キーワード
+          schema:
+            type: string
+          example: ジャンル
       summary: ユーザ自身の作成したタグのリストを取得
       responses:
         "200":
@@ -1445,121 +1465,6 @@ paths:
           $ref: "#/components/responses/401Unauthorized"
         "403":
           $ref: "#/components/responses/403Forbidden"
-    post: 
-      tags:
-        - tags
-      summary: タグの追加
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema: 
-              type: object
-              properties:
-                label: 
-                  type: string
-                color:
-                  type: string
-                description:
-                  type: string
-              required:
-                - label
-            example: 
-              label: 時事
-              color: gray
-      responses:
-        "200":
-          $ref: "#/components/responses/TagResponse"
-        "400":
-          $ref: "#/components/responses/400BadRequest"
-        "401": 
-          $ref: "#/components/responses/401Unauthorized"
-        "403":
-          $ref: "#/components/responses/403Forbidden"
-    put: 
-      tags:
-        - tags
-      summary: タグの編集
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema: 
-              type: object
-              properties: 
-                tid:
-                  type: string
-                label: 
-                  type: string
-                color: 
-                  type: string
-                description:
-                  type: string
-              required:
-                - tid
-                - label
-            example: 
-              tid: UaHxXrGKQM
-              label: 時事
-              color: gray
-      responses:
-        "200":
-          $ref: "#/components/responses/TagResponse"
-        "400":
-          $ref: "#/components/responses/400BadRequest"
-        "401": 
-          $ref: "#/components/responses/401Unauthorized"
-        "403":
-          $ref: "#/components/responses/403Forbidden"
-    delete: 
-      tags:
-        - tags
-      summary: タグの削除
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema: 
-              type: object
-              properties: 
-                tid:
-                  type: string
-              required:
-                - tid
-            example: 
-              tid: UaHxXrGKQM
-      responses:
-        "204":
-          description: deleted tag
-        "400":
-          $ref: "#/components/responses/400BadRequest"
-        "401": 
-          $ref: "#/components/responses/401Unauthorized"
-        "403":
-          $ref: "#/components/responses/403Forbidden"
-  "/tags/{tid}":
-    get: 
-      tags:
-        - tags
-      summary: tid からタグ情報を取得
-      parameters:
-        - name: tid
-          in: path
-          required: true
-          description: タグid
-          schema:
-            type: string
-          example: UaHxXrGKQM
-      responses:
-        "200":
-          $ref: "#/components/responses/TagResponse"
-        "400":
-          $ref: "#/components/responses/400BadRequest"
-        "401": 
-          $ref: "#/components/responses/401Unauthorized"
-        "403":
-          $ref: "#/components/responses/403Forbidden"
-
   "/users": 
     post: 
       tags: 
@@ -2357,7 +2262,6 @@ components:
           type: array
           items:
             type: string
-          readOnly: true
         creatorId:
           type: string
         isPublic: 
@@ -2416,8 +2320,6 @@ components:
     Tag: 
       type: object
       properties:
-        tid: 
-          type: string
         label: 
           type: string
         description:
@@ -2428,14 +2330,10 @@ components:
           type: string
         modified:
           type: string
-        creatorUid:
-          type: string
       required:
-        - tid
         - label
         - created
         - modified
-        - creatorUid
     User: 
       type: object
       properties:

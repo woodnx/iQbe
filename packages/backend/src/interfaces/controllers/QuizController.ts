@@ -1,27 +1,25 @@
 import { ApiError } from 'api';
 
 import IQuizQueryService from '@/applications/queryservices/IQuizQueryService';
+import QuizUseCase from '@/applications/usecases/QuizUseCase';
 import FavoriteService from '@/domains/Favorite/FavoriteService';
 import HistoryService from '@/domains/History/HistoryServise';
 import Quiz from '@/domains/Quiz';
 import IQuizRepository from '@/domains/Quiz/IQuizRepository';
-import QuizService from '@/domains/Quiz/QuizService';
 import RegisteredQuizService from '@/domains/RegisteredQuiz/ResisteredQuizService';
 import dayjs from '@/plugins/day';
 import { typedAsyncWrapper } from '@/utils';
-import TaggedQuizService from '@/domains/TaggedQuiz/TaggedQuizService';
 
 type QuizzesPath = '' | '/favorite' | '/history' | '/mylist/{mid}';
 
 export default class QuizController {
   constructor(
-    private quizService: QuizService,
     private quizRepository: IQuizRepository,
     private quizQueryService: IQuizQueryService,
+    private quizUseCase: QuizUseCase,
     private favoriteService: FavoriteService,
     private historyService: HistoryService,
     private registeredQuizService: RegisteredQuizService,
-    private taggedQuizService: TaggedQuizService,
   ) {}
 
   get(path: QuizzesPath = '') {
@@ -63,10 +61,11 @@ export default class QuizController {
     return typedAsyncWrapper<"/quizzes", "post">(async (req, res) => {
       const question: string | undefined = req.body.question;
       const answer:   string | undefined = req.body.answer;
-      const anotherAnswer = req.body.anotherAnswer;
-      const category = req.body.category || null;
-      const subCategory = category !== 0 && !!req.body.subCategory ? Number(req.body.subCategory) : null;
-      const wid = req.body.wid || null;
+      const anotherAnswer = req.body.anotherAnswer || undefined;
+      const tags = req.body.tags || [];
+      const category = req.body.category || undefined;
+      const subCategory = category !== 0 && !!req.body.subCategory ? Number(req.body.subCategory) : undefined;
+      const wid = req.body.wid || undefined;
       const limitedUser = req.body.limitedUser || [];
       const uid = req.uid;
 
@@ -74,21 +73,17 @@ export default class QuizController {
         throw new ApiError().invalidParams();
       }
 
-      const qid = this.quizService.generateQid();
-
-      const quiz = new Quiz(
-        qid,
+      await this.quizUseCase.addQuiz(
         question,
         answer,
-        anotherAnswer || null,
-        wid,
+        tags,
+        limitedUser,
+        uid,
+        anotherAnswer,
         category,
         subCategory,
-        uid,
-        limitedUser,
+        wid,
       );
-
-      await this.quizRepository.save(quiz);
 
       res.status(201).send();
     });
@@ -103,23 +98,19 @@ export default class QuizController {
         throw new ApiError().invalidParams();
       }
 
-      const quizzes = records.map(record => {
-        const qid = this.quizService.generateQid();
-
-        return new Quiz(
-          qid,
-          record.question,
-          record.answer,
-          record.anotherAnswer || null,
-          record.wid || null,
-          record.category || null,
-          record.subCategory || null,
+      await this.quizUseCase.addQuizzes(
+        records.map(r => ({
+          question: r.question,
+          answer: r.answer,
+          anotherAnswer: r.anotherAnswer || undefined,
+          tagLabels: r.tags || [],
+          wid: r.wid || undefined,
+          categoryId: r.category || undefined,
+          subCategoryId: r.subCategory || undefined,
+          limitedUser: r.limitedUser || [],
           uid,
-          record.limitedUser || [],
-        );
-      });
-
-      await this.quizRepository.saveMany(quizzes);
+        }))
+      )
 
       res.status(201).send();
     });
@@ -130,10 +121,11 @@ export default class QuizController {
       const qid = req.body.qid;
       const question: string | undefined = req.body.question;
       const answer: string | undefined = req.body.answer;
-      const anotherAnswer = req.body.anotherAnswer;
-      const category = req.body.category || null;
-      const subCategory = category !== 0 ? req.body.subCategory || null : 0;
-      const wid = req.body.wid || null;
+      const anotherAnswer = req.body.anotherAnswer || undefined;
+      const category = req.body.category || undefined;
+      const tags = req.body.tags || [];
+      const subCategory = category !== 0 ? req.body.subCategory || undefined : 0;
+      const wid = req.body.wid || undefined;
       const limitedUser = req.body.limitedUser || [];
       const uid = req.uid;
 
@@ -141,22 +133,17 @@ export default class QuizController {
         throw new ApiError().invalidParams();
       }
 
-      const quiz = await this.quizRepository.findByQid(qid);
-      if (!quiz) {
-        throw new ApiError().invalidParams();
-      }
-
-      await this.quizRepository.update(new Quiz(
-        quiz.qid,
+      await this.quizUseCase.editQuiz(
+        qid,
         question,
         answer,
-        anotherAnswer || null,
-        wid,
+        uid,
+        tags,
+        anotherAnswer,
         category,
         subCategory,
-        uid,
-        limitedUser,
-      ));
+        wid,
+      );
 
       res.status(201).send();
     });
@@ -231,28 +218,6 @@ export default class QuizController {
     });
   }
 
-  tagging() {
-    return typedAsyncWrapper<"/quizzes/tag/{tid}", "post">(async (req, res) => {
-      const qid = req.body.qid;
-      const tid = req.params.tid;
-
-      this.taggedQuizService.add(tid, qid);
-
-      res.status(201).send();
-    });
-  }
-
-  untagging() {
-    return typedAsyncWrapper<"/quizzes/tag/{tid}", "delete">(async (req, res) => {
-      const qid = req.body.qid;
-      const tid = req.params.tid;
-
-      this.taggedQuizService.delete(tid, qid);
-
-      res.status(201).send();
-    });
-  }
-
   addWorkbook() {
     return typedAsyncWrapper<"/quizzes/workbook/{wid}", "post">(async (req, res) => {
       const qid = req.body.qid;
@@ -272,6 +237,7 @@ export default class QuizController {
         quiz.question,
         quiz.answer,
         quiz.anotherAnswer,
+        quiz.tagLabels,
         wid,
         quiz.categoryId,
         quiz.subCategoryId,
@@ -301,6 +267,7 @@ export default class QuizController {
         quiz.question,
         quiz.answer,
         quiz.anotherAnswer,
+        quiz.tagLabels,
         null,
         quiz.categoryId,
         quiz.subCategoryId,
