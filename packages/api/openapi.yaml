@@ -1631,7 +1631,7 @@ components:
       in: query
       required: false
       schema:
-        type: string
+        type: number
     tags:
       name: tags
       in: query
@@ -1645,7 +1645,7 @@ components:
       in: query
       required: false
       schema: 
-        type: string
+        type: number
     wids:
       name: workbooks
       in: query
