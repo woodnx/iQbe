@@ -8,9 +8,7 @@ import QuizMylistButton from "./QuizMylistButton";
 interface Props extends BoxProps {
   qid?: string,
   answer?: string,
-  workbook?: string,
-  level?: string,
-  date?: string,
+  wid?: string,
   isFavorite?: boolean,
   registeredMylist?: string[],
   visible: boolean,
@@ -19,9 +17,7 @@ interface Props extends BoxProps {
 export function PracticeQuizInfo({
   qid = "",
   answer = "",
-  workbook = "",
-  level = "",
-  date = "",
+  wid = "",
   isFavorite = false,
   registeredMylist = [],
   visible,
@@ -51,12 +47,11 @@ export function PracticeQuizInfo({
           key={qid}
         />
         {
-          (!!workbook && !!level && !!date) 
+          (!!wid) 
           ?
           <QuizWorkbookBadge
-            workbookName={workbook}
-            levelColor={level}
-            date={date}
+            wid={wid}
+            levelColor={'gray'}
           />
           :
           null 

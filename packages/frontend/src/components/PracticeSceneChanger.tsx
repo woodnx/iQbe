@@ -208,9 +208,7 @@ export default function({
         <PracticeQuizInfo 
           qid={quiz?.qid}
           answer={quiz?.answer}
-          workbook={quiz?.workbook }
-          level={quiz?.level}
-          date={quiz?.date}
+          wid={quiz?.wid || undefined}
           isFavorite={quiz?.isFavorite}
           registeredMylist={quiz?.registerdMylist}
           visible={scene >= 4}

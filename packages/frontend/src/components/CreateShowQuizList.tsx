@@ -17,8 +17,8 @@ export default function({ wid }: Props) {
   const navigator = useNavigate();
   const { setParams } = useQuizzes("/create");
   const { workbooks } = useWorkbooks(true);
-  const { mutate: updateMutate } = $api.useMutation("put", "/workbooks");
-  const { mutate: deleteMutate } = $api.useMutation("delete", "/workbooks");
+  const { mutate: updateMutate } = $api.useMutation("put", "/workbooks/{wid}");
+  const { mutate: deleteMutate } = $api.useMutation("delete", "/workbooks/{wid}");
   
   const workbooksName = isAll ? 'すべてのクイズ' : workbooks?.find(list => list.wid == wid)?.name;
 
@@ -32,19 +32,18 @@ export default function({ wid }: Props) {
   }, [])
 
   const toEdit = async (newWorkbookName: string) => {
-    const body = {
-      wid,
-      newWorkbookName,
-    };
-    updateMutate({ body });
+    updateMutate({ 
+      body: {
+        name: newWorkbookName,
+      },
+      params: { path: { wid }}
+    });
   }
 
   const toDelete = async () => {
-    const body = { wid };
-    // api.workbooks.delete({ body });
-
-    // const newList = workbooks?.filter(w => w.wid !== wid);
-    deleteMutate({ body });
+    deleteMutate({ params: {
+      path: { wid }
+    } });
 
     navigator('/create');
   }

@@ -1473,11 +1473,42 @@ paths:
           $ref: "#/components/responses/401Unauthorized"
         "403":
           $ref: "#/components/responses/403Forbidden"
-    put: 
+  "/workbooks/{wid}":
+    get: 
       tags:
         - workbooks
-      summary: 問題集を編集
+      summary: 問題集の詳細を取得
+      description: リクエストパラメータに指定した問題集の詳細を取得します．
+      parameters:
+        - name: wid
+          in: path
+          required: true
+          description: 問題集のID
+          schema:
+            type: string
+          example: 1i7qaa
+      responses:
+        "200":
+          $ref: "#/components/responses/WorkbookResponse"
+        "400":
+          $ref: "#/components/responses/400BadRequest"
+        "401": 
+          $ref: "#/components/responses/401Unauthorized"
+        "403":
+          $ref: "#/components/responses/403Forbidden"
+    put:  
+      tags:
+        - workbooks
+      summary: 問題集の編集
       description: リクエストボディに指定した問題集を編集します．
+      parameters:
+        - name: wid
+          in: path
+          required: true
+          description: 問題集のID
+          schema:
+            type: string
+          example: 1i7qaa
       requestBody:
         required: true
         content:
@@ -1485,18 +1516,14 @@ paths:
             schema:  
               type: object
               properties:
-                wid: 
-                  type: string
                 name:
                   type: string
-                published:
+                published: 
                   type: string
                   format: date-time
               required:
-                - wid
                 - name
             example: 
-              wid: sX8G8W
               name: abc the 12th
       responses:
         "200":
@@ -1512,19 +1539,14 @@ paths:
         - workbooks
       summary: 問題集を削除
       description: リクエストボディに指定した問題集を削除します．削除する問題集に登録されたクイズは削除されません．
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                wid: 
-                  type: string
-              required:
-                - wid
-            example: 
-              wid: 1i7qaa
+      parameters:
+        - name: wid
+          in: path
+          required: true
+          description: 問題集のID
+          schema:
+            type: string
+          example: 1i7qaa
       responses:
         "200":
           $ref: "#/components/responses/WorkbooksResponse"
@@ -1533,7 +1555,7 @@ paths:
         "401": 
           $ref: "#/components/responses/401Unauthorized"
         "403":
-          $ref: "#/components/responses/403Forbidden"      
+          $ref: "#/components/responses/403Forbidden"
   "/workbooks/all":
     get:
       tags:
