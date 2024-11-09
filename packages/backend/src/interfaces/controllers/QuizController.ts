@@ -2,10 +2,8 @@ import { ApiError } from 'api';
 
 import IQuizQueryService from '@/applications/queryservices/IQuizQueryService';
 import QuizUseCase from '@/applications/usecases/QuizUseCase';
-import dayjs from '@/plugins/day';
 import { typedAsyncWrapper } from '@/utils';
 
-type QuizzesPath = '' | '/favorite' | '/history' | '/mylist/{mid}';
 
 export default class QuizController {
   constructor(
@@ -13,14 +11,14 @@ export default class QuizController {
     private quizUseCase: QuizUseCase,
   ) {}
 
-  get(path: QuizzesPath = '') {
+  get() {
     return typedAsyncWrapper<'/quizzes', "get">(async (req, res) => {
       if (!req.query) return;
 
       const page     = !!req.query.page     ? Number(req.query.page)    : 1;
       const maxView  = !!req.query.maxView || Number(req.query.maxView) <= 100  ? Number(req.query.maxView) : 100;
       const seed     = !!req.query.seed     ? Number(req.query.seed)    : undefined;
-      const wids     = req.query.workbooks || [];
+      const wids     = req.query.wids || [];
       const keyword = req.query.keyword || undefined;
       const keywordOption = (req.query.keywordOption) || undefined;
       const uid = req.uid;
@@ -36,11 +34,11 @@ export default class QuizController {
         wids,
         keyword,
         keywordOption,
-        since: !!since ? dayjs(since).toDate() : undefined,
-        until: !!until ? dayjs(until).toDate() : undefined,
+        since,
+        until,
         judgements,
         mid,
-      }, path);
+      });
 
       res.status(200).send(quizzes);
     });

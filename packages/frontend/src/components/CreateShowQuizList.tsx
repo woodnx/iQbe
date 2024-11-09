@@ -15,7 +15,7 @@ interface Props {
 export default function({ wid }: Props) {
   const isAll = (wid == 'all');
   const navigator = useNavigate();
-  const { setParams } = useQuizzes("/create");
+  const { setParams } = useQuizzes();
   const { workbooks } = useWorkbooks(true);
   const { mutate: updateMutate } = $api.useMutation("put", "/workbooks/{wid}");
   const { mutate: deleteMutate } = $api.useMutation("delete", "/workbooks/{wid}");
@@ -26,8 +26,8 @@ export default function({ wid }: Props) {
 
   useEffect(() => {
     setParams({ 
-      perPage: 100, 
-      workbooks: isAll ? undefined : [ wid ] 
+      maxView: 100, 
+      wids: isAll ? undefined : [ wid ] 
     })
   }, [])
 
@@ -78,7 +78,6 @@ export default function({ wid }: Props) {
   return (
     <>
       <QuizViewer
-        path="/create"
         headerCard={<CreateCard/>}
       />
     </>

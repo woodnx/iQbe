@@ -1,38 +1,8 @@
 // Globalなtypeを定義
 
-export interface Quiz {
-  qid: string,
-  question: string,
-  answer: string,
-  workbook: string,
-  wid: string,
-  level: string,
-  date: string,
-  tags: string[],
-  total: number,
-  right: number,
-  isFavorite: boolean,
-  registerdMylist: string[],
-  size: number,
-  judgement?: Judgement,
-  creatorId: string,
-  category?: number,
-  subCategory?: number,
-  isPublic?: boolean,
-}
+import { paths } from "api/schema";
 
-export interface QuizRequestParams {
-  page?: number,
-  perPage?: number,
-  seed?: number,
-  workbooks?: string[],
-  levels?: string[],
-  keyword?: string,
-  keywordOption?: KeywordOption,
-  since?: number,
-  until?: number,
-  judgements?: Judgement[],
-}
+export type QuizRequestParams = paths["/quizzes"]["get"]["parameters"]["query"] & {};
 
 export type KeywordOption = "1" | "2" | "3";
 

@@ -9,22 +9,20 @@ import QuizPagination from '@/components/QuizPagination';
 import QuizShuffleButton from '@/components/QuizShuffleButton';
 import QuizHiddenAnswerButton from '@/components/QuizHiddenAnswerButton';
 import { Judgement, KeywordOption, QuizRequestParams } from '@/types';
-import useQuizzes, { QuizzesPath } from '@/hooks/useQuizzes';
+import useQuizzes from '@/hooks/useQuizzes';
 import { useHistories } from "@/hooks/useHistories";
 import HistorySelectJudgement from './HistorySelectJudgement';
 import HistoryDateRange from './HistoryDateRange';
 import QuizTransfarButton from './QuizTransfarButton';
 
 interface Props {
-  path?: QuizzesPath,
   headerCard?: ReactNode,
   isHistory?: boolean,
   initialParams?: QuizRequestParams,
 }
 
 export default function({
-  path = '',
-  initialParams = { perPage: 100 },
+  initialParams = { maxView: 100 },
   headerCard = <></>,
   isHistory = false,
 }: Props) {
@@ -36,7 +34,7 @@ export default function({
     dayjs().endOf('day').valueOf(),
   ]);
   const navigate = useNavigate();
-  const { quizzes, params, setParams } = useQuizzes(path, initialParams);
+  const { quizzes, params, setParams } = useQuizzes(initialParams);
   const { histories } = useHistories(dates[0], dates[1]);
   const right = !!histories ? Number(histories.right) : 0;
   const wrong = !!histories ? Number(histories.wrong) : 0;
@@ -58,7 +56,7 @@ export default function({
       maxView: perPage,
       wids: workbooks, 
       keyword, 
-      keywordOption,
+      keywordOption: Number(keywordOption),
     });
   }
 
@@ -81,7 +79,7 @@ export default function({
   }
 
   const toTransfar = () => {
-    navigate(`/practice?path=/${path}`);
+    navigate(`/practice?path=/transfer`);
   }
 
   const changeJudgement = (
@@ -152,7 +150,7 @@ export default function({
             <Center mt="sm">
               <QuizPagination
                 page={activePage}
-                total={!!params?.perPage ? Math.ceil(size / params.perPage) : 0}
+                total={!!params?.maxView ? Math.ceil(size / params.maxView) : 0}
                 setPage={changePage}
               />
             </Center>
@@ -162,7 +160,7 @@ export default function({
       <QuizList
         quizzes={quizzes}
         page={activePage}
-        perPage={params?.perPage || 0}
+        perPage={params?.maxView || 0}
         isHidden={isHidden}
         coloring={isHistory}
       />  

@@ -17,16 +17,16 @@ const useQuizzes = (
 
   const { data: quizzes, error, isLoading } = $api.useQuery('get', `/quizzes`, {
     params: {
-      query: params &&{
+      query: {
         page: params.page,
         maxView: params.maxView,
         seed: params.seed,
-        workbooks: params.workbooks,
+        workbooks: params.wids,
         keyword: params.keyword,
         keywordOption: Number(params.keywordOption),
         judgements: params.judgements,
         since: params.since,
-        until: params.until
+        until: params.until,
       }
     },
     enabled: shouldFetch,

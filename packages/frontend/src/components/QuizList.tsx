@@ -1,7 +1,9 @@
 import { useMylists } from "@/hooks/useMylists";
 import QuizCard from "./QuizCard"
 import { Center, Loader } from "@mantine/core";
-import { Quiz } from "@/types";
+import { components } from "api/schema";
+
+type Quiz = components['schemas']['Quiz'];
 
 interface QuizListProps {
   quizzes?: Quiz[],
