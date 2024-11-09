@@ -728,6 +728,60 @@ paths:
           $ref: "#/components/responses/401Unauthorized"
         "403":
           $ref: "#/components/responses/403Forbidden"
+  "/like":
+    post: 
+      tags: 
+        - quizzes
+      summary: お気に入りにクイズを登録
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                qid: 
+                  type: string
+              required:
+                - qid
+            example: 
+              qid: DG8ED3bx7y0McbistuLx
+      responses:
+        "201":
+          $ref: "#/components/responses/QuizResponse"
+        "400":
+          $ref: "#/components/responses/400BadRequest"
+        "401": 
+          $ref: "#/components/responses/401Unauthorized"
+        "403":
+          $ref: "#/components/responses/403Forbidden"
+  "/unlike":
+    post: 
+      tags:
+        - quizzes
+      summary: お気に入りからクイズを削除
+      requestBody: 
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                qid: 
+                  type: string
+              required:
+                - qid
+            example: 
+              qid: DG8ED3bx7y0McbistuLx
+      responses:
+        "204": 
+          description: deleted quiz from favorite
+        "400":
+          $ref: "#/components/responses/400BadRequest"
+        "401": 
+          $ref: "#/components/responses/401Unauthorized"
+        "403":
+          $ref: "#/components/responses/403Forbidden"
   "/mylists":
     get:
       tags:
@@ -824,6 +878,37 @@ paths:
           $ref: "#/components/responses/401Unauthorized"
         "403":
           $ref: "#/components/responses/403Forbidden"
+  "/practice":
+    post: 
+      tags: 
+        - quizzes
+      summary: クイズを履歴に追加
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                qid: 
+                  type: string
+                judgement: 
+                  type: number
+                pressedWord:
+                  type: number
+              required:
+                - qid
+                - judgement
+                - pressedWord
+      responses:
+        "201":
+          $ref: "#/components/responses/QuizResponse"
+        "400":
+          $ref: "#/components/responses/400BadRequest"
+        "401": 
+          $ref: "#/components/responses/401Unauthorized"
+        "403":
+          $ref: "#/components/responses/403Forbidden"
   "/quizzes":
     get:
       tags:
@@ -834,11 +919,16 @@ paths:
         - $ref: "#/components/parameters/page"
         - $ref: "#/components/parameters/maxView"
         - $ref: "#/components/parameters/seed"
-        - $ref: "#/components/parameters/workbooks"
-        - $ref: "#/components/parameters/levels"
+        - $ref: "#/components/parameters/wids"
         - $ref: "#/components/parameters/keyword"
         - $ref: "#/components/parameters/keywordOption"
         - $ref: "#/components/parameters/crctAnsRatio"
+        - $ref: "#/components/parameters/since"
+        - $ref: "#/components/parameters/until"
+        - $ref: "#/components/parameters/judgements"
+        - $ref: "#/components/parameters/mid"
+        - $ref: "#/components/parameters/isFavorite"
+        - $ref: "#/components/parameters/tags"
       responses:
         "200":
           $ref: "#/components/responses/QuizzesResponse"
@@ -900,10 +990,19 @@ paths:
           $ref: "#/components/responses/401Unauthorized"
         "403":
           $ref: "#/components/responses/403Forbidden"
+  "/quizzes/{qid}":
     put: 
       tags: 
         - quizzes
       summary: クイズの編集
+      parameters:
+        - name: qid
+          in: path
+          required: true
+          description: クイズID
+          schema:
+            type: string
+          example: DG8ED3bx7y0McbistuLx
       requestBody:
          required: true
          content:
@@ -911,8 +1010,6 @@ paths:
               schema: 
                 type: object
                 properties:
-                  qid:
-                    type: string
                   question: 
                     type: string
                   anotherAnswer:
@@ -936,7 +1033,6 @@ paths:
                     items: 
                       type: string
                 required:
-                  - qid
                   - question
                   - answer
                 example:
@@ -956,133 +1052,21 @@ paths:
           $ref: "#/components/responses/401Unauthorized"
         "403":
           $ref: "#/components/responses/403Forbidden"
-  "/quizzes/favorite":
-    get:
-      tags:
-        - quizzes
-      summary: お気に入りクイズリストを取得
-      description: お気に入りに登録したクイズのクイズリストを取得する
-      parameters:
-        - $ref: "#/components/parameters/page"
-        - $ref: "#/components/parameters/maxView"
-        - $ref: "#/components/parameters/seed"
-        - $ref: "#/components/parameters/workbooks"
-        - $ref: "#/components/parameters/levels"
-        - $ref: "#/components/parameters/keyword"
-        - $ref: "#/components/parameters/keywordOption"
-        - $ref: "#/components/parameters/crctAnsRatio"
-      responses:
-        "200":
-          $ref: "#/components/responses/QuizzesResponse"
-        "400":
-          $ref: "#/components/responses/400BadRequest"
-        "401": 
-          $ref: "#/components/responses/401Unauthorized"
-        "403":
-          $ref: "#/components/responses/403Forbidden"
-    post: 
-      tags: 
-        - quizzes
-      summary: お気に入りにクイズを登録
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                qid: 
-                  type: string
-              required:
-                - qid
-            example: 
-              qid: DG8ED3bx7y0McbistuLx
-      responses:
-        "201":
-          $ref: "#/components/responses/QuizResponse"
-        "400":
-          $ref: "#/components/responses/400BadRequest"
-        "401": 
-          $ref: "#/components/responses/401Unauthorized"
-        "403":
-          $ref: "#/components/responses/403Forbidden"
     delete: 
       tags:
         - quizzes
-      summary: お気に入りからクイズを削除
-      requestBody: 
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                qid: 
-                  type: string
-              required:
-                - qid
-            example: 
-              qid: DG8ED3bx7y0McbistuLx
+      summary: クイズを削除
+      parameters:
+        - name: qid
+          in: path
+          required: true
+          description: クイズID
+          schema:
+            type: string
+          example: DG8ED3bx7y0McbistuLx
       responses:
         "204": 
-          description: deleted quiz from favorite
-        "400":
-          $ref: "#/components/responses/400BadRequest"
-        "401": 
-          $ref: "#/components/responses/401Unauthorized"
-        "403":
-          $ref: "#/components/responses/403Forbidden"
-  "/quizzes/history":
-    get:
-      tags:
-        - quizzes
-      summary: 指定した日時範囲のクイズリストを取得
-      description: 指定した日時範囲のクイズのリストを，正誤答とともに取得する
-      parameters:
-        - $ref: "#/components/parameters/page"
-        - $ref: "#/components/parameters/maxView"
-        - $ref: "#/components/parameters/seed"
-        - $ref: "#/components/parameters/workbooks"
-        - $ref: "#/components/parameters/levels"
-        - $ref: "#/components/parameters/keyword"
-        - $ref: "#/components/parameters/keywordOption"
-        - $ref: "#/components/parameters/crctAnsRatio"
-        - $ref: "#/components/parameters/since"
-        - $ref: "#/components/parameters/until"
-        - $ref: "#/components/parameters/judgement"
-      responses:
-        "200":
-          $ref: "#/components/responses/QuizzesResponse"
-        "400":
-          $ref: "#/components/responses/400BadRequest"
-        "401": 
-          $ref: "#/components/responses/401Unauthorized"
-        "403":
-          $ref: "#/components/responses/403Forbidden"
-    post: 
-      tags: 
-        - quizzes
-      summary: クイズを履歴に追加
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                qid: 
-                  type: string
-                judgement: 
-                  type: number
-                pressedWord:
-                  type: number
-              required:
-                - qid
-                - judgement
-                - pressedWord
-      responses:
-        "201":
-          $ref: "#/components/responses/QuizResponse"
+          description: クイズの削除を完了
         "400":
           $ref: "#/components/responses/400BadRequest"
         "401": 
@@ -1148,223 +1132,6 @@ paths:
       responses:
         "201":
           $ref: "#/components/responses/QuizzesResponse"
-        "400":
-          $ref: "#/components/responses/400BadRequest"
-        "401": 
-          $ref: "#/components/responses/401Unauthorized"
-        "403":
-          $ref: "#/components/responses/403Forbidden"
-  "/quizzes/mylist/{mid}":
-    get:
-      tags:
-        - quizzes
-      summary: 指定するマイリストのクイズリストを取得
-      parameters:
-        - $ref: "#/components/parameters/page"
-        - $ref: "#/components/parameters/maxView"
-        - $ref: "#/components/parameters/seed"
-        - $ref: "#/components/parameters/workbooks"
-        - $ref: "#/components/parameters/levels"
-        - $ref: "#/components/parameters/keyword"
-        - $ref: "#/components/parameters/keywordOption"
-        - $ref: "#/components/parameters/crctAnsRatio"
-        - $ref: "#/components/parameters/mid"
-      responses:
-        "200":
-          $ref: "#/components/responses/QuizzesResponse"
-        "400":
-          $ref: "#/components/responses/400BadRequest"
-        "401": 
-          $ref: "#/components/responses/401Unauthorized"
-        "403":
-          $ref: "#/components/responses/403Forbidden"
-    post: 
-      tags: 
-        - quizzes
-      summary: マイリストにクイズを登録
-      parameters:
-        - $ref: "#/components/parameters/mid"
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                qid: 
-                  type: string
-              required:
-                - qid
-            example:
-              qid: DG8ED3bx7y0McbistuLx
-      responses:
-        "201":
-          $ref: "#/components/responses/QuizResponse"
-        "400":
-          $ref: "#/components/responses/400BadRequest"
-        "401": 
-          $ref: "#/components/responses/401Unauthorized"
-        "403":
-          $ref: "#/components/responses/403Forbidden"
-    delete: 
-      tags:
-        - quizzes
-      summary: マイリストからクイズを削除
-      parameters:
-        - $ref: "#/components/parameters/mid"
-      requestBody: 
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                qid: 
-                  type: string
-              required:
-                - qid
-            example: 
-              qid: DG8ED3bx7y0McbistuLx
-      responses:
-        "204": 
-          description: "deleted quiz from mylist"
-        "400":
-          $ref: "#/components/responses/400BadRequest"
-        "401": 
-          $ref: "#/components/responses/401Unauthorized"
-        "403":
-          $ref: "#/components/responses/403Forbidden"
-  "/quizzes/tag/{tid}":
-    get:
-      tags:
-        - quizzes
-      summary: 指定するタグが付与されたクイズリストを取得
-      parameters:
-        - $ref: "#/components/parameters/page"
-        - $ref: "#/components/parameters/maxView"
-        - $ref: "#/components/parameters/seed"
-        - $ref: "#/components/parameters/workbooks"
-        - $ref: "#/components/parameters/levels"
-        - $ref: "#/components/parameters/keyword"
-        - $ref: "#/components/parameters/keywordOption"
-        - $ref: "#/components/parameters/crctAnsRatio"
-        - $ref: "#/components/parameters/tid"
-      responses:
-        "200":
-          $ref: "#/components/responses/QuizzesResponse"
-        "400":
-          $ref: "#/components/responses/400BadRequest"
-        "401": 
-          $ref: "#/components/responses/401Unauthorized"
-        "403":
-          $ref: "#/components/responses/403Forbidden"
-    post: 
-      tags: 
-        - quizzes
-      summary: クイズにタグを登録
-      parameters:
-        - $ref: "#/components/parameters/tid"
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                qid: 
-                  type: string
-              required:
-                - qid
-            example:
-              qid: DG8ED3bx7y0McbistuLx
-      responses:
-        "201":
-          $ref: "#/components/responses/QuizResponse"
-        "400":
-          $ref: "#/components/responses/400BadRequest"
-        "401": 
-          $ref: "#/components/responses/401Unauthorized"
-        "403":
-          $ref: "#/components/responses/403Forbidden"
-    delete: 
-      tags:
-        - quizzes
-      summary: クイズからタグを削除
-      parameters:
-        - $ref: "#/components/parameters/tid"
-      requestBody: 
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                qid: 
-                  type: string
-              required:
-                - qid
-            example: 
-              qid: DG8ED3bx7y0McbistuLx
-      responses:
-        "204": 
-          description: "deleted quiz from mylist"
-        "400":
-          $ref: "#/components/responses/400BadRequest"
-        "401": 
-          $ref: "#/components/responses/401Unauthorized"
-        "403":
-          $ref: "#/components/responses/403Forbidden"
-  "/quizzes/workbook/{wid}":
-    post: 
-      tags: 
-        - quizzes
-      summary: 問題集にクイズを追加
-      parameters:
-        - $ref: "#/components/parameters/wid"
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                qid: 
-                  type: string
-              required:
-                - qid
-            example: 
-              qid: DG8ED3bx7y0McbistuLx
-      responses:
-        "201":
-          $ref: "#/components/responses/QuizResponse"
-        "400":
-          $ref: "#/components/responses/400BadRequest"
-        "401": 
-          $ref: "#/components/responses/401Unauthorized"
-        "403":
-          $ref: "#/components/responses/403Forbidden"
-    delete: 
-      tags:
-        - quizzes
-      summary: 問題集からクイズを削除
-      parameters:
-        - $ref: "#/components/parameters/wid"
-      requestBody: 
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                qid: 
-                  type: string
-              required:
-                - qid
-            example: 
-              qid: DG8ED3bx7y0McbistuLx
-      responses:
-        "204": 
-          description: "deleted quiz from workbook"
         "400":
           $ref: "#/components/responses/400BadRequest"
         "401": 
@@ -1443,6 +1210,66 @@ paths:
           $ref: "#/components/responses/401Unauthorized"
         "403":
           $ref: "#/components/responses/403Forbidden"
+  "/register":
+    post: 
+      tags: 
+        - quizzes
+      summary: マイリストにクイズを登録
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                qid: 
+                  type: string
+                mid: 
+                  type: string
+              required:
+                - qid
+                - mid
+            example:
+              qid: DG8ED3bx7y0McbistuLx
+      responses:
+        "201":
+          $ref: "#/components/responses/QuizResponse"
+        "400":
+          $ref: "#/components/responses/400BadRequest"
+        "401": 
+          $ref: "#/components/responses/401Unauthorized"
+        "403":
+          $ref: "#/components/responses/403Forbidden"
+  "/unregister":
+    post: 
+      tags:
+        - quizzes
+      summary: マイリストからクイズを削除
+      requestBody: 
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                qid: 
+                  type: string
+                mid: 
+                  type: string
+              required:
+                - qid
+                - mid
+            example: 
+              qid: DG8ED3bx7y0McbistuLx
+      responses:
+        "204": 
+          description: "deleted quiz from mylist"
+        "400":
+          $ref: "#/components/responses/400BadRequest"
+        "401": 
+          $ref: "#/components/responses/401Unauthorized"
+        "403":
+          $ref: "#/components/responses/403Forbidden"
   "/tags":
     get: 
       tags:
@@ -1459,6 +1286,66 @@ paths:
       responses:
         "200":
           $ref: "#/components/responses/TagsResponse"
+        "400":
+          $ref: "#/components/responses/400BadRequest"
+        "401": 
+          $ref: "#/components/responses/401Unauthorized"
+        "403":
+          $ref: "#/components/responses/403Forbidden"
+  "/tagging":
+    post: 
+      tags: 
+        - quizzes
+      summary: クイズにタグを登録
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                qid: 
+                  type: string
+                tid: 
+                  type: string
+              required:
+                - qid
+                - tid
+            example:
+              qid: DG8ED3bx7y0McbistuLx
+      responses:
+        "201":
+          $ref: "#/components/responses/QuizResponse"
+        "400":
+          $ref: "#/components/responses/400BadRequest"
+        "401": 
+          $ref: "#/components/responses/401Unauthorized"
+        "403":
+          $ref: "#/components/responses/403Forbidden"
+  "/untagging":
+    post: 
+      tags:
+        - quizzes
+      summary: クイズからタグを削除
+      requestBody: 
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                qid: 
+                  type: string
+                tid:
+                  type: string
+              required:
+                - qid
+                - tid
+            example: 
+              qid: DG8ED3bx7y0McbistuLx
+      responses:
+        "204": 
+          description: "deleted quiz from mylist"
         "400":
           $ref: "#/components/responses/400BadRequest"
         "401": 
@@ -1586,11 +1473,42 @@ paths:
           $ref: "#/components/responses/401Unauthorized"
         "403":
           $ref: "#/components/responses/403Forbidden"
-    put: 
+  "/workbooks/{wid}":
+    get: 
       tags:
         - workbooks
-      summary: 問題集を編集
+      summary: 問題集の詳細を取得
+      description: リクエストパラメータに指定した問題集の詳細を取得します．
+      parameters:
+        - name: wid
+          in: path
+          required: true
+          description: 問題集のID
+          schema:
+            type: string
+          example: 1i7qaa
+      responses:
+        "200":
+          $ref: "#/components/responses/WorkbookResponse"
+        "400":
+          $ref: "#/components/responses/400BadRequest"
+        "401": 
+          $ref: "#/components/responses/401Unauthorized"
+        "403":
+          $ref: "#/components/responses/403Forbidden"
+    put:  
+      tags:
+        - workbooks
+      summary: 問題集の編集
       description: リクエストボディに指定した問題集を編集します．
+      parameters:
+        - name: wid
+          in: path
+          required: true
+          description: 問題集のID
+          schema:
+            type: string
+          example: 1i7qaa
       requestBody:
         required: true
         content:
@@ -1598,18 +1516,14 @@ paths:
             schema:  
               type: object
               properties:
-                wid: 
-                  type: string
                 name:
                   type: string
-                published:
+                published: 
                   type: string
                   format: date-time
               required:
-                - wid
                 - name
             example: 
-              wid: sX8G8W
               name: abc the 12th
       responses:
         "200":
@@ -1625,19 +1539,14 @@ paths:
         - workbooks
       summary: 問題集を削除
       description: リクエストボディに指定した問題集を削除します．削除する問題集に登録されたクイズは削除されません．
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                wid: 
-                  type: string
-              required:
-                - wid
-            example: 
-              wid: 1i7qaa
+      parameters:
+        - name: wid
+          in: path
+          required: true
+          description: 問題集のID
+          schema:
+            type: string
+          example: 1i7qaa
       responses:
         "200":
           $ref: "#/components/responses/WorkbooksResponse"
@@ -1646,7 +1555,7 @@ paths:
         "401": 
           $ref: "#/components/responses/401Unauthorized"
         "403":
-          $ref: "#/components/responses/403Forbidden"      
+          $ref: "#/components/responses/403Forbidden"
   "/workbooks/all":
     get:
       tags:
@@ -1662,58 +1571,34 @@ paths:
           $ref: "#/components/responses/403Forbidden"
 components:
   parameters:
-    page:
-      name: page
+    crctAnsRatio: 
+      name: crctAnsRatio
       in: query
       required: false
-      description: ページネーションでの現在のページ
+      description: クイズの正答率の絞り込み
       schema:
-        type: number
-      example: 1
-    maxView:
-      name: maxView
-      in: query
-      required: false
-      description: ページネーションでの1ページあたりのクイズ数
-      schema:
-        type: number
-        maximum: 100
-        minimum: 0
-      example: 100
-    seed:
-      name: seed
-      in: query
-      required: false
-      description: シャッフル時のシード値
-      schema: 
-        type: number
-      example: 520004
-    workbooks:
-      name: workbooks
-      in: query
-      required: false
-      description: 検索したいwidのリスト
-      schema: 
-        oneOf:
-          - type: array
-            items: 
-              type: string
-          - type: string
-      example: 
-        - WI0Nul
-        - qS3dmK
-    levels:
-      name: levels
-      in: query
-      required: false
-      description: 検索したいlevelIdのリスト
-      schema: 
         type: array
         items:
           type: number
-      example: 
+      example:
         - 1
-        - 2
+        - 100
+    isFavorite: 
+      name: isFavorite
+      in: query
+      required: false
+      schema: 
+        type: boolean 
+    judgements:
+      name: judgements
+      in: query
+      required: false
+      schema: 
+        type: array
+        description: 0(wrong) or 1(right) or 2(through)
+        items:
+          type: number
+          example: [0, 1]
     keyword:
       name: keyword
       in: query
@@ -1731,58 +1616,72 @@ components:
       schema:
         type: number
         example: 1
-    crctAnsRatio: 
-      name: crctAnsRatio
+    maxView:
+      name: maxView
       in: query
       required: false
-      description: クイズの正答率の絞り込み
+      description: ページネーションでの1ページあたりのクイズ数
       schema:
-        type: array
-        items:
-          type: number
-      example:
-        - 1
-        - 100
+        type: number
+        maximum: 100
+        minimum: 0
+      example: 100
+    mid: 
+      name: mid
+      in: query
+      required: false
+      schema: 
+        type: string
+    page:
+      name: page
+      in: query
+      required: false
+      description: ページネーションでの現在のページ
+      schema:
+        type: number
+      example: 1
+    seed:
+      name: seed
+      in: query
+      required: false
+      description: シャッフル時のシード値
+      schema: 
+        type: number
+      example: 520004
     since:
       name: since
       in: query
       required: false
       schema:
-        type: string
+        type: number
+    tags:
+      name: tags
+      in: query
+      required: false
+      schema: 
+        type: array
+        items: 
+          type: string
     until:
       name: until
       in: query
       required: false
       schema: 
-        type: string
-    judgement:
-      name: judement
+        type: number
+    wids:
+      name: wids
       in: query
       required: false
+      description: 検索したいwidのリスト
       schema: 
-        type: array
-        description: 0(wrong) or 1(right) or 2(through)
-        items:
-          type: number
-          example: [0, 1]
-    mid: 
-      name: mid
-      in: path
-      required: true
-      schema: 
-        type: string 
-    wid: 
-      name: wid
-      in: path
-      required: true
-      schema: 
-        type: string 
-    tid:
-      name: tid
-      in: path
-      required: true
-      schema:
-        type: string
+        oneOf:
+          - type: array
+            items: 
+              type: string
+          - type: string
+      example: 
+        - WI0Nul
+        - qS3dmK
   requestBodies:
     QuizRequestBody:
       required: true
@@ -2232,9 +2131,6 @@ components:
           type: string
         anotherAnswer:
           type: string
-        workbook:
-          type: string
-          readOnly: true
         wid: 
           type: string
         level:
@@ -2250,14 +2146,6 @@ components:
         right: 
           type: number
           readOnly: true
-        isFavorite:
-          type: boolean
-          readOnly: true
-        registerdMylist:
-          type: array 
-          items: 
-            type: string
-          readOnly: true
         tags:
           type: array
           items:
@@ -2271,16 +2159,28 @@ components:
           items:
             type: number
           writeOnly: true
+        isFavorite:
+          type: boolean
+          readOnly: true
+        registerdMylist:
+          type: array 
+          items: 
+            type: string
+          readOnly: true
+        judgement:
+          type: number
+          readOnly: true
       required:
-        - id
+        - qid
         - question
         - answer
         - total
         - right
-        - isFavorite
-        - registerdMylist
+        - tags
         - creatorId
         - isPublic
+        - isFavorite
+        - registerdMylist
     Rank: 
       type: object
       properties:

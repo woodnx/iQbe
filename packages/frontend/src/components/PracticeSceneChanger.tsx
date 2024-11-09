@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, Group, Loader, Overlay, Text } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { KeywordOption, Quiz } from "@/types";
+import { KeywordOption } from "@/types";
 import PracticeTypewriteQuiz from "@/components/PracticeTypewriteQuiz";
 import FilteringModal from "@/components/FilteringModal";
 import { PracticeQuizIntro } from "@/components/PracticeQuizIntro";
@@ -13,6 +13,9 @@ import PracticeResultModal  from "@/components/PracticeResultModal";
 import { useTimer, useTypewriter } from "@/hooks";
 import useQuizzes from "@/hooks/useQuizzes";
 import { $api } from "@/utils/client";
+import { components } from "api/schema";
+
+type Quiz = components['schemas']['Quiz'];
 
 interface Props {
   quizzes?: Quiz[],
@@ -35,7 +38,7 @@ export default function({
   const navigator = useNavigate();
 
   const { params, setParams } = useQuizzes();
-  const { mutate } = $api.useMutation("post", "/quizzes/history");
+  const { mutate } = $api.useMutation("post", "/practice");
   const [ rightList, setRightList ] = useState<string[]>([]);
   const [ pressedWord, setPressedWord ] = useState(0);
   const quiz = !!quizzes ? quizzes[shuffledList[nowNumber]] : null;
@@ -86,7 +89,6 @@ export default function({
 
   const toFilter = (
     workbooks?: string[], 
-    levels?: string[], 
     keyword?: string, 
     keywordOption?: KeywordOption,
     perPage?: number,
@@ -95,12 +97,11 @@ export default function({
     setParams({ 
       ...params, 
       page: 1, 
-      perPage,
+      maxView: perPage,
       seed,
-      workbooks, 
-      levels, 
+      wids: workbooks, 
       keyword, 
-      keywordOption
+      keywordOption: Number(keywordOption)
     });
     filter.close();
     onFilter();
@@ -111,12 +112,6 @@ export default function({
 
   const record = async (judgement: number) => {
     if (!quiz) return;
-
-    // api.quizzes.history.$post({ body: {
-    //   qid: quiz?.qid,
-    //   judgement,
-    //   pressedWord,
-    // }});
 
     mutate({ body: {
       qid: quiz?.qid,
@@ -167,7 +162,7 @@ export default function({
         rightTotal={rightList.length}
         quizzesTotal={maxQuizSize || 1}
         isTransfer={isTransfer}
-        canNext={(quizzes && params?.perPage && params?.page) ? Math.ceil(size / params?.perPage) >= params?.page + 1 : false}
+        canNext={(quizzes && params?.maxView && params?.page) ? Math.ceil(size / params?.maxView) >= params?.page + 1 : false}
         opened={resulted}
         onClose={result.close}
         onRetry={() => setScene(0)}
@@ -208,9 +203,7 @@ export default function({
         <PracticeQuizInfo 
           qid={quiz?.qid}
           answer={quiz?.answer}
-          workbook={quiz?.workbook }
-          level={quiz?.level}
-          date={quiz?.date}
+          wid={quiz?.wid || undefined}
           isFavorite={quiz?.isFavorite}
           registeredMylist={quiz?.registerdMylist}
           visible={scene >= 4}

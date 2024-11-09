@@ -2,11 +2,8 @@ import { QuizRequestParams } from '../types'
 import { $api } from '@/utils/client'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 
-export type QuizzesPath = '/favorite' | '/history' | '/mylist/{mid}' | '';
-
 const useQuizzes = (
-  path: QuizzesPath = '',
-  initialParams: QuizRequestParams = { perPage: 100 },
+  initialParams: QuizRequestParams = { maxView: 100 },
   shouldFetch = true,
 ) => {
   const { data: params, } = useQuery({
@@ -18,18 +15,18 @@ const useQuizzes = (
     queryClient.setQueryData(['params'], v);
   };
 
-  const { data: quizzes, error, isLoading } = $api.useQuery('get', `/quizzes${path}`, {
+  const { data: quizzes, error, isLoading } = $api.useQuery('get', `/quizzes`, {
     params: {
-      query: params &&  {
+      query: {
         page: params.page,
-        maxView: params.perPage,
+        maxView: params.maxView,
         seed: params.seed,
-        workbooks: params.workbooks,
+        workbooks: params.wids,
         keyword: params.keyword,
         keywordOption: Number(params.keywordOption),
-        judement: params.judgements,
+        judgements: params.judgements,
         since: params.since,
-        until: params.until
+        until: params.until,
       }
     },
     enabled: shouldFetch,

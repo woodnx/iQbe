@@ -6,6 +6,7 @@ import IQuizQueryService, { findOption } from '@/applications/queryservices/IQui
 import Quiz from '@/domains/Quiz';
 import IQuizRepository from '@/domains/Quiz/IQuizRepository';
 import KyselyClientManager from './kysely/KyselyClientManager';
+import dayjs from 'dayjs';
 
 type QuizDTO = components["schemas"]["Quiz"];
 
@@ -14,7 +15,7 @@ export default class QuizInfra implements IQuizRepository, IQuizQueryService {
     private clientManager: KyselyClientManager,
   ) {}
 
-  async findMany(uid: string, option: findOption = {}, path: string = '/'): Promise<QuizDTO[]> {
+  async findMany(uid: string, option: findOption = {}): Promise<QuizDTO[]> {
     const client = this.clientManager.getClient();
 
     const userId = await client.selectFrom('users')
@@ -54,8 +55,6 @@ export default class QuizInfra implements IQuizRepository, IQuizQueryService {
         query = query.where('workbooks.wid', 'in', option.wids);
       else
         query = query.where('workbooks.wid', '=', option.wids);
-    if (!!option.levelIds && option.levelIds.length) 
-      query = query.where('levels.id', 'in', option.levelIds);
     if (!!option.seed)     query = query.orderBy(sql`RAND(${option.seed})`);
     if (!!option.keyword && !!option.keywordOption) {
       if (option.keywordOption === 1) {
@@ -75,15 +74,15 @@ export default class QuizInfra implements IQuizRepository, IQuizQueryService {
     //   query = query.where(sql`quiz.total_crct_ans / (quiz.total_crct_ans + quiz.total_wrng_ans + quiz.total_through_ans) * 100 BETWEEN ${crctAnsRatio[0]} AND ${crctAnsRatio[1]}`)
     // }
 
-    if (path == '/favorite') {
+    if (option.isFavorite) {
       query = query
       .innerJoin('favorites', 'favorites.quiz_id', 'quizzes.id')
       .where('favorites.user_id', '=', userId)
       .orderBy('favorites.registered desc'); 
     }
-    else if (path === '/history' && !!option.since && !!option.until) {
-      const since = option.since;
-      const until = option.until;
+    else if (!!option.since && !!option.until) {
+      const since = dayjs(option.since).toDate() ;
+      const until = dayjs(option.until).toDate();
 
       query = query
       .innerJoin('histories', 'histories.quiz_id', 'quizzes.id')
@@ -102,11 +101,7 @@ export default class QuizInfra implements IQuizRepository, IQuizQueryService {
       ))
       .orderBy('histories.practiced desc');
     }
-    else if (path === '/create') {
-      query = query
-      .where('quizzes.creator_id', '=', userId)
-    }
-    else if (path === '/mylist/{mid}' && !!option.mid) {
+    else if (!!option.mid) {
       query = query
       .innerJoin('mylists_quizzes', 'mylists_quizzes.quiz_id', 'quizzes.id')
       .innerJoin('mylists', 'mylists.id', 'mylists_quizzes.mylist_id')

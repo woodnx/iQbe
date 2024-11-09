@@ -11,7 +11,7 @@ import { $api } from '@/utils/client';
 
 export default function Mylist(){
   const { mid } = useParams();
-  const { setParams } = useQuizzes(`/mylist/${mid}`);
+  const { setParams } = useQuizzes();
   const navigator = useNavigate();
   const { mylists } = useMylists();
   const { mutate: editMylist } = $api.useMutation("put", "/mylists");
@@ -23,7 +23,8 @@ export default function Mylist(){
 
   useEffect(() => {
     setParams({
-      perPage: 100,
+      maxView: 100,
+      mid,
     });
   }, [mid]);
 
@@ -75,7 +76,6 @@ export default function Mylist(){
     <>
       <QuizViewer 
         key={mid} 
-        path={`/mylist/${mid}`}
         headerCard={<MylistCard/>}
       />
     </>
