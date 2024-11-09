@@ -1562,7 +1562,7 @@ components:
         - 1
         - 100
     isFavorite: 
-      name: wid
+      name: isFavorite
       in: query
       required: false
       schema: 
@@ -1647,7 +1647,7 @@ components:
       schema: 
         type: number
     wids:
-      name: workbooks
+      name: wids
       in: query
       required: false
       description: 検索したいwidのリスト
