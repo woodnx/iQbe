@@ -3,7 +3,7 @@ import { $api } from '@/utils/client'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 
 const useQuizzes = (
-  initialParams: QuizRequestParams = { perPage: 100 },
+  initialParams: QuizRequestParams = { maxView: 100 },
   shouldFetch = true,
 ) => {
   const { data: params, } = useQuery({
@@ -17,14 +17,14 @@ const useQuizzes = (
 
   const { data: quizzes, error, isLoading } = $api.useQuery('get', `/quizzes`, {
     params: {
-      query: {
+      query: params &&{
         page: params.page,
-        maxView: params.perPage,
+        maxView: params.maxView,
         seed: params.seed,
         workbooks: params.workbooks,
         keyword: params.keyword,
         keywordOption: Number(params.keywordOption),
-        judement: params.judgements,
+        judgements: params.judgements,
         since: params.since,
         until: params.until
       }

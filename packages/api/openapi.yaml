@@ -1568,7 +1568,7 @@ components:
       schema: 
         type: boolean 
     judgements:
-      name: judement
+      name: judgements
       in: query
       required: false
       schema: 

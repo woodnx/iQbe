@@ -26,7 +26,7 @@ export default class QuizController {
       const uid = req.uid;
       const since = ('since' in req.query) ? Number(req.query.since) || undefined : undefined;
       const until = ('until' in req.query) ? Number(req.query.until) || undefined : undefined;
-      const judgements = ('judement' in req.query) ? req.query.judement || undefined : undefined;
+      const judgements = ('judgements' in req.query) ? req.query.judgements || undefined : undefined;
       const mid = req.query && ('mid' in req.query) ? req.query.mid || undefined : undefined;
       
       const quizzes = await this.quizQueryService.findMany(uid, {
