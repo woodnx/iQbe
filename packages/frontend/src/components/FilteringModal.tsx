@@ -6,14 +6,12 @@ import { useInput } from "@/hooks";
 import { KeywordOption } from "@/types";
 import { useIsMobile } from "@/contexts/isMobile";
 import FilteringWorkbook from "./FilteringWorkbook";
-import FilteringLevel from "./FilteringLevel";
 import FilteringQuizNumber from "./FilteringQuizNumber";
 import FilteringWord from "./FilteringWord";
 
 interface FilteringModalProps extends BoxProps {
   apply: (
     workbooks?: string[],
-    levels?: string[],
     keyword?: string,
     keywordOption?: KeywordOption,
     perPage?: number, 
@@ -32,7 +30,6 @@ export default function FilteringModal({
   ...others
 }: FilteringModalProps) {
   const [ workbooks, setWorkbooks ] = useState<string[]>([]);
-  const [ levels, setLevels ] = useState<string[]>([]);
   const [ keywordProps ] = useInput('');
   const [ keywordOption, setkeywordOption ] = useState<KeywordOption>('1')
   const [ perPage, setPerPage ] = useState(100);
@@ -79,11 +76,6 @@ export default function FilteringModal({
           values={workbooks} 
           onChange={setWorkbooks}
         />
-        <FilteringLevel 
-          value={levels}
-          onChange={setLevels}
-          mt="lg"
-        />
         <FilteringWord 
           wordInputProps={keywordProps} 
           wordSearchOption={{ 
@@ -101,7 +93,7 @@ export default function FilteringModal({
           <Button 
             leftSection={<IconSearch/>}
             onClick={() => { 
-              apply(workbooks, levels, keywordProps.value, keywordOption, perPage);
+              apply(workbooks, keywordProps.value, keywordOption, perPage);
               close();
             }}
           >Search</Button>

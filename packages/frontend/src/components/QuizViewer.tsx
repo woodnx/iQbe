@@ -46,7 +46,6 @@ export default function({
 
   const toFilter = (
     workbooks?: string[], 
-    levels?: string[], 
     keyword?: string, 
     keywordOption?: KeywordOption,
     perPage?: number,
@@ -56,9 +55,8 @@ export default function({
       ...params, 
       page: 1, 
       seed: undefined,
-      perPage,
-      workbooks, 
-      levels, 
+      maxView: perPage,
+      wids: workbooks, 
       keyword, 
       keywordOption,
     });
