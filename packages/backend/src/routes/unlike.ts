@@ -20,4 +20,4 @@ const favoriteController = new FavoriteController(
 
 router.post('/', favoriteController.unlike());
 
-export default router;
+module.exports = router;

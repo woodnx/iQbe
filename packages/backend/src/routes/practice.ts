@@ -18,4 +18,4 @@ const practiceController = new PracticeController(practiceUseCase);
 
 router.post('/', practiceController.practice());
 
-export default router;
+module.exports = router;

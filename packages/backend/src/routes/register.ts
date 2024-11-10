@@ -19,4 +19,4 @@ const registerController = new RegisterController(
 
 router.post('/', registerController.register());
 
-export default router;
+module.exports = router;
