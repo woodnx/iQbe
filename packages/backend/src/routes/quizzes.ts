@@ -29,6 +29,6 @@ router.get('/size', quizController.size());
 router.post('/', quizController.post());
 router.post('/multiple', quizController.multiplePost());
 
-router.put('/', quizController.put());
+router.put('/:qid', quizController.put());
 
 module.exports = router;

@@ -5,6 +5,7 @@ import ITransactionManager from "../shared/ITransactionManager";
 import Quiz from "@/domains/Quiz";
 import { ApiError } from "api";
 import ITagRepository from "@/domains/Tag/ITagRepository";
+import TagAssignmentService from "@/domains/Quiz/TagAssignmentSerice";
 
 type QuizDTO = components["responses"]["QuizResponse"]["content"]["application/json"];
 
@@ -27,6 +28,7 @@ export default class QuizUseCase {
     wid?: string,
   ): Promise<QuizDTO> {
     const quizService = new QuizService();
+    const tagAssignmentService = new TagAssignmentService(this.quizRepository, this.tagRepository);
 
     const qid = quizService.generateQid();
     const quiz = new Quiz(
@@ -43,6 +45,10 @@ export default class QuizUseCase {
     );
 
     await this.transactionManager.begin(async () => {
+      for (const tag of tagLabels) {
+        tagAssignmentService.assignTagToQuiz(qid, tag);
+      }
+
       await this.quizRepository.save(quiz);
     });
 
@@ -131,6 +137,7 @@ export default class QuizUseCase {
     subCategoryId?: number,
     wid?: string,
   ): Promise<QuizDTO> {
+    const tagAssignmentService = new TagAssignmentService(this.quizRepository, this.tagRepository);
     const quiz = await this.quizRepository.findByQid(qid);
     const editable = quiz?.isEditable(uid);
 
@@ -156,10 +163,24 @@ export default class QuizUseCase {
     quiz.editCategoryId(categoryId || null);
     quiz.editSubCategoryId(subCategoryId || null);
     quiz.editWid(wid || null);
+
+    // タグ付与処理
+    const oldTagLabels = quiz.tagLabels;
     quiz.editTags(tagLabels);
     
     await this.transactionManager.begin(async () => {
-      await this.quizRepository.update(quiz);
+      const addedTags = tagLabels.filter(tag => !oldTagLabels.includes(tag));
+      const removedTags = oldTagLabels.filter(tag => !tagLabels.includes(tag));
+
+      for (const tag of addedTags) {
+        await tagAssignmentService.assignTagToQuiz(qid, tag);
+      }
+
+      for (const tag of removedTags) {
+        await tagAssignmentService.removeTagFromQuiz(qid, tag);
+      }
+
+      await this.quizRepository.save(quiz);
     });
     
     return {
