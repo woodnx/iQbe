@@ -2,7 +2,7 @@ import { components } from 'api/schema';
 import { sql } from 'kysely';
 import { isEqual, sortBy, uniq } from 'lodash';
 
-import IQuizQueryService, { findOption } from '@/applications/queryservices/IQuizQueryService';
+import IQuizQueryService, { countOption, findOption } from '@/applications/queryservices/IQuizQueryService';
 import Quiz from '@/domains/Quiz';
 import IQuizRepository from '@/domains/Quiz/IQuizRepository';
 import KyselyClientManager from './kysely/KyselyClientManager';
@@ -167,6 +167,92 @@ export default class QuizInfra implements IQuizRepository, IQuizQueryService {
           isPublic: !visibleUser,
         };
     }));
+  }
+
+  async count(uid: string, option: countOption = {}): Promise<number> {
+    const client = this.clientManager.getClient();
+
+    const userId = await client.selectFrom('users')
+    .select('id')
+    .where('uid', '=', uid)
+    .executeTakeFirstOrThrow()
+    .then(u => u.id);
+
+    let query = client.selectFrom('quizzes')
+    .leftJoin('workbooks', 'quizzes.workbook_id', 'workbooks.id')
+    .leftJoin('levels', 'workbooks.level_id', 'levels.id')
+    .innerJoin('users', 'users.id', 'quizzes.creator_id')
+    .leftJoin('quiz_visible_users', 'quiz_visible_users.quiz_id', 'quizzes.id')
+    .select(({ fn }) => [
+      fn.countAll<number>().over().as('size'),
+    ])
+    .where(({ eb, or }) => or([
+      eb('quiz_visible_users.user_id', 'is', null),
+      eb('quiz_visible_users.user_id', '=', userId),
+    ]));
+
+    if (!!option.wids && option.wids.length)
+      if (Array.isArray(option.wids)) 
+        query = query.where('workbooks.wid', 'in', option.wids);
+      else
+        query = query.where('workbooks.wid', '=', option.wids);
+    if (!!option.keyword && !!option.keywordOption) {
+      if (option.keywordOption === 1) {
+        query = query.where((eb) => eb.or([
+          eb('quizzes.que', 'like', `%${option.keyword}%`),
+          eb('quizzes.ans', 'like', `%${option.keyword}%`)
+        ]));
+      }
+      else if (option.keywordOption === 2) { 
+        query = query.where('quizzes.que', 'like', `%${option.keyword}%`);
+      }
+      else { 
+        query = query.where('quizzes.ans', 'like', `%${option.keyword}%`)
+      }
+    }
+    // if (!!crctAnsRatio) {
+    //   query = query.where(sql`quiz.total_crct_ans / (quiz.total_crct_ans + quiz.total_wrng_ans + quiz.total_through_ans) * 100 BETWEEN ${crctAnsRatio[0]} AND ${crctAnsRatio[1]}`)
+    // }
+
+    if (option.isFavorite) {
+      query = query
+      .innerJoin('favorites', 'favorites.quiz_id', 'quizzes.id')
+      .where('favorites.user_id', '=', userId)
+      .orderBy('favorites.registered desc'); 
+    }
+    else if (!!option.since && !!option.until) {
+      const since = dayjs(option.since).toDate() ;
+      const until = dayjs(option.until).toDate();
+
+      query = query
+      .innerJoin('histories', 'histories.quiz_id', 'quizzes.id')
+      .select([
+        'histories.judgement as judgement',
+        'histories.practiced as practiced',
+      ])
+      .where('histories.user_id', '=', userId)
+      .where(({ eb, and, between }) => (
+        !!option.judgements
+        ? and([
+          eb('histories.judgement', 'in', option.judgements),
+          between('histories.practiced', since, until)
+        ])
+        : between('histories.practiced', since, until)
+      ))
+      .orderBy('histories.practiced desc');
+    }
+    else if (!!option.mid) {
+      query = query
+      .innerJoin('mylists_quizzes', 'mylists_quizzes.quiz_id', 'quizzes.id')
+      .innerJoin('mylists', 'mylists.id', 'mylists_quizzes.mylist_id')
+      .where('mylists.mid', '=', option.mid)
+      .where('mylists.user_id', '=', userId)
+      .orderBy('mylists_quizzes.registered desc');
+    }
+
+    const quizzes = await query.execute();
+
+    return quizzes[0].size;
   }
 
   async findByQid(qid: string): Promise<Quiz | null> {

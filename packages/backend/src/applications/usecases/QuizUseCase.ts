@@ -168,6 +168,7 @@ export default class QuizUseCase {
       answer: quiz.answer,
       anotherAnswer: quiz.anotherAnswer,
       wid: quiz.wid,
+      tags: quiz.tagLabels,
       category: quiz.categoryId,
       subCategory: quiz.subCategoryId,
       creatorId: quiz.creatorUid,

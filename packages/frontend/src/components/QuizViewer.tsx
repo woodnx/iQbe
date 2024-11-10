@@ -14,6 +14,7 @@ import { useHistories } from "@/hooks/useHistories";
 import HistorySelectJudgement from './HistorySelectJudgement';
 import HistoryDateRange from './HistoryDateRange';
 import QuizTransfarButton from './QuizTransfarButton';
+import useQuizSize from '@/hooks/useQuizSize';
 
 interface Props {
   headerCard?: ReactNode,
@@ -35,12 +36,13 @@ export default function({
   ]);
   const navigate = useNavigate();
   const { quizzes, params, setParams } = useQuizzes(initialParams);
+  const { quizzesSize } = useQuizSize(params);
   const { histories } = useHistories(dates[0], dates[1]);
   const right = !!histories ? Number(histories.right) : 0;
   const wrong = !!histories ? Number(histories.wrong) : 0;
   const through = !!histories ? Number(histories.through) : 0;
 
-  const size = !!quizzes && !!quizzes.length ? quizzes[0].size : 0;
+  const size = !!quizzes && !!quizzes.length && !!quizzesSize ? quizzesSize : 0;
 
   const toFilter = (
     workbooks?: string[], 

@@ -1073,6 +1073,42 @@ paths:
           $ref: "#/components/responses/401Unauthorized"
         "403":
           $ref: "#/components/responses/403Forbidden"
+  "/quizzes/size":
+    get: 
+      tags: 
+        - quizzes
+      summary: クイズの総数を取得
+      parameters:
+        - $ref: "#/components/parameters/wids"
+        - $ref: "#/components/parameters/keyword"
+        - $ref: "#/components/parameters/keywordOption"
+        - $ref: "#/components/parameters/crctAnsRatio"
+        - $ref: "#/components/parameters/since"
+        - $ref: "#/components/parameters/until"
+        - $ref: "#/components/parameters/judgements"
+        - $ref: "#/components/parameters/mid"
+        - $ref: "#/components/parameters/isFavorite"
+        - $ref: "#/components/parameters/tags"
+      responses:
+        "200":
+          description: クイズの総数
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  size: 
+                    type: number
+                required:
+                  - size
+              example:
+                size: 100
+        "400":
+          $ref: "#/components/responses/400BadRequest"
+        "401": 
+          $ref: "#/components/responses/401Unauthorized"
+        "403":
+          $ref: "#/components/responses/403Forbidden"
   "/quizzes/multiple":
     post: 
       tags: 
