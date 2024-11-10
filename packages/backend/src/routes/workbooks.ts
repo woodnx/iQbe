@@ -16,6 +16,7 @@ const router = express.Router();
 
 router.get('/', workbookController.get());
 router.get('/all', workbookController.getAll());
+router.get('/:wid', workbookController.getFromWid());
 router.post('/', workbookController.post());
 router.put('/:wid', workbookController.put());
 router.delete('/:wid', workbookController.delete());

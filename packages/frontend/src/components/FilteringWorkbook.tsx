@@ -39,12 +39,12 @@ export default function FilteringWorkbook({
   
   const options = workbooks?.filter((item) => 
     item.name.toLowerCase().includes(search.trim().toLowerCase()
-  )).map(({ wid, name, color }) => (
+  )).map(({ wid, color }) => (
     <Combobox.Option value={wid} key={wid} active={innerValues.includes(wid)}>
       <Group gap="sm">
         {innerValues.includes(wid) ? <CheckIcon size={12} /> : null}
         <QuizWorkbookBadge
-          workbookName={name}
+          wid={wid}
           levelColor={color || 'gray'}
         />
       </Group>

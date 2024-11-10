@@ -19,6 +19,7 @@ type Quiz = components['schemas']['Quiz'];
 
 interface Props {
   quizzes?: Quiz[],
+  size: number,
   shuffledList: number[],
   isTransfer?: boolean,
   onFilter?: () => void,
@@ -26,6 +27,7 @@ interface Props {
 
 export default function({
   quizzes,
+  size,
   shuffledList,
   isTransfer = false,
   onFilter = () => {},
@@ -43,7 +45,6 @@ export default function({
   const [ pressedWord, setPressedWord ] = useState(0);
   const quiz = !!quizzes ? quizzes[shuffledList[nowNumber]] : null;
   const maxQuizSize = quizzes?.length || 0;
-  const size = !!quizzes && !!quizzes.length ? quizzes[0].size : 0;
 
   const delay = useTimer(500, 100, () => setScene(1)); 
   const typewriter = useTypewriter(quiz?.question || "", 100, () => setScene(2));

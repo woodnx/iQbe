@@ -24,7 +24,7 @@ const quizController = new QuizController(
 );
 
 router.get('/', quizController.get());
-router.get('/create', quizController.get());
+router.get('/size', quizController.size());
 
 router.post('/', quizController.post());
 router.post('/multiple', quizController.multiplePost());

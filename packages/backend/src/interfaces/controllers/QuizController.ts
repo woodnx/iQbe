@@ -44,6 +44,33 @@ export default class QuizController {
     });
   }
 
+  size() {
+    return typedAsyncWrapper<'/quizzes/size', "get">(async (req, res) => {
+      if (!req.query) return;
+
+      const wids = req.query.wids || [];
+      const keyword = req.query.keyword || undefined;
+      const keywordOption = (req.query.keywordOption) || undefined;
+      const uid = req.uid;
+      const since = ('since' in req.query) ? Number(req.query.since) || undefined : undefined;
+      const until = ('until' in req.query) ? Number(req.query.until) || undefined : undefined;
+      const judgements = ('judgements' in req.query) ? req.query.judgements || undefined : undefined;
+      const mid = req.query && ('mid' in req.query) ? req.query.mid || undefined : undefined;
+
+      const size = await this.quizQueryService.count(uid, {
+        wids,
+        keyword,
+        keywordOption,
+        since,
+        until,
+        judgements,
+        mid,
+      });
+
+      res.status(200).send({ size });
+    });
+  }
+
   post() {
     return typedAsyncWrapper<"/quizzes", "post">(async (req, res) => {
       const question: string | undefined = req.body.question;
