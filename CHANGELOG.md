@@ -1,5 +1,19 @@
 # Changelog
 
+## [3.8.0](https://github.com/woodnx/iQbe/compare/v3.7.0...v3.8.0) (2024-11-10)
+
+
+### Features
+
+* タグの編集・追加・削除のフロントエンド実装  ([#127](https://github.com/woodnx/iQbe/issues/127)) ([573b9b0](https://github.com/woodnx/iQbe/commit/573b9b0e03ca0e0c93f9b1d885efe5815e456595)), closes [#126](https://github.com/woodnx/iQbe/issues/126)
+* タグの追加，編集を行えるようにした ([#136](https://github.com/woodnx/iQbe/issues/136)) ([aad7f57](https://github.com/woodnx/iQbe/commit/aad7f57ae425bcd2b63a160b590f78c6a2c04ac4))
+
+
+### Bug Fixes
+
+* **backend:** MariaDBからMySQLにDBコンテナを変更 ([#132](https://github.com/woodnx/iQbe/issues/132)) ([3920df1](https://github.com/woodnx/iQbe/commit/3920df1e531546f05d9b3dbac3a81d9ff087eb46))
+* Welcomeページに関する問題を修正 ([#131](https://github.com/woodnx/iQbe/issues/131)) ([3dba744](https://github.com/woodnx/iQbe/commit/3dba744872d13b82c241ecab733cc270df9195bf))
+
 ## [3.7.0](https://github.com/woodnx/iQbe/compare/v3.6.0...v3.7.0) (2024-09-28)
 
 
