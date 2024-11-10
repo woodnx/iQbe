@@ -415,20 +415,6 @@ export default class QuizInfra implements IQuizRepository, IQuizQueryService {
     // タグをクイズに付与
     const tagIds = await Promise.all(
       quiz.tagLabels.map(async (label) => {
-        // タグの有無を調査
-        const exist = await this.existTag(label);
-        
-        // タグがなかったら追加
-        if (!exist) {
-          await client.insertInto('tags')
-          .values({
-            label,
-            created: new Date(),
-            modified: new Date(),
-          })
-          .execute();
-        }
-
         return await client.selectFrom('tags')
         .select('id')
         .where('label', '=', label)
@@ -567,77 +553,6 @@ export default class QuizInfra implements IQuizRepository, IQuizQueryService {
         }
       }
     }
-
-    // Tagの付与 / 削除処理
-    const assignedTagIds = await Promise.all(
-      quiz.tagLabels.map(async (label) => {
-        // タグの有無を調査
-        const exist = await this.existTag(label);
-        
-        // タグがなかったら追加
-        if (!exist) {
-          await client.insertInto('tags')
-          .values({
-            label,
-            created: new Date(),
-            modified: new Date(),
-          })
-          .execute();
-        }
-
-        return await client.selectFrom('tags')
-        .select('id')
-        .where('label', '=', label)
-        .executeTakeFirstOrThrow()
-        .then(tag => tag.id)
-      })
-    );
-
-    const oldAssignedTagIds = await client.selectFrom('tagging')
-    .select('tag_id')
-    .where('quiz_id', '=', quizId)
-    .execute()
-    .then(tagging => tagging.map(t => t.tag_id));
-
-    const isChangedAssignedTag = !isEqual(
-      uniq(assignedTagIds),
-      uniq(oldAssignedTagIds),   
-    );
-
-    if (isChangedAssignedTag) {
-      // 追加するタグと削除するタグを抽出
-      const addTags = assignedTagIds.filter(tag => !oldAssignedTagIds.includes(tag));
-      const removeTags = oldAssignedTagIds.filter(tag => !assignedTagIds.includes(tag));
-
-      // 当該タグを追加
-      for (const tagId of addTags) {
-        await client.insertInto('tagging')
-        .values({
-          quiz_id: quizId,
-          tag_id: tagId,
-          registered: new Date(),
-        })
-        .execute();
-      }
-
-      // 当該タグを削除
-      for (const tagId of removeTags) {
-        await client.deleteFrom('tagging')
-        .where(({ eb, and }) => and([
-          eb('quiz_id', '=', quizId),
-          eb('tag_id', '=', tagId),
-        ]))
-        .execute();
-
-        const isUnusedTag = await this.checkUnusedTag(tagId);
-
-        if (isUnusedTag) {
-          await client.deleteFrom('tags')
-          .where('id', '=', tagId)
-          .execute();
-        }
-      }
-    }
   }
 
   async delete(qid: string): Promise<void> {
@@ -646,29 +561,5 @@ export default class QuizInfra implements IQuizRepository, IQuizQueryService {
     await client.deleteFrom('quizzes')
     .where('qid', '=', qid)
     .execute();
-  }
-
-  private async existTag(label: string): Promise<boolean | null> {
-    const client = this.clientManager.getClient();
-
-    const tag = await client.selectFrom('tags')
-    .select(['label'])
-    .where('label', '=', label)
-    .executeTakeFirst();
-
-    return !!tag;
-  }
-
-  private async checkUnusedTag(tagId: number) {
-    const client = this.clientManager.getClient();
-
-    const tagLabel = await client.selectFrom('tags')
-    .select('label')
-    .where('id', '=', tagId)
-    .executeTakeFirstOrThrow()
-    .then(tag => tag.label);
-
-    const quizzesWithTag = await this.findByTagLabel(tagLabel);
-    return quizzesWithTag.length === 0;
   }
 }

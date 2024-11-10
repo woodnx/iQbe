@@ -25,7 +25,7 @@ export default class TagAssignmentService {
     if (!quiz)
       throw new Error('No quiz exists for such qid');
 
-    if (exist) {
+    if (!exist) {
       await this.tagRepository.save(new Tag(tagLabel))
     }
 
@@ -37,10 +37,10 @@ export default class TagAssignmentService {
 
     quiz.addTagLabel(tag.label);
 
-    await this.quizRepository.update(quiz);
+    return quiz;
   }
 
-  async removeTagToQuiz(qid: string, tagLabel: string) {
+  async removeTagFromQuiz(qid: string, tagLabel: string) {
     const [ quiz, tag ] = await Promise.all([
       this.quizRepository.findByQid(qid),
       this.tagRepository.findByLabel(tagLabel),
@@ -51,12 +51,13 @@ export default class TagAssignmentService {
     }
 
     quiz.removeTagLabel(tagLabel);
-
-    await this.quizRepository.update(quiz);
+    
     const isUnused = await this.isUnusedTag(tagLabel);
 
     if (!isUnused) {
       await this.tagRepository.delete(tagLabel);
     }
+
+    return quiz;
   }
 }
