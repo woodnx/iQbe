@@ -1,10 +1,13 @@
 import { useState } from "react";
 import { Button, Card, BoxProps, Flex, Group, Text, } from "@mantine/core";
-import { Judgement, MylistInformation, Quiz } from "@/types";
+import { MylistInformation } from "@/types";
 import QuizMylistButton from "./QuizMylistButton";
 import QuizFavoriteButton from "./QuizFavoriteButton";
 import { QuizWorkbookBadge } from "./QuizWorkbookBadge";
 import QuizDetailsMenu from "./QuizDetailesMenu";
+import { components } from "api/schema";
+
+type Quiz = components['schemas']['Quiz'];
 
 interface Props extends BoxProps{
   index: number,
@@ -14,7 +17,7 @@ interface Props extends BoxProps{
   isHidden?: boolean,
 }
 
-const defineColor = (judgement: Judgement) => {
+const defineColor = (judgement: number) => {
   if (judgement == 0) return 'blue.1';
   else if (judgement == 1) return 'red.1'
   else return 'gray.1'
@@ -72,12 +75,11 @@ export default function QuizCard({
         />
         <Group>
           {
-            (!!quiz.workbook) 
+            (!!quiz.wid) 
             ?
             <QuizWorkbookBadge
-              workbookName={quiz.workbook}
+              wid={quiz.wid}
               levelColor={quiz.level || 'dark'}
-              date={quiz.date}
             />
             :
             null 
@@ -87,9 +89,10 @@ export default function QuizCard({
             creatorId={quiz.creatorId}
             question={quiz.question}
             answer={quiz.answer}
-            workbook={quiz.wid}
-            category={quiz.category}
-            subCategory={quiz.subCategory}
+            tags={quiz.tags}
+            wid={quiz.wid || undefined}
+            category={quiz.category || undefined}
+            subCategory={quiz.subCategory || undefined}
             isPublic={!!quiz.isPublic}
           />
         </Group>

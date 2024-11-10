@@ -4,13 +4,16 @@ import { useCategories, useSubCategories } from "@/hooks/useCategories";
 import { SubmitValue } from "@/types";
 import CategorySelector from "./CategorySelector";
 import WorkbookCreateAndSelector from "./WorkbookCreateAndSelector";
+import { useIsSuperUser } from "@/hooks/useLoginedUser";
+import TagInput from "./TagInput";
 
-interface Props extends BoxProps {
+interface QuizEditFormProps extends BoxProps {
   question?: string,
   answer?: string,
   workbook?: string,
   category?: number,
   subCategory?: number,
+  tags?: string[],
   isPublic?: boolean,
   onSubmit?: (v: SubmitValue) => void,
 }
@@ -21,10 +24,12 @@ export default function QuizEditForm({
   workbook: initialWorkbook,
   category: initialCategory,
   subCategory: initialSubCategory,
+  tags: initialTags,
   isPublic: initialIsPublic,
   onSubmit = () => {},
   ...others
-}: Props) {
+}: QuizEditFormProps) {
+  const isSuperUser = useIsSuperUser();
   const { categories } = useCategories();
   const { subCategories: sct } = useSubCategories();
 
@@ -35,6 +40,7 @@ export default function QuizEditForm({
       isPublic: !!initialIsPublic,
       category: initialCategory,
       subCategory: initialSubCategory,
+      tags: initialTags,
       workbook: initialWorkbook,
     },
     validate: {
@@ -43,7 +49,13 @@ export default function QuizEditForm({
     },
   });
 
-  const subCategories = sct?.filter(c => c.parentId === Number(form.values.category)).map(c => ({ ...c, value: String(c.id), label: c.name}));
+  const subCategories = sct?.filter(c => 
+    c.parentId === Number(form.values.category)
+  ).map(c => ({
+    ...c, 
+    value: String(c.id), 
+    label: c.name
+  }));
 
   const submit = (v: SubmitValue) => {
     onSubmit(v);
@@ -71,14 +83,6 @@ export default function QuizEditForm({
           mb="md"
         />
         <Grid>
-          <Grid.Col span={{ base: 12, xs: 6 }}>
-            <WorkbookCreateAndSelector
-              mb="md"
-              {...form.getInputProps('workbook')}
-            />
-          </Grid.Col>
-        </Grid>
-        <Grid>
           <Grid.Col span={6}>
             <CategorySelector
               label="ジャンル"
@@ -96,10 +100,23 @@ export default function QuizEditForm({
               {...form.getInputProps('subCategory')}
             />
           </Grid.Col>
+          <Grid.Col span={8}>
+            <TagInput 
+              {...form.getInputProps('tags')}
+            />
+          </Grid.Col>
+          <Grid.Col span={8}>
+            <WorkbookCreateAndSelector
+              mb="md"
+              {...form.getInputProps('workbook')}
+            />
+          </Grid.Col>
+          
         </Grid>
         <Group justify="space-between" mt="sm">
           <Switch
             {...form.getInputProps('isPublic', {type: 'checkbox'})}
+            disabled={!isSuperUser}
             label="クイズを公開する"
             my="sm"
           />

@@ -2,8 +2,8 @@ import { Element } from "./CreateDashboard";
 import PreviewCsvTable from "./PreviewCsvTable";
 import { Button, Divider, Group, Modal, Text, Title } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import WorkbookSelector from "./WorkbookSelector";
 import { useState } from "react";
+import WorkbookCreateAndSelector from "./WorkbookCreateAndSelector";
 
 interface Props {
   elements: Element[],
@@ -47,7 +47,7 @@ export default function CsvEditor({
 
   return (
     <> 
-      <WorkbookSelector 
+      <WorkbookCreateAndSelector
         mb="md"
         value={wid}
         onChange={setWid}

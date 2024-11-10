@@ -6,13 +6,12 @@ export default function Search() {
   const { setParams } = useQuizzes();
 
   useEffect(() => {
-    setParams({ perPage: 100 })
+    setParams({ maxView: 100, isFavorite: true })
   }, []); 
 
   return (
     <>
       <QuizViewer
-        path="/favorite"
       />
     </>
   )

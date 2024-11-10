@@ -8,7 +8,7 @@ export default function Setting() {
   const isSuperUser = useIsSuperUser();
 
   return (
-    <Container size="sm">
+    <Container size="md">
       <Title>設定</Title>
       
       <Tabs mt="lg" defaultValue="profile">
@@ -16,9 +16,9 @@ export default function Setting() {
           <Tabs.Tab value="profile">
             プロフィール
           </Tabs.Tab>
-          {/* <Tabs.Tab value="account">
+          <Tabs.Tab value="account">
             アカウント
-          </Tabs.Tab> */}
+          </Tabs.Tab>
           {
             isSuperUser && 
             <Tabs.Tab value="server">

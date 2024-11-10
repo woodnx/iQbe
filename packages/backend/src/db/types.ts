@@ -111,12 +111,9 @@ export type tagging = {
 };
 export type tags = {
     id: Generated<number>;
-    tid: string;
     label: string;
-    color: string | null;
     created: Timestamp;
     modified: Timestamp;
-    creator_id: number;
 };
 export type test_quizzes = {
     id: Generated<number>;
