@@ -17,4 +17,16 @@ export default class CategoryInfra implements CategoryRepository {
       return new Category(category.id, category.name, category.description)
     });
   }
+
+  async save(category: Category): Promise<void> {
+    const client = this.clientManager.getClient();
+
+    await client
+    .insertInto('categories')
+    .values({
+      name: category.name,
+      description: category.description,
+    })
+    .execute();
+  }
 }

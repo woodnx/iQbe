@@ -1,13 +1,20 @@
-import { Notifications } from "@mantine/notifications";
-import { BrowserRouter as Router } from "react-router-dom";
-import Layout from './layouts';
-import { ModalsProvider } from "@mantine/modals";
-import QuizEditModal from "./components/QuizEditModal";
-import { DatesProvider } from "@mantine/dates";
 import 'dayjs/locale/ja';
+
+import { BrowserRouter as Router } from 'react-router-dom';
+
+import { DatesProvider } from '@mantine/dates';
+import { ModalsProvider } from '@mantine/modals';
+import { Notifications } from '@mantine/notifications';
+
+import CategoryCreateModal from './components/CategoryCreateModal';
+import CategoryEditModal from './components/CategoryEditModal';
+import QuizEditModal from './components/QuizEditModal';
+import Layout from './layouts';
 
 const modals = {
   quizEdit: QuizEditModal,
+  categoryEdit: CategoryEditModal,
+  categoryCreate: CategoryCreateModal,
 };
 
 declare module '@mantine/modals' {
