@@ -8,6 +8,7 @@ export type categories = {
     id: Generated<number>;
     name: string;
     description: string | null;
+    parent_id: Generated<number>;
 };
 export type favorites = {
     user_id: number;
