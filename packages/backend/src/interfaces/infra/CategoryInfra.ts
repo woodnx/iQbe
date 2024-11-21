@@ -87,6 +87,86 @@ export default class CategoryInfra implements ICategoryRepository, ICategoryQuer
     });
   }
 
+  async findById(id: number): Promise<Category | undefined> {
+    const client = this.clientManager.getClient();
+
+    const category = await client
+    .selectFrom('categories')
+    .selectAll()
+    .where('id', '=', id)
+    .executeTakeFirst();
+
+    if (!category) return undefined;
+
+    return new Category(
+      category.id,
+      category.name,
+      category.description,
+      category.parent_id
+    );
+  }
+
+  async findByName(name: string): Promise<Category | undefined> {
+    const client = this.clientManager.getClient();
+
+    const category = await client
+    .selectFrom('categories')
+    .selectAll()
+    .where('name', '=', name)
+    .executeTakeFirst();
+
+    if (!category) return undefined;
+
+    return new Category(
+      category.id,
+      category.name,
+      category.description,
+      category.parent_id
+    );
+  }
+
+  async findChainById(id: number): Promise<Category[]> {
+    const client = this.clientManager.getClient();
+
+    const category = await client
+    .selectFrom('categories')
+    .selectAll()
+    .where('id', '=', id)
+    .executeTakeFirst();
+
+    if (!category) return [];
+
+    const chain: Category[] = [];
+    chain.push(new Category(
+      category.id,
+      category.name,
+      category.description,
+      category.parent_id
+    ));
+
+    let parentId = category.parent_id;
+    while (parentId !== -1) {
+      const parent = await client
+      .selectFrom('categories')
+      .selectAll()
+      .where('id', '=', parentId)
+      .executeTakeFirst();
+
+      if (!parent) break;
+
+      chain.push(new Category(
+        parent.id,
+        parent.name,
+        parent.description,
+        parent.parent_id
+      ));
+
+      parentId = parent.parent_id;
+    }
+
+    return chain.reverse();
+  }
+
   async save(category: Category): Promise<void> {
     const client = this.clientManager.getClient();
 
