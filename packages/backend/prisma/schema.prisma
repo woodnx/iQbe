@@ -33,6 +33,7 @@ model categories {
   id                 BigInt               @id @default(autoincrement())
   name               String               @db.VarChar(125)
   description        String?              @db.VarChar(256)
+  parent_id          BigInt               @default(-1)
   quizzes            quizzes[]
   quizzes_categories quizzes_categories[]
   sub_categories     sub_categories[]

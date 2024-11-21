@@ -389,6 +389,8 @@ paths:
                   type: string
                 description:
                   type: string
+                parentId:
+                  type: number
               required:
                 - name
             example: 
@@ -403,10 +405,19 @@ paths:
           $ref: "#/components/responses/401Unauthorized"
         "403":
           $ref: "#/components/responses/403Forbidden"
+  "/categories/{id}":
     put: 
       tags: 
         - categories
       summary: カテゴリーの編集
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: カテゴリーのID
+          schema:
+            type: number
+          example: 1
       requestBody:
         required: true
         content:
@@ -414,102 +425,16 @@ paths:
             schema: 
               type: object
               properties:
-                id: 
-                  type: number
                 name: 
                   type: string
                 description:
                   type: string
               required:
-                - id
                 - name
             example: 
               id: 1
               name: "文学"
               description: 小説や童話など文学に関するクイズ
-      responses:
-        "200": 
-          $ref: "#/components/responses/CategoryResponse"
-        "400":
-          $ref: "#/components/responses/400BadRequest"
-        "401": 
-          $ref: "#/components/responses/401Unauthorized"
-        "403":
-          $ref: "#/components/responses/403Forbidden"
-  "/categories/sub":
-    get: 
-      tags:
-        - categories
-      summary: クイズのサブカテゴリーのリストを取得
-      responses:
-        "200": 
-          $ref: "#/components/responses/SubCategoriesResponse"
-        "400":
-          $ref: "#/components/responses/400BadRequest"
-        "401": 
-          $ref: "#/components/responses/401Unauthorized"
-        "403":
-          $ref: "#/components/responses/403Forbidden"
-    post: 
-      tags: 
-        - categories
-      summary: サブカテゴリーの新規作成
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema: 
-              type: object
-              properties:
-                name: 
-                  type: string
-                description:
-                  type: string
-                parentId: 
-                  type: number
-              required:
-                - name
-                - parentId
-            example: 
-              name: "文学"
-              description: 小説や童話など文学に関するクイズ
-              parentId: 1
-      responses:
-        "200": 
-          $ref: "#/components/responses/CategoryResponse"
-        "400":
-          $ref: "#/components/responses/400BadRequest"
-        "401": 
-          $ref: "#/components/responses/401Unauthorized"
-        "403":
-          $ref: "#/components/responses/403Forbidden"
-    put: 
-      tags: 
-        - categories
-      summary: サブカテゴリーの編集
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema: 
-              type: object
-              properties:
-                id: 
-                  type: number
-                name: 
-                  type: string
-                description:
-                  type: string
-                parentId: 
-                  type: number
-              required:
-                - id
-                - name
-            example: 
-              id: 1
-              name: "文学"
-              description: 小説や童話など文学に関するクイズ
-              parentId: 1
       responses:
         "200": 
           $ref: "#/components/responses/CategoryResponse"

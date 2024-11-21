@@ -9,13 +9,3 @@ export const useCategories = () => {
     error,
   }
 }
-
-export const useSubCategories = () => {
-  const  { data: subCategories, error, isLoading } = $api.useQuery("get", "/categories/sub");
-
-  return {
-    subCategories,
-    isLoading,
-    error,
-  }
-}

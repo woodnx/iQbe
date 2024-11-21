@@ -16,36 +16,29 @@ export default function CategoryEditModal<T extends boolean>({
   innerProps,
 }: ContextModalProps<CategoryEditModalInnerProps<T>>) {
   const { id, ...formProps } = innerProps;
-  const { mutateAsync: edit } = $api.useMutation("put", "/categories");
-  const { mutateAsync: editSub } = $api.useMutation("put", "/categories/sub");
+  const { mutateAsync: edit } = $api.useMutation("put", "/categories/{id}");
 
   const submit = (
     name: string,
-    parentId: T extends true ? number : undefined,
     description?: string,
   ) => {
-    if (formProps.isSub) {
-      editSub({ body: {
-        id,
+    edit({ 
+      body: {
         name,
         description,
-        parentId,
-      }});
-    } 
-    else {
-      edit({ body: {
-        id,
-        name,
-        description,
-      }});
-    }
+      },
+      params: { 
+        path: { id },
+      }
+    });
+
     context.closeModal(modalId);
   }
 
   return(
     <CategoryEditForm
       {...formProps}
-      onSubmit={(name, parentId, description) => submit(name, parentId, description)}
+      onSubmit={(name, _, description) => submit(name, description)}
     />
   );
 }
