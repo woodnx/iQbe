@@ -34,6 +34,7 @@ model categories {
   name               String               @db.VarChar(125)
   description        String?              @db.VarChar(256)
   parent_id          BigInt               @default(-1)
+  disabled           Boolean              @default(false)
   quizzes            quizzes[]
   quizzes_categories quizzes_categories[]
   sub_categories     sub_categories[]

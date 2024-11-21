@@ -15,6 +15,10 @@ export default class Category {
   ) {
     return new Category(null, name, description, parentId);
   }
+
+  disable() {
+    this._disabled = true;
+  }
   
   get id(): number {
     if (!this._id) 

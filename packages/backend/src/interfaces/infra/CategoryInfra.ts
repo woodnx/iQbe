@@ -27,13 +27,20 @@ export default class CategoryInfra implements ICategoryRepository, ICategoryQuer
     const categories = await client
     .selectFrom('categories')
     .selectAll()
-    .where('parent_id', '=', -1)
+    .where((({ and, eb }) => and([
+      eb('parent_id', '=', -1),
+      eb('disabled', '=', 0),
+    ])))
     .execute();
 
     const subCategories = await client
     .selectFrom('categories')
     .selectAll()
     .where('parent_id', '!=', -1)
+    .where((({ and, eb }) => and([
+      eb('parent_id', '!=', -1),
+      eb('disabled', '=', 0),
+    ])))
     .execute();
 
     return categories.map(category => {
@@ -179,6 +186,7 @@ export default class CategoryInfra implements ICategoryRepository, ICategoryQuer
         name: category.name,
         description: category.description,
         parent_id: category.parentId,
+        disabled: category.disabled ? 1 : 0,
       })
       .where('id', '=', category.id)
       .execute();
@@ -192,6 +200,7 @@ export default class CategoryInfra implements ICategoryRepository, ICategoryQuer
       name: category.name,
       description: category.description,
       parent_id: category.parentId,
+      disabled: category.disabled ? 1 : 0,
     })
     .execute();
   }
