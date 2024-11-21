@@ -16,26 +16,18 @@ export default function CategoryCreateModal<T extends boolean>({
 }: ContextModalProps<CategoryCreateModalInnerProps<T>>) {
   const { ...formProps } = innerProps;
   const { mutateAsync: edit } = $api.useMutation("post", "/categories");
-  const { mutateAsync: editSub } = $api.useMutation("post", "/categories/sub");
 
   const submit = (
     name: string,
     parentId: T extends true ? number : undefined,
     description?: string,
   ) => {
-    if (formProps.isSub) {
-      editSub({ body: {
-        name,
-        description,
-        parentId: parentId || 0,
-      }});
-    } 
-    else {
-      edit({ body: {
-        name,
-        description,
-      }});
-    }
+    edit({ body: {
+      name,
+      description,
+      parentId,
+    }});
+    
     context.closeModal(modalId);
   }
 

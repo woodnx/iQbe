@@ -1,6 +1,6 @@
 import { Button, Card, BoxProps, Grid, Group, Switch, Textarea } from "@mantine/core";
 import { isNotEmpty, useForm } from "@mantine/form"
-import { useCategories, useSubCategories } from "@/hooks/useCategories";
+import { useCategories } from "@/hooks/useCategories";
 import { SubmitValue } from "@/types";
 import CategorySelector from "./CategorySelector";
 import WorkbookCreateAndSelector from "./WorkbookCreateAndSelector";
@@ -31,7 +31,6 @@ export default function QuizEditForm({
 }: QuizEditFormProps) {
   const isSuperUser = useIsSuperUser();
   const { categories } = useCategories();
-  const { subCategories: sct } = useSubCategories();
 
   const form = useForm({
     initialValues: {
@@ -49,13 +48,7 @@ export default function QuizEditForm({
     },
   });
 
-  const subCategories = sct?.filter(c => 
-    c.parentId === Number(form.values.category)
-  ).map(c => ({
-    ...c, 
-    value: String(c.id), 
-    label: c.name
-  }));
+  const subCategories = categories?.find(c => c.id == form.values.category)?.sub || [];
 
   const submit = (v: SubmitValue) => {
     onSubmit(v);
