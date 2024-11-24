@@ -21,6 +21,22 @@ export default class CategoryInfra implements ICategoryRepository, ICategoryQuer
     return category !== undefined;
   }
 
+  async getAll(): Promise<Category[]> {
+    const client = this.clientManager.getClient();
+    const category = await client
+    .selectFrom('categories')
+    .selectAll()
+    .execute();
+
+    return category.map(c => new Category(
+      c.id,
+      c.name,
+      c.description,
+      c.parent_id,
+      !!c.disabled ? true : false,
+    ))
+  }
+
   async available(): Promise<CategoryDTO[]> {
     const client = this.clientManager.getClient();
 

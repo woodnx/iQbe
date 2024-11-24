@@ -1,8 +1,19 @@
 import Category from "@/domains/Category";
 import CategoryRepository from "@/domains/Category/ICategoryRepository";
+import ITransactionManager from "../shared/ITransactionManager";
+
+type CategoryDAO = {
+  name: string,
+  description?: string | null,
+  sub?: {
+    name: string,
+    description?: string | null,
+  }[]
+}
 
 export default class CategoryUseCase {
   constructor(
+    private transactionManager: ITransactionManager,
     private categoryRepository: CategoryRepository,
   ) {}
 
@@ -14,6 +25,44 @@ export default class CategoryUseCase {
     );
 
     await this.categoryRepository.save(category);
+  }
+
+  async addPresetCategory(presetCategories: CategoryDAO[]) {
+    await this.transactionManager.begin(async () => {
+      const existingCategories = await this.categoryRepository.getAll();
+
+      for (const existingCategory of existingCategories) {
+        existingCategory.disable();
+        await this.categoryRepository.save(existingCategory);
+      }
+
+      for (const presetCategory of presetCategories) {
+        const category = Category.create(
+          presetCategory.name,
+          presetCategory.description || null,
+          -1, // -1 means no parent
+        );
+  
+        await this.categoryRepository.save(category);
+
+        const id = await this.categoryRepository
+        .findByName(presetCategory.name)
+        .then((category) => category?.id);
+
+        if (!id) throw new Error('Category not found');
+
+        const subCategories = presetCategory.sub || [];
+        for (const sub of subCategories) {
+          const subCategory = Category.create(
+            sub.name,
+            sub.description || null,
+            id,
+          );
+          
+          await this.categoryRepository.save(subCategory);
+        }
+      }
+    });
   }
 
   async editCategory(id: number, description: string | null) {

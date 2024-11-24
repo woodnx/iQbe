@@ -1,13 +1,28 @@
+import { ApiError } from 'api';
+
 import ICategoryQueryService from '@/applications/queryservices/ICategoryQueryService';
 import CategoryUseCase from '@/applications/usecases/CategoryUseCase';
+import preset from '@/db/categories/preset.json';
+import abc23 from '@/db/categories/abc23.json';
+import minhaya from '@/db/categories/minhaya.json';
 import { typedAsyncWrapper } from '@/utils';
-import { ApiError } from 'api';
 
 export default class CategoryController {
   constructor(
     private categoryQueryService: ICategoryQueryService,
     private categoryUseCase: CategoryUseCase,
   ) {}
+
+  private selectPreset(preset: string) {
+    switch (preset) {
+      case 'abc23':
+        return abc23;
+      case 'minhaya':
+        return minhaya;
+      default:
+        return null;
+    }
+  }
 
   get() {
     return typedAsyncWrapper<"/categories", "get">(async (req, res) => {
@@ -57,6 +72,32 @@ export default class CategoryController {
       }
 
       await this.categoryUseCase.editCategory(Number(id), description || null);
+    });
+  }
+
+  getPreset() {
+    return typedAsyncWrapper<"/categories/preset", "get">(async (req, res) => {
+      res.send(preset);
+    });
+  }
+
+  addFromPreset() {
+    return typedAsyncWrapper<"/categories/preset", "post">(async (req, res) => {
+      const preset = req.body.preset;
+
+      if (!preset) {
+        throw new ApiError().invalidParams();
+      }
+
+      const categories = this.selectPreset(preset);
+
+      if (!categories) {
+        throw new ApiError().invalidParams();
+      }
+
+      await this.categoryUseCase.addPresetCategory(categories);
+
+      res.send();
     });
   }
 }

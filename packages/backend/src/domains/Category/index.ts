@@ -1,11 +1,11 @@
 export default class Category {
-  private _disabled: boolean = false;
 
   constructor(
     private _id: number | null,
     private _name: string,
     private _description: string | null,
     private _parentId: number,
+    private _disabled: boolean = false,
   ){}
 
   static create(

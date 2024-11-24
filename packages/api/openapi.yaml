@@ -444,6 +444,56 @@ paths:
           $ref: "#/components/responses/401Unauthorized"
         "403":
           $ref: "#/components/responses/403Forbidden"
+  "/categories/preset":
+    get: 
+      tags:
+        - categories
+      responses:
+        "200":
+          description: 追加可能なプリセットを返す
+          content:
+            application/json:
+              schema: 
+                type: array
+                items:
+                  type: object
+                  properties:
+                    value:
+                      type: string
+                    name: 
+                      type: string
+                    description:
+                      type: string
+                    tag: 
+                      type: string
+                  required:
+                    - value
+                    - name
+    post: 
+      tags:
+        - categories
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: 
+              type: object
+              properties:
+                preset: 
+                  type: string
+              required:
+                - preset
+            example:
+              preset: "abc23"
+      responses:
+        "204": 
+          description: add preset category
+        "400":
+          $ref: "#/components/responses/400BadRequest"
+        "401": 
+          $ref: "#/components/responses/401Unauthorized"
+        "403":
+          $ref: "#/components/responses/403Forbidden"
   "/csv/parse":
     post: 
       tags:
