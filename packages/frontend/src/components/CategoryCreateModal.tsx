@@ -28,10 +28,21 @@ export default function CategoryCreateModal<T extends boolean>({
     onMutate: async ({ body }) => {
       const previous = queryClient.getQueryData(queryKey);
 
-      queryClient.setQueryData(queryKey, (old: Category[]) => [
-        ...old, 
-        body
-      ]);
+      queryClient.setQueryData(queryKey, (old: Category[]) => {
+        if (formProps.isSub) {
+          const parent = old.find(c => c.id === formProps.parentId);
+          if (!!parent) {
+            const sub = parent.sub || [];
+            return old.map(c => 
+              (c.id === formProps.parentId) 
+              ? { ...parent, sub: [ ...sub, body ] } 
+              : c
+            );
+          }
+        } else {
+          return [ ...old, body]
+        }
+      });
 
       return { previous };
     },

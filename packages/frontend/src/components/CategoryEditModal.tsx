@@ -30,7 +30,22 @@ export default function CategoryEditModal<T extends boolean>({
       const previous = queryClient.getQueryData(queryKey);
 
       queryClient.setQueryData(queryKey, (old: Category[] | undefined) => {
-        const data = old?.map(c => c.id === id ? { ...c, ...body } : c);
+        const data = old?.map(c => {
+          if (formProps.isSub) {
+            if (c.id === formProps.parentId) {
+              return {
+                ...c,
+                sub: c.sub?.map(sub => 
+                  (sub.id === id) ? { ...sub, ...body, } :sub
+                ),
+              };
+            }
+            return c;
+          } else {
+            return c.id === id ? { ...c, ...body } : c
+          }
+        });
+        
         return data;
       });
 
