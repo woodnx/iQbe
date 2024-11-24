@@ -48,14 +48,14 @@ export default function CategoryCard({
           name={name}
           description={description}
         />
-        <div>
-          <ActionIcon mr="lg" variant="transparent" color="gray">
-            <IconPencil onClick={modal} />
+        <Group wrap="nowrap">
+          <ActionIcon onClick={modal} variant="transparent" color="gray">
+            <IconPencil />
           </ActionIcon>
           <ActionIcon onClick={toggle} variant="transparent" color="gray">
             <IconChevron />
           </ActionIcon>
-        </div>
+        </Group>
       </Group>
       <Collapse in={opened}>
         <Divider mt="md"/>

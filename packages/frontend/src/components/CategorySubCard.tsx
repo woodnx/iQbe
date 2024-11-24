@@ -34,7 +34,7 @@ export default function CategorySubCard({
   });
 
   return (
-    <Group justify="space-between" {...others}>
+    <Group justify="space-between" wrap="nowrap" {...others}>
       <CategoryBaseCard 
         ml="xl"
         name={name}
