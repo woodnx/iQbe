@@ -17,11 +17,12 @@ export default class CategoryUseCase {
     private categoryRepository: CategoryRepository,
   ) {}
 
-  async addCategory(name: string, description: string | null, parentId: number | null) {
+  async addCategory(name: string, description: string | null, parentId: number | null, disabled: boolean) {
     const category = Category.create(
       name,
       description,
-      parentId || -1, // -1 means no parent
+      parentId || -1, // -1 means no parent,
+      disabled,
     );
 
     await this.categoryRepository.save(category);
@@ -41,6 +42,7 @@ export default class CategoryUseCase {
           presetCategory.name,
           presetCategory.description || null,
           -1, // -1 means no parent
+          false,
         );
   
         await this.categoryRepository.save(category);
@@ -57,6 +59,7 @@ export default class CategoryUseCase {
             sub.name,
             sub.description || null,
             id,
+            false,
           );
           
           await this.categoryRepository.save(subCategory);
@@ -65,12 +68,14 @@ export default class CategoryUseCase {
     });
   }
 
-  async editCategory(id: number, description: string | null) {
+  async editCategory(id: number, description: string | null, disabled: boolean) {
     const category = await this.categoryRepository.findById(id);
 
     if (!category) throw new Error('Category not found');
 
     category.editDescription(description);
+    disabled && category.disable();
+
     await this.categoryRepository.save(category);
   }
 }

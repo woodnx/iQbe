@@ -7,6 +7,7 @@ export interface CategorySubCardProps extends BoxProps {
   id: number,
   name: string,
   description?: string,
+  disabled: boolean,
   parentId: number,
   parentName: string,
 }
@@ -16,6 +17,7 @@ export default function CategorySubCard({
   name,
   description,
   parentId,
+  disabled,
   parentName,
   ...others
 }: CategorySubCardProps) {
@@ -25,6 +27,7 @@ export default function CategorySubCard({
     innerProps: {
       id,
       name,
+      disabled,
       description,
       isSub: true,
       parentId,
@@ -39,6 +42,7 @@ export default function CategorySubCard({
         ml="xl"
         name={name}
         description={description}
+        disabled={disabled}
       />
       <ActionIcon
         variant="transparent" 

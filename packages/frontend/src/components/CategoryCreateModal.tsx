@@ -53,6 +53,7 @@ export default function CategoryCreateModal<T extends boolean>({
 
   const submit = (
     name: string,
+    disabled: boolean,
     parentId: T extends true ? number : undefined,
     description?: string,
   ) => {
@@ -60,6 +61,7 @@ export default function CategoryCreateModal<T extends boolean>({
       name,
       description,
       parentId,
+      disabled,
     }});
     
     context.closeModal(modalId);
@@ -68,7 +70,7 @@ export default function CategoryCreateModal<T extends boolean>({
   return(
     <CategoryEditForm
       {...formProps}
-      onSubmit={(name, parentId, description) => submit(name, parentId, description)}
+      onSubmit={submit}
     />
   );
 }

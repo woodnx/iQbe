@@ -391,8 +391,11 @@ paths:
                   type: string
                 parentId:
                   type: number
+                disabled:
+                  type: boolean
               required:
                 - name
+                - disabled
             example: 
               name: "文学"
               description: 小説や童話など文学に関するクイズ
@@ -429,8 +432,11 @@ paths:
                   type: string
                 description:
                   type: string
+                disabled: 
+                  type: boolean
               required:
                 - name
+                - disabled
             example: 
               id: 1
               name: "文学"
@@ -2074,6 +2080,8 @@ components:
           type: string
         description:
           type: string
+        disabled:
+          type: boolean
         sub: 
           type: array
           items:
@@ -2081,6 +2089,7 @@ components:
       required:
         - id
         - name
+        - disabled
     Error: 
       type: object
       properties: 
@@ -2224,10 +2233,13 @@ components:
           type: string
         parentId:
           type: number
+        disabled:
+          type: boolean
       required:
         - id
         - name
         - parentId
+        - disabled
     Tag: 
       type: object
       properties:

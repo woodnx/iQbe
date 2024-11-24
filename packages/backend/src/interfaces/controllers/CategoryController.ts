@@ -26,7 +26,7 @@ export default class CategoryController {
 
   get() {
     return typedAsyncWrapper<"/categories", "get">(async (req, res) => {
-      const categories = await this.categoryQueryService.available();
+      const categories = await this.categoryQueryService.all();
     
       if (!categories) {
         throw new Error('');
@@ -36,11 +36,13 @@ export default class CategoryController {
         id: category.id,
         name: category.name,
         description: category.description,
+        disabled: category.disabled,
         sub: category.sub?.map(s => ({
           id: s.id,
           name: s.name,
           description: s.description,
           parentId: s.parentId,
+          disabled: s.disabled,
         })),
       }));
     
@@ -50,13 +52,13 @@ export default class CategoryController {
 
   post() {
     return typedAsyncWrapper<"/categories", "post">(async (req, res) => {
-      const { name, description, parentId } = req.body;
+      const { name, description, parentId, disabled } = req.body;
   
       if (!name) {
         throw new ApiError().invalidParams();
       }
     
-      await this.categoryUseCase.addCategory(name, description || null, parentId || null);
+      await this.categoryUseCase.addCategory(name, description || null, parentId || null, disabled);
     
       res.status(201).send();
     })
@@ -65,13 +67,13 @@ export default class CategoryController {
   put() {
     return typedAsyncWrapper<"/categories/{id}", "put">(async (req, res) => {
       const { id } = req.params;
-      const { description } = req.body;
+      const { description, disabled } = req.body;
 
       if (!id) {
         throw new ApiError().invalidParams();
       }
 
-      await this.categoryUseCase.editCategory(Number(id), description || null);
+      await this.categoryUseCase.editCategory(Number(id), description || null, disabled);
     });
   }
 

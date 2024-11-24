@@ -16,6 +16,7 @@ export default function CategoryInput({}: CategoryInputProps) {
       id={category.id}
       name={category.name}
       description={category.description || ''}
+      disabled={category.disabled}
       sub={category.sub || []}
       key={category.id}
     />

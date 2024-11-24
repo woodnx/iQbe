@@ -12,8 +12,9 @@ export default class Category {
     name: string,
     description: string | null,
     parentId: number,
+    disabled: boolean,
   ) {
-    return new Category(null, name, description, parentId);
+    return new Category(null, name, description, parentId, disabled);
   }
 
   disable() {

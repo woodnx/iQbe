@@ -10,10 +10,12 @@ interface CategoryCardProps extends BoxProps {
   id: number,
   name: string,
   description?: string,
+  disabled: boolean,
   sub?: {
     id: number,
     name: string,
-    description?: string | null
+    description?: string | null,
+    disabled: boolean,
   }[],
 }
 
@@ -21,6 +23,7 @@ export default function CategoryCard({
   id,
   name,
   description,
+  disabled,
   sub,
   ...other
 }: CategoryCardProps) {
@@ -34,6 +37,7 @@ export default function CategoryCard({
       id,
       name,
       description,
+      disabled,
       isSub: false,
       parentId: undefined,
     },
@@ -47,6 +51,7 @@ export default function CategoryCard({
         <CategoryBaseCard 
           name={name}
           description={description}
+          disabled={disabled}
         />
         <Group wrap="nowrap">
           <ActionIcon onClick={modal} variant="transparent" color="gray">
@@ -68,6 +73,7 @@ export default function CategoryCard({
               description={s.description || undefined}
               parentId={id}
               parentName={name}
+              disabled={s.disabled}
               mt="sm"
             /> 
           )

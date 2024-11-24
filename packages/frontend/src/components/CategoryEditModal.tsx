@@ -9,6 +9,7 @@ import { useQueryClient } from '@tanstack/react-query';
 export interface CategoryEditModalInnerProps<T extends boolean> {
   name: string,
   description?: string,
+  disabled: boolean,
   isSub: T,
   parentId: T extends true ? number : undefined,
   id: number,
@@ -58,12 +59,14 @@ export default function CategoryEditModal<T extends boolean>({
 
   const submit = (
     name: string,
+    disabled: boolean,
     description?: string,
   ) => {
     edit({ 
       body: {
         name,
         description,
+        disabled,
       },
       params: { 
         path: { id },
@@ -76,7 +79,7 @@ export default function CategoryEditModal<T extends boolean>({
   return(
     <CategoryEditForm
       {...formProps}
-      onSubmit={(name, _, description) => submit(name, description)}
+      onSubmit={(name, disabled, _, description) => submit(name, disabled, description)}
     />
   );
 }

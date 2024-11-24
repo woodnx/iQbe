@@ -66,12 +66,14 @@ export default class CategoryInfra implements ICategoryRepository, ICategoryQuer
           name: sub.name, 
           description: sub.description,
           parentId: sub.parent_id,
+          disabled: sub.disabled ? true : false,
       }));
 
       return {
         id: category.id, 
         name: category.name, 
         description: category.description,
+        disabled: category.disabled ? true : false,
         sub,
       }
     });
@@ -99,12 +101,14 @@ export default class CategoryInfra implements ICategoryRepository, ICategoryQuer
           name: sub.name, 
           description: sub.description,
           parentId: sub.parent_id,
+          disabled: sub.disabled ? true : false,
       }));
 
       return {
         id: category.id, 
         name: category.name, 
         description: category.description,
+        disabled: category.disabled ? true : false,
         sub,
       }
     });
