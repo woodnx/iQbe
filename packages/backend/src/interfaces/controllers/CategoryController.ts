@@ -46,4 +46,17 @@ export default class CategoryController {
       res.status(201).send();
     })
   }
+
+  put() {
+    return typedAsyncWrapper<"/categories/{id}", "put">(async (req, res) => {
+      const { id } = req.params;
+      const { description } = req.body;
+
+      if (!id) {
+        throw new ApiError().invalidParams();
+      }
+
+      await this.categoryUseCase.editCategory(Number(id), description || null);
+    });
+  }
 }

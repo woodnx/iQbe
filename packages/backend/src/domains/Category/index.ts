@@ -19,6 +19,10 @@ export default class Category {
   disable() {
     this._disabled = true;
   }
+
+  editDescription(description: string | null) {
+    this._description = description;
+  }
   
   get id(): number {
     if (!this._id) 

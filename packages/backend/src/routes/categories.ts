@@ -17,5 +17,6 @@ const router = express.Router();
 
 router.get('/', categoryController.get());
 router.post('/', categoryController.post());
+router.put('/:id', categoryController.put());
 
 module.exports = router;

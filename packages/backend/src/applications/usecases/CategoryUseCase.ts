@@ -15,4 +15,13 @@ export default class CategoryUseCase {
 
     await this.categoryRepository.save(category);
   }
+
+  async editCategory(id: number, description: string | null) {
+    const category = await this.categoryRepository.findById(id);
+
+    if (!category) throw new Error('Category not found');
+
+    category.editDescription(description);
+    await this.categoryRepository.save(category);
+  }
 }
