@@ -1,7 +1,8 @@
-import { Group, Title } from "@mantine/core";
+import { Center, Group, Title } from "@mantine/core";
 import CategoryCreateModalButton from "./CategoryCreateModalButton";
 import CategoryCard from "./CategoryCard";
 import { useCategories } from "@/hooks/useCategories";
+import CategoryPresetButton from "./CategoryPresetButton";
 
 export interface CategoryInputProps {
   
@@ -33,6 +34,13 @@ export default function CategoryInput({}: CategoryInputProps) {
         />
       </Group>
       { content }
+      <Center mt="md">
+        <CategoryPresetButton 
+          size="lg" 
+          radius="xl"
+          color="green"
+        />
+      </Center>
     </>
   );
 }

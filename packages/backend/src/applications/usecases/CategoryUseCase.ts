@@ -32,18 +32,18 @@ export default class CategoryUseCase {
     await this.transactionManager.begin(async () => {
       const existingCategories = await this.categoryRepository.getAll();
 
-      for (const existingCategory of existingCategories) {
-        existingCategory.disable();
-        await this.categoryRepository.save(existingCategory);
-      }
-
       for (const presetCategory of presetCategories) {
-        const category = Category.create(
+        const _category = existingCategories
+          .filter(c => c.name === presetCategory.name);
+        
+        const category = (_category.length == 0)
+        ? Category.create(
           presetCategory.name,
           presetCategory.description || null,
           -1, // -1 means no parent
           false,
-        );
+        )
+        : _category[0];
   
         await this.categoryRepository.save(category);
 
@@ -51,16 +51,22 @@ export default class CategoryUseCase {
         .findByName(presetCategory.name)
         .then((category) => category?.id);
 
-        if (!id) throw new Error('Category not found');
+        if (!id) 
+          throw new Error('Category not found');
 
         const subCategories = presetCategory.sub || [];
         for (const sub of subCategories) {
-          const subCategory = Category.create(
+          const _subCategory = existingCategories
+            .filter(c => c.name === sub.name);
+
+          const subCategory = (_subCategory.length == 0) 
+          ? Category.create(
             sub.name,
             sub.description || null,
             id,
             false,
-          );
+          )
+          : _subCategory[0];
           
           await this.categoryRepository.save(subCategory);
         }

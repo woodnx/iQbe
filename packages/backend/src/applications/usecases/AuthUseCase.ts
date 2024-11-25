@@ -1,10 +1,8 @@
 import { ApiError } from 'api';
 import { components } from 'api/schema';
 
-import abc23Categories from '@/db/abc23Categories.json';
 import AccessToken from '@/domains/AccessToken';
 import AuthService from '@/domains/Auth/AuthService';
-import Category from '@/domains/Category';
 import InviteCode from '@/domains/InviteCode';
 import IInviteCodeRepository from '@/domains/InviteCode/IInviteCodeRepository';
 import InviteCodeService from '@/domains/InviteCode/InviteCodeService';
@@ -199,13 +197,6 @@ export default class AuthUseCase {
     const user = new User(uid, passwd, username, email, created, created, undefined, 'SUPER_USER');
     const refreshToken = new RefreshToken(refreshTokenService.generateToken(), uid);
     const accessToken = new AccessToken(user);
-
-    // const categories = abc23Categories.map(({ name, sub }) => {
-    //   const subCategories = sub.map(({ name, description }) => 
-    //     SubCategory.create(name, description)
-    //   );
-    //   return Category.create(name, null, subCategories);
-    // });
 
     await this.transactionManager.begin(async () => {      
       if (requiredInviteCode) {
