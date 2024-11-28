@@ -25,7 +25,7 @@ export default function({
   });
 
   const options = data?.map(({ id, name, description }) => (
-    <Combobox.Option value={String(id)} key={id}>
+    <Combobox.Option value={String(id)} key={id} bg={value == String(id) ? 'blue.1' : undefined}>
       <Text size="sm">{name}</Text>
       <Text size="xs" opacity={0.65}>
         {description}
@@ -67,7 +67,7 @@ export default function({
           onClick={() => combobox.toggleDropdown()}
           rightSectionPointerEvents={value == null ? 'none' : 'all'}
         >
-          { display || <Input.Placeholder>{placeholder || 'ジャンルを選択'}</Input.Placeholder>}
+          { display ? <Text lineClamp={1}>{ display }</Text> : <Input.Placeholder>{placeholder || 'ジャンルを選択'}</Input.Placeholder>}
         </InputBase>
       </Combobox.Target>
 

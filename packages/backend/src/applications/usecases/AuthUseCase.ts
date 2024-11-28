@@ -1,10 +1,8 @@
 import { ApiError } from 'api';
 import { components } from 'api/schema';
 
-import abc23Categories from '@/db/abc23Categories.json';
 import AccessToken from '@/domains/AccessToken';
 import AuthService from '@/domains/Auth/AuthService';
-import Category from '@/domains/Category';
 import InviteCode from '@/domains/InviteCode';
 import IInviteCodeRepository from '@/domains/InviteCode/IInviteCodeRepository';
 import InviteCodeService from '@/domains/InviteCode/InviteCodeService';
@@ -24,12 +22,8 @@ type AuthDTO = components["responses"]["AuthResponseWithRefreshToken"]["content"
 export default class AuthUseCase {
   constructor(
     private transactionManager: ITransactionManager,
-    private authService: AuthService,
-    private inviteCodeService: InviteCodeService,
     private inviteCodeRepository: IInviteCodeRepository,
-    private refreshTokenService: RefreshTokenService,
     private refreshTokensRepostiory: IRefreshTokenRepository,
-    private userService: UserService,
     private userRepository: IUserRepository,
   ) {}
 
@@ -53,7 +47,7 @@ export default class AuthUseCase {
           detail: "You need reregistragion."
         });
       } 
-      else if (await this.userService.checkFirstStart()) {
+      else if (await userService.checkFirstStart()) {
         throw new ApiError({
           title: "NO_ANY_USERS",
           detail: "This instance is first start",
@@ -66,7 +60,7 @@ export default class AuthUseCase {
       }
     }
 
-    const checked = this.authService.checkPassword(password, user.passwd);
+    const checked = authService.checkPassword(password, user.passwd);
 
     if (!checked) throw new ApiError().noUser();
     
@@ -107,11 +101,11 @@ export default class AuthUseCase {
     const created = dayjs().toDate();
 
     const user = new User(uid, passwd, username, email, created, created);
-    const refreshToken = new RefreshToken(this.refreshTokenService.generateToken(), uid);
+    const refreshToken = new RefreshToken(refreshTokenService.generateToken(), uid);
     const accessToken = new AccessToken(user);
 
     const requiredInviteCode = (process.env.REQUIRE_INVITE_CODE !== 'false') ? true : false;
-    const isFirstUser = await this.userService.checkFirstStart();
+    const isFirstUser = await userService.checkFirstStart();
 
     await this.transactionManager.begin(async () => {      
       if (requiredInviteCode && !isFirstUser) {
@@ -125,7 +119,7 @@ export default class AuthUseCase {
         }
 
         const code = new InviteCode(inviteCode);
-        const available = await this.inviteCodeService.checkAvailable(code);
+        const available = await inviteCodeService.checkAvailable(code);
         
         // エラー処理
         if (!available) {
@@ -204,13 +198,6 @@ export default class AuthUseCase {
     const refreshToken = new RefreshToken(refreshTokenService.generateToken(), uid);
     const accessToken = new AccessToken(user);
 
-    // const categories = abc23Categories.map(({ name, sub }) => {
-    //   const subCategories = sub.map(({ name, description }) => 
-    //     SubCategory.create(name, description)
-    //   );
-    //   return Category.create(name, null, subCategories);
-    // });
-
     await this.transactionManager.begin(async () => {      
       if (requiredInviteCode) {
         if (!inviteCode || !inviteCode.trim()) 
@@ -266,7 +253,7 @@ export default class AuthUseCase {
     const user = await this.userRepository.findByUid(uid);
 
     if (!user) { 
-      if (await this.userService.checkFirstStart()) {
+      if (await userService.checkFirstStart()) {
         throw new ApiError({
           title: "NO_ANY_USERS",
           detail: "This instance is first start",
@@ -325,8 +312,8 @@ export default class AuthUseCase {
     const userId = await this.userRepository.findUserIdByEmail(email);
     if (!userId) throw new ApiError().noUser();
 
-    const uid = this.userService.generateUid();
-    const passwd = this.authService.generateHashedPassword(password);
+    const uid = userService.generateUid();
+    const passwd = authService.generateHashedPassword(password);
 
     user.reconstruct(
       uid,
@@ -338,7 +325,7 @@ export default class AuthUseCase {
     );
 
     const accessToken = new AccessToken(user);
-    const refreshToken = new RefreshToken(this.refreshTokenService.generateToken(), uid);
+    const refreshToken = new RefreshToken(refreshTokenService.generateToken(), uid);
 
     await this.transactionManager.begin(async () => {
       this.userRepository.update(user);

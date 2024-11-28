@@ -9,6 +9,7 @@ export type categories = {
     name: string;
     description: string | null;
     parent_id: Generated<number>;
+    disabled: Generated<number>;
 };
 export type favorites = {
     user_id: number;

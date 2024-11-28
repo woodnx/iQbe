@@ -21,19 +21,42 @@ export default class CategoryInfra implements ICategoryRepository, ICategoryQuer
     return category !== undefined;
   }
 
+  async getAll(): Promise<Category[]> {
+    const client = this.clientManager.getClient();
+    const category = await client
+    .selectFrom('categories')
+    .selectAll()
+    .execute();
+
+    return category.map(c => new Category(
+      c.id,
+      c.name,
+      c.description,
+      c.parent_id,
+      !!c.disabled ? true : false,
+    ))
+  }
+
   async available(): Promise<CategoryDTO[]> {
     const client = this.clientManager.getClient();
 
     const categories = await client
     .selectFrom('categories')
     .selectAll()
-    .where('parent_id', '=', -1)
+    .where((({ and, eb }) => and([
+      eb('parent_id', '=', -1),
+      eb('disabled', '=', 0),
+    ])))
     .execute();
 
     const subCategories = await client
     .selectFrom('categories')
     .selectAll()
     .where('parent_id', '!=', -1)
+    .where((({ and, eb }) => and([
+      eb('parent_id', '!=', -1),
+      eb('disabled', '=', 0),
+    ])))
     .execute();
 
     return categories.map(category => {
@@ -43,12 +66,14 @@ export default class CategoryInfra implements ICategoryRepository, ICategoryQuer
           name: sub.name, 
           description: sub.description,
           parentId: sub.parent_id,
+          disabled: sub.disabled ? true : false,
       }));
 
       return {
         id: category.id, 
         name: category.name, 
         description: category.description,
+        disabled: category.disabled ? true : false,
         sub,
       }
     });
@@ -76,15 +101,97 @@ export default class CategoryInfra implements ICategoryRepository, ICategoryQuer
           name: sub.name, 
           description: sub.description,
           parentId: sub.parent_id,
+          disabled: sub.disabled ? true : false,
       }));
 
       return {
         id: category.id, 
         name: category.name, 
         description: category.description,
+        disabled: category.disabled ? true : false,
         sub,
       }
     });
+  }
+
+  async findById(id: number): Promise<Category | undefined> {
+    const client = this.clientManager.getClient();
+
+    const category = await client
+    .selectFrom('categories')
+    .selectAll()
+    .where('id', '=', id)
+    .executeTakeFirst();
+
+    if (!category) return undefined;
+
+    return new Category(
+      category.id,
+      category.name,
+      category.description,
+      category.parent_id
+    );
+  }
+
+  async findByName(name: string): Promise<Category | undefined> {
+    const client = this.clientManager.getClient();
+
+    const category = await client
+    .selectFrom('categories')
+    .selectAll()
+    .where('name', '=', name)
+    .executeTakeFirst();
+
+    if (!category) return undefined;
+
+    return new Category(
+      category.id,
+      category.name,
+      category.description,
+      category.parent_id
+    );
+  }
+
+  async findChainById(id: number): Promise<Category[]> {
+    const client = this.clientManager.getClient();
+
+    const category = await client
+    .selectFrom('categories')
+    .selectAll()
+    .where('id', '=', id)
+    .executeTakeFirst();
+
+    if (!category) return [];
+
+    const chain: Category[] = [];
+    chain.push(new Category(
+      category.id,
+      category.name,
+      category.description,
+      category.parent_id
+    ));
+
+    let parentId = category.parent_id;
+    while (parentId !== -1) {
+      const parent = await client
+      .selectFrom('categories')
+      .selectAll()
+      .where('id', '=', parentId)
+      .executeTakeFirst();
+
+      if (!parent) break;
+
+      chain.push(new Category(
+        parent.id,
+        parent.name,
+        parent.description,
+        parent.parent_id
+      ));
+
+      parentId = parent.parent_id;
+    }
+
+    return chain.reverse();
   }
 
   async save(category: Category): Promise<void> {
@@ -99,6 +206,7 @@ export default class CategoryInfra implements ICategoryRepository, ICategoryQuer
         name: category.name,
         description: category.description,
         parent_id: category.parentId,
+        disabled: category.disabled ? 1 : 0,
       })
       .where('id', '=', category.id)
       .execute();
@@ -112,7 +220,16 @@ export default class CategoryInfra implements ICategoryRepository, ICategoryQuer
       name: category.name,
       description: category.description,
       parent_id: category.parentId,
+      disabled: category.disabled ? 1 : 0,
     })
+    .execute();
+  }
+
+  async delete(category: Category): Promise<void> {
+    const client = this.clientManager.getClient();
+    
+    await client.deleteFrom('categories')
+    .where('id', '=', category.id)
     .execute();
   }
 }

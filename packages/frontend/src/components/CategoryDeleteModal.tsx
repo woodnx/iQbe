@@ -1,31 +1,30 @@
 import { components } from 'api/schema';
 
 import { $api } from '@/utils/client';
+import { Button, Group, Text } from '@mantine/core';
 import { ContextModalProps } from '@mantine/modals';
+import { IconTrash } from '@tabler/icons-react';
 import { useQueryClient } from '@tanstack/react-query';
 
-import CategoryEditForm from './CategoryEditForm';
+type Category = components['schemas']['Category'];
 
 export interface CategoryCreateModalInnerProps<T extends boolean> {
-  name: string,
-  description?: string,
+  id: number,
   isSub: T,
   parentId: T extends true ? number : undefined,
 }
 
-type Category = components['schemas']['Category'];
-
-export default function CategoryCreateModal<T extends boolean>({
+const CategoryDeleteModal = <T extends boolean>({
   context,
   id: modalId,
   innerProps,
-}: ContextModalProps<CategoryCreateModalInnerProps<T>>) {
-  const { ...formProps } = innerProps;
+}: ContextModalProps<CategoryCreateModalInnerProps<T>>) => {
+  const { id, ...formProps } = innerProps;
   const queryClient = useQueryClient();
   const queryKey = ["get", "/categories", undefined];
 
-  const { mutate: edit } = $api.useMutation("post", "/categories", {
-    onMutate: async ({ body }) => {
+  const { mutate } = $api.useMutation("delete", "/categories/{id}", {
+    onMutate: () => {
       const previous = queryClient.getQueryData(queryKey);
 
       queryClient.setQueryData(queryKey, (old: Category[]) => {
@@ -35,42 +34,47 @@ export default function CategoryCreateModal<T extends boolean>({
             const sub = parent.sub || [];
             return old.map(c => 
               (c.id === formProps.parentId) 
-              ? { ...parent, sub: [ ...sub, body ] } 
+              ? { ...parent, sub: sub.filter(s => s.id !== id) } 
               : c
             );
           }
         } else {
-          return [ ...old, body]
+          return old.filter(c => c.id !== id)
         }
       });
 
       return { previous };
     },
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey })
+      queryClient.invalidateQueries({ queryKey });
     },
   });
 
-  const submit = (
-    name: string,
-    disabled: boolean,
-    parentId: T extends true ? number : undefined,
-    description?: string,
-  ) => {
-    edit({ body: {
-      name,
-      description,
-      parentId,
-      disabled,
+  const submit = () => {
+    mutate({ params: {
+      path: { id }
     }});
     
     context.closeModal(modalId);
   }
 
   return(
-    <CategoryEditForm
-      {...formProps}
-      onSubmit={submit}
-    />
+    <>
+      <Text>
+        ジャンルを削除します．
+        よろしいですか？
+      </Text>
+      <Group justify='flex-end' mt="md">
+        <Button 
+          color='red' 
+          leftSection={<IconTrash />}
+          onClick={submit}
+        >
+          削除
+        </Button>
+      </Group>
+    </>
   );
 }
+
+export default CategoryDeleteModal;
