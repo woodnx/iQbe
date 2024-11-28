@@ -23,8 +23,8 @@ export default function QuizMylistButton({
   const [ selectedMyListIdx, setSelectedMylistIdx ] = useState(registerdMylistId.map(id => mylists?.findIndex(list => list.mid == id)));
   const isMobile = useIsMobile();
   const { mutate: addMylist } = $api.useMutation("post", "/mylists");
-  const { mutate: addQuizToMylist } = $api.useMutation("post", "/quizzes/mylist/{mid}");
-  const { mutate: deleteQuizFromMylist } = $api.useMutation("delete", "/quizzes/mylist/{mid}")
+  const { mutate: addQuizToMylist } = $api.useMutation("post", "/register");
+  const { mutate: deleteQuizFromMylist } = $api.useMutation("post", "/unregister")
 
   const createMylist = async (mylistname: string) => {
     try {
@@ -32,9 +32,11 @@ export default function QuizMylistButton({
         listName: mylistname,
       }}, {
         onSuccess: (({ mid }) => {
-          addQuizToMylist({ 
-            params: { path: { mid } },
-            body: { qid },
+          addQuizToMylist({
+            body: { 
+              qid,
+              mid,
+            },
           });
         }),
       });
@@ -47,15 +49,19 @@ export default function QuizMylistButton({
     try {
       if (!selectedMyListIdx.includes(arrayIdx)) { // add quiz into mylist
         addQuizToMylist({ 
-          params: { path: { mid } },
-          body: { qid },
+          body: { 
+            qid,
+            mid,
+          },
         });
         setSelectedMylistIdx([...selectedMyListIdx, arrayIdx]);
       } 
       else {  // delete quiz from mylist
         deleteQuizFromMylist({ 
-          params: { path: { mid } }, 
-          body: { qid },
+          body: { 
+            qid,
+            mid,
+          },
         });
         setSelectedMylistIdx(selectedMyListIdx.filter(idx => idx != arrayIdx));
       }

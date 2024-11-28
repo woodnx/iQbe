@@ -13,8 +13,8 @@ export default function QuizFavoriteButton({
   qid,
 }: QuizFavoriteButtonProps) {
   const [ isFavorite, setFavorite ] = useState(innerIsFavorite);
-  const { mutate: like } = $api.useMutation("post", "/quizzes/favorite");
-  const { mutate: unlike } = $api.useMutation("delete", "/quizzes/favorite");
+  const { mutate: like } = $api.useMutation("post", "/like");
+  const { mutate: unlike } = $api.useMutation("post", "/unlike");
   
   const addFavoriteList = async () => {
     if (isFavorite) {
