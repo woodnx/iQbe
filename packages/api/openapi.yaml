@@ -450,6 +450,27 @@ paths:
           $ref: "#/components/responses/401Unauthorized"
         "403":
           $ref: "#/components/responses/403Forbidden"
+    delete:
+      tags: 
+        - categories
+      summary: カテゴリーの削除
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: カテゴリーのID
+          schema:
+            type: number
+          example: 1
+      responses:
+        "204": 
+          description: delete category
+        "400":
+          $ref: "#/components/responses/400BadRequest"
+        "401": 
+          $ref: "#/components/responses/401Unauthorized"
+        "403":
+          $ref: "#/components/responses/403Forbidden"
   "/categories/preset":
     get: 
       tags:
@@ -2082,6 +2103,8 @@ components:
           type: string
         disabled:
           type: boolean
+        from: 
+          type: string
         sub: 
           type: array
           items:
@@ -2235,6 +2258,8 @@ components:
           type: number
         disabled:
           type: boolean
+        from: 
+          type: string
       required:
         - id
         - name

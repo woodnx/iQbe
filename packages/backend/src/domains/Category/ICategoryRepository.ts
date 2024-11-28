@@ -6,4 +6,5 @@ export default interface ICategoryRepository {
   findByName(name: string): Promise<Category | undefined>,
   findChainById(id: number): Promise<Category[]>,
   save(category: Category): Promise<void>,
+  delete(category: Category): Promise<void>,
 }

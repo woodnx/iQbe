@@ -77,6 +77,16 @@ export default class CategoryController {
     });
   }
 
+  delete() {
+    return typedAsyncWrapper<"/categories/{id}", "delete">(async (req, res) => {
+      const { id } = req.params;
+
+      if (!id) throw new ApiError().invalidParams();
+
+      await this.categoryUseCase.deleteCategory(id);
+    })
+  }
+
   getPreset() {
     return typedAsyncWrapper<"/categories/preset", "get">(async (req, res) => {
       res.send(preset);

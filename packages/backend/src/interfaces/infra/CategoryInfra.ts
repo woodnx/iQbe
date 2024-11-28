@@ -224,4 +224,12 @@ export default class CategoryInfra implements ICategoryRepository, ICategoryQuer
     })
     .execute();
   }
+
+  async delete(category: Category): Promise<void> {
+    const client = this.clientManager.getClient();
+    
+    await client.deleteFrom('categories')
+    .where('id', '=', category.id)
+    .execute();
+  }
 }

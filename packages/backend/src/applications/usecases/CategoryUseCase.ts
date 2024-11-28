@@ -84,4 +84,13 @@ export default class CategoryUseCase {
 
     await this.categoryRepository.save(category);
   }
+
+  async deleteCategory(id: number) {
+    const category = await this.categoryRepository.findById(id);
+
+    if (!category) 
+      throw new Error('Category not found');
+    
+    this.categoryRepository.delete(category);
+  }
 }

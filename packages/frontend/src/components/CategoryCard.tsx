@@ -1,10 +1,11 @@
 import { ActionIcon, BoxProps, Card, Collapse, Divider, Group } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { IconChevronDown, IconChevronUp, IconPencil } from "@tabler/icons-react";
+import { IconChevronDown, IconChevronUp } from "@tabler/icons-react";
 import CategoryBaseCard from "./CategoryBaseCard";
 import CategoryCreateModalButton from "./CategoryCreateModalButton";
 import { modals } from "@mantine/modals";
 import CategorySubCard from "./CategorySubCard";
+import CategoryEditMenu from "./CategoryEditMenu";
 
 interface CategoryCardProps extends BoxProps {
   id: number,
@@ -30,7 +31,7 @@ export default function CategoryCard({
   const [ opened, { toggle } ] = useDisclosure(false);
   const IconChevron = () => opened ? <IconChevronUp /> : <IconChevronDown />;
 
-  const modal = () => modals.openContextModal({
+  const editModal = () => modals.openContextModal({
     modal: 'categoryEdit',
     title: `${name}ジャンルを編集`,
     innerProps: {
@@ -38,6 +39,18 @@ export default function CategoryCard({
       name,
       description,
       disabled,
+      isSub: false,
+      parentId: undefined,
+    },
+    size: 'lg',
+    zIndex: 200
+  });
+
+  const deleteModal = () => modals.openContextModal({
+    modal: 'categoryDelete',
+    title: `${name}ジャンルを削除`,
+    innerProps: {
+      id,
       isSub: false,
       parentId: undefined,
     },
@@ -54,9 +67,10 @@ export default function CategoryCard({
           disabled={disabled}
         />
         <Group wrap="nowrap">
-          <ActionIcon onClick={modal} variant="transparent" color="gray">
-            <IconPencil />
-          </ActionIcon>
+          <CategoryEditMenu 
+            onEdit={editModal}
+            onDelete={deleteModal}
+          />
           <ActionIcon onClick={toggle} variant="transparent" color="gray">
             <IconChevron />
           </ActionIcon>

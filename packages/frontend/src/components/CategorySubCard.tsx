@@ -1,7 +1,7 @@
-import { ActionIcon, BoxProps, Group } from "@mantine/core";
+import { BoxProps, Group } from "@mantine/core";
 import CategoryBaseCard from "./CategoryBaseCard";
-import { IconPencil } from "@tabler/icons-react";
 import { modals } from "@mantine/modals";
+import CategoryEditMenu from "./CategoryEditMenu";
 
 export interface CategorySubCardProps extends BoxProps {
   id: number,
@@ -21,7 +21,7 @@ export default function CategorySubCard({
   parentName,
   ...others
 }: CategorySubCardProps) {
-  const modal = () => modals.openContextModal({
+  const editModal = () => modals.openContextModal({
     modal: 'categoryEdit',
     title: `${parentName}ジャンルのサブジャンル「${name}」を編集`,
     innerProps: {
@@ -36,6 +36,18 @@ export default function CategorySubCard({
     zIndex: 200,
   });
 
+  const deleteModal = () => modals.openContextModal({
+    modal: 'categoryDelete',
+    title: `${name}ジャンルを削除`,
+    innerProps: {
+      id,
+      isSub: true,
+      parentId,
+    },
+    size: 'lg',
+    zIndex: 200
+  });
+
   return (
     <Group justify="space-between" wrap="nowrap" {...others}>
       <CategoryBaseCard 
@@ -44,13 +56,10 @@ export default function CategorySubCard({
         description={description}
         disabled={disabled}
       />
-      <ActionIcon
-        variant="transparent" 
-        color="gray"
-        onClick={modal}
-      >
-        <IconPencil />
-      </ActionIcon>
+      <CategoryEditMenu 
+        onEdit={editModal}
+        onDelete={deleteModal}
+      />
     </Group>
   );
 } 
