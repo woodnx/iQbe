@@ -26,7 +26,7 @@ export default function CreateWorkbookModal() {
 
   const create = async () => {
     const body = {
-      workbookName: listName,
+      name: listName,
     };
     
     mutate({ body });

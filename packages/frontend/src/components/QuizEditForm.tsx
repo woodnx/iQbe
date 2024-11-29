@@ -1,31 +1,35 @@
-import { Button, Card, BoxProps, Grid, Group, Switch, Textarea } from "@mantine/core";
-import { isNotEmpty, useForm } from "@mantine/form"
-import { useCategories } from "@/hooks/useCategories";
-import { SubmitValue } from "@/types";
-import CategorySelector from "./CategorySelector";
-import WorkbookCreateAndSelector from "./WorkbookCreateAndSelector";
-import { useIsSuperUser } from "@/hooks/useLoginedUser";
-import TagInput from "./TagInput";
+import { paths } from 'api/schema';
+
+import { useCategories } from '@/hooks/useCategories';
+import { useIsSuperUser } from '@/hooks/useLoginedUser';
+import { BoxProps, Button, Card, Grid, Group, Switch, Textarea } from '@mantine/core';
+import { isNotEmpty, useForm } from '@mantine/form';
+
+import CategorySelector from './CategorySelector';
+import TagInput from './TagInput';
+import WorkbookCreateAndSelector from './WorkbookCreateAndSelector';
+
+type QuizEditSubmitValues = paths["/quizzes"]["post"]["requestBody"]["content"]["application/json"];
 
 interface QuizEditFormProps extends BoxProps {
-  question?: string,
-  answer?: string,
-  workbook?: string,
+  question: string,
+  answer: string,
+  wid?: string,
   category?: number,
   subCategory?: number,
   tags?: string[],
   isPublic?: boolean,
-  onSubmit?: (v: SubmitValue) => void,
+  onSubmit?: (v: QuizEditSubmitValues) => void,
 }
 
 export default function QuizEditForm({
-  question: initialQuestion,
-  answer: initialAnswer,
-  workbook: initialWorkbook,
-  category: initialCategory,
-  subCategory: initialSubCategory,
-  tags: initialTags,
-  isPublic: initialIsPublic,
+  question,
+  answer,
+  wid,
+  category,
+  subCategory,
+  tags,
+  isPublic,
   onSubmit = () => {},
   ...others
 }: QuizEditFormProps) {
@@ -34,13 +38,13 @@ export default function QuizEditForm({
 
   const form = useForm({
     initialValues: {
-      question: initialQuestion,
-      answer: initialAnswer,
-      isPublic: !!initialIsPublic,
-      category: initialCategory,
-      subCategory: initialSubCategory,
-      tags: initialTags,
-      workbook: initialWorkbook,
+      question,
+      answer,
+      isPublic,
+      category,
+      subCategory,
+      tags,
+      wid,
     },
     validate: {
       question: isNotEmpty(),
@@ -50,7 +54,7 @@ export default function QuizEditForm({
 
   const subCategories = categories?.find(c => c.id == form.values.category)?.sub || [];
 
-  const submit = (v: SubmitValue) => {
+  const submit = (v: QuizEditSubmitValues) => {
     onSubmit(v);
     form.reset();
   }
@@ -101,7 +105,7 @@ export default function QuizEditForm({
           <Grid.Col span={8}>
             <WorkbookCreateAndSelector
               mb="md"
-              {...form.getInputProps('workbook')}
+              {...form.getInputProps('wid')}
             />
           </Grid.Col>
           
@@ -116,7 +120,7 @@ export default function QuizEditForm({
           <Button
             disabled={!form.isValid()}
             type="submit"
-          >{ !!initialQuestion ? 'Edit' : 'Create' }</Button>
+          >{ !!question ? 'Edit' : 'Create' }</Button>
         </Group>
       </form>
     </Card>

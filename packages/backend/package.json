@@ -9,9 +9,9 @@
     "watch": "tsc-watch --noClear --onSuccess \"node watch.mjs\"",
     "watch:": "tsup --config tsup.config.ts --watch --onSuccess 'node dist/index.js'",
     "migrate:create": "prisma migrate dev --create-only",
-    "migrate:exe":    "prisma migrate dev",
+    "migrate:exe": "prisma migrate dev",
     "migrate:status": "prisma migrate status",
-    "migrate:reset":  "prisma migrate reset"
+    "migrate:reset": "prisma migrate reset"
   },
   "author": "",
   "license": "ISC",
@@ -46,7 +46,7 @@
     "@types/multer": "^1.4.11",
     "@types/node": "^20.5.8",
     "@types/nodemailer": "^6.4.14",
-    "prisma": "^5.18.0",
+    "prisma": "^5.22.0",
     "prisma-kysely": "^1.8.0",
     "tsc-alias": "^1.8.10",
     "tsc-watch": "^6.2.0",

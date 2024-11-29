@@ -1,8 +1,12 @@
+import { paths } from 'api/schema';
+
 import QuizEditForm from '@/components/QuizEditForm';
-import { $api } from "@/utils/client";
-import { SubmitValue } from '@/types';
+import { $api } from '@/utils/client';
 import { Tabs } from '@mantine/core';
+
 import CsvFileImporter from './CsvFileImporter';
+
+type QuizEditSubmitValues = paths["/quizzes"]["post"]["requestBody"]["content"]["application/json"];
 
 export interface Element {
   question: string,
@@ -13,14 +17,14 @@ export interface Element {
 export default function CreateDashboard() {
   const { mutate } = $api.useMutation("post", "/quizzes");
 
-  const submit = ({ question, answer, category, tags, subCategory, workbook, isPublic }: SubmitValue) => {
+  const submit = ({ question, answer, category, tags, subCategory, wid, isPublic }: QuizEditSubmitValues) => {
     mutate({ body: {
       question,
       answer,
       category,
       tags,
       subCategory,
-      wid: workbook,
+      wid,
       isPublic,
     }});
   };
@@ -34,7 +38,12 @@ export default function CreateDashboard() {
         </Tabs.List>
 
         <Tabs.Panel value="single" pt="xs">
-          <QuizEditForm mb={16} onSubmit={submit}/>
+          <QuizEditForm 
+            question=''
+            answer=''
+            mb={16} 
+            onSubmit={submit}
+          />
         </Tabs.Panel>
         <Tabs.Panel value="file" pt="xs">
           <CsvFileImporter />
