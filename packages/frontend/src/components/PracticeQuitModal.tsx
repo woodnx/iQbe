@@ -1,4 +1,4 @@
-import { ActionIcon, Button, Center, BoxProps, Modal, Space, Stack, Title } from "@mantine/core";
+import { ActionIcon, Button, BoxProps, Modal, Space, Stack } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { IconPlayerPauseFilled } from "@tabler/icons-react";
 import { useIsMobile } from "@/contexts/isMobile";
@@ -24,7 +24,7 @@ export default function PracticePauseModal({
       leftSection={<IconPlayerPauseFilled/>}
       color="dark"
     >
-      Pause
+      演習をやめる
     </Button>
   );
 
@@ -47,9 +47,6 @@ export default function PracticePauseModal({
         onClose={() => close()}
         size={ isMobile ? 'xs' : 'md' }
       >
-        <Center>
-          <Title>Pause</Title>
-        </Center>
         <Space h={10}/>
         <Stack gap="md" h={300}>
           <Button size="lg" color="red" onClick={() => judge(1)}>正解にしてやめる</Button>

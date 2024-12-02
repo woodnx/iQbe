@@ -21,7 +21,7 @@ export default function({
       variant="outline"
       color={color}
       { ...others }
-    >Transfar</Button>
+    >演習に転送</Button>
   );
 
   const MobileButton = () => (

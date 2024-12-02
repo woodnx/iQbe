@@ -14,7 +14,7 @@ export default function QuizHiddenAnswerButton({
 }: Props) {
   const isMobile = useIsMobile();
   const icon = isHidden ?  <IconEye/> : <IconEyeOff/>;
-  const message = isHidden ? 'All Show' : 'All Hide';
+  const message = isHidden ? '解答を表示' : '解答を隠す';
   const color = 'violet';
 
   const innerOnToggle = () => {

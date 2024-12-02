@@ -26,8 +26,8 @@ export default function Home() {
               defaultValue="status"
             >
               <Tabs.List grow>
-                <Tabs.Tab value="status">STATUS</Tabs.Tab>
-                <Tabs.Tab value="ranking">RANKING</Tabs.Tab>
+                <Tabs.Tab value="status">演習状況</Tabs.Tab>
+                <Tabs.Tab value="ranking">ランキング</Tabs.Tab>
               </Tabs.List>
 
               <Tabs.Panel value="status">

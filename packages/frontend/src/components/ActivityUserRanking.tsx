@@ -21,12 +21,12 @@ export default function ActivityUserRanking(){
     )
   }) 
   :
-  <Center><Text>No data</Text></Center>
+  <Center><Text>データがありません...😢</Text></Center>
   
   return (
     <Card>
       <Group justify="space-between">
-        <Title size="h2">Ranking</Title>
+        <Title size="h2">ランキング</Title>
         <ActivitySelectRange
           period={period}
           onClick={setPeriod}

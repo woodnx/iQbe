@@ -77,7 +77,7 @@ export default function QuizMylistButton({
       variant="outline"
       size="xs"
       bg="#fff"
-    >Save</Button>
+    >追加</Button>
   );
 
   const mobileButton = (

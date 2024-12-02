@@ -22,13 +22,14 @@ export default function FilteringWord({
     <>
       <TextInput
         className={className}
-        label="Word Search"
+        label="キーワードによる絞り込み"
+        placeholder="キーワードを入力"
         {...wordInputProps}
         {...others}
       />
       <Radio.Group 
         mt="sm"
-        label="Search Option"
+        label="検索範囲"
         value={wordSearchOption.value}
         onChange={(v) => {
           if (v == "1" || v == "2" || v == "3") {

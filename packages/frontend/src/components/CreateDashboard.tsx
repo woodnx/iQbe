@@ -33,8 +33,8 @@ export default function CreateDashboard() {
     <>
       <Tabs defaultValue="single">
         <Tabs.List grow>
-          <Tabs.Tab value="single">Single</Tabs.Tab>
-          <Tabs.Tab value="file">CSV file</Tabs.Tab>
+          <Tabs.Tab value="single">シングル</Tabs.Tab>
+          <Tabs.Tab value="file">CSVファイル</Tabs.Tab>
         </Tabs.List>
 
         <Tabs.Panel value="single" pt="xs">

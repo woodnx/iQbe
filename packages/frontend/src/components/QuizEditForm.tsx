@@ -120,7 +120,7 @@ export default function QuizEditForm({
           <Button
             disabled={!form.isValid()}
             type="submit"
-          >{ !!question ? 'Edit' : 'Create' }</Button>
+          >保存</Button>
         </Group>
       </form>
     </Card>

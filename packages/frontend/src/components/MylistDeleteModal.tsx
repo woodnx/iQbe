@@ -27,7 +27,7 @@ export default function MylistDeleteModal({
       radius="xl" 
       leftSection={icon}
       onClick={open}
-    >Delete</Button>
+    >削除</Button>
   );
 
   const mobileButton = (
@@ -47,7 +47,7 @@ export default function MylistDeleteModal({
       <Modal 
         opened={opened} 
         onClose={close}
-        title={<Text fw={500} size="xl">Delete Mylist</Text>}
+        title="マイリストの削除"
         size={ isMobile ? 'xs' : 'md' }
         centered
       >
@@ -58,12 +58,12 @@ export default function MylistDeleteModal({
             variant="outline"
             color="dark"
             onClick={close}
-          >Cancel</Button>
+          >キャンセル</Button>
           <Button 
             color="red"
             onClick={del}
             leftSection={icon}
-          >Delete</Button>
+          >削除</Button>
         </Group>
       </Modal>
       { isMobile ? mobileButton : defaultButton }

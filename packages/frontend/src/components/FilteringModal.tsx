@@ -47,7 +47,7 @@ export default function FilteringModal({
       variant="outline"
       color="orange"
       { ...others }
-    >Filtering</Button>
+    >絞り込み</Button>
   );
 
   const mobileButton = (
@@ -67,7 +67,7 @@ export default function FilteringModal({
       <Modal 
         opened={innerOpened} 
         onClose={() => innerOnClose()}
-        title="Filtering Quiz"
+        title="絞り込み"
         size="lg"
         fullScreen={isMobile}
         pos="absolute"
@@ -96,7 +96,7 @@ export default function FilteringModal({
               apply(workbooks, keywordProps.value, keywordOption, perPage);
               close();
             }}
-          >Search</Button>
+          >検索</Button>
         </Group>
       </Modal>
       { isMobile ? mobileButton : defaultButton }

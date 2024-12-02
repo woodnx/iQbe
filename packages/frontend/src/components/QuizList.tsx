@@ -41,7 +41,7 @@ export default function QuizList({
           />
         ))
       }
-      { quizzes.length == 0 ? <Center>No data</Center> : null }
+      { quizzes.length == 0 ? <Center>何も見つかりませんでした...😢</Center> : null }
       </>
       : 
       <Center>
