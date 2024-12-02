@@ -5,6 +5,7 @@ import { $api } from '@/utils/client';
 import { Tabs } from '@mantine/core';
 
 import CsvFileImporter from './CsvFileImporter';
+import { notifications } from '@mantine/notifications';
 
 type QuizEditSubmitValues = paths["/quizzes"]["post"]["requestBody"]["content"]["application/json"];
 
@@ -18,15 +19,32 @@ export default function CreateDashboard() {
   const { mutate } = $api.useMutation("post", "/quizzes");
 
   const submit = ({ question, answer, category, tags, subCategory, wid, isPublic }: QuizEditSubmitValues) => {
-    mutate({ body: {
-      question,
-      answer,
-      category,
-      tags,
-      subCategory,
-      wid,
-      isPublic,
-    }});
+    mutate({ 
+        body: {
+          question,
+          answer,
+          category,
+          tags,
+          subCategory,
+          wid,
+          isPublic,
+        }
+      }, {
+        onSuccess:() => {
+          notifications.show({
+            title: '新しいクイズを作成しました',
+            message: '',
+          });
+        },
+        onError: () => {
+          notifications.show({
+            title: '何らかの障害が発生しました',
+            message: '何度も続く場合はサポート担当に問い合わせてください',
+            color: 'red',
+          });
+        }
+      }
+    );
   };
 
   return (

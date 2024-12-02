@@ -1,12 +1,15 @@
-import { ComponentProps, useState } from "react";
-import { ActionIcon, Button, Checkbox, Divider, Menu } from "@mantine/core";
-import { useDisclosure } from "@mantine/hooks";
-import { IconPlaylistAdd, IconPlus } from "@tabler/icons-react";
-import classes from "./styles/QuizMylistButton.module.css";
-import { MylistInformation } from "@/types";
-import { useIsMobile } from "@/contexts/isMobile";
-import MylistCreateModal from "./MylistCreateModal";
-import { $api } from "@/utils/client";
+import { ComponentProps, useState } from 'react';
+
+import { useIsMobile } from '@/contexts/isMobile';
+import { MylistInformation } from '@/types';
+import { $api } from '@/utils/client';
+import { ActionIcon, Button, Checkbox, Divider, Menu } from '@mantine/core';
+import { useDisclosure } from '@mantine/hooks';
+import { notifications } from '@mantine/notifications';
+import { IconPlaylistAdd, IconPlus } from '@tabler/icons-react';
+
+import MylistCreateModal from './MylistCreateModal';
+import classes from './styles/QuizMylistButton.module.css';
 
 interface Props extends ComponentProps<typeof Button> {
   qid: string,
@@ -55,6 +58,10 @@ export default function QuizMylistButton({
           },
         });
         setSelectedMylistIdx([...selectedMyListIdx, arrayIdx]);
+        notifications.show({
+          title: 'マイリストに追加',
+          message: 'マイリストにクイズを追加しました',
+        });
       } 
       else {  // delete quiz from mylist
         deleteQuizFromMylist({ 
@@ -64,8 +71,17 @@ export default function QuizMylistButton({
           },
         });
         setSelectedMylistIdx(selectedMyListIdx.filter(idx => idx != arrayIdx));
+        notifications.show({
+          title: 'マイリストから削除',
+          message: 'マイリストからクイズを削除しました',
+        });
       }
     } catch(e) {
+      notifications.show({
+        title: '何らかの障害が発生しました',
+        message: '何度も続く場合はサポート担当に問い合わせてください',
+        color: 'red',
+      });
       return;
     }
   };
