@@ -67,6 +67,7 @@ export default function HistoryDateRange({
           <DatePicker 
             type="range" 
             allowSingleDateInRange
+            monthLabelFormat="YYYY年 M月"
             value={innerDates}
             onChange={setDates} 
           />

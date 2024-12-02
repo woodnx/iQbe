@@ -25,17 +25,17 @@ export default function MylistCreateModal({
       opened={opened} 
       onClose={onClose}
       size={ isMobile ? 'xs' : 'md' }
+      title="マイリストの新規作成"
       centered
       zIndex={10000}
     >
       <TextInput 
-        label="Mylist name"
         {...mylistNameProps}
       />
-      <Group mt="xl" justify="right">
+      <Group mt="sm" justify="right">
         <Button
           onClick={create}
-        >Create</Button>
+        >新規作成</Button>
       </Group>
     </Modal>
   )

@@ -40,7 +40,7 @@ export default function QuizCard({
       color="violet.4"
       onClick={() => setInnerIsHidden(false)}
     >
-      Show answer
+      解答を表示
     </Button>
   )
 

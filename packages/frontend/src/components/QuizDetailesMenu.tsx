@@ -36,13 +36,13 @@ export default function({
         </ActionIcon>
       </Menu.Target>
       <Menu.Dropdown>
-        <Menu.Item>Show Details</Menu.Item>
+        <Menu.Item>詳細を表示</Menu.Item>
         <Menu.Item 
           disabled={!isCreated}
           onClick={() =>
             modals.openContextModal({
               modal: 'quizEdit',
-              title: 'Edit Quiz',
+              title: 'クイズを編集',
               innerProps: {
                 qid,
                 question,
@@ -54,9 +54,9 @@ export default function({
                 isPublic,
               },
               size: 'xl',
-              zIndex: 100
+              zIndex: 200
           })}
-        >Edit</Menu.Item>
+        >クイズを編集</Menu.Item>
       </Menu.Dropdown>
     </Menu>
   )

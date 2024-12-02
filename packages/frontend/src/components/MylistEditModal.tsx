@@ -1,6 +1,6 @@
 import { useIsMobile } from '@/contexts/isMobile';
 import { useInput } from '@/hooks';
-import { ActionIcon, BoxProps, Button, Group, Modal, Text, TextInput } from '@mantine/core';
+import { ActionIcon, BoxProps, Button, Group, Modal, TextInput } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { IconPencil } from '@tabler/icons-react';
 
@@ -32,7 +32,7 @@ export default function MylistEditModal({
       radius="xl" 
       leftSection={icon}
       onClick={open}
-    >Edit</Button>
+    >編集</Button>
   );
 
   const mobileButton = (
@@ -52,7 +52,7 @@ export default function MylistEditModal({
       <Modal 
         opened={opened} 
         onClose={close}
-        title={<Text fw={500} size="xl">Edit Mylist</Text>}
+        title="マイリストの編集"
         size={ isMobile ? 'xs' : 'md' }
         centered
       >
@@ -62,13 +62,13 @@ export default function MylistEditModal({
         <Group justify="space-between" mt="sm">
           <Button 
             variant="outline"
-            color="dark"
+            color="gray"
             onClick={close}
-          >Cancel</Button>
+          >キャンセル</Button>
           <Button 
             onClick={() => edit(newNameProps.value)}
             leftSection={icon}
-          >Save</Button>
+          >保存</Button>
         </Group>
       </Modal>
       { isMobile ? mobileButton : defaultButton }

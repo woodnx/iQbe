@@ -2,6 +2,7 @@ import { paths } from 'api/schema';
 
 import { $api } from '@/utils/client';
 import { ContextModalProps } from '@mantine/modals';
+import { notifications } from '@mantine/notifications';
 
 import QuizEditForm from './QuizEditForm';
 
@@ -23,17 +24,33 @@ export default function({ context, id, innerProps }: ContextModalProps<Props>) {
   const { mutate } = $api.useMutation("put", "/quizzes/{qid}");
   const submit = async ({ question, answer, tags, category, subCategory, wid, isPublic }: QuizEditSubmitValues) => {
     mutate({ 
-      body: {
-        question,
-        answer,
-        category,
-        subCategory,
-        tags,
-        wid,
-        isPublic,
+        body: {
+          question,
+          answer,
+          category,
+          subCategory,
+          tags,
+          wid,
+          isPublic,
+        },
+        params: { path: { qid } }
       },
-      params: { path: { qid } }
-    });
+      {
+        onSuccess:() => {
+          notifications.show({
+            title: 'クイズを編集しました',
+            message: '',
+          });
+        },
+        onError: () => {
+          notifications.show({
+            title: '何らかの障害が発生しました',
+            message: '何度も続く場合はサポート担当に問い合わせてください',
+            color: 'red',
+          });
+        }
+      }
+    );
     context.closeModal(id);
   }
 

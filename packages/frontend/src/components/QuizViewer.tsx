@@ -125,6 +125,7 @@ export default function({
             />
             <QuizTransfarButton
               apply={toTransfar}
+              disabled={quizzes?.length === 0}
             />
           </Group>
         }

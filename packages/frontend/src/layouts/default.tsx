@@ -50,22 +50,22 @@ export default function DefaultLayout() {
 
   const mockdata = [
     {
-      label: 'Activity',
+      label: 'アクティビティ',
       icon: IconActivity,
       link: '/',
     },
     {
-      label: 'Search',
+      label: '検索',
       icon: IconSearch,
       link: '/search',
     },
     {
-      label: 'Practice',
+      label: '演習',
       icon: IconSchool,
       link: '/practice',
     },
     {
-      label: 'Create',
+      label: '作問',
       icon: IconPencil,
       link: '/create',
       links: [
@@ -77,17 +77,17 @@ export default function DefaultLayout() {
       ]
     },
     {
-      label: 'Favorite',
+      label: 'お気に入り',
       icon: IconStar,
       link: '/favorite'
     },
     {
-      label: 'History',
+      label: '履歴',
       icon: IconHistory,
       link: '/history'
     },
     {
-      label: 'もっとみる',
+      label: 'マイリスト',
       icon: IconBooks,
       link: '/mylist',
       isTab: true,

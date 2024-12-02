@@ -8,6 +8,7 @@ import { useMylists } from '@/hooks/useMylists';
 import useQuizzes from '@/hooks/useQuizzes';
 import { Card, getGradient, Group, Text, useMantineTheme } from '@mantine/core';
 import { $api } from '@/utils/client';
+import { notifications } from '@mantine/notifications';
 
 export default function Mylist(){
   const { mid } = useParams();
@@ -45,6 +46,10 @@ export default function Mylist(){
       mid,
     }});
     navigator('/');
+    notifications.show({
+      title: 'マイリストを削除しました',
+      message: '',
+    })
   }
 
   const MylistCard = () => (

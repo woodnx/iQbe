@@ -33,10 +33,10 @@ export default function CsvDropzone(props: Partial<DropzoneProps>) {
 
         <div>
           <Text size="xl" inline>
-            Drag CSV file here or click to select files
+            CSVファイルをドラッグするか、クリックしてファイルを選択してください
           </Text>
           <Text size="sm" c="dimmed" inline mt={7}>
-            Attach as many files as you like, each file should not exceed 5mb
+            ファイルサイズは5MBまで
           </Text>
         </div>
       </Group>

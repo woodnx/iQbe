@@ -69,7 +69,7 @@ export default function FilteringWorkbook({
       {...others}
     >
       <Combobox.DropdownTarget>
-        <PillsInput pointer onClick={() => combobox.openDropdown()}>
+        <PillsInput pointer onClick={() => combobox.openDropdown()} label="問題集による絞り込み">
           <Pill.Group>
             { pills }
             <Combobox.EventsTarget>
@@ -77,7 +77,7 @@ export default function FilteringWorkbook({
                 onFocus={() => combobox.openDropdown()}
                 onBlur={() => combobox.closeDropdown()}
                 value={search}
-                placeholder="Search values"
+                placeholder="問題集名を入力"
                 onChange={(event) => {
                   combobox.updateSelectedOptionIndex();
                   setSearch(event.currentTarget.value);
@@ -97,7 +97,7 @@ export default function FilteringWorkbook({
       <Combobox.Dropdown>
         <Combobox.Options>
           <ScrollArea.Autosize type="scroll" mah={200}>
-            {options && options?.length > 0 ? options : <Combobox.Empty>Nothing found...</Combobox.Empty>}
+            {options && options?.length > 0 ? options : <Combobox.Empty>何も見つかりませんでした...😢</Combobox.Empty>}
           </ScrollArea.Autosize>
         </Combobox.Options>
       </Combobox.Dropdown>
