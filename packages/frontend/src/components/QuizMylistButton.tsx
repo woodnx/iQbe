@@ -4,12 +4,11 @@ import { useIsMobile } from '@/contexts/isMobile';
 import { MylistInformation } from '@/types';
 import { $api } from '@/utils/client';
 import { ActionIcon, Button, Checkbox, Divider, Menu } from '@mantine/core';
-import { useDisclosure } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
 import { IconPlaylistAdd, IconPlus } from '@tabler/icons-react';
 
-import MylistCreateModal from './MylistCreateModal';
 import classes from './styles/QuizMylistButton.module.css';
+import { modals } from '@mantine/modals';
 
 interface Props extends ComponentProps<typeof Button> {
   qid: string,
@@ -22,31 +21,10 @@ export default function QuizMylistButton({
   registerdMylistId,
   mylists,
 }: Props) {
-  const [ creating, create ] = useDisclosure(false);
   const [ selectedMyListIdx, setSelectedMylistIdx ] = useState(registerdMylistId.map(id => mylists?.findIndex(list => list.mid == id)));
   const isMobile = useIsMobile();
-  const { mutate: addMylist } = $api.useMutation("post", "/mylists");
   const { mutate: addQuizToMylist } = $api.useMutation("post", "/register");
   const { mutate: deleteQuizFromMylist } = $api.useMutation("post", "/unregister")
-
-  const createMylist = async (mylistname: string) => {
-    try {
-      addMylist({ body: {
-        listName: mylistname,
-      }}, {
-        onSuccess: (({ mid }) => {
-          addQuizToMylist({
-            body: { 
-              qid,
-              mid,
-            },
-          });
-        }),
-      });
-    } catch(e) {
-      return;
-    }
-  };
 
   const saveToList = async (mid: string, arrayIdx: number) => {
     try {
@@ -108,12 +86,6 @@ export default function QuizMylistButton({
 
   return (
     <>
-      <MylistCreateModal 
-        opened={creating} 
-        onClose={create.close}
-        onCreate={createMylist}
-        zIndex={50}
-      />
       <Menu 
         shadow="sm" 
         width={200} 
@@ -141,7 +113,18 @@ export default function QuizMylistButton({
           <Divider/>
           <Menu.Item 
             leftSection={<IconPlus size={14}/>}
-            onClick={create.open}
+            onClick={() => {
+              modals.openContextModal({
+                modal: 'mylistCreate',
+                title: 'マイリストを新規作成',
+                innerProps: {
+                  qid
+                },
+                size: 'md',
+                centered: true,
+                zIndex: 10000,
+              })
+            }}
           >
             マイリストを作成
           </Menu.Item>
