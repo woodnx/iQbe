@@ -2,20 +2,20 @@ import { useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
 import MylistDeleteModal from '@/components/MylistDeleteModal';
-import MylistEditModal from '@/components/MylistEditModal';
+import MylistEditModalButton from '@/components/MylistEditModalButton';
 import QuizViewer from '@/components/QuizViewer';
 import { useMylists } from '@/hooks/useMylists';
 import useQuizzes from '@/hooks/useQuizzes';
-import { Card, getGradient, Group, Text, useMantineTheme } from '@mantine/core';
 import { $api } from '@/utils/client';
+import { Card, getGradient, Group, Text, useMantineTheme } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
+import { modals } from '@mantine/modals';
 
 export default function Mylist(){
   const { mid } = useParams();
   const { setParams } = useQuizzes();
   const navigator = useNavigate();
   const { mylists } = useMylists();
-  const { mutate: editMylist } = $api.useMutation("put", "/mylists");
   const { mutate: deleteMylist } = $api.useMutation("delete", "/mylists");
 
   const mylistName = mylists?.find(list => list.mid == mid)?.name;
@@ -32,13 +32,6 @@ export default function Mylist(){
   if (!mid) {
     navigator('/404');
     return;
-  }
-
-  const toEdit = async (listName: string) => {
-    editMylist({ body: {
-      mid,
-      listName,
-    }});
   }
 
   const toDelete = async () => {
@@ -65,10 +58,21 @@ export default function Mylist(){
       <Group justify="space-between">
         <Text fw={700} fz={25}>{ mylistName }</Text>
         <Group justify="md">
-          <MylistEditModal
-            mylistName={mylistName || ''}
-            onSave={toEdit}
-          />
+          <MylistEditModalButton
+            onClick={() => {
+              modals.openContextModal({
+                modal: 'mylistEdit',
+                title: 'マイリストを編集',
+                innerProps: {
+                  mid,
+                  name: mylistName || '',
+                },
+                size: 'md',
+                centered: true,
+                zIndex: 200,
+              })
+            }}
+          /> 
           <MylistDeleteModal
             onDelete={toDelete}
           />

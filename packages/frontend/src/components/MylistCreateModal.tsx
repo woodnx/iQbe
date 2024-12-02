@@ -1,42 +1,50 @@
-import { Button, Group, Modal, ModalProps, TextInput } from "@mantine/core";
-import { useInput } from "@/hooks";
-import { useIsMobile } from "@/contexts/isMobile";
+import { $api } from '@/utils/client';
+import { BoxProps } from '@mantine/core';
+import { ContextModalProps } from '@mantine/modals';
 
-interface Props extends ModalProps {
-  onCreate?: (mylistName: string) => void,
+import MylistEditForm from './MylistEditForm';
+import { notifications } from '@mantine/notifications';
+
+interface MylistCreateModalInnerProps extends BoxProps {
+  qid: string,
 }
 
 export default function MylistCreateModal({
-  opened,
-  onClose,
-  onCreate = () => {},
-}: Props) {
-  const [ mylistNameProps, Reset ] = useInput('');
-  const isMobile = useIsMobile();
+  context, 
+  id,
+  innerProps,
+}: ContextModalProps<MylistCreateModalInnerProps>){
+  const { qid } = innerProps;
+  const { mutate: addMylist } = $api.useMutation("post", "/mylists");
+  const { mutate: addQuizToMylist } = $api.useMutation("post", "/register");
 
-  const create = () => {
-    onCreate(mylistNameProps.value);
-    onClose();
-    Reset();
-  }
-
+  const toCreate = async (mylistname: string) => {
+    try {
+      addMylist({ body: {
+        listName: mylistname,
+      }}, {
+        onSuccess: (({ mid }) => {
+          addQuizToMylist({
+            body: { 
+              qid,
+              mid,
+            },
+          });
+          notifications.show({
+            title: 'マイリストを新規作成しました',
+            message: 'マイリストを作成し、クイズを追加しました',
+          });
+        }),
+      });
+    } catch(e) {
+      return;
+    }
+    context.closeModal(id);
+  };
   return (
-    <Modal 
-      opened={opened} 
-      onClose={onClose}
-      size={ isMobile ? 'xs' : 'md' }
-      title="マイリストの新規作成"
-      centered
-      zIndex={10000}
-    >
-      <TextInput 
-        {...mylistNameProps}
-      />
-      <Group mt="sm" justify="right">
-        <Button
-          onClick={create}
-        >新規作成</Button>
-      </Group>
-    </Modal>
-  )
+    <MylistEditForm 
+      onSave={toCreate}
+      onClose={() => context.closeModal(id)}
+    />
+  );
 }

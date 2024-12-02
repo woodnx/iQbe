@@ -9,14 +9,18 @@ import { Notifications } from '@mantine/notifications';
 import CategoryCreateModal from './components/CategoryCreateModal';
 import CategoryDeleteModal from './components/CategoryDeleteModal';
 import CategoryEditModal from './components/CategoryEditModal';
+import MylistEditModal from './components/MylistEditModal';
 import QuizEditModal from './components/QuizEditModal';
 import Layout from './layouts';
+import MylistCreateModal from './components/MylistCreateModal';
 
 const modals = {
   quizEdit: QuizEditModal,
   categoryEdit: CategoryEditModal,
   categoryCreate: CategoryCreateModal,
   categoryDelete: CategoryDeleteModal,
+  mylistCreate: MylistCreateModal,
+  mylistEdit: MylistEditModal,
 };
 
 declare module '@mantine/modals' {
