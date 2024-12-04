@@ -234,7 +234,7 @@ model tagging {
 
 model tags {
   id          BigInt    @id @default(autoincrement())
-  label       String    @db.VarChar(128)
+  label       String    @db.VarChar(128) @unique
   created     DateTime  @db.DateTime(0)
   modified    DateTime  @db.DateTime(0)
   tagging     tagging[]
