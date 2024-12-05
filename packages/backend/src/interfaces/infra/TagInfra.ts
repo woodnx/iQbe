@@ -28,7 +28,7 @@ export default class TagInfra implements ITagRepository {
     ])
     .where('tag_id', '=', tag.id)
     .executeTakeFirst()
-    .then(result => !!result ? Number(result) : 0);
+    .then(result => !!result ? Number(result.count) : 0);
 
     return Tag.reconstruct(tag.id, tag.label, tag.created, usageCount);
   }
@@ -52,7 +52,7 @@ export default class TagInfra implements ITagRepository {
       ])
       .where('tag_id', '=', tag.id)
       .executeTakeFirst()
-      .then(result => !!result ? Number(result) : 0);
+      .then(result => !!result ? Number(result.count) : 0);
 
       return Tag.reconstruct(tag.id, tag.label, tag.created, usageCount);
     }));
@@ -65,6 +65,9 @@ export default class TagInfra implements ITagRepository {
     .values({
       label: tag.label,
       created: tag.created,
+      modified: tag.created,
+    })
+    .onDuplicateKeyUpdate({
       modified: tag.created,
     })
     .execute();

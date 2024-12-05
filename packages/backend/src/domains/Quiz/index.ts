@@ -100,14 +100,6 @@ export default class Quiz {
     this._tagLabels = tagLabels;
   }
 
-  addTagLabel(tagLabel: string): string[] {
-    return [...this._tagLabels, tagLabel];
-  }
-
-  removeTagLabel(tagLabel: string): string[] {
-    return this._tagLabels.filter(label => label !== tagLabel);
-  }
-
   isPublic(): boolean {
     return !!(this.visibleUids.length == 0)
   }

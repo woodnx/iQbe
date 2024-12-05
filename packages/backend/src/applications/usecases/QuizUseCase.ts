@@ -5,7 +5,7 @@ import ITransactionManager from "../shared/ITransactionManager";
 import Quiz from "@/domains/Quiz";
 import { ApiError } from "api";
 import ITagRepository from "@/domains/Tag/ITagRepository";
-import TagAssignmentService from "@/domains/Quiz/TagAssignmentSerice";
+import TagService from "@/domains/Tag/TagService";
 
 type QuizDTO = components["responses"]["QuizResponse"]["content"]["application/json"];
 
@@ -28,7 +28,7 @@ export default class QuizUseCase {
     wid?: string,
   ): Promise<QuizDTO> {
     const quizService = new QuizService();
-    const tagAssignmentService = new TagAssignmentService(this.quizRepository, this.tagRepository);
+    const tagService = new TagService(this.tagRepository);
 
     const qid = quizService.generateQid();
     const quiz = Quiz.create(
@@ -45,10 +45,7 @@ export default class QuizUseCase {
     );
 
     await this.transactionManager.begin(async () => {
-      for (const tag of tagLabels) {
-        tagAssignmentService.assignTagToQuiz(qid, tag);
-      }
-
+      await tagService.manageTagsToAdd(tagLabels);
       await this.quizRepository.save(quiz);
     });
 
@@ -137,8 +134,8 @@ export default class QuizUseCase {
     subCategoryId?: number,
     wid?: string,
   ): Promise<QuizDTO> {
-    const tagAssignmentService = new TagAssignmentService(this.quizRepository, this.tagRepository);
     const quiz = await this.quizRepository.findByQid(qid);
+    const tagService = new TagService(this.tagRepository);
     const editable = quiz?.isEditable(uid);
 
     if (!quiz) 
@@ -165,22 +162,16 @@ export default class QuizUseCase {
     quiz.editWid(wid || null);
 
     // タグ付与処理
-    const oldTagLabels = quiz.tagLabels;
+    const currentTags = quiz.tagLabels;
     quiz.editTags(tagLabels);
     
+    const tagsToAdd = tagLabels.filter(tag => !currentTags.includes(tag));
+    const tagsToRemove = currentTags.filter(tag => !tagLabels.includes(tag));
+    
     await this.transactionManager.begin(async () => {
-      const addedTags = tagLabels.filter(tag => !oldTagLabels.includes(tag));
-      const removedTags = oldTagLabels.filter(tag => !tagLabels.includes(tag));
-
-      for (const tag of addedTags) {
-        await tagAssignmentService.assignTagToQuiz(qid, tag);
-      }
-
-      for (const tag of removedTags) {
-        await tagAssignmentService.removeTagFromQuiz(qid, tag);
-      }
-
-      await this.quizRepository.save(quiz);
+      await tagService.manageTagsToAdd(tagsToAdd);
+      await this.quizRepository.update(quiz, tagsToAdd, tagsToRemove);
+      await tagService.manageTagsToRemove(tagsToRemove);
     });
     
     return {

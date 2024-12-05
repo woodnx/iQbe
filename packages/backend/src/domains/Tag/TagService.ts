@@ -1,3 +1,4 @@
+import { privateDecrypt } from "crypto";
 import Tag from ".";
 import ITagRepository from "./ITagRepository";
 
@@ -12,17 +13,19 @@ export default class TagService {
     return !!tag;
   }
 
-  async manageTag(currentTags: string[], newTags: string[]): Promise<string[]> {
-    const tagsToAdd = newTags.filter(tag => !currentTags.includes(tag));
-    const tagsToRemove = currentTags.filter(tag => !newTags.includes(tag));
-
+  async manageTagsToAdd(tagsToAdd: string[]): Promise<string[]> {
     for (const label of tagsToAdd) {
       const _tag = await this.tagRepository.findByLabel(label);
-      const tag = _tag || Tag.create(label);
+      const tag = _tag || Tag.create(label); // Tagが存在しなかったら新規作成
 
       tag.incrementTagUsage();
+      await this.tagRepository.save(tag);
     }
 
+    return tagsToAdd;
+  }
+
+  async manageTagsToRemove(tagsToRemove: string[]): Promise<string[]> {
     for (const label of tagsToRemove) {
       const tag = await this.tagRepository.findByLabel(label);
 
@@ -36,6 +39,6 @@ export default class TagService {
       }
     }
 
-    return newTags;
+    return tagsToRemove;
   }
 }

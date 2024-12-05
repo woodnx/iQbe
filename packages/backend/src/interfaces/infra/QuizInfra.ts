@@ -15,6 +15,53 @@ export default class QuizInfra implements IQuizRepository, IQuizQueryService {
     private clientManager: KyselyClientManager,
   ) {}
 
+  private async addTagToQuiz(qid: string, tagLabel: string) {
+    const client = this.clientManager.getClient();
+
+    const tagId = await client.selectFrom('tags')
+    .select(['id'])
+    .where('label', '=', tagLabel)
+    .executeTakeFirstOrThrow()
+    .then(tag => tag.id);
+
+    const quizId = await client.selectFrom('quizzes')
+    .select(['id'])
+    .where('qid', '=', qid)
+    .executeTakeFirstOrThrow()
+    .then(quiz => quiz.id)
+
+    await client.insertInto('tagging')
+    .values({
+      tag_id: tagId,
+      quiz_id: quizId,
+      registered: new Date(),
+    })
+    .execute();
+  }
+
+  private async removeTagFromQuiz(qid: string, tagLabel: string) {
+    const client = this.clientManager.getClient();
+
+    const tagId = await client.selectFrom('tags')
+    .select(['id'])
+    .where('label', '=', tagLabel)
+    .executeTakeFirstOrThrow()
+    .then(tag => tag.id);
+
+    const quizId = await client.selectFrom('quizzes')
+    .select(['id'])
+    .where('qid', '=', qid)
+    .executeTakeFirstOrThrow()
+    .then(quiz => quiz.id)
+
+    await client.deleteFrom('tagging')
+    .where(({ and, eb }) => and([
+      eb('tag_id', '=', tagId),
+      eb('quiz_id', '=', quizId),
+    ]))
+    .execute();
+  }
+
   async findMany(uid: string, option: findOption = {}): Promise<QuizDTO[]> {
     const client = this.clientManager.getClient();
 
@@ -458,7 +505,7 @@ export default class QuizInfra implements IQuizRepository, IQuizQueryService {
     }
   }
 
-  async update(quiz: Quiz): Promise<void> {
+  async update(quiz: Quiz, tagsToAdd: string[], tagsToRemove: string[]): Promise<void> {
     const client = this.clientManager.getClient();
 
     const [ workbookId, userId ] = await Promise.all([
@@ -517,6 +564,13 @@ export default class QuizInfra implements IQuizRepository, IQuizQueryService {
     .where('qid', '=', quiz.qid)
     .executeTakeFirstOrThrow()
     .then(quiz => quiz.id);
+
+    for (const tag of tagsToAdd) {
+      await this.addTagToQuiz(quiz.qid, tag);
+    }
+    for (const tag of tagsToRemove) {
+      await this.removeTagFromQuiz(quiz.qid, tag);
+    }
 
     if (isChangedVisibleUser) {
       if (quiz.isPublic()) { // limited / private -> publicに変更
