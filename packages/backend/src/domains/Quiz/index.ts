@@ -1,8 +1,5 @@
 export default class Quiz {
-  private _total: number;
-  private _right: number;
-
-  constructor(
+  private constructor(
     private _qid: string,
     private _question: string,
     private _answer: string,
@@ -13,9 +10,66 @@ export default class Quiz {
     private _subCategoryId: number | null,
     private _creatorUid: string,
     private _visibleUids: string[],
+    private _total: number,
+    private _right: number,
+  ) {}
+
+  static create(
+    qid: string,
+    question: string,
+    answer: string,
+    tagLabels: string[],
+    creatorUid: string,
+    visibleUids: string[],
+    anotherAnswer?: string,
+    wid?: string,
+    categoryId?: number,
+    subCategoryId?: number,
   ) {
-    this._total = 0;
-    this._right = 0;
+    return new Quiz(
+      qid,
+      question,
+      answer,
+      anotherAnswer || null,
+      tagLabels,
+      wid || null,
+      categoryId || null,
+      subCategoryId || null,
+      creatorUid,
+      visibleUids,
+      0,
+      0,
+    );
+  }
+
+  static reconstruct(
+    qid: string,
+    question: string,
+    answer: string,
+    tagLabels: string[],
+    total: number,
+    right: number,
+    creatorUid: string,
+    visibleUids: string[],
+    wid: string | null,
+    anotherAnswer: string | null, 
+    categoryId: number | null,
+    subCategoryId: number | null,
+  ) {
+    return new Quiz(
+      qid,
+      question,
+      answer,
+      anotherAnswer,
+      tagLabels,
+      wid,
+      categoryId,
+      subCategoryId,
+      creatorUid,
+      visibleUids,
+      total,
+      right,
+    );
   }
 
   editQuestion(question: string) {

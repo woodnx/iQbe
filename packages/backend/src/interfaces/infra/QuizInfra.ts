@@ -296,17 +296,19 @@ export default class QuizInfra implements IQuizRepository, IQuizQueryService {
       .then(tags => tags.map(t => t.label)),
     ]);
 
-    return new Quiz(
+    return Quiz.reconstruct(
       quiz.qid,
       quiz.question,
       quiz.answer,
-      quiz.anotherAnswer,
       tags,
+      quiz.total,
+      quiz.right || 0,
+      quiz.creatorUid,
+      visibleUser || [],
+      quiz.anotherAnswer,
       quiz.wid,
       quiz.categoryId,
       quiz.subCategoryId,
-      quiz.creatorUid,
-      visibleUser || [],
     );
   }
 
@@ -359,17 +361,19 @@ export default class QuizInfra implements IQuizRepository, IQuizQueryService {
         .then(tags => tags.map(t => t.label)),
       ]);
 
-      return new Quiz(
+      return Quiz.reconstruct(
         quiz.qid,
         quiz.question,
         quiz.answer,
-        quiz.anotherAnswer,
         tags,
+        quiz.total,
+        quiz.right || 0,
+        quiz.creatorUid,
+        visibleUser || [],
+        quiz.anotherAnswer,
         quiz.wid,
         quiz.categoryId,
         quiz.subCategoryId,
-        quiz.creatorUid,
-        visibleUser || [],
       );
     }));
 

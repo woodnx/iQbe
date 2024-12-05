@@ -31,17 +31,17 @@ export default class QuizUseCase {
     const tagAssignmentService = new TagAssignmentService(this.quizRepository, this.tagRepository);
 
     const qid = quizService.generateQid();
-    const quiz = new Quiz(
+    const quiz = Quiz.create(
       qid,
       question,
       answer,
-      anotherAnswer || null,
       tagLabels,
-      wid || null,
-      categoryId || null,
-      subCategoryId || null,
       uid,
       limitedUser,
+      anotherAnswer,
+      wid,
+      categoryId,
+      subCategoryId,
     );
 
     await this.transactionManager.begin(async () => {
@@ -89,17 +89,17 @@ export default class QuizUseCase {
       return Promise.all(quizzes.map(async (_quiz) => {
         const qid = quizService.generateQid();
 
-        const quiz = new Quiz(
+        const quiz = Quiz.create(
           qid,
           _quiz.question,
           _quiz.answer,
-          _quiz.anotherAnswer || null,
           _quiz.tagLabels,
-          _quiz.wid || null,
-          _quiz.categoryId || null,
-          _quiz.subCategoryId || null,
           _quiz.uid,
           _quiz.limitedUser,
+          _quiz.anotherAnswer,
+          _quiz.wid,
+          _quiz.categoryId,
+          _quiz.subCategoryId,
         );
 
         await this.quizRepository.save(quiz);
