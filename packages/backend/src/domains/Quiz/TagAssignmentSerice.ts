@@ -26,7 +26,7 @@ export default class TagAssignmentService {
       throw new Error('No quiz exists for such qid');
 
     if (!exist) {
-      await this.tagRepository.save(new Tag(tagLabel))
+      await this.tagRepository.save(Tag.create(tagLabel))
     }
 
     const tag = await this.tagRepository.findByLabel(tagLabel);
