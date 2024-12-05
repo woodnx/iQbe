@@ -224,8 +224,8 @@ model tagging {
   quiz_id    BigInt   @db.UnsignedBigInt
   registered DateTime @db.DateTime(0)
 
-  tags    tags    @relation(fields: [tag_id], references: [id], onDelete: Cascade, map: "tagging_ibfk_1")
-  quizzes quizzes @relation(fields: [quiz_id], references: [id], onDelete: Cascade, map: "tagging_ibfk_2")
+  tags    tags    @relation(fields: [tag_id], references: [id], map: "tagging_ibfk_1")
+  quizzes quizzes @relation(fields: [quiz_id], references: [id], map: "tagging_ibfk_2")
 
   @@id([tag_id, quiz_id])
   @@index([tag_id], map: "tag_id")
@@ -234,7 +234,7 @@ model tagging {
 
 model tags {
   id          BigInt    @id @default(autoincrement())
-  label       String    @db.VarChar(128)
+  label       String    @db.VarChar(128) @unique
   created     DateTime  @db.DateTime(0)
   modified    DateTime  @db.DateTime(0)
   tagging     tagging[]

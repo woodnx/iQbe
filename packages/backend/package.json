@@ -35,6 +35,8 @@
     "node-fetch": "^3.3.2",
     "nodemailer": "^6.9.7",
     "path": "^0.12.7",
+    "reflect-metadata": "^0.2.2",
+    "tsyringe": "^4.8.0",
     "uid": "^2.0.2"
   },
   "devDependencies": {

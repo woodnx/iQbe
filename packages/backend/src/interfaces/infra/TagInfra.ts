@@ -12,24 +12,50 @@ export default class TagInfra implements ITagRepository {
     const client = this.clientManager.getClient();
 
     const tag = await client.selectFrom('tags')
-    .select(['label'])
+    .select([
+      'id',
+      'label',
+      'created',
+    ])
     .where('label', '=', label)
     .executeTakeFirst();
 
     if (!tag) return null;
 
-    return new Tag(tag.label);
+    const usageCount = await client.selectFrom('tagging')
+    .select(({ fn }) => [
+      fn.count('tag_id').as('count')
+    ])
+    .where('tag_id', '=', tag.id)
+    .executeTakeFirst()
+    .then(result => !!result ? Number(result.count) : 0);
+
+    return Tag.reconstruct(tag.id, tag.label, tag.created, usageCount);
   }
 
   async search(q?: string): Promise<Tag[]> {
     const client = this.clientManager.getClient();
 
     const tags = await client.selectFrom('tags')
-    .select(['label'])
+    .select([
+      'id',
+      'label',
+      'created',
+    ])
     .where(sql`MATCH (label) AGAINST (${q} IN NATURAL LANGUAGE MODE)`)
     .execute();
 
-    return tags.map(tag => new Tag(tag.label));
+    return Promise.all(tags.map(async tag => { 
+      const usageCount = await client.selectFrom('tagging')
+      .select(({ fn }) => [
+        fn.count('tag_id').as('count')
+      ])
+      .where('tag_id', '=', tag.id)
+      .executeTakeFirst()
+      .then(result => !!result ? Number(result.count) : 0);
+
+      return Tag.reconstruct(tag.id, tag.label, tag.created, usageCount);
+    }));
   }
 
   async save(tag: Tag): Promise<void> {
@@ -39,6 +65,9 @@ export default class TagInfra implements ITagRepository {
     .values({
       label: tag.label,
       created: tag.created,
+      modified: tag.created,
+    })
+    .onDuplicateKeyUpdate({
       modified: tag.created,
     })
     .execute();
