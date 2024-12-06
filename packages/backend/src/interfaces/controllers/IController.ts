@@ -10,7 +10,7 @@ export default class IController {
 
   get() {
     return typedAsyncWrapper<'/i', 'get'>(async (req, res) => {
-      const uid = req.uid;
+      const uid = req.user.uid;
 
       const i = await this.userRepository.findByUid(uid);
 
@@ -32,7 +32,7 @@ export default class IController {
     return typedAsyncWrapper<'/i', 'put'>(async (req, res) => {
       const username = req.body.username;
       const nickname = req.body.nickname || undefined;
-      const uid = req.uid;
+      const uid = req.user.uid;
 
       const i = await this.userRepository.findByUid(uid);
       
@@ -58,7 +58,7 @@ export default class IController {
   registerProfileImage() {
     return asyncWrapper(async (req, res) => {
       const file = req.file;
-      const uid = req.uid;
+      const uid = req.user.uid;
       
       if (!file) {
         throw new ApiError({

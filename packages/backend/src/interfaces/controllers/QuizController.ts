@@ -21,7 +21,7 @@ export default class QuizController {
       const wids     = req.query.wids || [];
       const keyword = req.query.keyword || undefined;
       const keywordOption = (req.query.keywordOption) || undefined;
-      const uid = req.uid;
+      const uid = req.user.uid;
       const since = ('since' in req.query) ? Number(req.query.since) || undefined : undefined;
       const until = ('until' in req.query) ? Number(req.query.until) || undefined : undefined;
       const judgements = ('judgements' in req.query) ? req.query.judgements || undefined : undefined;
@@ -51,7 +51,7 @@ export default class QuizController {
       const wids = req.query.wids || [];
       const keyword = req.query.keyword || undefined;
       const keywordOption = (req.query.keywordOption) || undefined;
-      const uid = req.uid;
+      const uid = req.user.uid;
       const since = ('since' in req.query) ? Number(req.query.since) || undefined : undefined;
       const until = ('until' in req.query) ? Number(req.query.until) || undefined : undefined;
       const judgements = ('judgements' in req.query) ? req.query.judgements || undefined : undefined;
@@ -81,7 +81,7 @@ export default class QuizController {
       const subCategory = category !== 0 && !!req.body.subCategory ? Number(req.body.subCategory) : undefined;
       const wid = req.body.wid || undefined;
       const limitedUser = req.body.limitedUser || [];
-      const uid = req.uid;
+      const uid = req.user.uid;
 
       if (!question || !answer) {
         throw new ApiError().invalidParams();
@@ -106,7 +106,7 @@ export default class QuizController {
   multiplePost() {
     return typedAsyncWrapper<"/quizzes/multiple", "post">(async (req, res) => {
       const records = req.body.records;
-      const uid = req.uid;
+      const uid = req.user.uid;
 
       if (!records) {
         throw new ApiError().invalidParams();
@@ -141,7 +141,7 @@ export default class QuizController {
       const subCategory = category !== 0 ? req.body.subCategory || undefined : 0;
       const wid = req.body.wid || undefined;
       const limitedUser = req.body.limitedUser || [];
-      const uid = req.uid;
+      const uid = req.user.uid;
 
       if (!question || !answer || !qid) {
         throw new ApiError().invalidParams();

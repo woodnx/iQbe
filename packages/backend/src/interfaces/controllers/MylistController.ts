@@ -14,7 +14,7 @@ export default class MylistController {
 
   get() {
     return typedAsyncWrapper<"/mylists", "get">(async (req, res) => {
-      const uid = req.uid;
+      const uid = req.user.uid;
 
       const mylists = await this.mylistRepository.findManyByCreatorUid(uid);
 
@@ -28,7 +28,7 @@ export default class MylistController {
 
   post() {
     return typedAsyncWrapper<"/mylists", "post">(async (req, res) => {
-      const uid = req.uid;
+      const uid = req.user.uid;
       const listName = req.body.listName;
       const now = new Date();
 
@@ -70,7 +70,7 @@ export default class MylistController {
   delete() {
     return typedAsyncWrapper<"/mylists", "delete">(async (req, res) => {
       const mid = req.body.mid;
-      const uid = req.uid;
+      const uid = req.user.uid;
       if (!mid) throw new ApiError().invalidParams();
 
       const mylist = await this.mylistRepository.findByMid(mid);

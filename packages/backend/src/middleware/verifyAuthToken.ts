@@ -17,16 +17,20 @@ export default async function (req: Request, res: Response, next: NextFunction) 
 
   try {
     // idTokenを検証
-    const decodedUser = await verifyAccessToken(idToken);
+    const { uid, exp, iat } = await verifyAccessToken(idToken);
 
     const user = await db
     .selectFrom('users')
-    .selectAll()
-    .where('uid', '=', decodedUser.uid)
+    .select([
+      'id as userId',
+      'uid',
+      'username',
+      'permission',
+    ])
+    .where('uid', '=', uid)
     .executeTakeFirstOrThrow();
 
-    req.userId = user.id;
-    req.uid = decodedUser.uid;
+    req.user = { ...user, exp, iat };
 
     next();
   } catch(e) {

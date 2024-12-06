@@ -1,10 +1,18 @@
 import express from 'express';
 import { Send } from 'express-serve-static-core';
 
+type AuthUser = {
+  userId: number,
+  uid: string,
+  username: string,
+  permission: string,
+  iat: number,
+  exp: number,
+}
+
 declare module 'express-serve-static-core' {
   interface Request {
-    userId: number,
-    uid: string,
+    user: AuthUser,
   }
 }
 
