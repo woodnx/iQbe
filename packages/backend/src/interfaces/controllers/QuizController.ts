@@ -162,4 +162,17 @@ export default class QuizController {
       res.status(201).send();
     });
   }
+
+  delete() {
+    return typedAsyncWrapper<"/quizzes/{qid}", "delete">(async (req, res) => {
+      const qid = req.params.qid;
+
+      if (!qid) 
+        throw new ApiError().internalProblems();
+
+      await this.quizUseCase.deleteQuiz(qid);
+
+      res.status(204).send();
+    });
+  }
 }

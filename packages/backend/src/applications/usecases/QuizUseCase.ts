@@ -193,6 +193,18 @@ export default class QuizUseCase {
   }
 
   async deleteQuiz(qid: string): Promise<void> {
-    await this.quizRepository.delete(qid);
+    const tagService = new TagService(this.tagRepository);
+    const quiz = await this.quizRepository.findByQid(qid);
+
+    if (!quiz) 
+      throw new ApiError({
+        title: 'NO_QUIZ',
+        detail: 'This qid is not available id',
+        status: 400,
+        type: 'about:blank'
+      });
+
+    await this.quizRepository.delete(quiz);
+    await tagService.manageTagsToRemove(quiz.tagLabels);
   }
 }

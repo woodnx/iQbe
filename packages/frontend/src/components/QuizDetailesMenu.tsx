@@ -1,5 +1,5 @@
-import { ActionIcon, Menu } from "@mantine/core";
-import { IconDots } from "@tabler/icons-react";
+import { ActionIcon, Menu, rem } from "@mantine/core";
+import { IconDots, IconInfoCircle, IconPencil, IconTrash } from "@tabler/icons-react";
 import { modals } from "@mantine/modals";
 
 interface Props {
@@ -36,9 +36,12 @@ export default function({
         </ActionIcon>
       </Menu.Target>
       <Menu.Dropdown>
-        <Menu.Item>詳細を表示</Menu.Item>
-        <Menu.Item 
+        <Menu.Item
+          leftSection={<IconInfoCircle style={{ width: rem(14), height: rem(14) }}/>}
+        >詳細を表示</Menu.Item>
+        { <Menu.Item 
           disabled={!isCreated}
+          leftSection={<IconPencil style={{ width: rem(14), height: rem(14) }}/>}
           onClick={() =>
             modals.openContextModal({
               modal: 'quizEdit',
@@ -56,7 +59,23 @@ export default function({
               size: 'xl',
               zIndex: 200
           })}
-        >クイズを編集</Menu.Item>
+        >編集</Menu.Item>
+        }
+        <Menu.Item
+          leftSection={<IconTrash style={{ width: rem(14), height: rem(14) }}/>}
+          onClick={() =>
+            modals.openContextModal({
+              modal: 'quizDelete',
+              title: 'クイズを削除',
+              innerProps: {
+                qid,
+              },
+              size: 'md',
+              zIndex: 200
+          })}
+        >
+          削除
+        </Menu.Item>
       </Menu.Dropdown>
     </Menu>
   )

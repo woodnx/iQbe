@@ -603,11 +603,15 @@ export default class QuizInfra implements IQuizRepository, IQuizQueryService {
     }
   }
 
-  async delete(qid: string): Promise<void> {
+  async delete(quiz: Quiz): Promise<void> {
     const client = this.clientManager.getClient();
 
+    for (const tag of quiz.tagLabels) {
+      await this.removeTagFromQuiz(quiz.qid, tag);
+    }
+
     await client.deleteFrom('quizzes')
-    .where('qid', '=', qid)
+    .where('qid', '=', quiz.qid)
     .execute();
   }
 }

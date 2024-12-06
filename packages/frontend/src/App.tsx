@@ -13,9 +13,11 @@ import MylistEditModal from './components/MylistEditModal';
 import QuizEditModal from './components/QuizEditModal';
 import Layout from './layouts';
 import MylistCreateModal from './components/MylistCreateModal';
+import QuizDeleteModal from './components/QuizDeleteModal';
 
 const modals = {
   quizEdit: QuizEditModal,
+  quizDelete: QuizDeleteModal,
   categoryEdit: CategoryEditModal,
   categoryCreate: CategoryCreateModal,
   categoryDelete: CategoryDeleteModal,
