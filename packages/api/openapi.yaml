@@ -1632,11 +1632,15 @@ components:
       in: query
       required: false
       schema: 
-        type: array
-        description: 0(wrong) or 1(right) or 2(through)
-        items:
-          type: number
-          example: [0, 1]
+        anyOf:
+          - type: array
+            description: 0(wrong) or 1(right) or 2(through)
+            items:
+              type: number
+              example: [0, 1]
+          - type: number
+            description: 0(wrong) or 1(right) or 2(through)
+            example: 0
     keyword:
       name: keyword
       in: query

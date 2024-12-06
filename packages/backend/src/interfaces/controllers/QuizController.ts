@@ -3,6 +3,7 @@ import { ApiError } from 'api';
 import IQuizQueryService from '@/applications/queryservices/IQuizQueryService';
 import QuizUseCase from '@/applications/usecases/QuizUseCase';
 import { typedAsyncWrapper } from '@/utils';
+import { isArray, isNumber } from 'lodash';
 
 
 export default class QuizController {
@@ -24,8 +25,13 @@ export default class QuizController {
       const uid = req.user.uid;
       const since = ('since' in req.query) ? Number(req.query.since) || undefined : undefined;
       const until = ('until' in req.query) ? Number(req.query.until) || undefined : undefined;
-      const judgements = ('judgements' in req.query) ? req.query.judgements || undefined : undefined;
       const mid = req.query && ('mid' in req.query) ? req.query.mid || undefined : undefined;
+      const isFavorite = !!req.query.isFavorite;
+      const judgements = req.query.judgements
+        ? isArray(req.query.judgements) 
+        ? req.query.judgements 
+        : [ req.query.judgements ]
+        : undefined;
       
       const quizzes = await this.quizQueryService.findMany(uid, {
         page,
@@ -38,6 +44,7 @@ export default class QuizController {
         until,
         judgements,
         mid,
+        isFavorite,
       });
 
       res.status(200).send(quizzes);
@@ -54,8 +61,13 @@ export default class QuizController {
       const uid = req.user.uid;
       const since = ('since' in req.query) ? Number(req.query.since) || undefined : undefined;
       const until = ('until' in req.query) ? Number(req.query.until) || undefined : undefined;
-      const judgements = ('judgements' in req.query) ? req.query.judgements || undefined : undefined;
       const mid = req.query && ('mid' in req.query) ? req.query.mid || undefined : undefined;
+      const isFavorite = !!req.query.isFavorite;
+      const judgements = req.query.judgements
+        ? isArray(req.query.judgements) 
+        ? req.query.judgements 
+        : [ req.query.judgements ]
+        : undefined;
 
       const size = await this.quizQueryService.count(uid, {
         wids,
@@ -65,6 +77,7 @@ export default class QuizController {
         until,
         judgements,
         mid,
+        isFavorite,
       });
 
       res.status(200).send({ size });

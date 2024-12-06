@@ -16,6 +16,8 @@ const useQuizSize = (
         judgements: params.judgements,
         since: params.since,
         until: params.until,
+        mid: params.mid,
+        isFavorite: params.isFavorite,
       }
     },
     enabled: shouldFetch,
