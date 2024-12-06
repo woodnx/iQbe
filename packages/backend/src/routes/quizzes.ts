@@ -31,4 +31,6 @@ router.post('/multiple', quizController.multiplePost());
 
 router.put('/:qid', quizController.put());
 
+router.delete('/:qid', quizController.delete());
+
 module.exports = router;

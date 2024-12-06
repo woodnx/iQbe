@@ -5,5 +5,5 @@ export default interface IQuizRepository {
   findByTagLabel(tagLabel: string): Promise<Quiz[]>
   save(quiz: Quiz): Promise<void>,
   update(quiz: Quiz, tagsToAdd: string[], tagsToRemove: string[]): Promise<void>,
-  delete(qid: string): Promise<void>,
+  delete(quiz: Quiz): Promise<void>,
 }
