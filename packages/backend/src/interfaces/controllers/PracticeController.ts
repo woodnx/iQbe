@@ -8,7 +8,7 @@ export default class PracticeController {
 
   practice() {
     return typedAsyncWrapper<"/practice", "post">(async (req, res) => {
-      const uid = req.uid;
+      const uid = req.user.uid;
       const qid = req.body.qid;
       const judgement = req.body.judgement;
       const pressedWordPosition = req.body.pressedWord;

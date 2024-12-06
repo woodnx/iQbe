@@ -11,7 +11,7 @@ export default class JudgementController {
     return typedAsyncWrapper<"/histories/{since}/{until}", "get">(async (req, res) => {
       const since = req.params.since;
       const until = req.params.until;
-      const uid = req.uid;
+      const uid = req.user.uid;
       const date = [
         dayjs(Number(since)).toDate(),
         dayjs(Number(until)).toDate(),
