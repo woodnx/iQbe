@@ -264,8 +264,7 @@ export default class QuizInfra implements IQuizRepository, IQuizQueryService {
     if (option.isFavorite) {
       query = query
       .innerJoin('favorites', 'favorites.quiz_id', 'quizzes.id')
-      .where('favorites.user_id', '=', userId)
-      .orderBy('favorites.registered desc'); 
+      .where('favorites.user_id', '=', userId);
     }
     else if (!!option.since && !!option.until) {
       const since = dayjs(option.since).toDate() ;
@@ -299,7 +298,7 @@ export default class QuizInfra implements IQuizRepository, IQuizQueryService {
 
     const quizzes = await query.execute();
 
-    return quizzes[0].size;
+    return !!quizzes.length ? quizzes[0].size : 0;
   }
 
   async findByQid(qid: string): Promise<Quiz | null> {

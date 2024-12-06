@@ -14,7 +14,7 @@ const useQuizzes = (
   const setParams = (v: QuizRequestParams) => {
     queryClient.setQueryData(['params'], v);
   };
-
+  
   const { data: quizzes, error, isLoading } = $api.useQuery('get', `/quizzes`, {
     params: {
       query: {
@@ -27,6 +27,8 @@ const useQuizzes = (
         judgements: params.judgements,
         since: params.since,
         until: params.until,
+        mid: params.mid,
+        isFavorite: params.isFavorite,
       }
     },
     enabled: shouldFetch,
