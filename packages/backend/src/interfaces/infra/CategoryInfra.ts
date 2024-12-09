@@ -73,6 +73,7 @@ export default class CategoryInfra implements ICategoryRepository, ICategoryQuer
         id: category.id, 
         name: category.name, 
         description: category.description,
+        parentId: -1,
         disabled: category.disabled ? true : false,
         sub,
       }
@@ -108,6 +109,7 @@ export default class CategoryInfra implements ICategoryRepository, ICategoryQuer
         id: category.id, 
         name: category.name, 
         description: category.description,
+        parentId: -1,
         disabled: category.disabled ? true : false,
         sub,
       }

@@ -29,6 +29,8 @@ const useQuizzes = (
         until: params.until,
         mid: params.mid,
         isFavorite: params.isFavorite,
+        categories: params.categories,
+        tags: params.tags,
       }
     },
     enabled: shouldFetch,

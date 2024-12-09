@@ -32,6 +32,8 @@ export default class QuizController {
         ? req.query.judgements 
         : [ req.query.judgements ]
         : undefined;
+      const categories = req.query.categories || undefined;
+      const tags = req.query.tags || undefined;
       
       const quizzes = await this.quizQueryService.findMany(uid, {
         page,
@@ -45,6 +47,8 @@ export default class QuizController {
         judgements,
         mid,
         isFavorite,
+        categories,
+        tags
       });
 
       res.status(200).send(quizzes);

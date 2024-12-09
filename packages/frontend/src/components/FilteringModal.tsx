@@ -8,12 +8,14 @@ import { useIsMobile } from "@/contexts/isMobile";
 import FilteringWorkbook from "./FilteringWorkbook";
 import FilteringQuizNumber from "./FilteringQuizNumber";
 import FilteringWord from "./FilteringWord";
+import FilteringCategories from "./FilteringCategories";
 
 interface FilteringModalProps extends BoxProps {
   apply: (
     workbooks?: string[],
     keyword?: string,
     keywordOption?: KeywordOption,
+    categories?: number[],
     perPage?: number, 
   ) => void,
   initalState?: boolean,
@@ -33,6 +35,7 @@ export default function FilteringModal({
   const [ keywordProps ] = useInput('');
   const [ keywordOption, setkeywordOption ] = useState<KeywordOption>('1')
   const [ perPage, setPerPage ] = useState(100);
+  const [ categories, setCategories ] = useState<number[]>([]);
   const [ opened, { open, close } ] = useDisclosure();
   const isMobile = useIsMobile();
 
@@ -72,17 +75,23 @@ export default function FilteringModal({
         fullScreen={isMobile}
         pos="absolute"
       >
-        <FilteringWorkbook
-          values={workbooks} 
-          onChange={setWorkbooks}
-        />
+        
         <FilteringWord 
           wordInputProps={keywordProps} 
           wordSearchOption={{ 
             value: keywordOption, 
             onChange: setkeywordOption
           }}
-          mt="lg"
+        />
+        <FilteringWorkbook
+          values={workbooks} 
+          onChange={setWorkbooks}
+          mb="lg"
+        />
+        <FilteringCategories 
+          values={categories}
+          onChange={setCategories}
+          mb="lg"
         />
         <FilteringQuizNumber
           value={perPage}
@@ -93,7 +102,13 @@ export default function FilteringModal({
           <Button 
             leftSection={<IconSearch/>}
             onClick={() => { 
-              apply(workbooks, keywordProps.value, keywordOption, perPage);
+              apply(
+                workbooks, 
+                keywordProps.value, 
+                keywordOption, 
+                categories, 
+                perPage
+              );
               close();
             }}
           >検索</Button>

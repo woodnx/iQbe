@@ -48,6 +48,7 @@ export default function({
     workbooks?: string[], 
     keyword?: string, 
     keywordOption?: KeywordOption,
+    categories?: number[],
     perPage?: number,
   ) => {
     setPage(1);
@@ -59,6 +60,7 @@ export default function({
       wids: workbooks, 
       keyword, 
       keywordOption: Number(keywordOption),
+      categories,
     });
   }
 

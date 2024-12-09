@@ -931,6 +931,7 @@ paths:
         - $ref: "#/components/parameters/mid"
         - $ref: "#/components/parameters/isFavorite"
         - $ref: "#/components/parameters/tags"
+        - $ref: "#/components/parameters/categories"
       responses:
         "200":
           $ref: "#/components/responses/QuizzesResponse"
@@ -1091,6 +1092,7 @@ paths:
         - $ref: "#/components/parameters/mid"
         - $ref: "#/components/parameters/isFavorite"
         - $ref: "#/components/parameters/tags"
+        - $ref: "#/components/parameters/categories"
       responses:
         "200":
           description: クイズの総数
@@ -1609,6 +1611,20 @@ paths:
           $ref: "#/components/responses/403Forbidden"
 components:
   parameters:
+    categories: 
+      name: categories
+      in: query
+      required: false
+      description: ジャンルの絞り込み
+      schema:
+        oneOf:
+          - type: array
+            items: 
+              type: number
+          - type: number
+      example: 
+        - 1
+        - 2
     crctAnsRatio: 
       name: crctAnsRatio
       in: query
@@ -1701,9 +1717,11 @@ components:
       in: query
       required: false
       schema: 
-        type: array
-        items: 
-          type: string
+        oneOf:
+          - type: array
+            items: 
+              type: string
+          - type: string
     until:
       name: until
       in: query
@@ -2109,6 +2127,8 @@ components:
           type: boolean
         from: 
           type: string
+        parentId:
+          type: number
         sub: 
           type: array
           items:
@@ -2117,6 +2137,7 @@ components:
         - id
         - name
         - disabled
+        - parentId
     Error: 
       type: object
       properties: 
