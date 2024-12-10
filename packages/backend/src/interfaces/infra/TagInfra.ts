@@ -33,17 +33,21 @@ export default class TagInfra implements ITagRepository {
     return Tag.reconstruct(tag.id, tag.label, tag.created, usageCount);
   }
 
-  async search(q?: string): Promise<Tag[]> {
+  async search(q?: string, all?: boolean): Promise<Tag[]> {
     const client = this.clientManager.getClient();
 
-    const tags = await client.selectFrom('tags')
+    let query = client.selectFrom('tags')
     .select([
       'id',
       'label',
       'created',
-    ])
-    .where(sql`MATCH (label) AGAINST (${q} IN NATURAL LANGUAGE MODE)`)
-    .execute();
+    ]);
+
+    if (!all) {
+      query = query.where(sql`MATCH (label) AGAINST (${q} IN NATURAL LANGUAGE MODE)`);
+    }
+
+    const tags = await query.execute();
 
     return Promise.all(tags.map(async tag => { 
       const usageCount = await client.selectFrom('tagging')

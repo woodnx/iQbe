@@ -9,6 +9,7 @@ import FilteringWorkbook from "./FilteringWorkbook";
 import FilteringQuizNumber from "./FilteringQuizNumber";
 import FilteringWord from "./FilteringWord";
 import FilteringCategories from "./FilteringCategories";
+import FilteringTags from "./FilteringTags";
 
 interface FilteringModalProps extends BoxProps {
   apply: (
@@ -16,6 +17,7 @@ interface FilteringModalProps extends BoxProps {
     keyword?: string,
     keywordOption?: KeywordOption,
     categories?: number[],
+    tags?: string[],
     perPage?: number, 
   ) => void,
   initalState?: boolean,
@@ -36,6 +38,7 @@ export default function FilteringModal({
   const [ keywordOption, setkeywordOption ] = useState<KeywordOption>('1')
   const [ perPage, setPerPage ] = useState(100);
   const [ categories, setCategories ] = useState<number[]>([]);
+  const [ tags, setTags ] = useState<string[]>([]);
   const [ opened, { open, close } ] = useDisclosure();
   const isMobile = useIsMobile();
 
@@ -93,6 +96,10 @@ export default function FilteringModal({
           onChange={setCategories}
           mb="lg"
         />
+        <FilteringTags 
+          values={tags}
+          onChange={setTags}
+        />
         <FilteringQuizNumber
           value={perPage}
           onChange={setPerPage}
@@ -107,6 +114,7 @@ export default function FilteringModal({
                 keywordProps.value, 
                 keywordOption, 
                 categories, 
+                tags,
                 perPage
               );
               close();

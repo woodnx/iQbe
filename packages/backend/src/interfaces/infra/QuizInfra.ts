@@ -127,13 +127,13 @@ export default class QuizInfra implements IQuizRepository, IQuizQueryService {
     if (!!option.tags) {
       if (Array.isArray(option.tags) && option.tags.length) {
         query = query
-        .innerJoin('tagging', 'quiz_id', 'quizzes.id')
+        .innerJoin('tagging', 'tagging.quiz_id', 'quizzes.id')
         .innerJoin('tags', 'tagging.tag_id', 'tags.id')
         .where('tags.label', 'in', option.tags)
       }
       else {
         query = query
-        .innerJoin('tagging', 'quiz_id', 'quizzes.id')
+        .innerJoin('tagging', 'tagging.quiz_id', 'quizzes.id')
         .innerJoin('tags', 'tagging.tag_id', 'tags.id')
         .where('tags.label', '=', option.tags)
       }  
@@ -288,13 +288,13 @@ export default class QuizInfra implements IQuizRepository, IQuizQueryService {
     if (!!option.tags) {
       if (Array.isArray(option.tags) && option.tags.length) {
         query = query
-        .innerJoin('tagging', 'quiz_id', 'quizzes.id')
+        .innerJoin('tagging', 'tagging.quiz_id', 'quizzes.id')
         .innerJoin('tags', 'tagging.tag_id', 'tags.id')
         .where('tags.label', 'in', option.tags)
       }
       else {
         query = query
-        .innerJoin('tagging', 'quiz_id', 'quizzes.id')
+        .innerJoin('tagging', 'tagging.quiz_id', 'quizzes.id')
         .innerJoin('tags', 'tagging.tag_id', 'tags.id')
         .where('tags.label', '=', option.tags)
       }  

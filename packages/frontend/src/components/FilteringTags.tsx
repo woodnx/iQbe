@@ -1,79 +1,95 @@
-import { BoxProps, CheckIcon, Combobox, Group, Pill, PillsInput, ScrollArea, Text, useCombobox } from "@mantine/core";
-import { components } from "api/schema";
+import { useState } from "react";
+import { Badge, BoxProps, CheckIcon, Combobox, Group, Pill, PillsInput, rem, ScrollArea, useCombobox } from "@mantine/core";
+import { $api } from "@/utils/client";
+import { IconTag } from "@tabler/icons-react";
 
-type CategoryBase = components['schemas']['Category'] & components['schemas']['SubCategory'];
-
-interface FilteringCategoriesBaseProps extends BoxProps {
-  data?: CategoryBase[],
-  values?: CategoryBase[] | undefined,
-  onAdd?: (value: CategoryBase) => void,
-  onRemove?: (value: CategoryBase) => void,
-  onChange?: (values: CategoryBase[]) => void
+interface FilteringTagsProps extends BoxProps {
+  values?: string[] | undefined,
+  onAdd?: (value: string) => void,
+  onRemove?: (value: string) => void,
+  onChange?: (values: string[]) => void
 }
 
-export default function FilteringCategoriesBase({ 
-  data = [],
+export default function FilteringTags({ 
   values = [], 
   onChange = () => {},
   onAdd = () => {},
   onRemove = () => {},
   ...others
-}: FilteringCategoriesBaseProps) {
+}: FilteringTagsProps) {
+  const [ search, setSearch ] = useState('');
+  const { data: tags } = $api.useQuery('get', '/tags', {
+    params: {
+      query: {
+        q: search,
+      }
+    }
+  });
+  const { data: tagsAll } = $api.useQuery('get', '/tags', {
+    params: {
+      query: {
+        all: true,
+      }
+    }
+  });
+
   const combobox = useCombobox({
     onDropdownClose: () => combobox.resetSelectedOption(),
     onDropdownOpen: () => combobox.updateSelectedOptionIndex('active'),
   });
 
-  const handleValueSelect = (value?: CategoryBase) => {
+  const handleValueSelect = (value?: string) => {
     if (!value) return;
-    if (values.some(v => v.id === value.id)) return;
+
     onAdd(value);
     onChange([ ...values, value ]);
   }
 
-  const handleValueRemove = (value: CategoryBase) => {
+  const handleValueRemove = (value: string) => {
     onRemove(value);
-    onChange(values.filter(v => v.id !== value.id));
+    onChange(values.filter(v => v !== value));
   }
   
-  const options = data?.map(({ id, name, description }) => (
+  const options = tags?.map(({ label }) => (
     <Combobox.Option 
-      value={String(id)} 
-      key={id} 
+      value={label} 
+      key={label} 
       mb={4}
     >
-      <Group justify="space-between" wrap="nowrap">
-        <div>
-          <Text size="sm" lineClamp={1}>{name}</Text>
-          <Text size="xs" lineClamp={1} opacity={0.65}>
-            {description}
-          </Text>
-        </div>
-        {values.some((v) => v.id == id) ? <CheckIcon size={12} /> : null}
+      <Group>
+        <Badge 
+          color="gray" 
+          radius="sm"
+          variant="light"
+          leftSection={<IconTag style={{ width: rem(12), height: rem(12) }}/>}
+        >
+          { label }
+        </Badge>
+        {values.some(v => v == label) ? <CheckIcon size={12} /> : null}
       </Group>
     </Combobox.Option>
   ));
 
   const pills = values.map((value) => (
     <Pill 
-      key={value.id} 
+      key={value} 
       onRemove={() => handleValueRemove(value)}
       withRemoveButton
     >
-      { data?.filter(({ id }) => id == value.id)[0].name }
+      { tagsAll?.find(({ label }) => label == value)?.label }
     </Pill>
   ));
   
   return (
     <Combobox 
       store={combobox}
-      onOptionSubmit={(v) => handleValueSelect(data?.find(d => d.id == Number(v)))}
+      onOptionSubmit={handleValueSelect}
       withinPortal={true}
       {...others}
     >
       <Combobox.DropdownTarget>
         <PillsInput 
-          label="ジャンルによる絞り込み"
+          label="タグによる絞り込み"
           pointer 
           onClick={() => combobox.openDropdown()}
         >
@@ -81,13 +97,16 @@ export default function FilteringCategoriesBase({
             { pills }
             <Combobox.EventsTarget>
               <PillsInput.Field
-                type="hidden"
+                onFocus={() => combobox.openDropdown()}
                 onBlur={() => combobox.closeDropdown()}
-                onChange={() => {
+                value={search}
+                placeholder="タグ名を入力"
+                onChange={(event) => {
                   combobox.updateSelectedOptionIndex();
+                  setSearch(event.currentTarget.value);
                 }}
                 onKeyDown={(event) => {
-                  if (event.key === 'Backspace') {
+                  if (event.key === 'Backspace' && search.length === 0) {
                     event.preventDefault();
                     handleValueRemove(values[values.length - 1]);
                   }

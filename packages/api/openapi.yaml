@@ -1322,6 +1322,12 @@ paths:
           schema:
             type: string
           example: ジャンル
+        - name: all
+          in: query
+          required: false
+          description: すべてのタグを得るか
+          schema: 
+            type: boolean
       summary: ユーザ自身の作成したタグのリストを取得
       responses:
         "200":

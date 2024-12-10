@@ -49,6 +49,7 @@ export default function({
     keyword?: string, 
     keywordOption?: KeywordOption,
     categories?: number[],
+    tags?: string[],
     perPage?: number,
   ) => {
     setPage(1);
@@ -61,6 +62,7 @@ export default function({
       keyword, 
       keywordOption: Number(keywordOption),
       categories,
+      tags,
     });
   }
 
