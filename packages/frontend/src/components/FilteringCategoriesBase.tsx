@@ -6,6 +6,8 @@ type CategoryBase = components['schemas']['Category'] & components['schemas']['S
 interface FilteringCategoriesBaseProps extends BoxProps {
   data?: CategoryBase[],
   values?: CategoryBase[] | undefined,
+  label?: string,
+  placeholder?: string,
   onAdd?: (value: CategoryBase) => void,
   onRemove?: (value: CategoryBase) => void,
   onChange?: (values: CategoryBase[]) => void
@@ -13,7 +15,9 @@ interface FilteringCategoriesBaseProps extends BoxProps {
 
 export default function FilteringCategoriesBase({ 
   data = [],
-  values = [], 
+  values = [],
+  label, 
+  placeholder,
   onChange = () => {},
   onAdd = () => {},
   onRemove = () => {},
@@ -73,8 +77,8 @@ export default function FilteringCategoriesBase({
     >
       <Combobox.DropdownTarget>
         <PillsInput 
-          label="ジャンルによる絞り込み"
-          pointer 
+          label={label}
+          pointer
           onClick={() => combobox.openDropdown()}
         >
           <Pill.Group>
@@ -82,6 +86,7 @@ export default function FilteringCategoriesBase({
             <Combobox.EventsTarget>
               <PillsInput.Field
                 type="hidden"
+                placeholder={placeholder}
                 onBlur={() => combobox.closeDropdown()}
                 onChange={() => {
                   combobox.updateSelectedOptionIndex();

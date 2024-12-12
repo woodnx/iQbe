@@ -1,4 +1,4 @@
-import { BoxProps, Group, Radio, TextInput } from "@mantine/core"
+import { Box, BoxProps, Group, Radio, TextInput } from "@mantine/core"
 import { formInputProps } from "@/hooks"
 import { KeywordOption } from "@/types"
 
@@ -19,16 +19,14 @@ export default function FilteringWord({
   ...others
 }: FilteringWordProps) {
   return (
-    <>
+    <Box {...others}>
       <TextInput
         className={className}
         label="キーワードによる絞り込み"
         placeholder="キーワードを入力"
         {...wordInputProps}
-        {...others}
       />
       <Radio.Group 
-        mt="sm"
         label="検索範囲"
         value={wordSearchOption.value}
         onChange={(v) => {
@@ -53,6 +51,6 @@ export default function FilteringWord({
         </Group>
         
       </Radio.Group>
-    </>
+    </Box>
   )
 }

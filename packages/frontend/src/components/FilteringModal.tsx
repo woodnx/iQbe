@@ -88,6 +88,7 @@ export default function FilteringModal({
             value: keywordOption, 
             onChange: setkeywordOption
           }}
+          mb="lg"
         />
         <FilteringWorkbook
           values={workbooks} 
@@ -106,13 +107,13 @@ export default function FilteringModal({
         <FilteringTagMatchAll 
           value={tagMatchAll}
           onChange={setTagMatchAll}
+          mb="lg"
         />
         <FilteringQuizNumber
           value={perPage}
           onChange={setPerPage}
-          mt="lg"
         />
-        <Group mt="xl" justify="right">
+        <Group mt="lg" justify="right">
           <Button 
             leftSection={<IconSearch/>}
             onClick={() => { 

@@ -1,4 +1,4 @@
-import { BoxProps, Group } from "@mantine/core";
+import { BoxProps, Group, Text } from "@mantine/core";
 import { useCategories } from "@/hooks/useCategories";
 import FilteringCategoriesBase from "./FilteringCategoriesBase";
 import { useState } from "react";
@@ -23,10 +23,14 @@ export default function FilteringCategories({
   const [ showingSub, setShowingSub ] = useState<Category[]>([]);
 
   return (
+    <>
+    <Text fz="sm">ジャンルの絞り込み</Text>
     <Group grow {...others}>
       <FilteringCategoriesBase 
         data={data}
         values={categories}
+        label="大ジャンル"
+        placeholder="大ジャンルを選択"
         onChange={(value) => {
           setCategories(value);
           setShowingSub(value.reduce(
@@ -46,6 +50,8 @@ export default function FilteringCategories({
       <FilteringCategoriesBase 
         data={showingSub}
         values={subCategories}
+        label="小ジャンル"
+        placeholder="小ジャンルを選択"
         onChange={(value) => {
           setSubCategories(value);
         }}
@@ -81,5 +87,6 @@ export default function FilteringCategories({
         }}
       />
     </Group>
+    </>
   )
 }
