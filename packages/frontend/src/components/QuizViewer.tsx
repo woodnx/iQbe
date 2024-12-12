@@ -48,6 +48,9 @@ export default function({
     workbooks?: string[], 
     keyword?: string, 
     keywordOption?: KeywordOption,
+    categories?: number[],
+    tags?: string[],
+    tagMatchAll?: boolean,
     perPage?: number,
   ) => {
     setPage(1);
@@ -59,6 +62,9 @@ export default function({
       wids: workbooks, 
       keyword, 
       keywordOption: Number(keywordOption),
+      categories,
+      tags,
+      tagMatchAll,
     });
   }
 

@@ -117,6 +117,37 @@ export default class QuizInfra implements IQuizRepository, IQuizQueryService {
         query = query.where('quizzes.ans', 'like', `%${option.keyword}%`)
       }
     }
+    if (!!option.categories) {
+      if (Array.isArray(option.categories) && option.categories.length) 
+        query = query.where('quizzes.category_id', 'in', option.categories);
+      else
+        query = query.where('quizzes.category_id', '=', option.categories);
+      
+    }
+    if (!!option.tags) {
+      if (Array.isArray(option.tags) && option.tags.length) {
+        if (option.tagMatchAll) {
+          query = query
+          .innerJoin('tagging', 'tagging.quiz_id', 'quizzes.id')
+          .innerJoin('tags', 'tagging.tag_id', 'tags.id')
+          .where('tags.label', 'in', option.tags)
+          .groupBy('quizzes.id')
+          .having(({ fn }) => fn.count('tags.label'), '=', option.tags.length)
+        } 
+        else {
+          query = query
+          .innerJoin('tagging', 'tagging.quiz_id', 'quizzes.id')
+          .innerJoin('tags', 'tagging.tag_id', 'tags.id')
+          .where('tags.label', 'in', option.tags)
+        }
+      }
+      else {
+        query = query
+        .innerJoin('tagging', 'tagging.quiz_id', 'quizzes.id')
+        .innerJoin('tags', 'tagging.tag_id', 'tags.id')
+        .where('tags.label', '=', option.tags)
+      }  
+    }
     // if (!!crctAnsRatio) {
     //   query = query.where(sql`quiz.total_crct_ans / (quiz.total_crct_ans + quiz.total_wrng_ans + quiz.total_through_ans) * 100 BETWEEN ${crctAnsRatio[0]} AND ${crctAnsRatio[1]}`)
     // }
@@ -128,7 +159,7 @@ export default class QuizInfra implements IQuizRepository, IQuizQueryService {
       .orderBy('favorites.registered desc'); 
     }
     else if (!!option.since && !!option.until) {
-      const since = dayjs(option.since).toDate() ;
+      const since = dayjs(option.since).toDate();
       const until = dayjs(option.until).toDate();
 
       query = query
@@ -164,6 +195,7 @@ export default class QuizInfra implements IQuizRepository, IQuizQueryService {
     const quizzes = await query
     .limit(maxView)
     .offset(maxView * (page - 1))
+    .distinct()
     .execute();
 
     return Promise.all(
@@ -256,6 +288,27 @@ export default class QuizInfra implements IQuizRepository, IQuizQueryService {
       else { 
         query = query.where('quizzes.ans', 'like', `%${option.keyword}%`)
       }
+    }
+    if (!!option.categories) {
+      if (Array.isArray(option.categories) && option.categories.length) 
+        query = query.where('quizzes.category_id', 'in', option.categories);
+      else
+        query = query.where('quizzes.category_id', '=', option.categories);
+      
+    }
+    if (!!option.tags) {
+      if (Array.isArray(option.tags) && option.tags.length) {
+        query = query
+        .innerJoin('tagging', 'tagging.quiz_id', 'quizzes.id')
+        .innerJoin('tags', 'tagging.tag_id', 'tags.id')
+        .where('tags.label', 'in', option.tags)
+      }
+      else {
+        query = query
+        .innerJoin('tagging', 'tagging.quiz_id', 'quizzes.id')
+        .innerJoin('tags', 'tagging.tag_id', 'tags.id')
+        .where('tags.label', '=', option.tags)
+      }  
     }
     // if (!!crctAnsRatio) {
     //   query = query.where(sql`quiz.total_crct_ans / (quiz.total_crct_ans + quiz.total_wrng_ans + quiz.total_through_ans) * 100 BETWEEN ${crctAnsRatio[0]} AND ${crctAnsRatio[1]}`)

@@ -37,6 +37,7 @@ export default class CategoryController {
         name: category.name,
         description: category.description,
         disabled: category.disabled,
+        parentId: category.parentId,
         sub: category.sub?.map(s => ({
           id: s.id,
           name: s.name,

@@ -931,6 +931,8 @@ paths:
         - $ref: "#/components/parameters/mid"
         - $ref: "#/components/parameters/isFavorite"
         - $ref: "#/components/parameters/tags"
+        - $ref: "#/components/parameters/tagMatchAll"
+        - $ref: "#/components/parameters/categories"
       responses:
         "200":
           $ref: "#/components/responses/QuizzesResponse"
@@ -1091,6 +1093,8 @@ paths:
         - $ref: "#/components/parameters/mid"
         - $ref: "#/components/parameters/isFavorite"
         - $ref: "#/components/parameters/tags"
+        - $ref: "#/components/parameters/tagMatchAll"
+        - $ref: "#/components/parameters/categories"
       responses:
         "200":
           description: クイズの総数
@@ -1320,6 +1324,12 @@ paths:
           schema:
             type: string
           example: ジャンル
+        - name: all
+          in: query
+          required: false
+          description: すべてのタグを得るか
+          schema: 
+            type: boolean
       summary: ユーザ自身の作成したタグのリストを取得
       responses:
         "200":
@@ -1609,6 +1619,20 @@ paths:
           $ref: "#/components/responses/403Forbidden"
 components:
   parameters:
+    categories: 
+      name: categories
+      in: query
+      required: false
+      description: ジャンルの絞り込み
+      schema:
+        oneOf:
+          - type: array
+            items: 
+              type: number
+          - type: number
+      example: 
+        - 1
+        - 2
     crctAnsRatio: 
       name: crctAnsRatio
       in: query
@@ -1701,9 +1725,19 @@ components:
       in: query
       required: false
       schema: 
-        type: array
-        items: 
-          type: string
+        oneOf:
+          - type: array
+            items: 
+              type: string
+          - type: string
+    tagMatchAll:
+      name: tagMatchAll
+      in: query
+      required: false 
+      description: "タグ検索のオプション（true: AND検索, false: OR検索）"
+      schema: 
+        type: boolean
+      example: false
     until:
       name: until
       in: query
@@ -2109,6 +2143,8 @@ components:
           type: boolean
         from: 
           type: string
+        parentId:
+          type: number
         sub: 
           type: array
           items:
@@ -2117,6 +2153,7 @@ components:
         - id
         - name
         - disabled
+        - parentId
     Error: 
       type: object
       properties: 
