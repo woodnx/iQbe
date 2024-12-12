@@ -9,40 +9,31 @@ interface FilteringWorkbookProps extends BoxProps {
 }
 
 export default function FilteringWorkbook({ 
-  values, 
-  onChange,
+  values = [], 
+  onChange = () => {},
   ...others
- }: FilteringWorkbookProps ) {
+}: FilteringWorkbookProps ) {
   const { workbooks } = useWorkbooks(true);
   const [ search, setSearch ] = useState('');
-  const [ innerValues, setValue ] = useState<string[]>(values || []);
   const combobox = useCombobox({
     onDropdownClose: () => combobox.resetSelectedOption(),
     onDropdownOpen: () => combobox.updateSelectedOptionIndex('active'),
   });
 
   const handleValueSelect = (value: string) => {
-    setValue((current) => {
-      const values = current.includes(value) ? current.filter((v) => v !== value) : [...current, value];
-      onChange(values);
-      return values;
-    });
+    onChange([ ...values, value ]);
   }
 
   const handleValueRemove = (value: string) => {
-    setValue((current) => { 
-      const values = current.filter((v) => v !== value);
-      onChange(values);
-      return values;
-    });
+    onChange(values.filter((v) => v !== value));
   }
   
   const options = workbooks?.filter((item) => 
     item.name.toLowerCase().includes(search.trim().toLowerCase()
   )).map(({ wid, color }) => (
-    <Combobox.Option value={wid} key={wid} active={innerValues.includes(wid)}>
+    <Combobox.Option value={wid} key={wid} active={values.includes(wid)}>
       <Group gap="sm">
-        {innerValues.includes(wid) ? <CheckIcon size={12} /> : null}
+        {values.includes(wid) ? <CheckIcon size={12} /> : null}
         <QuizWorkbookBadge
           wid={wid}
           levelColor={color || 'gray'}
@@ -51,7 +42,7 @@ export default function FilteringWorkbook({
     </Combobox.Option>
   ));
 
-  const pills = innerValues.map((value) => (
+  const pills = values.map((value) => (
     <Pill 
       key={value} 
       onRemove={() => handleValueRemove(value)}
@@ -85,7 +76,7 @@ export default function FilteringWorkbook({
                 onKeyDown={(event) => {
                   if (event.key === 'Backspace' && search.length === 0) {
                     event.preventDefault();
-                    handleValueRemove(innerValues[innerValues.length - 1]);
+                    handleValueRemove(values[values.length - 1]);
                   }
                 }}
               />
