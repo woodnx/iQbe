@@ -46,6 +46,7 @@ export default function FilteringTags({
 
     onAdd(value);
     onChange([ ...values, value ]);
+    setSearch('');
   }
 
   const handleValueRemove = (value: string) => {
