@@ -2,6 +2,7 @@ import cors from 'cors';
 import express from 'express';
 import fs from 'fs';
 import path from 'path';
+import boolParser from 'express-query-boolean';
 
 import { errorHandler } from '@/middleware/error';
 import verifyAuthToken from '@/middleware/verifyAuthToken';
@@ -22,6 +23,7 @@ app.use(cors({
   optionsSuccessStatus: 200 //レスポンスstatusを200に設定
 }));
 app.use(express.json()); 
+app.use(boolParser());
 app.use(express.static(path.join(__dirname, 'public'))); 
 app.use(express.static(path.join(__dirname, 'web')));
 

@@ -50,6 +50,7 @@ export default function({
     keywordOption?: KeywordOption,
     categories?: number[],
     tags?: string[],
+    tagMatchAll?: boolean,
     perPage?: number,
   ) => {
     setPage(1);
@@ -63,6 +64,7 @@ export default function({
       keywordOption: Number(keywordOption),
       categories,
       tags,
+      tagMatchAll,
     });
   }
 

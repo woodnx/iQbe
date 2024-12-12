@@ -10,6 +10,7 @@ import FilteringQuizNumber from "./FilteringQuizNumber";
 import FilteringWord from "./FilteringWord";
 import FilteringCategories from "./FilteringCategories";
 import FilteringTags from "./FilteringTags";
+import FilteringTagMatchAll from "./FilteringTagMatchAll";
 
 interface FilteringModalProps extends BoxProps {
   apply: (
@@ -18,6 +19,7 @@ interface FilteringModalProps extends BoxProps {
     keywordOption?: KeywordOption,
     categories?: number[],
     tags?: string[],
+    tagMatchAll?: boolean,
     perPage?: number, 
   ) => void,
   initalState?: boolean,
@@ -39,6 +41,7 @@ export default function FilteringModal({
   const [ perPage, setPerPage ] = useState(100);
   const [ categories, setCategories ] = useState<number[]>([]);
   const [ tags, setTags ] = useState<string[]>([]);
+  const [ tagMatchAll, setTagMatchAll ] = useState<boolean>(false);
   const [ opened, { open, close } ] = useDisclosure();
   const isMobile = useIsMobile();
 
@@ -100,6 +103,10 @@ export default function FilteringModal({
           values={tags}
           onChange={setTags}
         />
+        <FilteringTagMatchAll 
+          value={tagMatchAll}
+          onChange={setTagMatchAll}
+        />
         <FilteringQuizNumber
           value={perPage}
           onChange={setPerPage}
@@ -115,6 +122,7 @@ export default function FilteringModal({
                 keywordOption, 
                 categories, 
                 tags,
+                tagMatchAll,
                 perPage
               );
               close();

@@ -931,6 +931,7 @@ paths:
         - $ref: "#/components/parameters/mid"
         - $ref: "#/components/parameters/isFavorite"
         - $ref: "#/components/parameters/tags"
+        - $ref: "#/components/parameters/tagMatchAll"
         - $ref: "#/components/parameters/categories"
       responses:
         "200":
@@ -1092,6 +1093,7 @@ paths:
         - $ref: "#/components/parameters/mid"
         - $ref: "#/components/parameters/isFavorite"
         - $ref: "#/components/parameters/tags"
+        - $ref: "#/components/parameters/tagMatchAll"
         - $ref: "#/components/parameters/categories"
       responses:
         "200":
@@ -1728,6 +1730,14 @@ components:
             items: 
               type: string
           - type: string
+    tagMatchAll:
+      name: tagMatchAll
+      in: query
+      required: false 
+      description: "タグ検索のオプション（true: AND検索, false: OR検索）"
+      schema: 
+        type: boolean
+      example: false
     until:
       name: until
       in: query

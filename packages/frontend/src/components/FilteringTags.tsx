@@ -1,7 +1,10 @@
-import { useState } from "react";
-import { Badge, BoxProps, CheckIcon, Combobox, Group, Pill, PillsInput, rem, ScrollArea, useCombobox } from "@mantine/core";
-import { $api } from "@/utils/client";
-import { IconTag } from "@tabler/icons-react";
+import { useState } from 'react';
+
+import { $api } from '@/utils/client';
+import {
+  Badge, BoxProps, CheckIcon, Combobox, Group, Pill, PillsInput, rem, ScrollArea, useCombobox
+} from '@mantine/core';
+import { IconTag } from '@tabler/icons-react';
 
 interface FilteringTagsProps extends BoxProps {
   values?: string[] | undefined,

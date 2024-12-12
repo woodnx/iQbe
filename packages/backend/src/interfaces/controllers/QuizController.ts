@@ -34,6 +34,7 @@ export default class QuizController {
         : undefined;
       const categories = req.query.categories || undefined;
       const tags = req.query.tags || undefined;
+      const tagMatchAll = req.query.tagMatchAll;
       
       const quizzes = await this.quizQueryService.findMany(uid, {
         page,
@@ -48,7 +49,8 @@ export default class QuizController {
         mid,
         isFavorite,
         categories,
-        tags
+        tags,
+        tagMatchAll,
       });
 
       res.status(200).send(quizzes);

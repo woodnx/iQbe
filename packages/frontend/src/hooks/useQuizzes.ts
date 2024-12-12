@@ -31,6 +31,7 @@ const useQuizzes = (
         isFavorite: params.isFavorite,
         categories: params.categories,
         tags: params.tags,
+        tagMatchAll: params.tagMatchAll,
       }
     },
     enabled: shouldFetch,

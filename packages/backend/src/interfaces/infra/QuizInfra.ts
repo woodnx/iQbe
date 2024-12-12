@@ -126,10 +126,20 @@ export default class QuizInfra implements IQuizRepository, IQuizQueryService {
     }
     if (!!option.tags) {
       if (Array.isArray(option.tags) && option.tags.length) {
-        query = query
-        .innerJoin('tagging', 'tagging.quiz_id', 'quizzes.id')
-        .innerJoin('tags', 'tagging.tag_id', 'tags.id')
-        .where('tags.label', 'in', option.tags)
+        if (option.tagMatchAll) {
+          query = query
+          .innerJoin('tagging', 'tagging.quiz_id', 'quizzes.id')
+          .innerJoin('tags', 'tagging.tag_id', 'tags.id')
+          .where('tags.label', 'in', option.tags)
+          .groupBy('quizzes.id')
+          .having(({ fn }) => fn.count('tags.label'), '=', option.tags.length)
+        } 
+        else {
+          query = query
+          .innerJoin('tagging', 'tagging.quiz_id', 'quizzes.id')
+          .innerJoin('tags', 'tagging.tag_id', 'tags.id')
+          .where('tags.label', 'in', option.tags)
+        }
       }
       else {
         query = query
@@ -185,6 +195,7 @@ export default class QuizInfra implements IQuizRepository, IQuizQueryService {
     const quizzes = await query
     .limit(maxView)
     .offset(maxView * (page - 1))
+    .distinct()
     .execute();
 
     return Promise.all(
