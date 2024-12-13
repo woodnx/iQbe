@@ -1,6 +1,5 @@
 import { paths } from 'api/schema';
 
-import { useCategories } from '@/hooks/useCategories';
 import { useIsSuperUser } from '@/hooks/useLoginedUser';
 import { BoxProps, Button, Card, Grid, Group, Switch, Textarea } from '@mantine/core';
 import { isNotEmpty, useForm } from '@mantine/form';
@@ -16,7 +15,6 @@ interface QuizEditFormProps extends BoxProps {
   answer: string,
   wid?: string,
   category?: number,
-  subCategory?: number,
   tags?: string[],
   isPublic?: boolean,
   onSubmit?: (v: QuizEditSubmitValues) => void,
@@ -27,14 +25,12 @@ export default function QuizEditForm({
   answer,
   wid,
   category,
-  subCategory,
   tags,
   isPublic,
   onSubmit = () => {},
   ...others
 }: QuizEditFormProps) {
   const isSuperUser = useIsSuperUser();
-  const { categories } = useCategories();
 
   const form = useForm({
     initialValues: {
@@ -42,7 +38,6 @@ export default function QuizEditForm({
       answer,
       isPublic,
       category,
-      subCategory,
       tags,
       wid,
     },
@@ -51,8 +46,6 @@ export default function QuizEditForm({
       answer: isNotEmpty(),
     },
   });
-
-  const subCategories = categories?.find(c => c.id == form.values.category)?.sub || [];
 
   const submit = (v: QuizEditSubmitValues) => {
     onSubmit(v);
@@ -69,7 +62,7 @@ export default function QuizEditForm({
           variant="filled"
           autosize
           minRows={2}
-          mb="md"
+          mb="sm"
         />
         <Textarea
           {...form.getInputProps('answer')}
@@ -77,26 +70,13 @@ export default function QuizEditForm({
           label="解答"
           variant="filled"
           autosize
-          mb="md"
+          mb="sm"
+        />
+        <CategorySelector 
+          {...form.getInputProps('category')}
+          mb="sm"
         />
         <Grid>
-          <Grid.Col span={6}>
-            <CategorySelector
-              label="ジャンル"
-              data={categories || []}
-              onClear={() => form.setFieldValue('subCategory', undefined)}
-              {...form.getInputProps('category')}
-            />
-          </Grid.Col>
-          <Grid.Col span={6}>
-            <CategorySelector
-              label="サブジャンル"
-              placeholder="サブジャンルを選択"
-              key={form.values.category}
-              data={subCategories || []} 
-              {...form.getInputProps('subCategory')}
-            />
-          </Grid.Col>
           <Grid.Col span={8}>
             <TagInput 
               {...form.getInputProps('tags')}
@@ -108,7 +88,6 @@ export default function QuizEditForm({
               {...form.getInputProps('wid')}
             />
           </Grid.Col>
-          
         </Grid>
         <Group justify="space-between" mt="sm">
           <Switch

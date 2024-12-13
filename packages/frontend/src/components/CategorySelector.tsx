@@ -1,91 +1,67 @@
-import { CloseButton, Combobox, Input, InputBase, ScrollArea, Text, useCombobox } from "@mantine/core";
-import type { components } from 'api/schema';
+import { BoxProps, Group } from "@mantine/core";
+import CategorySelectorBase from "./CategorySelectorBase";
+import { $api } from "@/utils/client";
+import { useEffect, useState } from "react";
 
-type Category = components["schemas"]["Category"]
-
-interface Props {
-  data: Category[] | undefined,
-  value?: string,
-  label?: string,
-  placeholder?: string,
-  onChange?: (value: string | null) => void,
-  onClear?: () => void,
+interface CategorySelectorProps extends BoxProps {
+  value?: number,
+  onChange?: (value: number | undefined) => void,
 }
 
-export default function({
-  data,
+export default function CategorySelector({
   value,
-  label,
-  placeholder,
   onChange = () => {},
-  onClear = () => {},
-}: Props) {
-  const combobox = useCombobox({
-    onDropdownClose: () => combobox.resetSelectedOption(),
+  ...others
+}: CategorySelectorProps) {
+  const { data } = $api.useQuery('get', '/categories/{id}', {
+    params: {
+      path: {
+        id: value || 0
+      }
+    }
   });
 
-  const options = data?.map(({ id, name, description }) => (
-    <Combobox.Option value={String(id)} key={id} bg={value == String(id) ? 'blue.1' : undefined}>
-      <Text size="sm">{name}</Text>
-      <Text size="xs" opacity={0.65}>
-        {description}
-      </Text>
-    </Combobox.Option>
-  ));
+  useEffect(() => {
+    if (data && data.length > 0) setCategory(data[0].id);
+    if (data && data.length > 1) setSubCategory(data[1].id);
+  }, [ data ])
 
-  const display = data?.filter(({ id }) => value == String(id))[0]?.name;
+  const [ category, setCategory ] = useState<number | undefined>();
+  const [ subCategory, setSubCategory ] = useState<number | undefined>();
+
+  const { data: categories } = $api.useQuery('get', '/categories');
+  const subCategories = categories?.find(c => c.id == category)?.sub || [];
 
   return (
-    <Combobox
-      store={combobox}
-      onOptionSubmit={(val) => {
-        onChange(val);
-        combobox.closeDropdown();
-      }}
-    >
-      <Combobox.Target>
-        <InputBase
-          label={label}
-          component="button"
-          type="button"
-          pointer
-          rightSection={
-            value != null ? (
-              <CloseButton
-                size="sm"
-                onMouseDown={(e) => e.preventDefault()}
-                onClick={() => { 
-                  onChange(null);
-                  onClear();
-                }}
-                aria-label="Clear value"
-              />
-            ) : (
-              <Combobox.Chevron/>
-            )
-          }
-          onClick={() => combobox.toggleDropdown()}
-          rightSectionPointerEvents={value == null ? 'none' : 'all'}
-        >
-          { 
-            display 
-            ? <Text lineClamp={1} fz="sm">
-                { display }
-              </Text> 
-            : <Input.Placeholder>
-              {placeholder || 'ジャンルを選択'}
-            </Input.Placeholder>
-          }
-        </InputBase>
-      </Combobox.Target>
-
-      <Combobox.Dropdown>
-        <Combobox.Options>
-          <ScrollArea.Autosize type="scroll" mah={200}>
-            {options}
-          </ScrollArea.Autosize>
-        </Combobox.Options>
-      </Combobox.Dropdown>
-    </Combobox>
+    <Group grow {...others}>
+      <CategorySelectorBase 
+        label="ジャンル"
+        data={categories}
+        value={category}
+        onChange={(val) => {
+          setCategory(val);
+          val && onChange(val);
+        }}
+        onClear={() => { 
+          setCategory(undefined);
+          setSubCategory(undefined);
+          onChange(undefined);
+        }}
+      />
+      <CategorySelectorBase
+        label="サブジャンル"
+        placeholder="サブジャンルを選択"
+        data={subCategories}
+        value={subCategory}
+        onChange={(val) => {
+          setSubCategory(val);
+          val && onChange(val);
+        }}
+        onClear={() => { 
+          setSubCategory(undefined);
+          onChange(undefined);
+        }}
+      />
+    </Group>
   )
 }

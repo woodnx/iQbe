@@ -14,7 +14,6 @@ interface Props {
   answer: string,
   wid?: string,
   category?: number,
-  subCategory?: number,
   tags?: string[],
   isPublic: boolean,
 }
@@ -22,13 +21,12 @@ interface Props {
 export default function({ context, id, innerProps }: ContextModalProps<Props>) {
   const { qid, ...formProps } = innerProps;
   const { mutate } = $api.useMutation("put", "/quizzes/{qid}");
-  const submit = async ({ question, answer, tags, category, subCategory, wid, isPublic }: QuizEditSubmitValues) => {
+  const submit = async ({ question, answer, tags, category, wid, isPublic }: QuizEditSubmitValues) => {
     mutate({ 
         body: {
           question,
           answer,
           category,
-          subCategory,
           tags,
           wid,
           isPublic,
