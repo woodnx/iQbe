@@ -89,7 +89,7 @@ export default class QuizInfra implements IQuizRepository, IQuizQueryService {
       'workbooks.name as workbook',
       'levels.color as level',
       'users.uid as creatorId',
-      'quizzes.category_id as categoryId',
+      'quizzes.category_id as category',
       'quizzes.total_crct_ans as right',
       sql<number>`total_crct_ans + total_through_ans + total_wrng_ans`.as('total'),
       fn.countAll<number>().over().as('size'),
