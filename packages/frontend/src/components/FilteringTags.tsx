@@ -28,13 +28,6 @@ export default function FilteringTags({
       }
     }
   });
-  const { data: tagsAll } = $api.useQuery('get', '/tags', {
-    params: {
-      query: {
-        all: true,
-      }
-    }
-  });
 
   const combobox = useCombobox({
     onDropdownClose: () => combobox.resetSelectedOption(),
@@ -80,7 +73,7 @@ export default function FilteringTags({
       onRemove={() => handleValueRemove(value)}
       withRemoveButton
     >
-      { tagsAll?.find(({ label }) => label == value)?.label }
+      { value }
     </Pill>
   ));
   

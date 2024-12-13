@@ -67,7 +67,15 @@ export default function({
           onClick={() => combobox.toggleDropdown()}
           rightSectionPointerEvents={value == null ? 'none' : 'all'}
         >
-          { display ? <Text lineClamp={1}>{ display }</Text> : <Input.Placeholder>{placeholder || 'ジャンルを選択'}</Input.Placeholder>}
+          { 
+            display 
+            ? <Text lineClamp={1} fz="sm">
+                { display }
+              </Text> 
+            : <Input.Placeholder>
+              {placeholder || 'ジャンルを選択'}
+            </Input.Placeholder>
+          }
         </InputBase>
       </Combobox.Target>
 
