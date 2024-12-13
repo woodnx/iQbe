@@ -409,6 +409,27 @@ paths:
         "403":
           $ref: "#/components/responses/403Forbidden"
   "/categories/{id}":
+    get: 
+      tags:
+        - categories
+      summary:  カテゴリーの取得
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: カテゴリーのID
+          schema: 
+            type: number
+          example: 1
+      responses:
+        "200":
+          $ref: "#/components/responses/CategoriesResponse"
+        "400":
+          $ref: "#/components/responses/400BadRequest"
+        "401": 
+          $ref: "#/components/responses/401Unauthorized"
+        "403":
+          $ref: "#/components/responses/403Forbidden"
     put: 
       tags: 
         - categories

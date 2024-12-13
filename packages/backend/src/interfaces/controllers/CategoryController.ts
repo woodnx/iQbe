@@ -51,6 +51,21 @@ export default class CategoryController {
     })
   }
 
+  getFromId() {
+    return typedAsyncWrapper<"/categories/{id}", "get">(async (req, res) => {
+      const { id } = req.params;
+      const categories = await this.categoryUseCase.findById(id);
+
+      res.status(200).send(categories.map(category => ({
+        id: category.id,
+        name: category.name,
+        description: category.description,
+        disabled: category.disabled,
+        parentId: category.parentId,
+      })));
+    })
+  }
+
   post() {
     return typedAsyncWrapper<"/categories", "post">(async (req, res) => {
       const { name, description, parentId, disabled } = req.body;
