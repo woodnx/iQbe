@@ -92,7 +92,6 @@ export default function QuizCard({
             tags={quiz.tags}
             wid={quiz.wid || undefined}
             category={quiz.category || undefined}
-            subCategory={quiz.subCategory || undefined}
             isPublic={!!quiz.isPublic}
           />
         </Group>

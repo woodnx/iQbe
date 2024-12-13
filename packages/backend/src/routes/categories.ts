@@ -21,6 +21,7 @@ const router = express.Router();
 
 router.get('/', categoryController.get());
 router.post('/', categoryController.post());
+router.get('/:id', categoryController.getFromId());
 router.put('/:id', categoryController.put());
 router.delete('/:id', categoryController.delete());
 

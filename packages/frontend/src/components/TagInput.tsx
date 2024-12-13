@@ -9,12 +9,11 @@ export interface TagInputProps {
 }
 
 export default function TagInput({
-  value,
+  value = [],
   onChange = () => {},
 }: TagInputProps) {
   const [ search, setSearch ] = useState('');
   const [ debounced ] = useDebouncedValue(search, 500);
-  const [ innerValues, setInnerValues ] = useState<string[]>(value || []);
 
   const { data: searchedTags } = $api.useQuery('get', '/tags', {
     params: {
@@ -33,11 +32,10 @@ export default function TagInput({
       clearable
       searchValue={search}
       onSearchChange={setSearch}
-      value={innerValues}
+      value={value}
       maxTags={10}
       data={data}
-      onChange={(value) => { 
-        setInnerValues(value);
+      onChange={(value) => {
         onChange(value)
       }}
     />

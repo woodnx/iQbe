@@ -1,10 +1,9 @@
 import { ApiError } from 'api';
+import { isArray } from 'lodash';
 
 import IQuizQueryService from '@/applications/queryservices/IQuizQueryService';
 import QuizUseCase from '@/applications/usecases/QuizUseCase';
 import { typedAsyncWrapper } from '@/utils';
-import { isArray, isNumber } from 'lodash';
-
 
 export default class QuizController {
   constructor(
@@ -97,7 +96,6 @@ export default class QuizController {
       const anotherAnswer = req.body.anotherAnswer || undefined;
       const tags = req.body.tags || [];
       const category = req.body.category || undefined;
-      const subCategory = category !== 0 && !!req.body.subCategory ? Number(req.body.subCategory) : undefined;
       const wid = req.body.wid || undefined;
       const limitedUser = req.body.limitedUser || [];
       const uid = req.user.uid;
@@ -114,7 +112,6 @@ export default class QuizController {
         uid,
         anotherAnswer,
         category,
-        subCategory,
         wid,
       );
 
@@ -157,7 +154,6 @@ export default class QuizController {
       const anotherAnswer = req.body.anotherAnswer || undefined;
       const category = req.body.category || undefined;
       const tags = req.body.tags || [];
-      const subCategory = category !== 0 ? req.body.subCategory || undefined : 0;
       const wid = req.body.wid || undefined;
       const limitedUser = req.body.limitedUser || [];
       const uid = req.user.uid;
@@ -174,7 +170,6 @@ export default class QuizController {
         tags,
         anotherAnswer,
         category,
-        subCategory,
         wid,
       );
 

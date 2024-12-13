@@ -1,12 +1,15 @@
 import { components } from 'api/schema';
+import dayjs from 'dayjs';
 import { sql } from 'kysely';
 import { isEqual, sortBy, uniq } from 'lodash';
 
-import IQuizQueryService, { countOption, findOption } from '@/applications/queryservices/IQuizQueryService';
+import IQuizQueryService, {
+    countOption, findOption
+} from '@/applications/queryservices/IQuizQueryService';
 import Quiz from '@/domains/Quiz';
 import IQuizRepository from '@/domains/Quiz/IQuizRepository';
+
 import KyselyClientManager from './kysely/KyselyClientManager';
-import dayjs from 'dayjs';
 
 type QuizDTO = components["schemas"]["Quiz"];
 
@@ -86,8 +89,7 @@ export default class QuizInfra implements IQuizRepository, IQuizQueryService {
       'workbooks.name as workbook',
       'levels.color as level',
       'users.uid as creatorId',
-      'quizzes.category_id as categoryId',
-      'quizzes.sub_category_id as subCategoryId',
+      'quizzes.category_id as category',
       'quizzes.total_crct_ans as right',
       sql<number>`total_crct_ans + total_through_ans + total_wrng_ans`.as('total'),
       fn.countAll<number>().over().as('size'),
@@ -407,7 +409,6 @@ export default class QuizInfra implements IQuizRepository, IQuizQueryService {
       quiz.anotherAnswer,
       quiz.wid,
       quiz.categoryId,
-      quiz.subCategoryId,
     );
   }
 
@@ -472,7 +473,6 @@ export default class QuizInfra implements IQuizRepository, IQuizQueryService {
         quiz.anotherAnswer,
         quiz.wid,
         quiz.categoryId,
-        quiz.subCategoryId,
       );
     }));
 
@@ -505,7 +505,6 @@ export default class QuizInfra implements IQuizRepository, IQuizQueryService {
       workbook_id: workbookId || null,
       creator_id: userId,
       category_id: quiz.categoryId,
-      sub_category_id: quiz.subCategoryId,
     })
     .execute();
 
@@ -606,7 +605,6 @@ export default class QuizInfra implements IQuizRepository, IQuizQueryService {
       workbook_id: workbookId,
       creator_id: userId,
       category_id: quiz.categoryId,
-      sub_category_id: quiz.subCategoryId,
     })
     .where('qid', '=', quiz.qid)
     .executeTakeFirstOrThrow()

@@ -1,11 +1,13 @@
-import IQuizRepository from "@/domains/Quiz/IQuizRepository";
-import QuizService from "@/domains/Quiz/QuizService";
-import { components } from "api/schema";
-import ITransactionManager from "../shared/ITransactionManager";
-import Quiz from "@/domains/Quiz";
-import { ApiError } from "api";
-import ITagRepository from "@/domains/Tag/ITagRepository";
-import TagService from "@/domains/Tag/TagService";
+import { ApiError } from 'api';
+import { components } from 'api/schema';
+
+import Quiz from '@/domains/Quiz';
+import IQuizRepository from '@/domains/Quiz/IQuizRepository';
+import QuizService from '@/domains/Quiz/QuizService';
+import ITagRepository from '@/domains/Tag/ITagRepository';
+import TagService from '@/domains/Tag/TagService';
+
+import ITransactionManager from '../shared/ITransactionManager';
 
 type QuizDTO = components["responses"]["QuizResponse"]["content"]["application/json"];
 
@@ -24,7 +26,6 @@ export default class QuizUseCase {
     uid: string,
     anotherAnswer?: string,
     categoryId?: number,
-    subCategoryId?: number,
     wid?: string,
   ): Promise<QuizDTO> {
     const quizService = new QuizService();
@@ -41,7 +42,6 @@ export default class QuizUseCase {
       anotherAnswer,
       wid,
       categoryId,
-      subCategoryId,
     );
 
     await this.transactionManager.begin(async () => {
@@ -57,7 +57,6 @@ export default class QuizUseCase {
       wid: quiz.wid,
       tags: quiz.tagLabels,
       category: quiz.categoryId,
-      subCategory: quiz.subCategoryId,
       creatorId: quiz.creatorUid,
       isPublic: quiz.isPublic(),
       right: quiz.right,
@@ -76,7 +75,6 @@ export default class QuizUseCase {
       uid: string,
       anotherAnswer?: string,
       categoryId?: number,
-      subCategoryId?: number,
       wid?: string,
     }[],
   ): Promise<QuizDTO[]> {
@@ -96,7 +94,6 @@ export default class QuizUseCase {
           _quiz.anotherAnswer,
           _quiz.wid,
           _quiz.categoryId,
-          _quiz.subCategoryId,
         );
 
         await this.quizRepository.save(quiz);
@@ -109,7 +106,6 @@ export default class QuizUseCase {
           wid: quiz.wid,
           tags: _quiz.tagLabels,
           category: quiz.categoryId,
-          subCategory: quiz.subCategoryId,
           creatorId: quiz.creatorUid,
           isPublic: quiz.isPublic(),
           right: quiz.right,
@@ -131,7 +127,6 @@ export default class QuizUseCase {
     tagLabels: string[],
     anotherAnswer?: string,
     categoryId?: number,
-    subCategoryId?: number,
     wid?: string,
   ): Promise<QuizDTO> {
     const quiz = await this.quizRepository.findByQid(qid);
@@ -158,7 +153,6 @@ export default class QuizUseCase {
     quiz.editAnswer(answer);
     quiz.editAnotherAnswer(anotherAnswer || null);
     quiz.editCategoryId(categoryId || null);
-    quiz.editSubCategoryId(subCategoryId || null);
     quiz.editWid(wid || null);
 
     // タグ付与処理
@@ -182,7 +176,6 @@ export default class QuizUseCase {
       wid: quiz.wid,
       tags: quiz.tagLabels,
       category: quiz.categoryId,
-      subCategory: quiz.subCategoryId,
       creatorId: quiz.creatorUid,
       isPublic: quiz.isPublic(),
       right: quiz.right,

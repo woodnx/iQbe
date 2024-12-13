@@ -10,7 +10,6 @@ interface Props {
   wid?: string,
   tags: string[],
   category?: number,
-  subCategory?: number,
   isPublic: boolean,
 }
 
@@ -22,7 +21,6 @@ export default function({
   wid,
   tags,
   category,
-  subCategory,
   isPublic,
 }: Props) {
   const uid = localStorage.getItem('uid')
@@ -53,7 +51,6 @@ export default function({
                 wid,
                 tags,
                 category,
-                subCategory,
                 isPublic,
               },
               size: 'xl',

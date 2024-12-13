@@ -17,6 +17,12 @@ export default class CategoryUseCase {
     private categoryRepository: CategoryRepository,
   ) {}
 
+  async findById(id: number) {
+    const category = await this.categoryRepository.findChainById(id);
+
+    return category;
+  }
+
   async addCategory(name: string, description: string | null, parentId: number | null, disabled: boolean) {
     const category = Category.create(
       name,
