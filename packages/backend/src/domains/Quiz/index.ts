@@ -7,7 +7,6 @@ export default class Quiz {
     private _tagLabels: string[],
     private _wid: string | null,
     private _categoryId: number | null,
-    private _subCategoryId: number | null,
     private _creatorUid: string,
     private _visibleUids: string[],
     private _total: number,
@@ -24,7 +23,6 @@ export default class Quiz {
     anotherAnswer?: string,
     wid?: string,
     categoryId?: number,
-    subCategoryId?: number,
   ) {
     return new Quiz(
       qid,
@@ -34,7 +32,6 @@ export default class Quiz {
       tagLabels,
       wid || null,
       categoryId || null,
-      subCategoryId || null,
       creatorUid,
       visibleUids,
       0,
@@ -54,7 +51,6 @@ export default class Quiz {
     wid: string | null,
     anotherAnswer: string | null, 
     categoryId: number | null,
-    subCategoryId: number | null,
   ) {
     return new Quiz(
       qid,
@@ -64,7 +60,6 @@ export default class Quiz {
       tagLabels,
       wid,
       categoryId,
-      subCategoryId,
       creatorUid,
       visibleUids,
       total,
@@ -86,10 +81,6 @@ export default class Quiz {
 
   editCategoryId(categoryId: number | null) {
     this._categoryId = categoryId;
-  }
-
-  editSubCategoryId(subCategoryId: number | null) {
-    this._subCategoryId = subCategoryId;
   }
 
   editWid(wid: string | null) {
@@ -138,10 +129,6 @@ export default class Quiz {
 
   get categoryId(): number | null {
     return this._categoryId;
-  }
-
-  get subCategoryId(): number | null {
-    return this._subCategoryId;
   }
 
   get total(): number {

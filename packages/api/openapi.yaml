@@ -967,8 +967,6 @@ paths:
                     type: string
                   category:
                     type: number
-                  subCategory:
-                    type: number
                   isPublic: 
                     type: boolean
                   limitedUser:
@@ -1027,8 +1025,6 @@ paths:
                   wid:
                     type: string
                   category:
-                    type: number
-                  subCategory:
                     type: number
                   isPublic: 
                     type: boolean
@@ -2221,8 +2217,6 @@ components:
           type: string
           readOnly: true
         category:
-          type: number
-        subCategory:
           type: number
         total: 
           type: number
