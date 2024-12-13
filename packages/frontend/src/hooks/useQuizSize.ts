@@ -10,7 +10,7 @@ const useQuizSize = (
   const { data, error, isLoading } = $api.useQuery('get', '/quizzes/size', {
     params: {
       query: {
-        workbooks: params.wids,
+        wids: params.wids,
         keyword: params.keyword,
         keywordOption: Number(params.keywordOption),
         judgements: params.judgements,

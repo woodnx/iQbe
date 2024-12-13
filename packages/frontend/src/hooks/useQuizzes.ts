@@ -21,7 +21,7 @@ const useQuizzes = (
         page: params.page,
         maxView: params.maxView,
         seed: params.seed,
-        workbooks: params.wids,
+        wids: params.wids,
         keyword: params.keyword,
         keywordOption: Number(params.keywordOption),
         judgements: params.judgements,
