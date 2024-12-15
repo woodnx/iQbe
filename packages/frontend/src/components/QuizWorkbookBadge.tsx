@@ -1,23 +1,22 @@
 import { Badge, BadgeProps } from "@mantine/core";
 import { useIsMobile } from "@/contexts/isMobile";
-import { $api } from "@/utils/client";
+import { components } from "api/schema";
+
+type Workbook = components["schemas"]["Workbook"];
 
 interface Props extends BadgeProps {
-  wid: string,
+  workbook: Workbook,
   levelColor: string,
   transformUpper?: boolean,
 }
 
 export function QuizWorkbookBadge({
-  wid,
+  workbook,
   levelColor,
   transformUpper,
   ...other
 }: Props) {
   const isMobile = useIsMobile();
-  const { data: workbook } = $api.useQuery('get', '/workbooks/{wid}', {
-    params: { path: { wid } },
-  })
 
   return (
     <Badge 
@@ -28,7 +27,10 @@ export function QuizWorkbookBadge({
       style={{ textTransform: 'none', backgroundColor: '#fff' }}
       {...other}
     >
-      <div>{workbook?.name}{!!workbook?.date ? `(${workbook?.date.slice(0, 4)})` : null}</div>
+      <div>
+        {workbook?.name}
+        {/* {!!workbook?.date ? `(${workbook?.date.slice(0, 4)})` : null} */}
+      </div>
     </Badge>
   )
 }

@@ -1,30 +1,32 @@
 import { Card, BoxProps, Group, Overlay, Text } from "@mantine/core";
-import { useMylists } from "@/hooks/useMylists";
 import { useIsMobile } from "@/contexts/isMobile";
 import QuizFavoriteButton from "./QuizFavoriteButton";
 import { QuizWorkbookBadge } from "./QuizWorkbookBadge";
 import QuizMylistButton from "./QuizMylistButton";
+import { components } from "api/schema";
+
+type Mylist = components["schemas"]["Mylist"];
+type Workbook = components["schemas"]["Workbook"];
 
 interface Props extends BoxProps {
   qid?: string,
   answer?: string,
-  wid?: string,
+  workbook?: Workbook,
   isFavorite?: boolean,
-  registeredMylist?: string[],
+  registeredMylist?: Mylist[],
   visible: boolean,
 }
 
 export function PracticeQuizInfo({
   qid = "",
   answer = "",
-  wid = "",
+  workbook,
   isFavorite = false,
   registeredMylist = [],
   visible,
   ...other
 }: Props) {
   const isMobile = useIsMobile();
-  const { mylists } = useMylists();
 
   return (
     <Card p="sm" radius="sm" { ...other }>
@@ -42,15 +44,14 @@ export function PracticeQuizInfo({
       <Group justify="space-between" m={0} mt="sm">
         <QuizMylistButton
           qid={qid}
-          registerdMylistId={registeredMylist}
-          mylists={mylists || []}
+          registerdMylists={registeredMylist}
           key={qid}
         />
         {
-          (!!wid) 
+          (!!workbook) 
           ?
           <QuizWorkbookBadge
-            wid={wid}
+            workbook={workbook}
             levelColor={'gray'}
           />
           :

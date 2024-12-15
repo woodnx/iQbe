@@ -93,7 +93,7 @@ model mylists {
   name            String            @default("") @db.VarChar(128)
   created         DateTime          @db.DateTime(0)
   attr            Int
-  mid             String?           @default("") @db.VarChar(20)
+  mid             String            @default("") @db.VarChar(20)
   users           users             @relation(fields: [user_id], references: [id], onUpdate: Restrict, map: "mylists_ibfk_1")
   mylists_quizzes mylists_quizzes[]
 

@@ -1,4 +1,4 @@
-import { paths } from 'api/schema';
+import { components, paths } from 'api/schema';
 
 import { $api } from '@/utils/client';
 import { ContextModalProps } from '@mantine/modals';
@@ -7,13 +7,14 @@ import { notifications } from '@mantine/notifications';
 import QuizEditForm from './QuizEditForm';
 
 type QuizEditSubmitValues = paths["/quizzes"]["post"]["requestBody"]["content"]["application/json"];
+type Category = components["schemas"]["Category"];
 
 interface Props {
   qid: string,
   question: string,
   answer: string,
   wid?: string,
-  category?: number,
+  category?: Category[],
   tags?: string[],
   isPublic: boolean,
 }

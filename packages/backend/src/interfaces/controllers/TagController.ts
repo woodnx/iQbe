@@ -16,8 +16,8 @@ export default class TagController {
 
       const sendTags = tags.map(tag => ({
         label: tag.label,
-        created: format(tag.created),
-        modified: format(tag.created),
+        created: tag.created,
+        modified: tag.created,
       }));
 
       res.send(sendTags)

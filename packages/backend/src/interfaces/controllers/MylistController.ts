@@ -3,7 +3,6 @@ import { ApiError } from 'api';
 import Mylist from '@/domains/Mylist';
 import IMylistRepository from '@/domains/Mylist/IMylistRepository';
 import MylistService from '@/domains/Mylist/MylistService';
-import { format } from '@/plugins/day';
 import { typedAsyncWrapper } from '@/utils';
 
 export default class MylistController {
@@ -21,7 +20,7 @@ export default class MylistController {
       res.status(200).send(mylists.map(m => ({
         mid: m.mid,
         name: m.name,
-        created: format(m.created)
+        created: m.created,
       })));
     });
   }
@@ -42,7 +41,7 @@ export default class MylistController {
       res.send({
         mid,
         name: listName,
-        created: format(now),
+        created: now,
       });
     });
   }
@@ -62,7 +61,7 @@ export default class MylistController {
       res.send({
         mid,
         name: listName,
-        created: format(mylist.created),
+        created: mylist.created,
       });
     });
   }
@@ -82,7 +81,7 @@ export default class MylistController {
       res.send(mylists.map(m => ({
         mid: m.mid,
         name: m.name,
-        created: format(m.created)
+        created: m.created,
       })));
     });
   }

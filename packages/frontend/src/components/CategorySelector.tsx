@@ -1,11 +1,16 @@
-import { BoxProps, Group } from "@mantine/core";
-import CategorySelectorBase from "./CategorySelectorBase";
-import { $api } from "@/utils/client";
-import { useEffect, useState } from "react";
+import { components } from 'api/schema';
+import { useState } from 'react';
+
+import { $api } from '@/utils/client';
+import { BoxProps, Group } from '@mantine/core';
+
+import CategorySelectorBase from './CategorySelectorBase';
+
+type Category = components["schemas"]["Category"];
 
 interface CategorySelectorProps extends BoxProps {
-  value?: number,
-  onChange?: (value: number | undefined) => void,
+  value?: Category[],
+  onChange?: (value: Category[] | undefined) => void,
 }
 
 export default function CategorySelector({
@@ -13,24 +18,15 @@ export default function CategorySelector({
   onChange = () => {},
   ...others
 }: CategorySelectorProps) {
-  const { data } = $api.useQuery('get', '/categories/{id}', {
-    params: {
-      path: {
-        id: value || 0
-      }
-    }
-  });
-
-  useEffect(() => {
-    if (data && data.length > 0) setCategory(data[0].id);
-    if (data && data.length > 1) setSubCategory(data[1].id);
-  }, [ data ])
-
-  const [ category, setCategory ] = useState<number | undefined>();
-  const [ subCategory, setSubCategory ] = useState<number | undefined>();
+  const [ category, setCategory ] = useState<Category | undefined>(
+    (value && value.length > 0) ? value[0] : undefined
+  );
+  const [ subCategory, setSubCategory ] = useState<Category | undefined>(
+    (value && value.length > 1) ? value[1] : undefined
+  );
 
   const { data: categories } = $api.useQuery('get', '/categories');
-  const subCategories = categories?.find(c => c.id == category)?.sub || [];
+  const subCategories = categories?.find(c => c.id == category?.id)?.sub || [];
 
   return (
     <Group grow {...others}>
@@ -40,7 +36,7 @@ export default function CategorySelector({
         value={category}
         onChange={(val) => {
           setCategory(val);
-          val && onChange(val);
+          val && onChange([ val ]);
         }}
         onClear={() => { 
           setCategory(undefined);
@@ -55,7 +51,7 @@ export default function CategorySelector({
         value={subCategory}
         onChange={(val) => {
           setSubCategory(val);
-          val && onChange(val);
+          val && onChange([ ...value || [], val ]);
         }}
         onClear={() => { 
           setSubCategory(undefined);

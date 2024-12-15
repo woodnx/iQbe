@@ -3,7 +3,6 @@ import { ApiError } from 'api';
 import Workbook from '@/domains/Workbook';
 import IWorkbookRepository from '@/domains/Workbook/IWorkbookRepository';
 import WorkbookService from '@/domains/Workbook/WorkbookService';
-import { format } from '@/plugins/day';
 import { typedAsyncWrapper } from '@/utils';
 
 export default class WorkbookController {
@@ -20,7 +19,7 @@ export default class WorkbookController {
       res.status(200).send(workbooks.map(w => ({
         wid: w.wid,
         name: w.name,
-        date: w.date ? format(w.date) : undefined,
+        date: w.date || undefined,
         creatorId: w.creatorUid,
         levelId: w.levelId,
         color: w.color,
@@ -40,7 +39,7 @@ export default class WorkbookController {
       res.status(200).send({
         wid: workbook.wid,
         name: workbook.name,
-        date: workbook.date ? format(workbook.date) : undefined,
+        date: workbook.date || undefined,
         creatorId: workbook.creatorUid,
         levelId: workbook.levelId,
         color: workbook.color,
@@ -56,7 +55,7 @@ export default class WorkbookController {
       res.status(200).send(workbooks.map(w => ({
         wid: w.wid,
         name: w.name,
-        date: w.date ? format(w.date) : undefined,
+        date: w.date || undefined,
         creatorId: w.creatorUid,
         levelId: w.levelId,
         color: w.color,
@@ -85,7 +84,7 @@ export default class WorkbookController {
       res.status(200).send({
         wid,
         name,
-        date: date ? format(date) : null,
+        date: date || null,
         creatorId: uid,
         levelId: null,
         color: null,
@@ -130,7 +129,7 @@ export default class WorkbookController {
       res.status(200).send(workbooks.map(w => ({
         wid: w.wid,
         name: w.name,
-        date: w.date ? format(w.date) : undefined,
+        date: w.date || undefined,
         creatorId: w.creatorUid,
         levelId: w.levelId,
         color: w.color,

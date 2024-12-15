@@ -40,7 +40,7 @@ export type mylists = {
     name: Generated<string>;
     created: Timestamp;
     attr: number;
-    mid: Generated<string | null>;
+    mid: Generated<string>;
 };
 export type mylists_quizzes = {
     mylist_id: number;

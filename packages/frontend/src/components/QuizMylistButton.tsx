@@ -1,41 +1,42 @@
+import { components } from 'api/schema';
 import { ComponentProps, useState } from 'react';
 
 import { useIsMobile } from '@/contexts/isMobile';
-import { MylistInformation } from '@/types';
 import { $api } from '@/utils/client';
 import { ActionIcon, Button, Checkbox, Divider, Menu } from '@mantine/core';
+import { modals } from '@mantine/modals';
 import { notifications } from '@mantine/notifications';
 import { IconPlaylistAdd, IconPlus } from '@tabler/icons-react';
 
 import classes from './styles/QuizMylistButton.module.css';
-import { modals } from '@mantine/modals';
+
+type Mylist = components["schemas"]["Mylist"];
 
 interface Props extends ComponentProps<typeof Button> {
   qid: string,
-  registerdMylistId: string[],
-  mylists: MylistInformation[],
+  registerdMylists: Mylist[],
 }
 
 export default function QuizMylistButton({
   qid,
-  registerdMylistId,
-  mylists,
+  registerdMylists,
 }: Props) {
-  const [ selectedMyListIdx, setSelectedMylistIdx ] = useState(registerdMylistId.map(id => mylists?.findIndex(list => list.mid == id)));
+  const { data: mylists } = $api.useQuery('get', '/mylists');
+  const [ selectedMids, setSelectedMids ] = useState(registerdMylists.map(mylist => mylist.mid));
   const isMobile = useIsMobile();
   const { mutate: addQuizToMylist } = $api.useMutation("post", "/register");
   const { mutate: deleteQuizFromMylist } = $api.useMutation("post", "/unregister")
 
-  const saveToList = async (mid: string, arrayIdx: number) => {
+  const saveToList = async (mid: string) => {
     try {
-      if (!selectedMyListIdx.includes(arrayIdx)) { // add quiz into mylist
+      if (!selectedMids.includes(mid)) { // add quiz into mylist
         addQuizToMylist({ 
           body: { 
             qid,
             mid,
           },
         });
-        setSelectedMylistIdx([...selectedMyListIdx, arrayIdx]);
+        setSelectedMids([...selectedMids, mid]);
         notifications.show({
           title: 'マイリストに追加',
           message: 'マイリストにクイズを追加しました',
@@ -48,7 +49,7 @@ export default function QuizMylistButton({
             mid,
           },
         });
-        setSelectedMylistIdx(selectedMyListIdx.filter(idx => idx != arrayIdx));
+        setSelectedMids(selectedMids.filter(_mid => _mid != mid));
         notifications.show({
           title: 'マイリストから削除',
           message: 'マイリストからクイズを削除しました',
@@ -98,14 +99,14 @@ export default function QuizMylistButton({
         </Menu.Target>
         <Menu.Dropdown>
           {
-            mylists?.map((m, idx) => 
+            mylists?.map((m) => 
               <Menu.Item 
                 key={m.mid}
               >
                 <Checkbox
                   label={m.name}
-                  checked={selectedMyListIdx.includes(idx)}
-                  onChange={() => saveToList(m.mid, idx)}
+                  checked={selectedMids.includes(m.mid)}
+                  onChange={() => saveToList(m.mid)}
                 />
               </Menu.Item>
             )

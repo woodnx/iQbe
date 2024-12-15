@@ -1,4 +1,3 @@
-import { useMylists } from "@/hooks/useMylists";
 import QuizCard from "./QuizCard"
 import { Center, Loader } from "@mantine/core";
 import { components } from "api/schema";
@@ -20,8 +19,6 @@ export default function QuizList({
   isHidden = false,
   coloring = false,
 }: QuizListProps) {
-  const { mylists } = useMylists();
-
   return (
     <>
     {
@@ -34,7 +31,6 @@ export default function QuizList({
             key={`${idx}${isHidden}`}
             index={(page -1) * perPage + idx + 1}
             quiz={quiz}
-            mylists={mylists || []}
             coloring={coloring}
             isHidden={isHidden}
             mb={10}
