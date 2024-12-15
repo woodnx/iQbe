@@ -30,7 +30,12 @@ export default async function (req: Request, res: Response, next: NextFunction) 
     .where('uid', '=', uid)
     .executeTakeFirstOrThrow();
 
-    req.user = { ...user, exp, iat };
+    req.user = { 
+      ...user, 
+      exp, 
+      iat,
+      isSuperUser: user.permission == 'SUPER_USER',
+    };
 
     next();
   } catch(e) {

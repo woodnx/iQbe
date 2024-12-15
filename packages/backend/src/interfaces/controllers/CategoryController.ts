@@ -2,9 +2,9 @@ import { ApiError } from 'api';
 
 import ICategoryQueryService from '@/applications/queryservices/ICategoryQueryService';
 import CategoryUseCase from '@/applications/usecases/CategoryUseCase';
-import preset from '@/db/categories/preset.json';
 import abc23 from '@/db/categories/abc23.json';
 import minhaya from '@/db/categories/minhaya.json';
+import preset from '@/db/categories/preset.json';
 import { typedAsyncWrapper } from '@/utils';
 
 export default class CategoryController {
@@ -68,6 +68,9 @@ export default class CategoryController {
 
   post() {
     return typedAsyncWrapper<"/categories", "post">(async (req, res) => {
+      if (!req.user.isSuperUser) 
+        throw new ApiError().accessDenied();
+
       const { name, description, parentId, disabled } = req.body;
   
       if (!name) {
@@ -82,6 +85,9 @@ export default class CategoryController {
 
   put() {
     return typedAsyncWrapper<"/categories/{id}", "put">(async (req, res) => {
+      if (!req.user.isSuperUser) 
+        throw new ApiError().accessDenied();
+
       const { id } = req.params;
       const { description, disabled } = req.body;
 
@@ -95,6 +101,9 @@ export default class CategoryController {
 
   delete() {
     return typedAsyncWrapper<"/categories/{id}", "delete">(async (req, res) => {
+      if (req.user.isSuperUser) 
+        throw new ApiError().accessDenied();
+
       const { id } = req.params;
 
       if (!id) throw new ApiError().invalidParams();
@@ -111,6 +120,9 @@ export default class CategoryController {
 
   addFromPreset() {
     return typedAsyncWrapper<"/categories/preset", "post">(async (req, res) => {
+      if (!req.user.isSuperUser) 
+        throw new ApiError().accessDenied();
+
       const preset = req.body.preset;
 
       if (!preset) {
