@@ -1,5 +1,4 @@
 import ITagRepository from '@/domains/Tag/ITagRepository';
-import { format } from '@/plugins/day';
 import { typedAsyncWrapper } from '@/utils';
 
 export default class TagController {

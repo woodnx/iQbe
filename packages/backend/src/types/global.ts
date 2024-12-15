@@ -6,6 +6,7 @@ type AuthUser = {
   uid: string,
   username: string,
   permission: string,
+  isSuperUser: boolean,
   iat: number,
   exp: number,
 }
