@@ -19,6 +19,7 @@ interface QuizEditFormProps extends BoxProps {
   tags?: string[],
   isPublic?: boolean,
   onSubmit?: (v: QuizEditSubmitValues) => void,
+  disabled?: boolean,
 }
 
 export default function QuizEditForm({
@@ -29,6 +30,7 @@ export default function QuizEditForm({
   tags,
   isPublic,
   onSubmit = () => {},
+  disabled,
   ...others
 }: QuizEditFormProps) {
   const isSuperUser = useIsSuperUser();
@@ -67,7 +69,7 @@ export default function QuizEditForm({
         submit({ 
           ...value,
           category: categoryId, 
-        })
+        });
       })}>
         <Textarea
           {...form.getInputProps('question')}
@@ -77,6 +79,7 @@ export default function QuizEditForm({
           autosize
           minRows={2}
           mb="sm"
+          disabled={disabled}
         />
         <Textarea
           {...form.getInputProps('answer')}
@@ -85,35 +88,42 @@ export default function QuizEditForm({
           variant="filled"
           autosize
           mb="sm"
+          disabled={disabled}
         />
         <CategorySelector 
           {...form.getInputProps('category')}
           mb="sm"
+          disabled={disabled}
         />
         <Grid>
           <Grid.Col span={8}>
             <TagInput 
               {...form.getInputProps('tags')}
+              disabled={disabled}
             />
           </Grid.Col>
           <Grid.Col span={8}>
             <WorkbookCreateAndSelector
               mb="md"
               {...form.getInputProps('wid')}
+              disabled={disabled}
             />
           </Grid.Col>
         </Grid>
         <Group justify="space-between" mt="sm">
           <Switch
             {...form.getInputProps('isPublic', {type: 'checkbox'})}
-            disabled={!isSuperUser}
+            disabled={!isSuperUser || disabled}
             label="クイズを公開する"
             my="sm"
           />
-          <Button
-            disabled={!form.isValid()}
-            type="submit"
-          >保存</Button>
+          { 
+            !disabled && 
+            <Button
+              disabled={!form.isValid()}
+              type="submit"
+            >保存</Button>
+          }
         </Group>
       </form>
     </Card>

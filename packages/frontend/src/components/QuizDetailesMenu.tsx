@@ -41,6 +41,23 @@ export default function({
       <Menu.Dropdown>
         <Menu.Item
           leftSection={<IconInfoCircle style={{ width: rem(14), height: rem(14) }}/>}
+          onClick={() => {
+            modals.openContextModal({
+              modal: 'quizDetailes',
+              title: 'クイズの詳細',
+              innerProps: {
+                qid,
+                question,
+                answer,
+                wid: workbook?.wid,
+                tags: tags.map(tag => tag.label),
+                category: category || [],
+                isPublic,
+              },
+              size: 'xl',
+              zIndex: 200
+            });
+          }}
         >詳細を表示</Menu.Item>
         { <Menu.Item 
           disabled={!isCreated}

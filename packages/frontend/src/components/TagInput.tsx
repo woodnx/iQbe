@@ -6,11 +6,13 @@ import { useState } from "react";
 export interface TagInputProps {
   value?: string[],
   onChange?: (values: string[]) => void,
+  disabled?: boolean
 }
 
 export default function TagInput({
   value = [],
   onChange = () => {},
+  disabled,
 }: TagInputProps) {
   const [ search, setSearch ] = useState('');
   const [ debounced ] = useDebouncedValue(search, 500);
@@ -35,6 +37,7 @@ export default function TagInput({
       value={value}
       maxTags={10}
       data={data}
+      disabled={disabled}
       onChange={(value) => {
         onChange(value)
       }}
