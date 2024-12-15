@@ -5,10 +5,10 @@ type Category = components["schemas"]["Category"];
 
 interface CategorySelectorBaseProps {
   data: Category[] | undefined,
-  value?: number,
+  value?: Category,
   label?: string,
   placeholder?: string,
-  onChange?: (value: number | undefined) => void,
+  onChange?: (value: Category | undefined) => void,
   onClear?: () => void,
 }
 
@@ -25,7 +25,7 @@ export default function CategorySelectorBase({
   });
 
   const options = data?.map(({ id, name, description }) => (
-    <Combobox.Option value={String(id)} key={id} bg={value == id ? 'blue.1' : undefined}>
+    <Combobox.Option value={String(id)} key={id} bg={value?.id == id ? 'blue.1' : undefined}>
       <Text size="sm">{name}</Text>
       <Text size="xs" opacity={0.65}>
         {description}
@@ -33,13 +33,13 @@ export default function CategorySelectorBase({
     </Combobox.Option>
   ));
 
-  const display = data?.filter(({ id }) => value == id)[0]?.name;
+  const display = data?.filter(({ id }) => value?.id == id)[0]?.name;
 
   return (
     <Combobox
       store={combobox}
       onOptionSubmit={(val) => {
-        onChange(Number(val));
+        onChange(data?.find(d => d.id == Number(val)));
         combobox.closeDropdown();
       }}
     >

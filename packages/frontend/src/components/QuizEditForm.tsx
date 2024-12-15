@@ -1,4 +1,4 @@
-import { paths } from 'api/schema';
+import { components, paths } from 'api/schema';
 
 import { useIsSuperUser } from '@/hooks/useLoginedUser';
 import { BoxProps, Button, Card, Grid, Group, Switch, Textarea } from '@mantine/core';
@@ -9,12 +9,13 @@ import TagInput from './TagInput';
 import WorkbookCreateAndSelector from './WorkbookCreateAndSelector';
 
 type QuizEditSubmitValues = paths["/quizzes"]["post"]["requestBody"]["content"]["application/json"];
+type Category = components["schemas"]["Category"];
 
 interface QuizEditFormProps extends BoxProps {
   question: string,
   answer: string,
   wid?: string,
-  category?: number,
+  category?: Category[],
   tags?: string[],
   isPublic?: boolean,
   onSubmit?: (v: QuizEditSubmitValues) => void,
@@ -54,7 +55,20 @@ export default function QuizEditForm({
 
   return (
     <Card padding={0} {...others}>
-      <form onSubmit={form.onSubmit(v => submit(v))}>
+      <form onSubmit={form.onSubmit(v => {
+        const { category, ...value } = v;
+        const categoryId = 
+          category && category.length > 1 ?
+          category[1].id :
+          category && category.length > 0 ?
+          category[0].id :
+          undefined;
+
+        submit({ 
+          ...value,
+          category: categoryId, 
+        })
+      })}>
         <Textarea
           {...form.getInputProps('question')}
           placeholder="問題文を入力"

@@ -2216,6 +2216,7 @@ components:
           type: string
         created:
           type: string
+          format: date-time
           readOnly: true
       required:
         - mid
@@ -2234,21 +2235,34 @@ components:
           type: string
         wid: 
           type: string
-        level:
-          type: string
+          writeOnly: true
+        workbook:
+          $ref: "#/components/schemas/Workbook"
           readOnly: true
-        category:
+        categoryId:
           type: number
+          writeOnly: true
+        category:
+          type: array
+          items:
+            $ref: "#/components/schemas/Category"
+          readOnly: true
         total: 
           type: number
           readOnly: true
         right: 
           type: number
           readOnly: true
+        tagLabels:
+          type: array
+          items: 
+            type: string
+          writeOnly: true
         tags:
           type: array
           items:
-            type: string
+            $ref: "#/components/schemas/Tag"
+          readOnly: true
         creatorId:
           type: string
         isPublic: 
@@ -2264,7 +2278,7 @@ components:
         registerdMylist:
           type: array 
           items: 
-            type: string
+            $ref: "#/components/schemas/Mylist"
           readOnly: true
         judgement:
           type: number
@@ -2275,11 +2289,9 @@ components:
         - answer
         - total
         - right
-        - tags
         - creatorId
         - isPublic
         - isFavorite
-        - registerdMylist
     Rank: 
       type: object
       properties:
@@ -2326,14 +2338,12 @@ components:
       properties:
         label: 
           type: string
-        description:
-          type: string
-        color: 
-          type: string
         created: 
           type: string
+          format: date-time
         modified:
           type: string
+          format: date-time
       required:
         - label
         - created
@@ -2371,6 +2381,7 @@ components:
           type: string
         date: 
           type: string
+          format: date-time
         levelId: 
           type: number
         color: 

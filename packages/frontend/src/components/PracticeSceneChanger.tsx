@@ -92,6 +92,9 @@ export default function({
     workbooks?: string[], 
     keyword?: string, 
     keywordOption?: KeywordOption,
+    categories?: number[],
+    tags?: string[],
+    tagMatchAll?: boolean,
     perPage?: number,
   ) => {
     const seed = Math.floor(Math.random() * 100000);
@@ -102,7 +105,10 @@ export default function({
       seed,
       wids: workbooks, 
       keyword, 
-      keywordOption: Number(keywordOption)
+      keywordOption: Number(keywordOption),
+      categories,
+      tags,
+      tagMatchAll,
     });
     filter.close();
     onFilter();
@@ -204,9 +210,9 @@ export default function({
         <PracticeQuizInfo 
           qid={quiz?.qid}
           answer={quiz?.answer}
-          wid={quiz?.wid || undefined}
+          workbook={quiz?.workbook || undefined}
           isFavorite={quiz?.isFavorite}
-          registeredMylist={quiz?.registerdMylist}
+          registeredMylist={quiz?.registerdMylist || []}
           visible={scene >= 4}
         />
       </Card>

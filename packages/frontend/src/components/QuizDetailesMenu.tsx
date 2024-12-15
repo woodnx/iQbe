@@ -1,15 +1,20 @@
 import { ActionIcon, Menu, rem } from "@mantine/core";
 import { IconDots, IconInfoCircle, IconPencil, IconTrash } from "@tabler/icons-react";
 import { modals } from "@mantine/modals";
+import { components } from "api/schema";
+
+type Category = components["schemas"]["Category"];
+type Workbook = components["schemas"]["Workbook"];
+type Tag = components["schemas"]["Tag"];
 
 interface Props {
   qid: string,
   creatorId: string,
   question: string,
   answer: string,
-  wid?: string,
-  tags: string[],
-  category?: number,
+  workbook?: Workbook,
+  tags: Tag[],
+  category?: Category[],
   isPublic: boolean,
 }
 
@@ -18,7 +23,7 @@ export default function({
   creatorId,
   question,
   answer,
-  wid,
+  workbook,
   tags,
   category,
   isPublic,
@@ -48,8 +53,8 @@ export default function({
                 qid,
                 question,
                 answer,
-                wid,
-                tags,
+                wid: workbook?.wid,
+                tags: tags.map(tag => tag.label),
                 category,
                 isPublic,
               },

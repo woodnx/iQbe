@@ -6,12 +6,16 @@ import KyselyClientManager from '@/interfaces/infra/kysely/KyselyClientManager';
 import KyselyTransactionManager from '@/interfaces/infra/kysely/KyselyTransactionManager';
 import QuizInfra from '@/interfaces/infra/QuizInfra';
 import TagInfra from '@/interfaces/infra/TagInfra';
+import CategoryInfra from '@/interfaces/infra/CategoryInfra';
 
 const router = express.Router();
 
 const kyselyClientManager = new KyselyClientManager();
 const kyselyTransactionManager = new KyselyTransactionManager(kyselyClientManager);
-const quizInfra = new QuizInfra(kyselyClientManager);
+const quizInfra = new QuizInfra(
+  kyselyClientManager,
+  new CategoryInfra(kyselyClientManager),
+);
 const tagInfra = new TagInfra(kyselyClientManager);
 const quizUseCase = new QuizUseCase(
   kyselyTransactionManager,

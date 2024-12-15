@@ -55,8 +55,8 @@ export default class QuizUseCase {
       answer: quiz.answer,
       anotherAnswer: quiz.anotherAnswer,
       wid: quiz.wid,
-      tags: quiz.tagLabels,
-      category: quiz.categoryId,
+      tagLabels: quiz.tagLabels,
+      categoryId: quiz.categoryId,
       creatorId: quiz.creatorUid,
       isPublic: quiz.isPublic(),
       right: quiz.right,
@@ -104,14 +104,13 @@ export default class QuizUseCase {
           answer: quiz.answer,
           anotherAnswer: quiz.anotherAnswer,
           wid: quiz.wid,
-          tags: _quiz.tagLabels,
-          category: quiz.categoryId,
+          tagLabels: _quiz.tagLabels,
+          categoryId: quiz.categoryId,
           creatorId: quiz.creatorUid,
           isPublic: quiz.isPublic(),
           right: quiz.right,
           total: quiz.total,
           isFavorite: false,
-          registerdMylist: [],
         }
       }))
     });
@@ -174,14 +173,13 @@ export default class QuizUseCase {
       answer: quiz.answer,
       anotherAnswer: quiz.anotherAnswer,
       wid: quiz.wid,
-      tags: quiz.tagLabels,
-      category: quiz.categoryId,
+      tagLabels: quiz.tagLabels,
+      categoryId: quiz.categoryId,
       creatorId: quiz.creatorUid,
       isPublic: quiz.isPublic(),
       right: quiz.right,
       total: quiz.total,
       isFavorite: false,
-      registerdMylist: [],
     }
   }
 

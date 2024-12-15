@@ -4,18 +4,20 @@ import { sql } from 'kysely';
 import { isEqual, sortBy, uniq } from 'lodash';
 
 import IQuizQueryService, {
-    countOption, findOption
+  countOption, findOption
 } from '@/applications/queryservices/IQuizQueryService';
 import Quiz from '@/domains/Quiz';
 import IQuizRepository from '@/domains/Quiz/IQuizRepository';
 
 import KyselyClientManager from './kysely/KyselyClientManager';
+import CategoryInfra from './CategoryInfra';
 
 type QuizDTO = components["schemas"]["Quiz"];
 
 export default class QuizInfra implements IQuizRepository, IQuizQueryService {
   constructor(
     private clientManager: KyselyClientManager,
+    private categoryInfra: CategoryInfra,
   ) {}
 
   private async addTagToQuiz(qid: string, tagLabel: string) {
@@ -86,10 +88,8 @@ export default class QuizInfra implements IQuizRepository, IQuizQueryService {
       'quizzes.ans as answer',
       'quizzes.anoans as anotherAnswer',
       'workbooks.wid as wid', 
-      'workbooks.name as workbook',
-      'levels.color as level',
       'users.uid as creatorId',
-      'quizzes.category_id as category',
+      'quizzes.category_id as categoryId',
       'quizzes.total_crct_ans as right',
       sql<number>`total_crct_ans + total_through_ans + total_wrng_ans`.as('total'),
       fn.countAll<number>().over().as('size'),
@@ -204,7 +204,27 @@ export default class QuizInfra implements IQuizRepository, IQuizQueryService {
       quizzes.map(async q => {
         const { id: quizId, ...quiz } = q;
         
-        const [ isFavorite, registerdMylist, tags, visibleUser ] = await Promise.all([
+        const [ 
+          category,
+          workbook,
+          isFavorite, 
+          registerdMylist, 
+          tags, 
+          visibleUser 
+        ] = await Promise.all([
+          quiz.categoryId ? this.categoryInfra.findChainById(quiz.categoryId) : [],
+
+          client.selectFrom('workbooks')
+          .innerJoin('users', 'workbooks.creator_id', 'users.id')
+          .select([
+            'wid',
+            'date',
+            'name',
+            'users.uid as creatorId',
+          ])
+          .where('wid', '=', quiz.wid)
+          .executeTakeFirst(),
+
           client.selectFrom('favorites')
           .select('quiz_id')
           .where(({eb, and}) => and([
@@ -215,20 +235,26 @@ export default class QuizInfra implements IQuizRepository, IQuizQueryService {
   
           client.selectFrom('mylists_quizzes')
           .innerJoin('mylists', 'mylists_quizzes.mylist_id', 'mylists.id')
-          .select(['mylists.mid as mid'])
+          .select([
+            'mylists.mid as mid',
+            'mylists.name as name',
+            'mylists.created as created'
+          ])
           .where(({eb, and}) => and([
             eb('mylists.user_id', '=', userId),
             eb('mylists_quizzes.quiz_id', '=', quizId)
           ]))
-          .execute()
-          .then(mylists => mylists.map(m => m?.mid || '')),
+          .execute(),
 
           client.selectFrom('tagging')
           .innerJoin('tags', 'tagging.tag_id', 'tags.id')
-          .select('tags.label as label')
+          .select([
+            'tags.label as label',
+            'tags.created as created',
+            'tags.modified as modified'
+          ])
           .where('tagging.quiz_id', '=', quizId)
-          .execute()
-          .then(tags => tags.map(t => t.label)),
+          .execute(),
   
           client.selectFrom('quiz_visible_users')
           .innerJoin('users', 'users.id', 'quiz_visible_users.user_id')
@@ -240,12 +266,25 @@ export default class QuizInfra implements IQuizRepository, IQuizQueryService {
         ]);
         
         return {
-          ...quiz,
-          right: quiz.right || 0,
+          qid: quiz.qid,
+          question: quiz.question,
+          answer: quiz.answer,
+          anotherAnswer: quiz.anotherAnswer,
+          creatorId: quiz.creatorId,
+          isPublic: !visibleUser,
           isFavorite: !!isFavorite,
+          right: quiz.right || 0,
+          total: quiz.total || 0,
           registerdMylist,
           tags,
-          isPublic: !visibleUser,
+          workbook,
+          category: category?.map(c => ({
+            id: c.id,
+            name: c.name,
+            parentId: c.parentId,
+            description: c.description,
+            disabled: c.disabled,
+          })),
         };
     }));
   }
