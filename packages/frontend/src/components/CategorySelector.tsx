@@ -11,11 +11,13 @@ type Category = components["schemas"]["Category"];
 interface CategorySelectorProps extends BoxProps {
   value?: Category[],
   onChange?: (value: Category[] | undefined) => void,
+  disabled?: boolean,
 }
 
 export default function CategorySelector({
   value,
   onChange = () => {},
+  disabled,
   ...others
 }: CategorySelectorProps) {
   const [ category, setCategory ] = useState<Category | undefined>(
@@ -34,6 +36,7 @@ export default function CategorySelector({
         label="ジャンル"
         data={categories}
         value={category}
+        disabled={disabled}
         onChange={(val) => {
           setCategory(val);
           val && onChange([ val ]);
@@ -49,6 +52,7 @@ export default function CategorySelector({
         placeholder="サブジャンルを選択"
         data={subCategories}
         value={subCategory}
+        disabled={disabled}
         onChange={(val) => {
           setSubCategory(val);
           val && onChange([ ...value || [], val ]);

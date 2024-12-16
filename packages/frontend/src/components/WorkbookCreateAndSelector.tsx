@@ -6,11 +6,13 @@ import WorkbookSelector from "./WorkbookSelector";
 interface Props extends BoxProps {
   value?: string | null,
   onChange?: (value: string | null) => void,
+  disabled?: boolean,
 }
 
 export default function WorkbookCreateAndSelector({
   value,
   onChange = () => {},
+  disabled,
   ...others
 }: Props) {
   const { workbooks } = useWorkbooks();
@@ -25,12 +27,16 @@ export default function WorkbookCreateAndSelector({
             <WorkbookSelector
               value={value}
               onChange={(v) => onChange(v)}
+              disabled={disabled}
             />
           </Grid.Col>
         }
-        <Grid.Col span={12}>
-          <WorkbookCreateModalButton />
-        </Grid.Col>
+        { 
+          !disabled && 
+          <Grid.Col span={12}>
+            <WorkbookCreateModalButton />
+          </Grid.Col>
+        }
       </Grid>
     </Box>
   );

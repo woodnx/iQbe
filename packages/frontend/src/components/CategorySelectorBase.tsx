@@ -8,6 +8,7 @@ interface CategorySelectorBaseProps {
   value?: Category,
   label?: string,
   placeholder?: string,
+  disabled?: boolean,
   onChange?: (value: Category | undefined) => void,
   onClear?: () => void,
 }
@@ -17,6 +18,7 @@ export default function CategorySelectorBase({
   value,
   label,
   placeholder,
+  disabled,
   onChange = () => {},
   onClear = () => {},
 }: CategorySelectorBaseProps) {
@@ -46,11 +48,12 @@ export default function CategorySelectorBase({
       <Combobox.Target>
         <InputBase
           label={label}
+          disabled={disabled}
           component="button"
           type="button"
           pointer
           rightSection={
-            value != null ? (
+            value != null && !disabled ? (
               <CloseButton
                 size="sm"
                 onMouseDown={(e) => e.preventDefault()}
