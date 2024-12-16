@@ -14,8 +14,10 @@ import QuizEditModal from './components/QuizEditModal';
 import Layout from './layouts';
 import MylistCreateModal from './components/MylistCreateModal';
 import QuizDeleteModal from './components/QuizDeleteModal';
+import QuizDetailesModal from './components/QuizDetailesModal';
 
 const modals = {
+  quizDetailes: QuizDetailesModal,
   quizEdit: QuizEditModal,
   quizDelete: QuizDeleteModal,
   categoryEdit: CategoryEditModal,
