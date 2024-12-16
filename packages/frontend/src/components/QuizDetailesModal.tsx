@@ -1,7 +1,7 @@
 import { components } from 'api/schema';
 
 import { ContextModalProps } from '@mantine/modals';
-import { ActionIcon, Affix, Code, CopyButton, Group, rem, Text, Tooltip } from '@mantine/core';
+import { ActionIcon, Code, CopyButton, Group, rem, Tooltip } from '@mantine/core';
 import { IconCheck, IconCopy } from '@tabler/icons-react';
 
 type Quiz = components["schemas"]["Quiz"];
