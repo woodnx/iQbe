@@ -68,6 +68,8 @@ model invite_codes {
   id      BigInt   @id @default(autoincrement())
   code    String   @db.VarChar(32)
   used    Boolean  @default(false)
+  created DateTime @default(now())
+  updated DateTime @default(now()) @updatedAt
 }
 
 model levels {

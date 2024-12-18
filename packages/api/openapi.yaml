@@ -711,14 +711,61 @@ paths:
         "403":
           $ref: "#/components/responses/403Forbidden"
   "/invite-code":
+    get:
+      tags:
+        - auth
+      summary: 招待コード
+      description: 招待コードのリストを取得
+      parameters:
+        - name: status
+          in: query
+          required: false
+          description: '0: 未使用, 1: 使用済み'
+          schema: 
+            type: number
+          example: 0
+        - name: sort
+          in: query
+          required: false
+          description: 'asc: 作成日時（昇順），desc: 作成日時（降順）'
+          schema:
+            type: string
+          example: asc
+      responses:
+        "200":
+            description: 招待コードのリストを取得
+            content:
+              application/json:
+                schema: 
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      code: 
+                        type: string
+                      status:
+                        type: number
+                      created: 
+                        type: string
+                        format: date-time
+                    required:
+                      - code
+                      - status
+                      - created
+        "400":
+          $ref: "#/components/responses/400BadRequest"
+        "401": 
+          $ref: "#/components/responses/401Unauthorized"
+        "403":
+          $ref: "#/components/responses/403Forbidden"
     post:
       tags: 
         - auth
-      summary: 招待コードを取得
-      description: 招待コードを取得する
+      summary: 招待コードを発行
+      description: 招待コードを発行する
       responses:
         "200":
-          description: 招待コードを取得
+          description: 招待コードを発行
           content:
             application/json:
               schema:

@@ -118,7 +118,7 @@ export default class AuthUseCase {
           });
         }
 
-        const code = new InviteCode(inviteCode);
+        const code = InviteCode.create(inviteCode);
         const available = await inviteCodeService.checkAvailable(code);
         
         // エラー処理
@@ -208,7 +208,7 @@ export default class AuthUseCase {
             detail: "This server is required invite code. Please set invite code."
           });
 
-        const code = new InviteCode(inviteCode);
+        const code = InviteCode.create(inviteCode);
         const available = await inviteCodeService.checkAvailable(code);
         
         // エラー処理
