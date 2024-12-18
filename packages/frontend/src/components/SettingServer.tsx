@@ -1,9 +1,11 @@
-import CategoryInput from "./CategorySetting";
+import CategorySetting from "./CategorySetting";
+import InviteCodeSetting from "./InviteCodeSetting";
 
 export default function SettingServer() {
   return (
     <>
-      <CategoryInput />
+      <InviteCodeSetting />
+      <CategorySetting />
     </>
   )
 }
