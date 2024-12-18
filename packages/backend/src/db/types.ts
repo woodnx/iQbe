@@ -27,6 +27,8 @@ export type invite_codes = {
     id: Generated<number>;
     code: string;
     used: Generated<number>;
+    created: Generated<Timestamp>;
+    updated: Generated<Timestamp>;
 };
 export type levels = {
     id: Generated<number>;

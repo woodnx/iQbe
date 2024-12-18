@@ -9,6 +9,7 @@ const inviteCodeController = new InviteCodeController(
 
 const router = express.Router();
 
+router.get('/', inviteCodeController.get());
 router.post('/', inviteCodeController.create());
 
 module.exports = router;

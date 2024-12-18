@@ -9,6 +9,27 @@ export default class InviteCodeController {
     private inviteCodeRepository: IInviteCodeRepository,
   ) {}
 
+  get() {
+    return typedAsyncWrapper<"/invite-code", "get">(async (req, res) => {
+      if (!req.user.isSuperUser) 
+        throw new ApiError().accessDenied();
+
+      const status = req.query?.status || undefined;
+      const sort = req.query?.sort || undefined;
+
+      const inviteCodes = await this.inviteCodeRepository.findMany({
+        status,
+        sort,
+      });
+
+      res.status(200).send(inviteCodes.map(inviteCode => ({
+        code: inviteCode.code,
+        status: inviteCode.used,
+        created: inviteCode.created,
+      })));
+    });
+  }
+
   create() {
     return typedAsyncWrapper<"/invite-code", "post">(async (req, res) => {
       if (!req.user.isSuperUser) 
