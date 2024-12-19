@@ -1,8 +1,9 @@
 import cors from 'cors';
 import express from 'express';
+import * as OpenApiValidator from 'express-openapi-validator';
+import boolParser from 'express-query-boolean';
 import fs from 'fs';
 import path from 'path';
-import boolParser from 'express-query-boolean';
 
 import { errorHandler } from '@/middleware/error';
 import verifyAuthToken from '@/middleware/verifyAuthToken';
@@ -26,6 +27,14 @@ app.use(express.json());
 app.use(boolParser());
 app.use(express.static(path.join(__dirname, 'public'))); 
 app.use(express.static(path.join(__dirname, 'web')));
+
+app.use(
+  OpenApiValidator.middleware({
+    apiSpec: path.join(__dirname, '../../api/openapi.yaml'),
+    validateRequests: true, // (default)
+    validateResponses: false, // false by default
+  }),
+);
 
 // router import
 const filenames = fs.readdirSync(path.join(__dirname, 'routes')).filter(n => !n.includes(".map"))
