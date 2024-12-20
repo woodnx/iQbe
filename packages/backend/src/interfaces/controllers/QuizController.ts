@@ -98,17 +98,22 @@ export default class QuizController {
       const category = req.body.category || undefined;
       const wid = req.body.wid || undefined;
       const limitedUser = req.body.limitedUser || [];
+      const isPublic = !!req.body.isPublic;
       const uid = req.user.uid;
 
       if (!question || !answer) {
         throw new ApiError().invalidParams();
       }
 
+      if (isPublic && !req.user.isSuperUser) {
+        throw new ApiError().accessDenied();
+      }
+
       await this.quizUseCase.addQuiz(
         question,
         answer,
         tags,
-        limitedUser,
+        isPublic,
         uid,
         anotherAnswer,
         category,
