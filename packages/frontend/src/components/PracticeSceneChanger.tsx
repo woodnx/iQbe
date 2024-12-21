@@ -189,7 +189,7 @@ export default function({
           apply={toFilter}
           opened={filtering}
           onOpen={filter.open}
-          onClose={!!quizzes ? filter.close : toFilter}
+          onClose={toFilter}
         />
         <PracticeQuitModal
           onJudge={(j) => stopQuiz(j)}
