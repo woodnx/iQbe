@@ -50,7 +50,7 @@
     "@types/multer": "^1.4.11",
     "@types/node": "^20.5.8",
     "@types/nodemailer": "^6.4.14",
-    "prisma": "^5.22.0",
+    "prisma": "^6.1.0",
     "prisma-kysely": "^1.8.0",
     "tsc-alias": "^1.8.10",
     "tsc-watch": "^6.2.0",

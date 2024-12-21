@@ -5,7 +5,6 @@ generator client {
   output = "../src/db"
   fileName = "types.ts"
   enumFileName = "enums.ts"
-  previewFeatures = ["fullTextSearch", "fullTextIndex"]
 }
 
 datasource db {
