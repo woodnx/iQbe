@@ -26,6 +26,7 @@
     "express": "^4.18.2",
     "express-openapi-validator": "^5.3.9",
     "express-query-boolean": "^2.0.0",
+    "express-query-int": "^3.0.0",
     "hashids": "^2.3.0",
     "jsonwebtoken": "^9.0.2",
     "knex": "^2.5.1",

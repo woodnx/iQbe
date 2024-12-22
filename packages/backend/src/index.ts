@@ -2,6 +2,7 @@ import cors from 'cors';
 import express from 'express';
 import * as OpenApiValidator from 'express-openapi-validator';
 import boolParser from 'express-query-boolean';
+import intParser from 'express-query-int';
 import fs from 'fs';
 import path from 'path';
 
@@ -25,6 +26,7 @@ app.use(cors({
 }));
 app.use(express.json({limit: '5mb'})); 
 app.use(boolParser());
+app.use(intParser());
 app.use(express.static(path.join(process.cwd(), 'public'))); 
 app.use(express.static(path.join(__dirname, 'web')));
 
