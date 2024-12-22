@@ -184,7 +184,9 @@ model quizzes {
   sub_categories     sub_categories?      @relation(fields: [sub_category_id], references: [id])
   users              users?               @relation(fields: [creator_id], references: [id], onUpdate: Cascade, onDelete: Cascade)
 
-  @@fulltext([que, ans, anoans])
+  @@fulltext([que])
+  @@fulltext([ans])
+  @@fulltext([que, ans])
 }
 
 model quizzes_categories {
