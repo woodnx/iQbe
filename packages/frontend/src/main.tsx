@@ -17,7 +17,7 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
     <MantineProvider
       theme={{
-        fontFamily: 'Noto Sans JP',
+        fontFamily: 'Hiragino Maru Gothic Pro, Kosugi Maru, BIZ UDGothic, Roboto, HelveticaNeue, Arial, sans-serif',
       }}
     >
       <QueryClientProvider client={queryClient}>
