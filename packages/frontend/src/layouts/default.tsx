@@ -1,7 +1,7 @@
 import { useLayoutEffect } from "react";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { ActionIcon, AppShell, Center, Container, Drawer, Group, Loader } from "@mantine/core";
-import { IconActivity, IconHistory, IconHome, IconMenu2, IconPencil, IconSchool, IconSearch, IconStar } from "@tabler/icons-react";
+import { IconActivity, IconBook, IconHistory, IconHome, IconMenu2, IconPencil, IconSchool, IconSearch, IconStar } from "@tabler/icons-react";
 import { useState } from "react";
 import { useDisclosure } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
@@ -22,7 +22,8 @@ const checkPathname = (pathname: string) => {
   else if (pathname === '/favorite') return '/favorite';
   else if (pathname === '/history') return '/history';
   else if (pathname === '/setting') return '/setting';
-  else if (pathname.includes('create')) return '/create';
+  else if (pathname === '/create') return '/create';
+  else if (pathname.includes('workbook')) return '/workbook';
   else if (pathname.includes('mylist')) return '/mylist';
   else return '';
 };
@@ -55,6 +56,12 @@ export default function DefaultLayout() {
       link: '/',
     },
     {
+      label: '問題集',
+      icon: IconBook,
+      link: '/workbook',
+      links: mockWorkbooks
+    },
+    {
       label: '検索',
       icon: IconSearch,
       link: '/search',
@@ -68,13 +75,6 @@ export default function DefaultLayout() {
       label: '作問',
       icon: IconPencil,
       link: '/create',
-      links: [
-        {
-          label: 'すべてのクイズ',
-          link: 'all',
-        },
-        ...mockWorkbooks || [],
-      ]
     },
     {
       label: 'お気に入り',
@@ -97,7 +97,9 @@ export default function DefaultLayout() {
     },
   ];
 
-  const activeIdx = mockdata.findIndex((data) => checkPathname(location.pathname) === data.link);
+  const activeIdx = mockdata.findIndex((data) => 
+    checkPathname(location.pathname) === data.link
+  );
 
   useLayoutEffect(() => {
     let ignore = false;
