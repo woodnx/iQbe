@@ -7,14 +7,14 @@ import {
 import { IconTag } from '@tabler/icons-react';
 
 interface FilteringTagsProps extends BoxProps {
-  values?: string[] | undefined,
+  value?: string[] | undefined,
   onAdd?: (value: string) => void,
   onRemove?: (value: string) => void,
   onChange?: (values: string[]) => void
 }
 
 export default function FilteringTags({ 
-  values = [], 
+  value = [], 
   onChange = () => {},
   onAdd = () => {},
   onRemove = () => {},
@@ -34,17 +34,17 @@ export default function FilteringTags({
     onDropdownOpen: () => combobox.updateSelectedOptionIndex('active'),
   });
 
-  const handleValueSelect = (value?: string) => {
-    if (!value) return;
+  const handleValueSelect = (v?: string) => {
+    if (!v) return;
 
-    onAdd(value);
-    onChange([ ...values, value ]);
+    onAdd(v);
+    onChange([ ...value, v ]);
     setSearch('');
   }
 
-  const handleValueRemove = (value: string) => {
-    onRemove(value);
-    onChange(values.filter(v => v !== value));
+  const handleValueRemove = (v: string) => {
+    onRemove(v);
+    onChange(value.filter(_v => _v !== v));
   }
   
   const options = tags?.map(({ label }) => (
@@ -62,18 +62,18 @@ export default function FilteringTags({
         >
           { label }
         </Badge>
-        {values.some(v => v == label) ? <CheckIcon size={12} /> : null}
+        {value.some(v => v == label) ? <CheckIcon size={12} /> : null}
       </Group>
     </Combobox.Option>
   ));
 
-  const pills = values.map((value) => (
+  const pills = value.map((v) => (
     <Pill 
-      key={value} 
-      onRemove={() => handleValueRemove(value)}
+      key={v} 
+      onRemove={() => handleValueRemove(v)}
       withRemoveButton
     >
-      { value }
+      { v }
     </Pill>
   ));
   
@@ -105,7 +105,7 @@ export default function FilteringTags({
                 onKeyDown={(event) => {
                   if (event.key === 'Backspace' && search.length === 0) {
                     event.preventDefault();
-                    handleValueRemove(values[values.length - 1]);
+                    handleValueRemove(value[value.length - 1]);
                   }
                 }}
               />

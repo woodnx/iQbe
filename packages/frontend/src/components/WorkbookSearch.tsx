@@ -30,6 +30,7 @@ export default function WorkbookSearch({
         {
           displayed.map(workbook => (
             <WorkbookCard
+              key={workbook.wid}
               wid={workbook.wid}
               title={workbook.name}
             />

@@ -106,14 +106,14 @@ export default class QuizInfra implements IQuizRepository, IQuizQueryService {
         query = query.where('workbooks.wid', '=', option.wids);
     if (!!option.seed)     query = query.orderBy(sql`RAND(${option.seed})`);
     if (!!option.keyword && !!option.keywordOption) {
-      if (option.keywordOption === 1) {
-        query = query.where(sql`MATCH (que, ans) AGAINST (${option.keyword} IN BOOLEAN MODE)`);
+      if (option.keywordOption === 2) {
+        query = query.where(sql`MATCH (ans) AGAINST (${option.keyword} IN BOOLEAN MODE)`);
       }
-      else if (option.keywordOption === 2) { 
+      else if (option.keywordOption === 3) { 
         query = query.where(sql`MATCH (que) AGAINST (${option.keyword} IN BOOLEAN MODE)`);
       }
       else { 
-        query = query.where(sql`MATCH (ans) AGAINST (${option.keyword} IN BOOLEAN MODE)`);
+        query = query.where(sql`MATCH (que, ans) AGAINST (${option.keyword} IN BOOLEAN MODE)`);
       }
     }
     if (!!option.categories) {

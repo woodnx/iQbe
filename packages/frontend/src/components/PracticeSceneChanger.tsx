@@ -1,19 +1,20 @@
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { Card, Group, Loader, Overlay, Text } from "@mantine/core";
-import { useDisclosure } from "@mantine/hooks";
-import { KeywordOption } from "@/types";
-import PracticeTypewriteQuiz from "@/components/PracticeTypewriteQuiz";
-import FilteringModal from "@/components/FilteringModal";
-import { PracticeQuizIntro } from "@/components/PracticeQuizIntro";
-import { PracticeQuizInfo } from "@/components/PracticeQuizInfo";
-import { PracticeQuizController } from "@/components/PracticeQuizController";
-import PracticeQuitModal from "@/components/PracticeQuitModal";
-import PracticeResultModal  from "@/components/PracticeResultModal";
-import { useTimer, useTypewriter } from "@/hooks";
-import useQuizzes from "@/hooks/useQuizzes";
-import { $api } from "@/utils/client";
-import { components } from "api/schema";
+import { components } from 'api/schema';
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+
+import FilteringModal from '@/components/FilteringModal';
+import FilteringModalButton from '@/components/FilteringModalButton';
+import PracticeQuitModal from '@/components/PracticeQuitModal';
+import { PracticeQuizController } from '@/components/PracticeQuizController';
+import { PracticeQuizInfo } from '@/components/PracticeQuizInfo';
+import { PracticeQuizIntro } from '@/components/PracticeQuizIntro';
+import PracticeResultModal from '@/components/PracticeResultModal';
+import PracticeTypewriteQuiz from '@/components/PracticeTypewriteQuiz';
+import { useTimer, useTypewriter } from '@/hooks';
+import useQuizzes from '@/hooks/useQuizzes';
+import { $api } from '@/utils/client';
+import { Card, Group, Loader, Overlay, Text } from '@mantine/core';
+import { useDisclosure } from '@mantine/hooks';
 
 type Quiz = components['schemas']['Quiz'];
 
@@ -33,7 +34,7 @@ export default function({
   onFilter = () => {},
 }: Props) {
   const [ nowNumber, setNowNumber ] = useState(0);
-  const [ scene, setScene ] = useState(0);
+  const [ scene, setScene ] = useState(isTransfer ? 0 : -1);
   const [ startTrigger, setStartTrigger ] = useState(isTransfer);
   const [ filtering, filter ] = useDisclosure(false);
   const [ resulted, result ] = useDisclosure(false);
@@ -83,32 +84,31 @@ export default function({
 
   useEffect(() => {
     if (!isTransfer) filter.open();
-    
-    setScene(0);
-    return () => setScene(0);
+    return () => setScene(isTransfer ? 0 : -1);
   },[]);
 
   const toFilter = (
-    workbooks?: string[], 
+    wids?: string | string[], 
     keyword?: string, 
-    keywordOption?: KeywordOption,
-    categories?: number[],
-    tags?: string[],
+    keywordOption?: number,
+    categories?: number | number[],
+    tags?: string | string[],
     tagMatchAll?: boolean,
-    perPage?: number,
+    maxView?: number,
   ) => {
     const seed = Math.floor(Math.random() * 100000);
     setParams({ 
-      ...params, 
+      ...params,
       page: 1, 
-      maxView: perPage,
+      maxView,
       seed,
-      wids: workbooks, 
+      wids, 
       keyword, 
       keywordOption: Number(keywordOption),
       categories,
       tags,
       tagMatchAll,
+      isFavorite: false,
     });
     filter.close();
     onFilter();
@@ -165,6 +165,12 @@ export default function({
           </Overlay> 
         : null
       }
+      <FilteringModal 
+        isFilterKeyword={true}
+        opened={filtering}
+        onSubmit={toFilter}
+        onClose={toFilter}
+      />
       <PracticeResultModal
         rightTotal={rightList.length}
         quizzesTotal={maxQuizSize || 1}
@@ -185,11 +191,8 @@ export default function({
         onQuit={() => navigator('/')}
       />
       <Group justify="space-between">
-        <FilteringModal
-          apply={toFilter}
-          opened={filtering}
-          onOpen={filter.open}
-          onClose={toFilter}
+        <FilteringModalButton
+          onSubmit={toFilter}
         />
         <PracticeQuitModal
           onJudge={(j) => stopQuiz(j)}

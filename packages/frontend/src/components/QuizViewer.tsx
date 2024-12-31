@@ -1,20 +1,22 @@
 import { ReactNode, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Center, Group, Stack, } from '@mantine/core';
-import dayjs from "@/plugins/dayjs";
-import QuizList from '@/components/QuizList';
+
 import QuizControllBar from '@/components/QuizControllBar';
-import FilteringModal from '@/components/FilteringModal';
+import QuizHiddenAnswerButton from '@/components/QuizHiddenAnswerButton';
+import QuizList from '@/components/QuizList';
 import QuizPagination from '@/components/QuizPagination';
 import QuizShuffleButton from '@/components/QuizShuffleButton';
-import QuizHiddenAnswerButton from '@/components/QuizHiddenAnswerButton';
-import { Judgement, KeywordOption, QuizRequestParams } from '@/types';
-import useQuizzes from '@/hooks/useQuizzes';
-import { useHistories } from "@/hooks/useHistories";
-import HistorySelectJudgement from './HistorySelectJudgement';
-import HistoryDateRange from './HistoryDateRange';
-import QuizTransfarButton from './QuizTransfarButton';
+import { useHistories } from '@/hooks/useHistories';
 import useQuizSize from '@/hooks/useQuizSize';
+import useQuizzes from '@/hooks/useQuizzes';
+import dayjs from '@/plugins/dayjs';
+import { Judgement, QuizRequestParams } from '@/types';
+import { Center, Group, Stack } from '@mantine/core';
+
+import FilteringModalButton from './FilteringModalButton';
+import HistoryDateRange from './HistoryDateRange';
+import HistorySelectJudgement from './HistorySelectJudgement';
+import QuizTransfarButton from './QuizTransfarButton';
 
 interface Props {
   headerCard?: ReactNode,
@@ -45,11 +47,11 @@ export default function({
   const size = !!quizzes && !!quizzes.length && !!quizzesSize ? quizzesSize : 0;
 
   const toFilter = (
-    workbooks?: string[], 
+    workbooks?: string | string[], 
     keyword?: string, 
-    keywordOption?: KeywordOption,
-    categories?: number[],
-    tags?: string[],
+    keywordOption?: number,
+    categories?: number | number[],
+    tags?: string | string[],
     tagMatchAll?: boolean,
     perPage?: number,
   ) => {
@@ -108,7 +110,7 @@ export default function({
       ...params,
       since: dates[0],
       until: dates[1]
-    })
+    });
   }
 
   return (
@@ -119,8 +121,8 @@ export default function({
         header={headerCard}
         buttons={
           <Group>
-            <FilteringModal
-              apply={toFilter}
+            <FilteringModalButton 
+              onSubmit={toFilter}
             />
             <QuizShuffleButton
               apply={toShuffle}

@@ -6,13 +6,11 @@ type Workbook = components["schemas"]["Workbook"];
 
 interface Props extends BadgeProps {
   workbook: Workbook,
-  levelColor: string,
   transformUpper?: boolean,
 }
 
 export function QuizWorkbookBadge({
   workbook,
-  levelColor,
   transformUpper,
   ...other
 }: Props) {
@@ -21,7 +19,6 @@ export function QuizWorkbookBadge({
   return (
     <Badge 
       variant="dot"
-      color={levelColor} 
       radius="sm"
       size={ isMobile ? "md" : "lg" }
       style={{ textTransform: 'none', backgroundColor: '#fff' }}

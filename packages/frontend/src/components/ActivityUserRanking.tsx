@@ -4,16 +4,26 @@ import { Period } from "@/plugins/dayjs";
 import { useAllUserRanking } from "@/hooks/useUserRanking";
 import ActivityRank from "./ActivityRank";
 import ActivitySelectRange from "./ActivitySelectRange";
+import { IconCircleNumber1, IconCircleNumber2, IconCircleNumber3, IconCircleNumber4, IconCircleNumber5, IconCircleNumber6 } from "@tabler/icons-react";
 
 export default function ActivityUserRanking(){
   const [ period, setPeriod ] = useState<Period>('day');
   const { allUserRanking } = useAllUserRanking(period);
+  const icons = [
+    IconCircleNumber1,
+    IconCircleNumber2,
+    IconCircleNumber3,
+    IconCircleNumber4,
+    IconCircleNumber5,
+    IconCircleNumber6,
+  ]
 
   const Item = allUserRanking?.length !== 0 ? 
-  allUserRanking?.map((r) => {
+  allUserRanking?.map((r, idx) => {
     return (
       <ActivityRank
         name={r.nickname || r.username}
+        icon={icons[idx]}
         rank={r.rank}
         count={r.count}
         key={r.uid}
