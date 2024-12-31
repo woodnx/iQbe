@@ -13,6 +13,7 @@ interface FilteringModalProps {
     tagMatchAll?: boolean,
     maxView?: number, 
   ) => void,
+  isFilterKeyword?: boolean,
   initalState?: boolean,
   opened?: boolean,
   onOpen?: () => void,
@@ -20,8 +21,9 @@ interface FilteringModalProps {
 };
 
 export default function FilteringModal({
-  onSubmit = () => {},
   opened: outerOpened,
+  isFilterKeyword = false,
+  onSubmit = () => {},
   onClose,
 }: FilteringModalProps) {
   const [ opened, { close } ] = useDisclosure();
@@ -41,6 +43,7 @@ export default function FilteringModal({
         pos="absolute"
       >
         <FilteringForm 
+          isFilterKeyword={isFilterKeyword}
           onSubmit={({
             wids,
             keyword,

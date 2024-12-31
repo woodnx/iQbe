@@ -23,7 +23,7 @@ const useQuizzes = (
         seed: params.seed,
         wids: params.wids,
         keyword: params.keyword,
-        keywordOption: Number(params.keywordOption),
+        keywordOption: params.keywordOption,
         judgements: params.judgements,
         since: params.since,
         until: params.until,

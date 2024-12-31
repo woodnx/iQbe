@@ -35,6 +35,7 @@ export default function FilteringWord({
       <Radio.Group 
         label="検索範囲"
         value={wordSearchOption.value}
+        defaultValue="1"
         onChange={(v) => {
           if (v == "1" || v == "2" || v == "3") {
             wordSearchOption.onChange && wordSearchOption.onChange(v);

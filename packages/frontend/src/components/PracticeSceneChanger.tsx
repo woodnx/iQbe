@@ -166,6 +166,7 @@ export default function({
         : null
       }
       <FilteringModal 
+        isFilterKeyword={true}
         opened={filtering}
         onSubmit={toFilter}
         onClose={toFilter}
