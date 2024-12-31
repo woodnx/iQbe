@@ -4,12 +4,12 @@ import { QuizWorkbookBadge } from "./QuizWorkbookBadge";
 import { useWorkbooks } from "@/hooks/useWorkbooks";
 
 interface FilteringWorkbookProps extends BoxProps {
-  values: string[] | undefined,
-  onChange: (values: string[]) => void
+  value?: string[],
+  onChange?: (value: string[]) => void
 }
 
 export default function FilteringWorkbook({ 
-  values = [], 
+  value = [], 
   onChange = () => {},
   ...others
 }: FilteringWorkbookProps ) {
@@ -20,35 +20,34 @@ export default function FilteringWorkbook({
     onDropdownOpen: () => combobox.updateSelectedOptionIndex('active'),
   });
 
-  const handleValueSelect = (value: string) => {
-    onChange([ ...values, value ]);
+  const handleValueSelect = (v: string) => {
+    onChange([ ...value, v ]);
   }
 
-  const handleValueRemove = (value: string) => {
-    onChange(values.filter((v) => v !== value));
+  const handleValueRemove = (v: string) => {
+    onChange(value.filter((_v) => _v !== v));
   }
   
   const options = workbooks?.filter((item) => 
     item.name.toLowerCase().includes(search.trim().toLowerCase()
-  )).map(({ wid, color }) => (
-    <Combobox.Option value={wid} key={wid} active={values.includes(wid)}>
+  )).map((workbook) => (
+    <Combobox.Option value={workbook.wid} key={workbook.wid} active={value.includes(workbook.wid)}>
       <Group gap="sm">
-        {values.includes(wid) ? <CheckIcon size={12} /> : null}
+        {value.includes(workbook.wid) ? <CheckIcon size={12} /> : null}
         <QuizWorkbookBadge
-          wid={wid}
-          levelColor={color || 'gray'}
+          workbook={workbook}
         />
       </Group>
     </Combobox.Option>
   ));
 
-  const pills = values.map((value) => (
+  const pills = value.map((v) => (
     <Pill 
-      key={value} 
-      onRemove={() => handleValueRemove(value)}
+      key={v} 
+      onRemove={() => handleValueRemove(v)}
       withRemoveButton
     >
-      { workbooks?.filter(({ wid }) => wid == value)[0].name }
+      { workbooks?.filter(({ wid }) => wid == v)[0].name }
     </Pill>
   ))
   
@@ -76,7 +75,7 @@ export default function FilteringWorkbook({
                 onKeyDown={(event) => {
                   if (event.key === 'Backspace' && search.length === 0) {
                     event.preventDefault();
-                    handleValueRemove(values[values.length - 1]);
+                    handleValueRemove(value[value.length - 1]);
                   }
                 }}
               />

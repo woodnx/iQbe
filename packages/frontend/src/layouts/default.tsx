@@ -1,19 +1,22 @@
-import { useLayoutEffect } from "react";
-import { Outlet, useLocation, useNavigate } from "react-router-dom";
-import { ActionIcon, AppShell, Center, Container, Drawer, Group, Loader } from "@mantine/core";
-import { IconActivity, IconBook, IconHistory, IconHome, IconMenu2, IconPencil, IconSchool, IconSearch, IconStar } from "@tabler/icons-react";
-import { useState } from "react";
-import { useDisclosure } from "@mantine/hooks";
-import { notifications } from "@mantine/notifications";
-import { useMylists } from "../hooks/useMylists";
-import Logo from "../components/Logo";
-import { checkAuth } from "../plugins/auth";
-import { useWorkbooks } from "@/hooks/useWorkbooks";
-import NavbarLink from "@/components/NavbarLink";
-import { IconBooks } from "@tabler/icons-react";
-import { useIsMobile } from "@/contexts/isMobile";
-import useHeaderHeight from "@/hooks/useHeaderHeight";
-import UserInfoMenu from "@/components/UserInfoMenu";
+import { useLayoutEffect, useState } from 'react';
+import { Outlet, useLocation, useNavigate } from 'react-router-dom';
+
+import NavbarLink from '@/components/NavbarLink';
+import UserInfoMenu from '@/components/UserInfoMenu';
+import { useIsMobile } from '@/contexts/isMobile';
+import useHeaderHeight from '@/hooks/useHeaderHeight';
+import { useWorkbooks } from '@/hooks/useWorkbooks';
+import { ActionIcon, AppShell, Center, Container, Drawer, Group, Loader } from '@mantine/core';
+import { useDisclosure } from '@mantine/hooks';
+import { notifications } from '@mantine/notifications';
+import {
+    IconActivity, IconBook, IconBooks, IconHistory, IconHome, IconMenu2, IconPencil, IconSchool,
+    IconSearch, IconStar
+} from '@tabler/icons-react';
+
+import Logo from '../components/Logo';
+import { useMylists } from '../hooks/useMylists';
+import { checkAuth } from '../plugins/auth';
 
 const checkPathname = (pathname: string) => {
   if (pathname === '/') return '/';
@@ -60,11 +63,6 @@ export default function DefaultLayout() {
       icon: IconBook,
       link: '/workbook',
       links: mockWorkbooks
-    },
-    {
-      label: '検索',
-      icon: IconSearch,
-      link: '/search',
     },
     {
       label: '演習',

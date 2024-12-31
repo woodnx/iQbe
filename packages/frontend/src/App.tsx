@@ -9,14 +9,16 @@ import { Notifications } from '@mantine/notifications';
 import CategoryCreateModal from './components/CategoryCreateModal';
 import CategoryDeleteModal from './components/CategoryDeleteModal';
 import CategoryEditModal from './components/CategoryEditModal';
-import MylistEditModal from './components/MylistEditModal';
-import QuizEditModal from './components/QuizEditModal';
-import Layout from './layouts';
+import FilteringContextModal from './components/FilteringContextModal';
 import MylistCreateModal from './components/MylistCreateModal';
+import MylistEditModal from './components/MylistEditModal';
 import QuizDeleteModal from './components/QuizDeleteModal';
 import QuizDetailesModal from './components/QuizDetailesModal';
+import QuizEditModal from './components/QuizEditModal';
+import Layout from './layouts';
 
 const modals = {
+  quizFiltering: FilteringContextModal,
   quizDetailes: QuizDetailesModal,
   quizEdit: QuizEditModal,
   quizDelete: QuizDeleteModal,

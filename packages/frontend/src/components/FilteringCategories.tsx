@@ -8,12 +8,12 @@ type Category = components['schemas']['Category'];
 type SubCategory = components['schemas']['SubCategory'];
 
 interface FilteringCategoriesProps extends BoxProps {
-  values?: number[],
-  onChange?: (values: number[]) => void
+  value?: number[],
+  onChange?: (value: number[]) => void,
 }
 
 export default function FilteringCategories({ 
-  values = [], 
+  value = [], 
   onChange = () => {},
   ...others
 }: FilteringCategoriesProps) {
@@ -38,7 +38,10 @@ export default function FilteringCategories({
             [] as Category[]
           ));
 
-          const subIds = value.reduce((acc, category) => [...acc, ...category.sub?.map(s => s.id) || []], [] as number[]);
+          const subIds = value.reduce(
+            (acc, category) => [...acc, ...category.sub?.map(s => s.id) || []], 
+            [] as number[]
+          );
           onChange(subIds);
         }}
         onRemove={(target) => {
@@ -60,12 +63,12 @@ export default function FilteringCategories({
           const subIds = parent?.sub?.map(s => s.id) || [];
           const fullParent = parent?.sub?.reduce((bool, s) => {
             if (!bool) return false;
-            if (values.some(v => s.id == v)) return true;
+            if (value.some(v => s.id == v)) return true;
             else return false;
           }, true);
 
           if (fullParent) {
-            onChange([...new Set([...values.filter(v => !subIds.includes(v)), target.id ])]);
+            onChange([...new Set([...value.filter(v => !subIds.includes(v)), target.id ])]);
           }
         }}
         onRemove={(target) => {
@@ -74,15 +77,15 @@ export default function FilteringCategories({
 
           const existSubId = parent?.sub?.reduce((bool, s) => {
             if (bool) return true;
-            if (!values.some(v => s.id == v && target.id != v)) return false;
+            if (!value.some(v => s.id == v && target.id != v)) return false;
             else return true;
           }, false);
 
           if (existSubId) {
-            onChange([...new Set([...values.filter(v => target.id != v)])]);
+            onChange([...new Set([...value.filter(v => target.id != v)])]);
           }
           else {
-            onChange([...new Set([...values.filter(v => target.id != v), ...values, ...subIds])]);
+            onChange([...new Set([...value.filter(v => target.id != v), ...value, ...subIds])]);
           }
         }}
       />
