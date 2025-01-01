@@ -10,7 +10,7 @@ export default class FavoriteController {
   like() {
     return typedAsyncWrapper<"/like", "post">(async (req, res) => {
       const qid = req.body.qid;
-      const uid = req.uid;
+      const uid = req.user.uid;
 
       if (!qid) {
         throw new ApiError().invalidParams();
@@ -25,7 +25,7 @@ export default class FavoriteController {
   unlike() {
     return typedAsyncWrapper<"/unlike", "post">(async (req, res) => {
       const qid = req.body.qid;
-      const uid = req.uid;
+      const uid = req.user.uid;
 
       if (!qid) {
         throw new ApiError().invalidParams();

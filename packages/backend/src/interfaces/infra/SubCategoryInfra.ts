@@ -20,4 +20,17 @@ export default class SubCategoryInfra implements SubCategoryRepository {
 
     return sub.map(s => new SubCategory(s.id, s.name, s.description, s.parentId));
   }
+
+  async save(subCategory: SubCategory): Promise<void> {
+    const client = this.clientManager.getClient();
+
+    await client
+    .insertInto('sub_categories')
+    .values({
+      name: subCategory.name,
+      description: subCategory.description,
+      parent_id: subCategory.parentId,
+    })
+    .execute();
+  }
 }

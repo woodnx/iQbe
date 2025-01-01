@@ -1,83 +1,67 @@
-import { CloseButton, Combobox, Input, InputBase, ScrollArea, Text, useCombobox } from "@mantine/core";
-import type { components } from 'api/schema';
+import { components } from 'api/schema';
+import { useState } from 'react';
 
-type Category = components["schemas"]["Category"]
+import { $api } from '@/utils/client';
+import { BoxProps, Group } from '@mantine/core';
 
-interface Props {
-  data: Category[] | undefined,
-  value?: string,
-  label?: string,
-  placeholder?: string,
-  onChange?: (value: string | null) => void,
-  onClear?: () => void,
+import CategorySelectorBase from './CategorySelectorBase';
+
+type Category = components["schemas"]["Category"];
+
+interface CategorySelectorProps extends BoxProps {
+  value?: Category[],
+  onChange?: (value: Category[] | undefined) => void,
+  disabled?: boolean,
 }
 
-export default function({
-  data,
+export default function CategorySelector({
   value,
-  label,
-  placeholder,
   onChange = () => {},
-  onClear = () => {},
-}: Props) {
-  const combobox = useCombobox({
-    onDropdownClose: () => combobox.resetSelectedOption(),
-  });
+  disabled,
+  ...others
+}: CategorySelectorProps) {
+  const [ category, setCategory ] = useState<Category | undefined>(
+    (value && value.length > 0) ? value[0] : undefined
+  );
+  const [ subCategory, setSubCategory ] = useState<Category | undefined>(
+    (value && value.length > 1) ? value[1] : undefined
+  );
 
-  const options = data?.map(({ id, name, description }) => (
-    <Combobox.Option value={String(id)} key={id}>
-      <Text size="sm">{name}</Text>
-      <Text size="xs" opacity={0.65}>
-        {description}
-      </Text>
-    </Combobox.Option>
-  ));
-
-  const display = data?.filter(({ id }) => value == String(id))[0]?.name;
+  const { data: categories } = $api.useQuery('get', '/categories');
+  const subCategories = categories?.find(c => c.id == category?.id)?.sub || [];
 
   return (
-    <Combobox
-      store={combobox}
-      onOptionSubmit={(val) => {
-        onChange(val);
-        combobox.closeDropdown();
-      }}
-    >
-      <Combobox.Target>
-        <InputBase
-          label={label}
-          component="button"
-          type="button"
-          pointer
-          rightSection={
-            value != null ? (
-              <CloseButton
-                size="sm"
-                onMouseDown={(e) => e.preventDefault()}
-                onClick={() => { 
-                  onChange(null);
-                  onClear();
-                }}
-                aria-label="Clear value"
-              />
-            ) : (
-              <Combobox.Chevron/>
-            )
-          }
-          onClick={() => combobox.toggleDropdown()}
-          rightSectionPointerEvents={value == null ? 'none' : 'all'}
-        >
-          { display || <Input.Placeholder>{placeholder || 'ジャンルを選択'}</Input.Placeholder>}
-        </InputBase>
-      </Combobox.Target>
-
-      <Combobox.Dropdown>
-        <Combobox.Options>
-          <ScrollArea.Autosize type="scroll" mah={200}>
-            {options}
-          </ScrollArea.Autosize>
-        </Combobox.Options>
-      </Combobox.Dropdown>
-    </Combobox>
+    <Group grow {...others}>
+      <CategorySelectorBase 
+        label="ジャンル"
+        data={categories}
+        value={category}
+        disabled={disabled}
+        onChange={(val) => {
+          setCategory(val);
+          val && onChange([ val ]);
+        }}
+        onClear={() => { 
+          setCategory(undefined);
+          setSubCategory(undefined);
+          onChange(undefined);
+        }}
+      />
+      <CategorySelectorBase
+        label="サブジャンル"
+        placeholder="サブジャンルを選択"
+        data={subCategories}
+        value={subCategory}
+        disabled={disabled}
+        onChange={(val) => {
+          setSubCategory(val);
+          val && onChange([ ...value || [], val ]);
+        }}
+        onClear={() => { 
+          setSubCategory(undefined);
+          onChange(undefined);
+        }}
+      />
+    </Group>
   )
 }

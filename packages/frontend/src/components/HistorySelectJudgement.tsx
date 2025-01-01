@@ -25,7 +25,7 @@ export default function HistorySelectJudgement({
   return (
     <>
       <HistorySelectButton 
-        label="Right" 
+        label="正答" 
         color="red" 
         count={right}
         isSelect={judgements.includes(1)}
@@ -33,7 +33,7 @@ export default function HistorySelectJudgement({
         onClick={() => setJudgements(1)}
       />
       <HistorySelectButton 
-        label="Wrong" 
+        label="誤答" 
         color="blue" 
         count={wrong} 
         isSelect={judgements.includes(0)}
@@ -41,7 +41,7 @@ export default function HistorySelectJudgement({
         onClick={() => setJudgements(0)}
       />
       <HistorySelectButton 
-        label="Through" 
+        label="スルー" 
         color="gray" 
         count={throgh}
         isSelect={judgements.includes(2)}

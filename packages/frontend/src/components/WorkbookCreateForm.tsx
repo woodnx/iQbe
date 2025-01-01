@@ -1,29 +1,42 @@
-import { Button, Group, ModalProps, TextInput } from "@mantine/core";
+import { Button, Group, TextInput } from "@mantine/core";
 import { DateInput } from "@mantine/dates";
-import { useInputState } from "@mantine/hooks";
-import { useState } from "react";
+import { isNotEmpty, useForm } from "@mantine/form";
+import { IconPencil } from "@tabler/icons-react";
 
-interface Props extends ModalProps {
-  onCreate?: (name: string, published: Date | null) => void,
+interface WorkbookCreateFormProps {
+  name?: string,
+  date?: Date,
+  onSubmit?: (name: string, published?: Date) => void,
+  onClose?: () => void,
 }
 
 export default function WorkbookCreateForm({
-  onCreate = () => {},
-}: Props) {
-  const [ name, setName ] = useInputState('');
-  const [ published, setPublished ] = useState<Date | null>(null);
+  name,
+  date,
+  onSubmit = () => {},
+  onClose = () => {},
+}: WorkbookCreateFormProps) {
+  const form = useForm({
+    initialValues: {
+      name: name,
+      date: date && new Date(date),
+    },
+    validate: {
+      name: isNotEmpty(),
+    }
+  });
+  const icon = <IconPencil />;
 
-  const create = () => {
-    onCreate(name, published);
-    setName('');
+  const submit = (v: { name?: string, date?: Date }) => {
+    onSubmit(v.name || '', v.date);
+    form.reset();
   };
 
   return (
-    <>
+    <form onSubmit={form.onSubmit(v => submit(v))}>
       <TextInput 
         label="問題集の名前"
-        value={name} 
-        onChange={setName}
+        {...form.getInputProps('name')}
       />
       <DateInput 
         clearable
@@ -32,14 +45,21 @@ export default function WorkbookCreateForm({
         decadeLabelFormat="YYYY年"
         yearLabelFormat="YYYY年"
         monthLabelFormat="YYYY年 MMMM"
-        value={published}
-        onChange={setPublished}
+        
+        {...form.getInputProps('date')}
       />
-      <Group mt="xl" justify="right">
-        <Button
-          onClick={create}
-        >新規作成</Button>
+      <Group justify="space-between" mt="sm">
+        <Button 
+          variant="outline"
+          color="gray"
+          onClick={onClose}
+        >キャンセル</Button>
+        <Button 
+          type="submit"
+          leftSection={icon}
+          disabled={!form.isValid()}
+        >保存</Button>
       </Group>
-    </>
+    </form>
   )
 }

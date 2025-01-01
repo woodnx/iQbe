@@ -1,5 +1,6 @@
 import { ApiError } from 'api';
 import { components } from 'api/schema';
+
 import AccessToken from '@/domains/AccessToken';
 import AuthService from '@/domains/Auth/AuthService';
 import InviteCode from '@/domains/InviteCode';
@@ -10,7 +11,7 @@ import IRefreshTokenRepository from '@/domains/RefreshToken/IRefreshTokenReposit
 import RefreshTokenService from '@/domains/RefreshToken/RefreshTokenService';
 import User from '@/domains/User';
 import IUserRepository from '@/domains/User/IUserRepository';
-import UsersService from '@/domains/User/UserService';
+import UserService from '@/domains/User/UserService';
 import dayjs, { format } from '@/plugins/day';
 
 import ITransactionManager from '../shared/ITransactionManager';
@@ -21,12 +22,8 @@ type AuthDTO = components["responses"]["AuthResponseWithRefreshToken"]["content"
 export default class AuthUseCase {
   constructor(
     private transactionManager: ITransactionManager,
-    private authService: AuthService,
-    private inviteCodeService: InviteCodeService,
     private inviteCodeRepository: IInviteCodeRepository,
-    private refreshTokenService: RefreshTokenService,
     private refreshTokensRepostiory: IRefreshTokenRepository,
-    private userService: UsersService,
     private userRepository: IUserRepository,
   ) {}
 
@@ -34,6 +31,9 @@ export default class AuthUseCase {
     username: string,
     password: string
   ): Promise<AuthDTO> {
+    const authService = new AuthService();
+    const userService = new UserService(this.userRepository);
+
     const user = await this.userRepository.findByUsername(username);
 
     if (!user) {
@@ -47,7 +47,7 @@ export default class AuthUseCase {
           detail: "You need reregistragion."
         });
       } 
-      else if (await this.userService.checkFirstStart()) {
+      else if (await userService.checkFirstStart()) {
         throw new ApiError({
           title: "NO_ANY_USERS",
           detail: "This instance is first start",
@@ -60,7 +60,7 @@ export default class AuthUseCase {
       }
     }
 
-    const checked = this.authService.checkPassword(password, user.passwd);
+    const checked = authService.checkPassword(password, user.passwd);
 
     if (!checked) throw new ApiError().noUser();
     
@@ -91,16 +91,21 @@ export default class AuthUseCase {
     email: string,
     inviteCode?: string,
   ): Promise<AuthDTO> {
-    const uid = this.userService.generateUid();
-    const passwd = this.authService.generateHashedPassword(password);
+    const authService = new AuthService();
+    const userService = new UserService(this.userRepository);
+    const refreshTokenService = new RefreshTokenService();
+    const inviteCodeService = new InviteCodeService(this.inviteCodeRepository);
+
+    const uid = userService.generateUid();
+    const passwd = authService.generateHashedPassword(password);
     const created = dayjs().toDate();
 
     const user = new User(uid, passwd, username, email, created, created);
-    const refreshToken = new RefreshToken(this.refreshTokenService.generateToken(), uid);
+    const refreshToken = new RefreshToken(refreshTokenService.generateToken(), uid);
     const accessToken = new AccessToken(user);
 
     const requiredInviteCode = (process.env.REQUIRE_INVITE_CODE !== 'false') ? true : false;
-    const isFirstUser = await this.userService.checkFirstStart();
+    const isFirstUser = await userService.checkFirstStart();
 
     await this.transactionManager.begin(async () => {      
       if (requiredInviteCode && !isFirstUser) {
@@ -113,8 +118,8 @@ export default class AuthUseCase {
           });
         }
 
-        const code = new InviteCode(inviteCode);
-        const available = await this.inviteCodeService.checkAvailable(code);
+        const code = InviteCode.create(inviteCode);
+        const available = await inviteCodeService.checkAvailable(code);
         
         // エラー処理
         if (!available) {
@@ -163,14 +168,92 @@ export default class AuthUseCase {
     };
   }
 
+  async signupFirstUser(
+    username: string,
+    password: string,
+    email: string,
+    inviteCode?: string,
+  ): Promise<AuthDTO> {
+    const authService = new AuthService();
+    const userService = new UserService(this.userRepository);
+    const refreshTokenService = new RefreshTokenService();
+    const inviteCodeService = new InviteCodeService(this.inviteCodeRepository);
+
+    const requiredInviteCode = (process.env.REQUIRE_INVITE_CODE !== 'false') ? true : false;
+    const isFirstUser = await userService.checkFirstStart();
+
+    if (!isFirstUser)
+      throw new ApiError({
+        title: "NOT_FIRST_USER",
+        detail: "This instance is not first start",
+        type: "about:blank", 
+        status: 401,
+      });
+    
+    const uid = userService.generateUid();
+    const passwd = authService.generateHashedPassword(password);
+    const created = dayjs().toDate();
+
+    const user = new User(uid, passwd, username, email, created, created, undefined, 'SUPER_USER');
+    const refreshToken = new RefreshToken(refreshTokenService.generateToken(), uid);
+    const accessToken = new AccessToken(user);
+
+    await this.transactionManager.begin(async () => {      
+      if (requiredInviteCode) {
+        if (!inviteCode || !inviteCode.trim()) 
+          throw new ApiError({
+            title: "NO_INVITE_CODE",
+            type: "about:blank",
+            status: 401,
+            detail: "This server is required invite code. Please set invite code."
+          });
+
+        const code = InviteCode.create(inviteCode);
+        const available = await inviteCodeService.checkAvailable(code);
+        
+        // エラー処理
+        if (!available) 
+          throw new ApiError({
+            title: "USED_INVITE_CODE",
+            type: "about:blank",
+            status: 401,
+            detail: "This invite code is used. Please set another invite code."
+          });
+        
+        code.markUsed();
+        await this.inviteCodeRepository.update(code);
+      }
+
+      await this.userRepository.save(user);
+      await this.refreshTokensRepostiory.save(refreshToken);
+    });
+
+    return { 
+      user: {
+        uid: user.uid,
+        username: user.username,
+        email: user.email,
+        nickname: user.nickname,
+        modified: format(user.modified),
+        created: format(user.created),
+        permission: user.permission,
+        photoURL: user.photoUrl,
+      },
+      refreshToken: refreshToken.token, 
+      accessToken: accessToken.toToken(),
+    };
+  }
+
   async getToken(
     uid: string,
     refreshToken: string,
   ): Promise<TokenDTO>  {
+    const userService = new UserService(this.userRepository);
+
     const user = await this.userRepository.findByUid(uid);
 
     if (!user) { 
-      if (await this.userService.checkFirstStart()) {
+      if (await userService.checkFirstStart()) {
         throw new ApiError({
           title: "NO_ANY_USERS",
           detail: "This instance is first start",
@@ -211,6 +294,10 @@ export default class AuthUseCase {
     email: string,
     password: string,
   ): Promise<AuthDTO> {
+    const authService = new AuthService();
+    const userService = new UserService(this.userRepository);
+    const refreshTokenService = new RefreshTokenService();
+
     const user = await this.userRepository.findByEmail(email);
 
     if (!user) {
@@ -225,8 +312,8 @@ export default class AuthUseCase {
     const userId = await this.userRepository.findUserIdByEmail(email);
     if (!userId) throw new ApiError().noUser();
 
-    const uid = this.userService.generateUid();
-    const passwd = this.authService.generateHashedPassword(password);
+    const uid = userService.generateUid();
+    const passwd = authService.generateHashedPassword(password);
 
     user.reconstruct(
       uid,
@@ -238,7 +325,7 @@ export default class AuthUseCase {
     );
 
     const accessToken = new AccessToken(user);
-    const refreshToken = new RefreshToken(this.refreshTokenService.generateToken(), uid);
+    const refreshToken = new RefreshToken(refreshTokenService.generateToken(), uid);
 
     await this.transactionManager.begin(async () => {
       this.userRepository.update(user);

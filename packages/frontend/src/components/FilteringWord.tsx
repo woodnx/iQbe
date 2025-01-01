@@ -1,38 +1,44 @@
-import { BoxProps, Group, Radio, TextInput } from "@mantine/core"
-import { formInputProps } from "@/hooks"
-import { KeywordOption } from "@/types"
+import { KeywordOption } from '@/types';
+import { Box, BoxProps, Group, Radio, TextInput } from '@mantine/core';
+import { ChangeEvent } from 'react';
 
-export type optionProps = {
-  value: string,
-  onChange: (value: KeywordOption) => void
+type FormInputProps = {
+  value?: string,
+  onChange?: (value: ChangeEvent<HTMLInputElement>) => void
+}
+
+export type OptionProps = {
+  value?: string,
+  onChange?: (value: KeywordOption) => void
 }
 
 interface FilteringWordProps extends BoxProps {
-  wordInputProps: formInputProps,
-  wordSearchOption: optionProps,
+  wordInputProps: FormInputProps,
+  wordSearchOption: OptionProps,
 }
 
 export default function FilteringWord({ 
-  wordInputProps, 
-  wordSearchOption,
+  wordInputProps  = { value: '', onChange: () => {} }, 
+  wordSearchOption = { value: '', onChange: () => {} },
   className,
   ...others
 }: FilteringWordProps) {
   return (
-    <>
+    <Box {...others}>
       <TextInput
         className={className}
-        label="Word Search"
-        {...wordInputProps}
-        {...others}
+        label="キーワードによる絞り込み"
+        placeholder="キーワードを入力"
+        value={wordInputProps.value}
+        onChange={wordInputProps.onChange}
       />
       <Radio.Group 
-        mt="sm"
-        label="Search Option"
+        label="検索範囲"
         value={wordSearchOption.value}
+        defaultValue="1"
         onChange={(v) => {
           if (v == "1" || v == "2" || v == "3") {
-            wordSearchOption.onChange(v);
+            wordSearchOption.onChange && wordSearchOption.onChange(v);
           }
         }}
       >
@@ -52,6 +58,6 @@ export default function FilteringWord({
         </Group>
         
       </Radio.Group>
-    </>
+    </Box>
   )
 }

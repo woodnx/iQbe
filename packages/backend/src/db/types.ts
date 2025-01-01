@@ -8,6 +8,8 @@ export type categories = {
     id: Generated<number>;
     name: string;
     description: string | null;
+    parent_id: Generated<number>;
+    disabled: Generated<number>;
 };
 export type favorites = {
     user_id: number;
@@ -25,6 +27,8 @@ export type invite_codes = {
     id: Generated<number>;
     code: string;
     used: Generated<number>;
+    created: Generated<Timestamp>;
+    updated: Generated<Timestamp>;
 };
 export type levels = {
     id: Generated<number>;
@@ -38,7 +42,7 @@ export type mylists = {
     name: Generated<string>;
     created: Timestamp;
     attr: number;
-    mid: Generated<string | null>;
+    mid: Generated<string>;
 };
 export type mylists_quizzes = {
     mylist_id: number;

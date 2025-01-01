@@ -1,65 +1,66 @@
-import { ComponentProps, useState } from "react";
-import { ActionIcon, Button, Checkbox, Divider, Menu } from "@mantine/core";
-import { useDisclosure } from "@mantine/hooks";
-import { IconPlaylistAdd, IconPlus } from "@tabler/icons-react";
-import classes from "./styles/QuizMylistButton.module.css";
-import { MylistInformation } from "@/types";
-import { useIsMobile } from "@/contexts/isMobile";
-import MylistCreateModal from "./MylistCreateModal";
-import { $api } from "@/utils/client";
+import { components } from 'api/schema';
+import { ComponentProps, useState } from 'react';
+
+import { useIsMobile } from '@/contexts/isMobile';
+import { $api } from '@/utils/client';
+import { ActionIcon, Button, Checkbox, Divider, Menu } from '@mantine/core';
+import { modals } from '@mantine/modals';
+import { notifications } from '@mantine/notifications';
+import { IconPlaylistAdd, IconPlus } from '@tabler/icons-react';
+
+import classes from './styles/QuizMylistButton.module.css';
+
+type Mylist = components["schemas"]["Mylist"];
 
 interface Props extends ComponentProps<typeof Button> {
   qid: string,
-  registerdMylistId: string[],
-  mylists: MylistInformation[],
+  registerdMylists: Mylist[],
 }
 
 export default function QuizMylistButton({
   qid,
-  registerdMylistId,
-  mylists,
+  registerdMylists,
 }: Props) {
-  const [ creating, create ] = useDisclosure(false);
-  const [ selectedMyListIdx, setSelectedMylistIdx ] = useState(registerdMylistId.map(id => mylists?.findIndex(list => list.mid == id)));
+  const { data: mylists } = $api.useQuery('get', '/mylists');
+  const [ selectedMids, setSelectedMids ] = useState(registerdMylists.map(mylist => mylist.mid));
   const isMobile = useIsMobile();
-  const { mutate: addMylist } = $api.useMutation("post", "/mylists");
-  const { mutate: addQuizToMylist } = $api.useMutation("post", "/quizzes/mylist/{mid}");
-  const { mutate: deleteQuizFromMylist } = $api.useMutation("delete", "/quizzes/mylist/{mid}")
+  const { mutate: addQuizToMylist } = $api.useMutation("post", "/register");
+  const { mutate: deleteQuizFromMylist } = $api.useMutation("post", "/unregister")
 
-  const createMylist = async (mylistname: string) => {
+  const saveToList = async (mid: string) => {
     try {
-      addMylist({ body: {
-        listName: mylistname,
-      }}, {
-        onSuccess: (({ mid }) => {
-          addQuizToMylist({ 
-            params: { path: { mid } },
-            body: { qid },
-          });
-        }),
-      });
-    } catch(e) {
-      return;
-    }
-  };
-
-  const saveToList = async (mid: string, arrayIdx: number) => {
-    try {
-      if (!selectedMyListIdx.includes(arrayIdx)) { // add quiz into mylist
+      if (!selectedMids.includes(mid)) { // add quiz into mylist
         addQuizToMylist({ 
-          params: { path: { mid } },
-          body: { qid },
+          body: { 
+            qid,
+            mid,
+          },
         });
-        setSelectedMylistIdx([...selectedMyListIdx, arrayIdx]);
+        setSelectedMids([...selectedMids, mid]);
+        notifications.show({
+          title: 'マイリストに追加',
+          message: 'マイリストにクイズを追加しました',
+        });
       } 
       else {  // delete quiz from mylist
         deleteQuizFromMylist({ 
-          params: { path: { mid } }, 
-          body: { qid },
+          body: { 
+            qid,
+            mid,
+          },
         });
-        setSelectedMylistIdx(selectedMyListIdx.filter(idx => idx != arrayIdx));
+        setSelectedMids(selectedMids.filter(_mid => _mid != mid));
+        notifications.show({
+          title: 'マイリストから削除',
+          message: 'マイリストからクイズを削除しました',
+        });
       }
     } catch(e) {
+      notifications.show({
+        title: '何らかの障害が発生しました',
+        message: '何度も続く場合はサポート担当に問い合わせてください',
+        color: 'red',
+      });
       return;
     }
   };
@@ -71,7 +72,7 @@ export default function QuizMylistButton({
       variant="outline"
       size="xs"
       bg="#fff"
-    >Save</Button>
+    >追加</Button>
   );
 
   const mobileButton = (
@@ -86,12 +87,6 @@ export default function QuizMylistButton({
 
   return (
     <>
-      <MylistCreateModal 
-        opened={creating} 
-        onClose={create.close}
-        onCreate={createMylist}
-        zIndex={50}
-      />
       <Menu 
         shadow="sm" 
         width={200} 
@@ -104,14 +99,14 @@ export default function QuizMylistButton({
         </Menu.Target>
         <Menu.Dropdown>
           {
-            mylists?.map((m, idx) => 
+            mylists?.map((m) => 
               <Menu.Item 
                 key={m.mid}
               >
                 <Checkbox
                   label={m.name}
-                  checked={selectedMyListIdx.includes(idx)}
-                  onChange={() => saveToList(m.mid, idx)}
+                  checked={selectedMids.includes(m.mid)}
+                  onChange={() => saveToList(m.mid)}
                 />
               </Menu.Item>
             )
@@ -119,7 +114,18 @@ export default function QuizMylistButton({
           <Divider/>
           <Menu.Item 
             leftSection={<IconPlus size={14}/>}
-            onClick={create.open}
+            onClick={() => {
+              modals.openContextModal({
+                modal: 'mylistCreate',
+                title: 'マイリストを新規作成',
+                innerProps: {
+                  qid
+                },
+                size: 'md',
+                centered: true,
+                zIndex: 10000,
+              })
+            }}
           >
             マイリストを作成
           </Menu.Item>

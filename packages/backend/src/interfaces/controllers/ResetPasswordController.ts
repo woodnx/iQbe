@@ -12,7 +12,7 @@ export default class ResetPasswordController {
     return typedAsyncWrapper<"/reset-password", "post">(async (req, res, next) => {
       const token = req.body.token;
       const newPassword = req.body.newPassword;
-      const uid = req.uid;
+      const uid = req.user.uid;
   
       if (!token || !newPassword) {
         throw new ApiError().invalidParams();

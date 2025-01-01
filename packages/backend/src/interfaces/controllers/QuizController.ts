@@ -1,9 +1,9 @@
 import { ApiError } from 'api';
+import { isArray } from 'lodash';
 
 import IQuizQueryService from '@/applications/queryservices/IQuizQueryService';
 import QuizUseCase from '@/applications/usecases/QuizUseCase';
 import { typedAsyncWrapper } from '@/utils';
-
 
 export default class QuizController {
   constructor(
@@ -21,11 +21,19 @@ export default class QuizController {
       const wids     = req.query.wids || [];
       const keyword = req.query.keyword || undefined;
       const keywordOption = (req.query.keywordOption) || undefined;
-      const uid = req.uid;
+      const uid = req.user.uid;
       const since = ('since' in req.query) ? Number(req.query.since) || undefined : undefined;
       const until = ('until' in req.query) ? Number(req.query.until) || undefined : undefined;
-      const judgements = ('judgements' in req.query) ? req.query.judgements || undefined : undefined;
       const mid = req.query && ('mid' in req.query) ? req.query.mid || undefined : undefined;
+      const isFavorite = !!req.query.isFavorite;
+      const judgements = req.query.judgements
+        ? isArray(req.query.judgements) 
+        ? req.query.judgements 
+        : [ req.query.judgements ]
+        : undefined;
+      const categories = req.query.categories || undefined;
+      const tags = req.query.tags || undefined;
+      const tagMatchAll = req.query.tagMatchAll;
       
       const quizzes = await this.quizQueryService.findMany(uid, {
         page,
@@ -38,6 +46,10 @@ export default class QuizController {
         until,
         judgements,
         mid,
+        isFavorite,
+        categories,
+        tags,
+        tagMatchAll,
       });
 
       res.status(200).send(quizzes);
@@ -51,11 +63,16 @@ export default class QuizController {
       const wids = req.query.wids || [];
       const keyword = req.query.keyword || undefined;
       const keywordOption = (req.query.keywordOption) || undefined;
-      const uid = req.uid;
+      const uid = req.user.uid;
       const since = ('since' in req.query) ? Number(req.query.since) || undefined : undefined;
       const until = ('until' in req.query) ? Number(req.query.until) || undefined : undefined;
-      const judgements = ('judgements' in req.query) ? req.query.judgements || undefined : undefined;
       const mid = req.query && ('mid' in req.query) ? req.query.mid || undefined : undefined;
+      const isFavorite = !!req.query.isFavorite;
+      const judgements = req.query.judgements
+        ? isArray(req.query.judgements) 
+        ? req.query.judgements 
+        : [ req.query.judgements ]
+        : undefined;
 
       const size = await this.quizQueryService.count(uid, {
         wids,
@@ -65,6 +82,7 @@ export default class QuizController {
         until,
         judgements,
         mid,
+        isFavorite,
       });
 
       res.status(200).send({ size });
@@ -78,24 +96,27 @@ export default class QuizController {
       const anotherAnswer = req.body.anotherAnswer || undefined;
       const tags = req.body.tags || [];
       const category = req.body.category || undefined;
-      const subCategory = category !== 0 && !!req.body.subCategory ? Number(req.body.subCategory) : undefined;
       const wid = req.body.wid || undefined;
       const limitedUser = req.body.limitedUser || [];
-      const uid = req.uid;
+      const isPublic = !!req.body.isPublic;
+      const uid = req.user.uid;
 
       if (!question || !answer) {
         throw new ApiError().invalidParams();
+      }
+
+      if (isPublic && !req.user.isSuperUser) {
+        throw new ApiError().accessDenied();
       }
 
       await this.quizUseCase.addQuiz(
         question,
         answer,
         tags,
-        limitedUser,
+        isPublic,
         uid,
         anotherAnswer,
         category,
-        subCategory,
         wid,
       );
 
@@ -106,7 +127,7 @@ export default class QuizController {
   multiplePost() {
     return typedAsyncWrapper<"/quizzes/multiple", "post">(async (req, res) => {
       const records = req.body.records;
-      const uid = req.uid;
+      const uid = req.user.uid;
 
       if (!records) {
         throw new ApiError().invalidParams();
@@ -138,10 +159,9 @@ export default class QuizController {
       const anotherAnswer = req.body.anotherAnswer || undefined;
       const category = req.body.category || undefined;
       const tags = req.body.tags || [];
-      const subCategory = category !== 0 ? req.body.subCategory || undefined : 0;
       const wid = req.body.wid || undefined;
       const limitedUser = req.body.limitedUser || [];
-      const uid = req.uid;
+      const uid = req.user.uid;
 
       if (!question || !answer || !qid) {
         throw new ApiError().invalidParams();
@@ -155,11 +175,23 @@ export default class QuizController {
         tags,
         anotherAnswer,
         category,
-        subCategory,
         wid,
       );
 
       res.status(201).send();
+    });
+  }
+
+  delete() {
+    return typedAsyncWrapper<"/quizzes/{qid}", "delete">(async (req, res) => {
+      const qid = req.params.qid;
+
+      if (!qid) 
+        throw new ApiError().internalProblems();
+
+      await this.quizUseCase.deleteQuiz(qid);
+
+      res.status(204).send();
     });
   }
 }

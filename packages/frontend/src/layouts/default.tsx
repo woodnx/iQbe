@@ -1,19 +1,22 @@
-import { useLayoutEffect } from "react";
-import { Outlet, useLocation, useNavigate } from "react-router-dom";
-import { ActionIcon, AppShell, Center, Container, Drawer, Group, Loader } from "@mantine/core";
-import { IconActivity, IconHistory, IconHome, IconMenu2, IconPencil, IconSchool, IconSearch, IconStar } from "@tabler/icons-react";
-import { useState } from "react";
-import { useDisclosure } from "@mantine/hooks";
-import { notifications } from "@mantine/notifications";
-import { useMylists } from "../hooks/useMylists";
-import Logo from "../components/Logo";
-import { checkAuth } from "../plugins/auth";
-import { useWorkbooks } from "@/hooks/useWorkbooks";
-import NavbarLink from "@/components/NavbarLink";
-import { IconBooks } from "@tabler/icons-react";
-import { useIsMobile } from "@/contexts/isMobile";
-import useHeaderHeight from "@/hooks/useHeaderHeight";
-import UserInfoMenu from "@/components/UserInfoMenu";
+import { useLayoutEffect, useState } from 'react';
+import { Outlet, useLocation, useNavigate } from 'react-router-dom';
+
+import NavbarLink from '@/components/NavbarLink';
+import UserInfoMenu from '@/components/UserInfoMenu';
+import { useIsMobile } from '@/contexts/isMobile';
+import useHeaderHeight from '@/hooks/useHeaderHeight';
+import { useWorkbooks } from '@/hooks/useWorkbooks';
+import { ActionIcon, AppShell, Center, Container, Drawer, Group, Loader } from '@mantine/core';
+import { useDisclosure } from '@mantine/hooks';
+import { notifications } from '@mantine/notifications';
+import {
+    IconActivity, IconBook, IconBooks, IconHistory, IconHome, IconMenu2, IconPencil, IconSchool,
+    IconSearch, IconStar
+} from '@tabler/icons-react';
+
+import Logo from '../components/Logo';
+import { useMylists } from '../hooks/useMylists';
+import { checkAuth } from '../plugins/auth';
 
 const checkPathname = (pathname: string) => {
   if (pathname === '/') return '/';
@@ -22,7 +25,8 @@ const checkPathname = (pathname: string) => {
   else if (pathname === '/favorite') return '/favorite';
   else if (pathname === '/history') return '/history';
   else if (pathname === '/setting') return '/setting';
-  else if (pathname.includes('create')) return '/create';
+  else if (pathname === '/create') return '/create';
+  else if (pathname.includes('workbook')) return '/workbook';
   else if (pathname.includes('mylist')) return '/mylist';
   else return '';
 };
@@ -50,44 +54,38 @@ export default function DefaultLayout() {
 
   const mockdata = [
     {
-      label: 'Activity',
+      label: 'アクティビティ',
       icon: IconActivity,
       link: '/',
     },
     {
-      label: 'Search',
-      icon: IconSearch,
-      link: '/search',
+      label: '問題集',
+      icon: IconBook,
+      link: '/workbook',
+      links: mockWorkbooks
     },
     {
-      label: 'Practice',
+      label: '演習',
       icon: IconSchool,
       link: '/practice',
     },
     {
-      label: 'Create',
+      label: '作問',
       icon: IconPencil,
       link: '/create',
-      links: [
-        {
-          label: 'すべてのクイズ',
-          link: 'all',
-        },
-        ...mockWorkbooks || [],
-      ]
     },
     {
-      label: 'Favorite',
+      label: 'お気に入り',
       icon: IconStar,
       link: '/favorite'
     },
     {
-      label: 'History',
+      label: '履歴',
       icon: IconHistory,
       link: '/history'
     },
     {
-      label: 'もっとみる',
+      label: 'マイリスト',
       icon: IconBooks,
       link: '/mylist',
       isTab: true,
@@ -97,7 +95,9 @@ export default function DefaultLayout() {
     },
   ];
 
-  const activeIdx = mockdata.findIndex((data) => checkPathname(location.pathname) === data.link);
+  const activeIdx = mockdata.findIndex((data) => 
+    checkPathname(location.pathname) === data.link
+  );
 
   useLayoutEffect(() => {
     let ignore = false;

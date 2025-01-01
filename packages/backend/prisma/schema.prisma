@@ -5,7 +5,6 @@ generator client {
   output = "../src/db"
   fileName = "types.ts"
   enumFileName = "enums.ts"
-  previewFeatures = ["fullTextSearch", "fullTextIndex"]
 }
 
 datasource db {
@@ -33,6 +32,8 @@ model categories {
   id                 BigInt               @id @default(autoincrement())
   name               String               @db.VarChar(125)
   description        String?              @db.VarChar(256)
+  parent_id          BigInt               @default(-1)
+  disabled           Boolean              @default(false)
   quizzes            quizzes[]
   quizzes_categories quizzes_categories[]
   sub_categories     sub_categories[]
@@ -66,6 +67,8 @@ model invite_codes {
   id      BigInt   @id @default(autoincrement())
   code    String   @db.VarChar(32)
   used    Boolean  @default(false)
+  created DateTime @default(now())
+  updated DateTime @default(now()) @updatedAt
 }
 
 model levels {
@@ -91,7 +94,7 @@ model mylists {
   name            String            @default("") @db.VarChar(128)
   created         DateTime          @db.DateTime(0)
   attr            Int
-  mid             String?           @default("") @db.VarChar(20)
+  mid             String            @default("") @db.VarChar(20)
   users           users             @relation(fields: [user_id], references: [id], onUpdate: Restrict, map: "mylists_ibfk_1")
   mylists_quizzes mylists_quizzes[]
 
@@ -181,7 +184,9 @@ model quizzes {
   sub_categories     sub_categories?      @relation(fields: [sub_category_id], references: [id])
   users              users?               @relation(fields: [creator_id], references: [id], onUpdate: Cascade, onDelete: Cascade)
 
-  @@fulltext([que, ans, anoans])
+  @@fulltext([que])
+  @@fulltext([ans])
+  @@fulltext([que, ans])
 }
 
 model quizzes_categories {
@@ -222,8 +227,8 @@ model tagging {
   quiz_id    BigInt   @db.UnsignedBigInt
   registered DateTime @db.DateTime(0)
 
-  tags    tags    @relation(fields: [tag_id], references: [id], onDelete: Cascade, map: "tagging_ibfk_1")
-  quizzes quizzes @relation(fields: [quiz_id], references: [id], onDelete: Cascade, map: "tagging_ibfk_2")
+  tags    tags    @relation(fields: [tag_id], references: [id], map: "tagging_ibfk_1")
+  quizzes quizzes @relation(fields: [quiz_id], references: [id], map: "tagging_ibfk_2")
 
   @@id([tag_id, quiz_id])
   @@index([tag_id], map: "tag_id")
@@ -232,7 +237,7 @@ model tagging {
 
 model tags {
   id          BigInt    @id @default(autoincrement())
-  label       String    @db.VarChar(128)
+  label       String    @db.VarChar(128) @unique
   created     DateTime  @db.DateTime(0)
   modified    DateTime  @db.DateTime(0)
   tagging     tagging[]

@@ -389,14 +389,41 @@ paths:
                   type: string
                 description:
                   type: string
+                parentId:
+                  type: number
+                disabled:
+                  type: boolean
               required:
                 - name
+                - disabled
             example: 
               name: "文学"
               description: 小説や童話など文学に関するクイズ
       responses:
         "200": 
           $ref: "#/components/responses/CategoryResponse"
+        "400":
+          $ref: "#/components/responses/400BadRequest"
+        "401": 
+          $ref: "#/components/responses/401Unauthorized"
+        "403":
+          $ref: "#/components/responses/403Forbidden"
+  "/categories/{id}":
+    get: 
+      tags:
+        - categories
+      summary:  カテゴリーの取得
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: カテゴリーのID
+          schema: 
+            type: number
+          example: 1
+      responses:
+        "200":
+          $ref: "#/components/responses/CategoriesResponse"
         "400":
           $ref: "#/components/responses/400BadRequest"
         "401": 
@@ -407,6 +434,14 @@ paths:
       tags: 
         - categories
       summary: カテゴリーの編集
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: カテゴリーのID
+          schema:
+            type: number
+          example: 1
       requestBody:
         required: true
         content:
@@ -414,15 +449,15 @@ paths:
             schema: 
               type: object
               properties:
-                id: 
-                  type: number
                 name: 
                   type: string
                 description:
                   type: string
+                disabled: 
+                  type: boolean
               required:
-                - id
                 - name
+                - disabled
             example: 
               id: 1
               name: "文学"
@@ -436,24 +471,55 @@ paths:
           $ref: "#/components/responses/401Unauthorized"
         "403":
           $ref: "#/components/responses/403Forbidden"
-  "/categories/sub":
+    delete:
+      tags: 
+        - categories
+      summary: カテゴリーの削除
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: カテゴリーのID
+          schema:
+            type: number
+          example: 1
+      responses:
+        "204": 
+          description: delete category
+        "400":
+          $ref: "#/components/responses/400BadRequest"
+        "401": 
+          $ref: "#/components/responses/401Unauthorized"
+        "403":
+          $ref: "#/components/responses/403Forbidden"
+  "/categories/preset":
     get: 
       tags:
         - categories
-      summary: クイズのサブカテゴリーのリストを取得
       responses:
-        "200": 
-          $ref: "#/components/responses/SubCategoriesResponse"
-        "400":
-          $ref: "#/components/responses/400BadRequest"
-        "401": 
-          $ref: "#/components/responses/401Unauthorized"
-        "403":
-          $ref: "#/components/responses/403Forbidden"
+        "200":
+          description: 追加可能なプリセットを返す
+          content:
+            application/json:
+              schema: 
+                type: array
+                items:
+                  type: object
+                  properties:
+                    value:
+                      type: string
+                    name: 
+                      type: string
+                    description:
+                      type: string
+                    tag: 
+                      type: string
+                  required:
+                    - value
+                    - name
     post: 
-      tags: 
+      tags:
         - categories
-      summary: サブカテゴリーの新規作成
       requestBody:
         required: true
         content:
@@ -461,58 +527,15 @@ paths:
             schema: 
               type: object
               properties:
-                name: 
+                preset: 
                   type: string
-                description:
-                  type: string
-                parentId: 
-                  type: number
               required:
-                - name
-                - parentId
-            example: 
-              name: "文学"
-              description: 小説や童話など文学に関するクイズ
-              parentId: 1
+                - preset
+            example:
+              preset: "abc23"
       responses:
-        "200": 
-          $ref: "#/components/responses/CategoryResponse"
-        "400":
-          $ref: "#/components/responses/400BadRequest"
-        "401": 
-          $ref: "#/components/responses/401Unauthorized"
-        "403":
-          $ref: "#/components/responses/403Forbidden"
-    put: 
-      tags: 
-        - categories
-      summary: サブカテゴリーの編集
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema: 
-              type: object
-              properties:
-                id: 
-                  type: number
-                name: 
-                  type: string
-                description:
-                  type: string
-                parentId: 
-                  type: number
-              required:
-                - id
-                - name
-            example: 
-              id: 1
-              name: "文学"
-              description: 小説や童話など文学に関するクイズ
-              parentId: 1
-      responses:
-        "200": 
-          $ref: "#/components/responses/CategoryResponse"
+        "204": 
+          description: add preset category
         "400":
           $ref: "#/components/responses/400BadRequest"
         "401": 
@@ -688,14 +711,61 @@ paths:
         "403":
           $ref: "#/components/responses/403Forbidden"
   "/invite-code":
+    get:
+      tags:
+        - auth
+      summary: 招待コード
+      description: 招待コードのリストを取得
+      parameters:
+        - name: status
+          in: query
+          required: false
+          description: '0: 未使用, 1: 使用済み'
+          schema: 
+            type: number
+          example: 0
+        - name: sort
+          in: query
+          required: false
+          description: 'asc: 作成日時（昇順），desc: 作成日時（降順）'
+          schema:
+            type: string
+          example: asc
+      responses:
+        "200":
+            description: 招待コードのリストを取得
+            content:
+              application/json:
+                schema: 
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      code: 
+                        type: string
+                      status:
+                        type: number
+                      created: 
+                        type: string
+                        format: date-time
+                    required:
+                      - code
+                      - status
+                      - created
+        "400":
+          $ref: "#/components/responses/400BadRequest"
+        "401": 
+          $ref: "#/components/responses/401Unauthorized"
+        "403":
+          $ref: "#/components/responses/403Forbidden"
     post:
       tags: 
         - auth
-      summary: 招待コードを取得
-      description: 招待コードを取得する
+      summary: 招待コードを発行
+      description: 招待コードを発行する
       responses:
         "200":
-          description: 招待コードを取得
+          description: 招待コードを発行
           content:
             application/json:
               schema:
@@ -929,6 +999,8 @@ paths:
         - $ref: "#/components/parameters/mid"
         - $ref: "#/components/parameters/isFavorite"
         - $ref: "#/components/parameters/tags"
+        - $ref: "#/components/parameters/tagMatchAll"
+        - $ref: "#/components/parameters/categories"
       responses:
         "200":
           $ref: "#/components/responses/QuizzesResponse"
@@ -962,8 +1034,6 @@ paths:
                   wid:
                     type: string
                   category:
-                    type: number
-                  subCategory:
                     type: number
                   isPublic: 
                     type: boolean
@@ -1023,8 +1093,6 @@ paths:
                   wid:
                     type: string
                   category:
-                    type: number
-                  subCategory:
                     type: number
                   isPublic: 
                     type: boolean
@@ -1089,6 +1157,8 @@ paths:
         - $ref: "#/components/parameters/mid"
         - $ref: "#/components/parameters/isFavorite"
         - $ref: "#/components/parameters/tags"
+        - $ref: "#/components/parameters/tagMatchAll"
+        - $ref: "#/components/parameters/categories"
       responses:
         "200":
           description: クイズの総数
@@ -1318,6 +1388,12 @@ paths:
           schema:
             type: string
           example: ジャンル
+        - name: all
+          in: query
+          required: false
+          description: すべてのタグを得るか
+          schema: 
+            type: boolean
       summary: ユーザ自身の作成したタグのリストを取得
       responses:
         "200":
@@ -1607,6 +1683,20 @@ paths:
           $ref: "#/components/responses/403Forbidden"
 components:
   parameters:
+    categories: 
+      name: categories
+      in: query
+      required: false
+      description: ジャンルの絞り込み
+      schema:
+        oneOf:
+          - type: array
+            items: 
+              type: number
+          - type: number
+      example: 
+        - 1
+        - 2
     crctAnsRatio: 
       name: crctAnsRatio
       in: query
@@ -1630,11 +1720,15 @@ components:
       in: query
       required: false
       schema: 
-        type: array
-        description: 0(wrong) or 1(right) or 2(through)
-        items:
-          type: number
-          example: [0, 1]
+        anyOf:
+          - type: array
+            description: 0(wrong) or 1(right) or 2(through)
+            items:
+              type: number
+              example: [0, 1]
+          - type: number
+            description: 0(wrong) or 1(right) or 2(through)
+            example: 0
     keyword:
       name: keyword
       in: query
@@ -1695,9 +1789,19 @@ components:
       in: query
       required: false
       schema: 
-        type: array
-        items: 
-          type: string
+        oneOf:
+          - type: array
+            items: 
+              type: string
+          - type: string
+    tagMatchAll:
+      name: tagMatchAll
+      in: query
+      required: false 
+      description: "タグ検索のオプション（true: AND検索, false: OR検索）"
+      schema: 
+        type: boolean
+      example: false
     until:
       name: until
       in: query
@@ -2099,6 +2203,12 @@ components:
           type: string
         description:
           type: string
+        disabled:
+          type: boolean
+        from: 
+          type: string
+        parentId:
+          type: number
         sub: 
           type: array
           items:
@@ -2106,6 +2216,8 @@ components:
       required:
         - id
         - name
+        - disabled
+        - parentId
     Error: 
       type: object
       properties: 
@@ -2151,6 +2263,7 @@ components:
           type: string
         created:
           type: string
+          format: date-time
           readOnly: true
       required:
         - mid
@@ -2169,23 +2282,34 @@ components:
           type: string
         wid: 
           type: string
-        level:
-          type: string
+          writeOnly: true
+        workbook:
+          $ref: "#/components/schemas/Workbook"
           readOnly: true
+        categoryId:
+          type: number
+          writeOnly: true
         category:
-          type: number
-        subCategory:
-          type: number
+          type: array
+          items:
+            $ref: "#/components/schemas/Category"
+          readOnly: true
         total: 
           type: number
           readOnly: true
         right: 
           type: number
           readOnly: true
+        tagLabels:
+          type: array
+          items: 
+            type: string
+          writeOnly: true
         tags:
           type: array
           items:
-            type: string
+            $ref: "#/components/schemas/Tag"
+          readOnly: true
         creatorId:
           type: string
         isPublic: 
@@ -2201,7 +2325,7 @@ components:
         registerdMylist:
           type: array 
           items: 
-            type: string
+            $ref: "#/components/schemas/Mylist"
           readOnly: true
         judgement:
           type: number
@@ -2212,11 +2336,9 @@ components:
         - answer
         - total
         - right
-        - tags
         - creatorId
         - isPublic
         - isFavorite
-        - registerdMylist
     Rank: 
       type: object
       properties:
@@ -2249,23 +2371,26 @@ components:
           type: string
         parentId:
           type: number
+        disabled:
+          type: boolean
+        from: 
+          type: string
       required:
         - id
         - name
         - parentId
+        - disabled
     Tag: 
       type: object
       properties:
         label: 
           type: string
-        description:
-          type: string
-        color: 
-          type: string
         created: 
           type: string
+          format: date-time
         modified:
           type: string
+          format: date-time
       required:
         - label
         - created
@@ -2303,6 +2428,7 @@ components:
           type: string
         date: 
           type: string
+          format: date-time
         levelId: 
           type: number
         color: 

@@ -9,7 +9,7 @@ export default function ({
 }: Props){
   return (
     <Box {...others}>
-      <Text>表示問題数</Text>
+      <Text fz="sm">表示問題数</Text>
       <Slider 
         label={`${value}問`}
         min={1}

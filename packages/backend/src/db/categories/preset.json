@@ -1,0 +1,13 @@
+[
+  {
+    "name": "abc 23rd",
+    "value": "abc23",
+    "description": "『abc 23rd』で使われたジャンル群",
+    "tag": "おすすめ"
+  },
+  {
+    "name": "みんはや",
+    "value": "minhaya",
+    "description": "『みんなで早押しクイズ』で使われているジャンル"
+  }
+]

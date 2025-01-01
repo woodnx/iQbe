@@ -1,8 +1,13 @@
+import { paths } from 'api/schema';
+
 import QuizEditForm from '@/components/QuizEditForm';
-import { $api } from "@/utils/client";
-import { SubmitValue } from '@/types';
+import { $api } from '@/utils/client';
 import { Tabs } from '@mantine/core';
+
 import CsvFileImporter from './CsvFileImporter';
+import { notifications } from '@mantine/notifications';
+
+type QuizEditSubmitValues = paths["/quizzes"]["post"]["requestBody"]["content"]["application/json"];
 
 export interface Element {
   question: string,
@@ -13,28 +18,49 @@ export interface Element {
 export default function CreateDashboard() {
   const { mutate } = $api.useMutation("post", "/quizzes");
 
-  const submit = ({ question, answer, category, tags, subCategory, workbook, isPublic }: SubmitValue) => {
-    mutate({ body: {
-      question,
-      answer,
-      category,
-      tags,
-      subCategory,
-      wid: workbook,
-      isPublic,
-    }});
+  const submit = ({ question, answer, category, tags,  wid, isPublic }: QuizEditSubmitValues) => {
+    mutate({ 
+        body: {
+          question,
+          answer,
+          category,
+          tags,
+          wid,
+          isPublic,
+        }
+      }, {
+        onSuccess:() => {
+          notifications.show({
+            title: '新しいクイズを作成しました',
+            message: '',
+          });
+        },
+        onError: () => {
+          notifications.show({
+            title: '何らかの障害が発生しました',
+            message: '何度も続く場合はサポート担当に問い合わせてください',
+            color: 'red',
+          });
+        }
+      }
+    );
   };
 
   return (
     <>
       <Tabs defaultValue="single">
         <Tabs.List grow>
-          <Tabs.Tab value="single">Single</Tabs.Tab>
-          <Tabs.Tab value="file">CSV file</Tabs.Tab>
+          <Tabs.Tab value="single">シングル</Tabs.Tab>
+          <Tabs.Tab value="file">CSVファイル</Tabs.Tab>
         </Tabs.List>
 
         <Tabs.Panel value="single" pt="xs">
-          <QuizEditForm mb={16} onSubmit={submit}/>
+          <QuizEditForm 
+            question=''
+            answer=''
+            mb={16} 
+            onSubmit={submit}
+          />
         </Tabs.Panel>
         <Tabs.Panel value="file" pt="xs">
           <CsvFileImporter />

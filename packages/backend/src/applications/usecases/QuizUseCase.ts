@@ -1,11 +1,13 @@
-import IQuizRepository from "@/domains/Quiz/IQuizRepository";
-import QuizService from "@/domains/Quiz/QuizService";
-import { components } from "api/schema";
-import ITransactionManager from "../shared/ITransactionManager";
-import Quiz from "@/domains/Quiz";
-import { ApiError } from "api";
-import ITagRepository from "@/domains/Tag/ITagRepository";
-import TagAssignmentService from "@/domains/Quiz/TagAssignmentSerice";
+import { ApiError } from 'api';
+import { components } from 'api/schema';
+
+import Quiz from '@/domains/Quiz';
+import IQuizRepository from '@/domains/Quiz/IQuizRepository';
+import QuizService from '@/domains/Quiz/QuizService';
+import ITagRepository from '@/domains/Tag/ITagRepository';
+import TagService from '@/domains/Tag/TagService';
+
+import ITransactionManager from '../shared/ITransactionManager';
 
 type QuizDTO = components["responses"]["QuizResponse"]["content"]["application/json"];
 
@@ -20,35 +22,30 @@ export default class QuizUseCase {
     question: string,
     answer: string,
     tagLabels: string[],
-    limitedUser: string[],
+    isPublic: boolean,
     uid: string,
     anotherAnswer?: string,
     categoryId?: number,
-    subCategoryId?: number,
     wid?: string,
   ): Promise<QuizDTO> {
     const quizService = new QuizService();
-    const tagAssignmentService = new TagAssignmentService(this.quizRepository, this.tagRepository);
+    const tagService = new TagService(this.tagRepository);
 
     const qid = quizService.generateQid();
-    const quiz = new Quiz(
+    const quiz = Quiz.create(
       qid,
       question,
       answer,
-      anotherAnswer || null,
       tagLabels,
-      wid || null,
-      categoryId || null,
-      subCategoryId || null,
       uid,
-      limitedUser,
+      isPublic ? [] : [ uid ],
+      anotherAnswer,
+      wid,
+      categoryId,
     );
 
     await this.transactionManager.begin(async () => {
-      for (const tag of tagLabels) {
-        tagAssignmentService.assignTagToQuiz(qid, tag);
-      }
-
+      await tagService.manageTagsToAdd(tagLabels);
       await this.quizRepository.save(quiz);
     });
 
@@ -58,9 +55,8 @@ export default class QuizUseCase {
       answer: quiz.answer,
       anotherAnswer: quiz.anotherAnswer,
       wid: quiz.wid,
-      tags: quiz.tagLabels,
-      category: quiz.categoryId,
-      subCategory: quiz.subCategoryId,
+      tagLabels: quiz.tagLabels,
+      categoryId: quiz.categoryId,
       creatorId: quiz.creatorUid,
       isPublic: quiz.isPublic(),
       right: quiz.right,
@@ -79,7 +75,6 @@ export default class QuizUseCase {
       uid: string,
       anotherAnswer?: string,
       categoryId?: number,
-      subCategoryId?: number,
       wid?: string,
     }[],
   ): Promise<QuizDTO[]> {
@@ -89,17 +84,16 @@ export default class QuizUseCase {
       return Promise.all(quizzes.map(async (_quiz) => {
         const qid = quizService.generateQid();
 
-        const quiz = new Quiz(
+        const quiz = Quiz.create(
           qid,
           _quiz.question,
           _quiz.answer,
-          _quiz.anotherAnswer || null,
           _quiz.tagLabels,
-          _quiz.wid || null,
-          _quiz.categoryId || null,
-          _quiz.subCategoryId || null,
           _quiz.uid,
           _quiz.limitedUser,
+          _quiz.anotherAnswer,
+          _quiz.wid,
+          _quiz.categoryId,
         );
 
         await this.quizRepository.save(quiz);
@@ -110,15 +104,13 @@ export default class QuizUseCase {
           answer: quiz.answer,
           anotherAnswer: quiz.anotherAnswer,
           wid: quiz.wid,
-          tags: _quiz.tagLabels,
-          category: quiz.categoryId,
-          subCategory: quiz.subCategoryId,
+          tagLabels: _quiz.tagLabels,
+          categoryId: quiz.categoryId,
           creatorId: quiz.creatorUid,
           isPublic: quiz.isPublic(),
           right: quiz.right,
           total: quiz.total,
           isFavorite: false,
-          registerdMylist: [],
         }
       }))
     });
@@ -134,11 +126,10 @@ export default class QuizUseCase {
     tagLabels: string[],
     anotherAnswer?: string,
     categoryId?: number,
-    subCategoryId?: number,
     wid?: string,
   ): Promise<QuizDTO> {
-    const tagAssignmentService = new TagAssignmentService(this.quizRepository, this.tagRepository);
     const quiz = await this.quizRepository.findByQid(qid);
+    const tagService = new TagService(this.tagRepository);
     const editable = quiz?.isEditable(uid);
 
     if (!quiz) 
@@ -161,26 +152,19 @@ export default class QuizUseCase {
     quiz.editAnswer(answer);
     quiz.editAnotherAnswer(anotherAnswer || null);
     quiz.editCategoryId(categoryId || null);
-    quiz.editSubCategoryId(subCategoryId || null);
     quiz.editWid(wid || null);
 
     // タグ付与処理
-    const oldTagLabels = quiz.tagLabels;
+    const currentTags = quiz.tagLabels;
     quiz.editTags(tagLabels);
     
+    const tagsToAdd = tagLabels.filter(tag => !currentTags.includes(tag));
+    const tagsToRemove = currentTags.filter(tag => !tagLabels.includes(tag));
+    
     await this.transactionManager.begin(async () => {
-      const addedTags = tagLabels.filter(tag => !oldTagLabels.includes(tag));
-      const removedTags = oldTagLabels.filter(tag => !tagLabels.includes(tag));
-
-      for (const tag of addedTags) {
-        await tagAssignmentService.assignTagToQuiz(qid, tag);
-      }
-
-      for (const tag of removedTags) {
-        await tagAssignmentService.removeTagFromQuiz(qid, tag);
-      }
-
-      await this.quizRepository.save(quiz);
+      await tagService.manageTagsToAdd(tagsToAdd);
+      await this.quizRepository.update(quiz, tagsToAdd, tagsToRemove);
+      await tagService.manageTagsToRemove(tagsToRemove);
     });
     
     return {
@@ -189,19 +173,29 @@ export default class QuizUseCase {
       answer: quiz.answer,
       anotherAnswer: quiz.anotherAnswer,
       wid: quiz.wid,
-      tags: quiz.tagLabels,
-      category: quiz.categoryId,
-      subCategory: quiz.subCategoryId,
+      tagLabels: quiz.tagLabels,
+      categoryId: quiz.categoryId,
       creatorId: quiz.creatorUid,
       isPublic: quiz.isPublic(),
       right: quiz.right,
       total: quiz.total,
       isFavorite: false,
-      registerdMylist: [],
     }
   }
 
   async deleteQuiz(qid: string): Promise<void> {
-    await this.quizRepository.delete(qid);
+    const tagService = new TagService(this.tagRepository);
+    const quiz = await this.quizRepository.findByQid(qid);
+
+    if (!quiz) 
+      throw new ApiError({
+        title: 'NO_QUIZ',
+        detail: 'This qid is not available id',
+        status: 400,
+        type: 'about:blank'
+      });
+
+    await this.quizRepository.delete(quiz);
+    await tagService.manageTagsToRemove(quiz.tagLabels);
   }
 }

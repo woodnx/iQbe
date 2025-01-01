@@ -1,5 +1,8 @@
 import cors from 'cors';
 import express from 'express';
+import * as OpenApiValidator from 'express-openapi-validator';
+import boolParser from 'express-query-boolean';
+import intParser from 'express-query-int';
 import fs from 'fs';
 import path from 'path';
 
@@ -21,9 +24,19 @@ app.use(cors({
   credentials: true, //レスポンスヘッダーにAccess-Control-Allow-Credentials追加
   optionsSuccessStatus: 200 //レスポンスstatusを200に設定
 }));
-app.use(express.json()); 
-app.use(express.static(path.join(__dirname, 'public'))); 
+app.use(express.json({limit: '5mb'})); 
+app.use(boolParser());
+app.use(intParser());
+app.use(express.static(path.join(process.cwd(), 'public'))); 
 app.use(express.static(path.join(__dirname, 'web')));
+
+app.use(
+  OpenApiValidator.middleware({
+    apiSpec: path.join(__dirname, '../../api/openapi.yaml'),
+    validateRequests: true, // (default)
+    validateResponses: false, // false by default
+  }),
+);
 
 // router import
 const filenames = fs.readdirSync(path.join(__dirname, 'routes')).filter(n => !n.includes(".map"))

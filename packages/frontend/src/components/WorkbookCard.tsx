@@ -1,49 +1,91 @@
-import { Badge, Card, BoxProps, Divider, Grid, Paper, Text } from "@mantine/core";
-import { useNavigate } from "react-router-dom";
+import { components } from 'api/schema';
+import dayjs from 'dayjs';
+import { useNavigate } from 'react-router-dom';
+
+import { useAuth } from '@/hooks/useAuth';
+import { ActionIcon, Badge, BoxProps, Card, Group, Menu, rem, Text } from '@mantine/core';
+import { IconDots, IconPencil, IconTrash } from '@tabler/icons-react';
+import { modals } from '@mantine/modals';
+
+type Workbook = components['schemas']['Workbook'];
 
 interface Props extends BoxProps {
-  wid: string,
-  title: string,
-  color?: string,
-  date?: string,
+  workbook: Workbook,
 }
 
 export default function WorkbookCard({
-  wid,
-  title,
-  color = '#ffffff',
-  date,
+  workbook,
 }: Props) {
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const uid = user.uid;
 
   return (
-    <Card<'a'>
-      padding="lg" 
-      radius="md"
-      component="a" 
+    <Card
+      px="lg"
+      py="sm"
+      radius="lg"
       withBorder
-      href={`/create/${wid}`}
-      onClick={(e) => {
-        e.preventDefault();
-        navigate(`/create/${wid}`);
-      }}
     >
-      <Card.Section >
-        <Paper bg={color} h={150}/>
-        <Divider/>
-      </Card.Section>
-      <Grid my={10} justify="space-between">
-        <Grid.Col span={{ base: 8, sm: 7 }} >
-          <Text fw={700} truncate>{title}</Text>
-        </Grid.Col>
-        <Grid.Col span="content">
-          {
-          !!date 
-          ? <Badge>{date}</Badge>
-          : null
+      <Group my={10} justify="space-between">
+        <Text 
+          fw={700} 
+          truncate 
+          onClick={(e) => {
+            e.preventDefault();
+            navigate(`/workbook/${workbook.wid}`);
+          }}
+          component="a" 
+          href=""
+        >{workbook.name}</Text>
+        <Group>
+          { workbook.date && <Badge color='gray'>{dayjs(workbook.date).year()}</Badge> }
+          { 
+            uid == workbook.creatorId && 
+            <Menu withinPortal position="bottom-end">
+              <Menu.Target>
+                <ActionIcon variant="subtle" color="gray">
+                  <IconDots/>
+                </ActionIcon>
+              </Menu.Target>
+              <Menu.Dropdown>
+                <Menu.Item
+                  leftSection={<IconPencil style={{ width: rem(14), height: rem(14) }}/>}
+                  onClick={() => 
+                    modals.openContextModal({
+                      modal: 'workbookEdit',
+                      title: '問題集の編集',
+                      innerProps: {
+                        wid: workbook.wid,
+                        name: workbook.name,
+                        date: workbook?.date || undefined,
+                      },
+                      size: 'md',
+                      zIndex: 200,
+                    })
+                  }
+                >編集</Menu.Item>
+                <Menu.Item
+                  leftSection={<IconTrash style={{ width: rem(14), height: rem(14) }}/>}
+                  onClick={() =>
+                    modals.openContextModal({
+                      modal: 'workbookDelete',
+                      title: '問題集を削除',
+                      innerProps: {
+                        wid: workbook.wid,
+                      },
+                      size: 'md',
+                      zIndex: 200
+                    })
+                  }
+                >
+                  削除
+                </Menu.Item>
+              </Menu.Dropdown>
+            </Menu>
           }
-        </Grid.Col>
-      </Grid>
+        </Group>
+      </Group>
     </Card>
   )
 }

@@ -20,7 +20,7 @@ export default function QuizShuffleButton({
       variant="outline"
       color="blue"
       { ...others }
-    >Shuffle</Button>
+    >シャッフル</Button>
   );
 
   const mobileButton = (

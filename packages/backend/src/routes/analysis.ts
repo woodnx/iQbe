@@ -8,7 +8,7 @@ import { typedWrapper } from '@/utils/wrappers';
 const router = express.Router();
 
 router.get('/status/:date/:period', typedWrapper<"/analysis/status/{date}/{period}", "get">(async (req, res, next) => {
-  const userId = req.userId;
+  const userId = req.user.userId;
   const date = req.params.date;
   const _period = req.params.period;
 
@@ -124,7 +124,7 @@ router.get('/ranking/all/:period', async (req, res) => {
 
 router.get('/ranking/personal/:period', async (req, res) => {
   const _period = req.params.period
-  const userId = req.userId
+  const userId = req.user.userId
   const now = dayjs().format('YYYY-MM-DD HH:mm:ss')
 
   const period: Period = (_period == 'week' || _period == 'month') ? _period : 'day'

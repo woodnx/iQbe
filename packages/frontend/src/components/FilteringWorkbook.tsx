@@ -4,60 +4,50 @@ import { QuizWorkbookBadge } from "./QuizWorkbookBadge";
 import { useWorkbooks } from "@/hooks/useWorkbooks";
 
 interface FilteringWorkbookProps extends BoxProps {
-  values: string[] | undefined,
-  onChange: (values: string[]) => void
+  value?: string[],
+  onChange?: (value: string[]) => void
 }
 
 export default function FilteringWorkbook({ 
-  values, 
-  onChange,
+  value = [], 
+  onChange = () => {},
   ...others
- }: FilteringWorkbookProps ) {
+}: FilteringWorkbookProps ) {
   const { workbooks } = useWorkbooks(true);
   const [ search, setSearch ] = useState('');
-  const [ innerValues, setValue ] = useState<string[]>(values || []);
   const combobox = useCombobox({
     onDropdownClose: () => combobox.resetSelectedOption(),
     onDropdownOpen: () => combobox.updateSelectedOptionIndex('active'),
   });
 
-  const handleValueSelect = (value: string) => {
-    setValue((current) => {
-      const values = current.includes(value) ? current.filter((v) => v !== value) : [...current, value];
-      onChange(values);
-      return values;
-    });
+  const handleValueSelect = (v: string) => {
+    onChange([ ...value, v ]);
   }
 
-  const handleValueRemove = (value: string) => {
-    setValue((current) => { 
-      const values = current.filter((v) => v !== value);
-      onChange(values);
-      return values;
-    });
+  const handleValueRemove = (v: string) => {
+    onChange(value.filter((_v) => _v !== v));
   }
   
   const options = workbooks?.filter((item) => 
     item.name.toLowerCase().includes(search.trim().toLowerCase()
-  )).map(({ wid, color }) => (
-    <Combobox.Option value={wid} key={wid} active={innerValues.includes(wid)}>
+  )).map((workbook) => (
+    <Combobox.Option value={workbook.wid} key={workbook.wid} active={value.includes(workbook.wid)}>
       <Group gap="sm">
-        {innerValues.includes(wid) ? <CheckIcon size={12} /> : null}
+        {value.includes(workbook.wid) ? <CheckIcon size={12} /> : null}
         <QuizWorkbookBadge
-          wid={wid}
-          levelColor={color || 'gray'}
+          workbook={workbook}
         />
       </Group>
     </Combobox.Option>
   ));
 
-  const pills = innerValues.map((value) => (
+  const pills = value.map((v) => (
     <Pill 
-      key={value} 
-      onRemove={() => handleValueRemove(value)}
+      key={v} 
+      onRemove={() => handleValueRemove(v)}
       withRemoveButton
     >
-      { workbooks?.filter(({ wid }) => wid == value)[0].name }
+      { workbooks?.filter(({ wid }) => wid == v)[0].name }
     </Pill>
   ))
   
@@ -69,7 +59,7 @@ export default function FilteringWorkbook({
       {...others}
     >
       <Combobox.DropdownTarget>
-        <PillsInput pointer onClick={() => combobox.openDropdown()}>
+        <PillsInput pointer onClick={() => combobox.openDropdown()} label="問題集による絞り込み">
           <Pill.Group>
             { pills }
             <Combobox.EventsTarget>
@@ -77,7 +67,7 @@ export default function FilteringWorkbook({
                 onFocus={() => combobox.openDropdown()}
                 onBlur={() => combobox.closeDropdown()}
                 value={search}
-                placeholder="Search values"
+                placeholder="問題集名を入力"
                 onChange={(event) => {
                   combobox.updateSelectedOptionIndex();
                   setSearch(event.currentTarget.value);
@@ -85,7 +75,7 @@ export default function FilteringWorkbook({
                 onKeyDown={(event) => {
                   if (event.key === 'Backspace' && search.length === 0) {
                     event.preventDefault();
-                    handleValueRemove(innerValues[innerValues.length - 1]);
+                    handleValueRemove(value[value.length - 1]);
                   }
                 }}
               />
@@ -97,7 +87,7 @@ export default function FilteringWorkbook({
       <Combobox.Dropdown>
         <Combobox.Options>
           <ScrollArea.Autosize type="scroll" mah={200}>
-            {options && options?.length > 0 ? options : <Combobox.Empty>Nothing found...</Combobox.Empty>}
+            {options && options?.length > 0 ? options : <Combobox.Empty>何も見つかりませんでした...😢</Combobox.Empty>}
           </ScrollArea.Autosize>
         </Combobox.Options>
       </Combobox.Dropdown>

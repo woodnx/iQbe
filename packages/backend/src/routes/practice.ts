@@ -6,12 +6,16 @@ import UserInfra from '@/interfaces/infra/UserInfra';
 import KyselyClientManager from '@/interfaces/infra/kysely/KyselyClientManager';
 import HistoryInfra from '@/interfaces/infra/HistoryInfra';
 import PracticeController from '@/interfaces/controllers/PracticeController';
+import CategoryInfra from '@/interfaces/infra/CategoryInfra';
 
 const router = express.Router();
 const kyselyClientManager = new KyselyClientManager();
 const practiceUseCase = new PracticeUseCase(
   new UserInfra(kyselyClientManager),
-  new QuizInfra(kyselyClientManager),
+  new QuizInfra(
+    kyselyClientManager,
+    new CategoryInfra(kyselyClientManager),
+  ),
   new HistoryInfra(kyselyClientManager),
 );
 const practiceController = new PracticeController(practiceUseCase);

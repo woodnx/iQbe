@@ -1,30 +1,49 @@
-import CategoryService from '@/domains/Category/CategoryService';
-import SubCategoryRepository from '@/domains/SubCategory/SubCategoryRepository';
+import { ApiError } from 'api';
+
+import ICategoryQueryService from '@/applications/queryservices/ICategoryQueryService';
+import CategoryUseCase from '@/applications/usecases/CategoryUseCase';
+import abc23 from '@/db/categories/abc23.json';
+import minhaya from '@/db/categories/minhaya.json';
+import preset from '@/db/categories/preset.json';
 import { typedAsyncWrapper } from '@/utils';
 
 export default class CategoryController {
   constructor(
-    private categoryService: CategoryService,
-    private subCategoryRepository: SubCategoryRepository,
+    private categoryQueryService: ICategoryQueryService,
+    private categoryUseCase: CategoryUseCase,
   ) {}
+
+  private selectPreset(preset: string) {
+    switch (preset) {
+      case 'abc23':
+        return abc23;
+      case 'minhaya':
+        return minhaya;
+      default:
+        return null;
+    }
+  }
 
   get() {
     return typedAsyncWrapper<"/categories", "get">(async (req, res) => {
-      const categories = await this.categoryService.findAllWithSub();
+      const categories = await this.categoryQueryService.all();
     
       if (!categories) {
         throw new Error('');
       }
     
       const data = categories.map(category => ({
-        id: category.category.id,
-        name: category.category.name,
-        description: category.category.description,
+        id: category.id,
+        name: category.name,
+        description: category.description,
+        disabled: category.disabled,
+        parentId: category.parentId,
         sub: category.sub?.map(s => ({
           id: s.id,
           name: s.name,
           description: s.description,
           parentId: s.parentId,
+          disabled: s.disabled,
         })),
       }));
     
@@ -32,18 +51,93 @@ export default class CategoryController {
     })
   }
 
-  getSub() {
-    return typedAsyncWrapper<"/categories/sub", "get">(async (req, res) => {
-      const subCategories = await this.subCategoryRepository.findAll();
+  getFromId() {
+    return typedAsyncWrapper<"/categories/{id}", "get">(async (req, res) => {
+      const { id } = req.params;
+      const categories = await this.categoryUseCase.findById(id);
+
+      res.status(200).send(categories.map(category => ({
+        id: category.id,
+        name: category.name,
+        description: category.description,
+        disabled: category.disabled,
+        parentId: category.parentId,
+      })));
+    })
+  }
+
+  post() {
+    return typedAsyncWrapper<"/categories", "post">(async (req, res) => {
+      if (!req.user.isSuperUser) 
+        throw new ApiError().accessDenied();
+
+      const { name, description, parentId, disabled } = req.body;
+  
+      if (!name) {
+        throw new ApiError().invalidParams();
+      }
     
-      const data = subCategories?.map(sub => ({
-        id: sub.id,
-        name: sub.name,
-        description: sub.description,
-        parentId: sub.parentId,
-      }));
+      await this.categoryUseCase.addCategory(name, description || null, parentId || null, disabled);
     
-      res.status(200).send(data);
+      res.status(201).send();
+    })
+  }
+
+  put() {
+    return typedAsyncWrapper<"/categories/{id}", "put">(async (req, res) => {
+      if (!req.user.isSuperUser) 
+        throw new ApiError().accessDenied();
+
+      const { id } = req.params;
+      const { description, disabled } = req.body;
+
+      if (!id) {
+        throw new ApiError().invalidParams();
+      }
+
+      await this.categoryUseCase.editCategory(Number(id), description || null, disabled);
+    });
+  }
+
+  delete() {
+    return typedAsyncWrapper<"/categories/{id}", "delete">(async (req, res) => {
+      if (req.user.isSuperUser) 
+        throw new ApiError().accessDenied();
+
+      const { id } = req.params;
+
+      if (!id) throw new ApiError().invalidParams();
+
+      await this.categoryUseCase.deleteCategory(id);
+    })
+  }
+
+  getPreset() {
+    return typedAsyncWrapper<"/categories/preset", "get">(async (req, res) => {
+      res.send(preset);
+    });
+  }
+
+  addFromPreset() {
+    return typedAsyncWrapper<"/categories/preset", "post">(async (req, res) => {
+      if (!req.user.isSuperUser) 
+        throw new ApiError().accessDenied();
+
+      const preset = req.body.preset;
+
+      if (!preset) {
+        throw new ApiError().invalidParams();
+      }
+
+      const categories = this.selectPreset(preset);
+
+      if (!categories) {
+        throw new ApiError().invalidParams();
+      }
+
+      await this.categoryUseCase.addPresetCategory(categories);
+
+      res.send();
     });
   }
 }

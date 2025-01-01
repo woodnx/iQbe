@@ -1,8 +1,5 @@
 export default class Quiz {
-  private _total: number;
-  private _right: number;
-
-  constructor(
+  private constructor(
     private _qid: string,
     private _question: string,
     private _answer: string,
@@ -10,12 +7,64 @@ export default class Quiz {
     private _tagLabels: string[],
     private _wid: string | null,
     private _categoryId: number | null,
-    private _subCategoryId: number | null,
     private _creatorUid: string,
     private _visibleUids: string[],
+    private _total: number,
+    private _right: number,
+  ) {}
+
+  static create(
+    qid: string,
+    question: string,
+    answer: string,
+    tagLabels: string[],
+    creatorUid: string,
+    visibleUids: string[],
+    anotherAnswer?: string,
+    wid?: string,
+    categoryId?: number,
   ) {
-    this._total = 0;
-    this._right = 0;
+    return new Quiz(
+      qid,
+      question,
+      answer,
+      anotherAnswer || null,
+      tagLabels,
+      wid || null,
+      categoryId || null,
+      creatorUid,
+      visibleUids,
+      0,
+      0,
+    );
+  }
+
+  static reconstruct(
+    qid: string,
+    question: string,
+    answer: string,
+    tagLabels: string[],
+    total: number,
+    right: number,
+    creatorUid: string,
+    visibleUids: string[],
+    wid: string | null,
+    anotherAnswer: string | null, 
+    categoryId: number | null,
+  ) {
+    return new Quiz(
+      qid,
+      question,
+      answer,
+      anotherAnswer,
+      tagLabels,
+      wid,
+      categoryId,
+      creatorUid,
+      visibleUids,
+      total,
+      right,
+    );
   }
 
   editQuestion(question: string) {
@@ -34,24 +83,12 @@ export default class Quiz {
     this._categoryId = categoryId;
   }
 
-  editSubCategoryId(subCategoryId: number | null) {
-    this._subCategoryId = subCategoryId;
-  }
-
   editWid(wid: string | null) {
     this._wid = wid;
   }
 
   editTags(tagLabels: string[]) {
     this._tagLabels = tagLabels;
-  }
-
-  addTagLabel(tagLabel: string): string[] {
-    return [...this._tagLabels, tagLabel];
-  }
-
-  removeTagLabel(tagLabel: string): string[] {
-    return this._tagLabels.filter(label => label !== tagLabel);
   }
 
   isPublic(): boolean {
@@ -92,10 +129,6 @@ export default class Quiz {
 
   get categoryId(): number | null {
     return this._categoryId;
-  }
-
-  get subCategoryId(): number | null {
-    return this._subCategoryId;
   }
 
   get total(): number {

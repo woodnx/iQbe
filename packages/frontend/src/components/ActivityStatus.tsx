@@ -16,7 +16,7 @@ export default function () {
     <>
       <Card ref={ref} >
         <Group justify="space-between">
-          <Title size="h2">Status</Title>
+          <Title size="h2">演習状況</Title>
           <ActivitySelectRange
             period={period}
             onClick={setPeriod}

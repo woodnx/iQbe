@@ -1,13 +1,36 @@
-import { Notifications } from "@mantine/notifications";
-import { BrowserRouter as Router } from "react-router-dom";
-import Layout from './layouts';
-import { ModalsProvider } from "@mantine/modals";
-import QuizEditModal from "./components/QuizEditModal";
-import { DatesProvider } from "@mantine/dates";
 import 'dayjs/locale/ja';
 
+import { BrowserRouter as Router } from 'react-router-dom';
+
+import { DatesProvider } from '@mantine/dates';
+import { ModalsProvider } from '@mantine/modals';
+import { Notifications } from '@mantine/notifications';
+
+import CategoryCreateModal from './components/CategoryCreateModal';
+import CategoryDeleteModal from './components/CategoryDeleteModal';
+import CategoryEditModal from './components/CategoryEditModal';
+import FilteringContextModal from './components/FilteringContextModal';
+import MylistCreateModal from './components/MylistCreateModal';
+import MylistEditModal from './components/MylistEditModal';
+import QuizDeleteModal from './components/QuizDeleteModal';
+import QuizDetailesModal from './components/QuizDetailesModal';
+import QuizEditModal from './components/QuizEditModal';
+import WorkbookDeleteModal from './components/WorkbookDeleteModal';
+import WorkbookEditModal from './components/WorkbookEditModal';
+import Layout from './layouts';
+
 const modals = {
+  quizFiltering: FilteringContextModal,
+  quizDetailes: QuizDetailesModal,
   quizEdit: QuizEditModal,
+  quizDelete: QuizDeleteModal,
+  categoryEdit: CategoryEditModal,
+  categoryCreate: CategoryCreateModal,
+  categoryDelete: CategoryDeleteModal,
+  mylistCreate: MylistCreateModal,
+  mylistEdit: MylistEditModal,
+  workbookEdit: WorkbookEditModal,
+  workbookDelete: WorkbookDeleteModal,
 };
 
 declare module '@mantine/modals' {

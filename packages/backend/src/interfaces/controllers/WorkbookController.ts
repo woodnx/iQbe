@@ -3,7 +3,6 @@ import { ApiError } from 'api';
 import Workbook from '@/domains/Workbook';
 import IWorkbookRepository from '@/domains/Workbook/IWorkbookRepository';
 import WorkbookService from '@/domains/Workbook/WorkbookService';
-import { format } from '@/plugins/day';
 import { typedAsyncWrapper } from '@/utils';
 
 export default class WorkbookController {
@@ -14,13 +13,13 @@ export default class WorkbookController {
 
   get() {
     return typedAsyncWrapper<"/workbooks", "get">(async (req, res) => {
-      const uid = req.uid;
+      const uid = req.user.uid;
       const workbooks = await this.workbookRepository.findManyByUid(uid);
     
       res.status(200).send(workbooks.map(w => ({
         wid: w.wid,
         name: w.name,
-        date: w.date ? format(w.date) : undefined,
+        date: w.date || undefined,
         creatorId: w.creatorUid,
         levelId: w.levelId,
         color: w.color,
@@ -30,7 +29,7 @@ export default class WorkbookController {
 
   getFromWid() {
     return typedAsyncWrapper<"/workbooks/{wid}", "get">(async (req, res) => {
-      const uid = req.uid;
+      const uid = req.user.uid;
       const wid = req.params.wid;
 
       const workbook = await this.workbookRepository.findByWid(wid);
@@ -40,7 +39,7 @@ export default class WorkbookController {
       res.status(200).send({
         wid: workbook.wid,
         name: workbook.name,
-        date: workbook.date ? format(workbook.date) : undefined,
+        date: workbook.date || undefined,
         creatorId: workbook.creatorUid,
         levelId: workbook.levelId,
         color: workbook.color,
@@ -50,13 +49,13 @@ export default class WorkbookController {
 
   getAll() {
     return typedAsyncWrapper<"/workbooks/all", "get">(async (req, res) => {
-      const uid = req.uid;
+      const uid = req.user.uid;
       const workbooks = await this.workbookRepository.findManyByUid(uid);
     
       res.status(200).send(workbooks.map(w => ({
         wid: w.wid,
         name: w.name,
-        date: w.date ? format(w.date) : undefined,
+        date: w.date || undefined,
         creatorId: w.creatorUid,
         levelId: w.levelId,
         color: w.color,
@@ -66,7 +65,7 @@ export default class WorkbookController {
 
   post() {
     return typedAsyncWrapper<"/workbooks", "post">(async (req, res) => {
-      const uid = req.uid;
+      const uid = req.user.uid;
       const name = req.body.name;
       const date = req.body.published || null;
 
@@ -85,7 +84,7 @@ export default class WorkbookController {
       res.status(200).send({
         wid,
         name,
-        date: date ? format(date) : null,
+        date: date || null,
         creatorId: uid,
         levelId: null,
         color: null,
@@ -95,7 +94,7 @@ export default class WorkbookController {
 
   put() {
     return typedAsyncWrapper<"/workbooks/{wid}", "put">(async (req, res) => {
-      const uid = req.uid;
+      const uid = req.user.uid;
       const wid = req.params.wid;
       const name = req.body.name;
       const date = req.body.published || null;
@@ -121,7 +120,7 @@ export default class WorkbookController {
 
   delete() {
     return typedAsyncWrapper<"/workbooks/{wid}", "delete">(async (req, res) => {
-      const uid = req.uid;
+      const uid = req.user.uid;
       const wid = req.params.wid;
 
       await this.workbookRepository.delete(wid);
@@ -130,7 +129,7 @@ export default class WorkbookController {
       res.status(200).send(workbooks.map(w => ({
         wid: w.wid,
         name: w.name,
-        date: w.date ? format(w.date) : undefined,
+        date: w.date || undefined,
         creatorId: w.creatorUid,
         levelId: w.levelId,
         color: w.color,

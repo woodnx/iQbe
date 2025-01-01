@@ -14,19 +14,24 @@ const useQuizzes = (
   const setParams = (v: QuizRequestParams) => {
     queryClient.setQueryData(['params'], v);
   };
-
+  
   const { data: quizzes, error, isLoading } = $api.useQuery('get', `/quizzes`, {
     params: {
       query: {
         page: params.page,
         maxView: params.maxView,
         seed: params.seed,
-        workbooks: params.wids,
+        wids: params.wids,
         keyword: params.keyword,
-        keywordOption: Number(params.keywordOption),
+        keywordOption: params.keywordOption,
         judgements: params.judgements,
         since: params.since,
         until: params.until,
+        mid: params.mid,
+        isFavorite: params.isFavorite,
+        categories: params.categories,
+        tags: params.tags,
+        tagMatchAll: params.tagMatchAll,
       }
     },
     enabled: shouldFetch,

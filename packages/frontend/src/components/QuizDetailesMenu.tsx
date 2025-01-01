@@ -1,30 +1,27 @@
-import { ActionIcon, Menu } from "@mantine/core";
-import { IconDots } from "@tabler/icons-react";
+import { ActionIcon, Menu, rem, ScrollArea } from "@mantine/core";
+import { IconDots, IconInfoCircle, IconPencil, IconTrash } from "@tabler/icons-react";
 import { modals } from "@mantine/modals";
+import { components } from "api/schema";
+
+type Quiz = components["schemas"]["Quiz"];
 
 interface Props {
-  qid: string,
-  creatorId: string,
-  question: string,
-  answer: string,
-  wid?: string,
-  tags: string[],
-  category?: number,
-  subCategory?: number,
-  isPublic: boolean,
+  quiz: Quiz,
 }
 
 export default function({
-  qid,
-  creatorId,
-  question,
-  answer,
-  wid,
-  tags,
-  category,
-  subCategory,
-  isPublic,
+  quiz,
 }: Props) {
+  const {
+    qid,
+    question,
+    answer,
+    workbook,
+    tags,
+    category,
+    isPublic,
+    creatorId,
+  } = quiz;
   const uid = localStorage.getItem('uid')
   const isCreated = creatorId == uid;
 
@@ -36,27 +33,60 @@ export default function({
         </ActionIcon>
       </Menu.Target>
       <Menu.Dropdown>
-        <Menu.Item>Show Details</Menu.Item>
-        <Menu.Item 
-          disabled={!isCreated}
-          onClick={() =>
+        <Menu.Item
+          leftSection={<IconInfoCircle style={{ width: rem(14), height: rem(14) }}/>}
+          onClick={() => 
             modals.openContextModal({
-              modal: 'quizEdit',
-              title: 'Edit Quiz',
+              modal: 'quizDetailes',
+              title: 'クイズの詳細',
               innerProps: {
-                qid,
-                question,
-                answer,
-                wid,
-                tags,
-                category,
-                subCategory,
-                isPublic,
+                quiz,
               },
               size: 'xl',
-              zIndex: 100
-          })}
-        >Edit</Menu.Item>
+              zIndex: 200,
+              scrollAreaComponent: ScrollArea.Autosize
+            })
+          }
+        >詳細を表示</Menu.Item>
+        { 
+          isCreated && <Menu.Item 
+            leftSection={<IconPencil style={{ width: rem(14), height: rem(14) }}/>}
+            onClick={() =>
+              modals.openContextModal({
+                modal: 'quizEdit',
+                title: 'クイズを編集',
+                innerProps: {
+                  qid,
+                  question,
+                  answer,
+                  wid: workbook?.wid,
+                  tags: tags?.map(tag => tag.label),
+                  category: category || undefined,
+                  isPublic,
+                },
+                size: 'xl',
+                zIndex: 200
+              })
+            }
+          >編集</Menu.Item>
+        }
+        { 
+          isCreated && <Menu.Item
+            leftSection={<IconTrash style={{ width: rem(14), height: rem(14) }}/>}
+            onClick={() =>
+              modals.openContextModal({
+                modal: 'quizDelete',
+                title: 'クイズを削除',
+                innerProps: {
+                  qid,
+                },
+                size: 'md',
+                zIndex: 200
+            })}
+          >
+            削除
+          </Menu.Item>
+        }
       </Menu.Dropdown>
     </Menu>
   )

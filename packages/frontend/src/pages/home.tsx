@@ -1,8 +1,11 @@
-import { Card, Grid, Modal, Tabs } from "@mantine/core";
-import ActivityStatus from "@/components/ActivityStatus";
-import ActivityUserRanking from "@/components/ActivityUserRanking";
-import { useRequestResetPassword, useSetRequestResetPassword } from "@/contexts/requestResetPassword";
-import ResetPasswordModal from "@/components/ResetPasswordModal";
+import ActivityStatus from '@/components/ActivityStatus';
+import ActivityUserRanking from '@/components/ActivityUserRanking';
+import QuizSearchInput from '@/components/QuizSearchInput';
+import ResetPasswordModal from '@/components/ResetPasswordModal';
+import {
+  useRequestResetPassword, useSetRequestResetPassword
+} from '@/contexts/requestResetPassword';
+import { Card, Grid, Modal, Tabs } from '@mantine/core';
 
 export default function Home() {
   const requesting = useRequestResetPassword();
@@ -13,7 +16,10 @@ export default function Home() {
       <Modal opened={requesting} onClose={() => setRequesting(false)} >
         <ResetPasswordModal onSubmit={() => setRequesting(false)} />
       </Modal>
-      <Grid>
+      <Grid align='center'>
+        <Grid.Col span={10}>
+          <QuizSearchInput />
+        </Grid.Col>
         <Grid.Col span={{ base: 12, md: 6 }}>
           <Card
             style={{
@@ -26,8 +32,8 @@ export default function Home() {
               defaultValue="status"
             >
               <Tabs.List grow>
-                <Tabs.Tab value="status">STATUS</Tabs.Tab>
-                <Tabs.Tab value="ranking">RANKING</Tabs.Tab>
+                <Tabs.Tab value="status">演習状況</Tabs.Tab>
+                <Tabs.Tab value="ranking">ランキング</Tabs.Tab>
               </Tabs.List>
 
               <Tabs.Panel value="status">
