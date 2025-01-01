@@ -14,7 +14,7 @@ export default function WorkbookCreateModalButton({
   const { mutateAsync } = $api.useMutation("post", "/workbooks");
   const queryClient = useQueryClient();
 
-  const createWorkbook = async (name: string, published: Date | null) => {
+  const createWorkbook = async (name: string, published?: Date) => {
     try {
       await mutateAsync({body: {
         name,
@@ -29,12 +29,16 @@ export default function WorkbookCreateModalButton({
 
   return (
     <>
-      <Modal opened={creating} onClose={create.close} title="問題集の新規作成" centered>
+      <Modal 
+        centered 
+        title="問題集の新規作成" 
+        zIndex={100}
+        opened={creating} 
+        onClose={create.close} 
+      >
         <WorkbookCreateForm
-          opened={creating}
+          onSubmit={createWorkbook}
           onClose={create.close}
-          onCreate={createWorkbook}
-          zIndex={100}
         />
       </Modal>
       <Button 

@@ -4,6 +4,9 @@ import useQuizzes from "@/hooks/useQuizzes";
 import { useWorkbooks } from "@/hooks/useWorkbooks";
 import QuizViewer from "./QuizViewer";
 import { Navigate } from "react-router-dom";
+import MylistEditModalButton from "./MylistEditModalButton";
+import { IconTrash } from "@tabler/icons-react";
+import { modals } from "@mantine/modals";
 
 interface Props {
   wid: string,
@@ -13,9 +16,6 @@ export default function({ wid }: Props) {
   const theme = useMantineTheme();
   const { setParams } = useQuizzes();
   const { workbooks, isLoading } = useWorkbooks(true);
-  
-  const workbook = workbooks?.find(list => list.wid == wid);
-  const workbooksName = workbook?.name;
 
   useEffect(() => {
     setParams({ 
@@ -25,6 +25,10 @@ export default function({ wid }: Props) {
   }, []);
 
   if (isLoading) return <Center><Loader/></Center>;
+
+  const workbook = workbooks?.find(list => list.wid == wid);
+  const name = workbook?.name || '';
+  const date = workbook?.date;
 
   const hasAccess = workbooks?.some((workbook) => workbook.wid === wid);
 
@@ -43,7 +47,35 @@ export default function({ wid }: Props) {
       }}
     >
       <Group justify="space-between">
-        <Text fw={700} fz={25}>{ workbooksName }</Text>
+        <Text fw={700} fz={25}>{ name }</Text>
+        <Group>
+          <MylistEditModalButton 
+            onClick={() => {
+              modals.openContextModal({
+                modal: 'workbookEdit',
+                title: '問題集の編集',
+                innerProps: {
+                  wid,
+                  name,
+                  date: date || undefined,
+                }
+              })
+            }}
+          />
+          <MylistEditModalButton 
+            icon={IconTrash}
+            label="削除"
+            onClick={() => {
+              modals.openContextModal({
+                modal: 'workbookDelete',
+                title: '問題集の削除',
+                innerProps: {
+                  wid,
+                }
+              })
+            }}
+          />
+        </Group>
       </Group>
     </Card>
   );

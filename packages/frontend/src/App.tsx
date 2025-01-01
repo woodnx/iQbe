@@ -15,6 +15,8 @@ import MylistEditModal from './components/MylistEditModal';
 import QuizDeleteModal from './components/QuizDeleteModal';
 import QuizDetailesModal from './components/QuizDetailesModal';
 import QuizEditModal from './components/QuizEditModal';
+import WorkbookDeleteModal from './components/WorkbookDeleteModal';
+import WorkbookEditModal from './components/WorkbookEditModal';
 import Layout from './layouts';
 
 const modals = {
@@ -27,6 +29,8 @@ const modals = {
   categoryDelete: CategoryDeleteModal,
   mylistCreate: MylistCreateModal,
   mylistEdit: MylistEditModal,
+  workbookEdit: WorkbookEditModal,
+  workbookDelete: WorkbookDeleteModal,
 };
 
 declare module '@mantine/modals' {

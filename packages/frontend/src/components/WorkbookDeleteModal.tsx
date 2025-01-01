@@ -4,17 +4,17 @@ import { ContextModalProps } from '@mantine/modals';
 import { notifications } from '@mantine/notifications';
 import { IconTrash } from '@tabler/icons-react';
 
-export interface QuizDeleteModalInnerProps {
-  qid: string,
+export interface WorkbookDeleteModalInnerProps {
+  wid: string,
 }
 
-const QuizDeleteModal = ({
+const WorkbookDeleteModal = ({
   id,
   context,
   innerProps,
-}: ContextModalProps<QuizDeleteModalInnerProps>) => {
-  const { qid } = innerProps;
-  const { mutate } = $api.useMutation('delete', '/quizzes/{qid}');
+}: ContextModalProps<WorkbookDeleteModalInnerProps>) => {
+  const { wid } = innerProps;
+  const { mutate } = $api.useMutation('delete', '/workbooks/{wid}');
   const icon = <IconTrash/>;
 
   const submit = () => {
@@ -22,7 +22,7 @@ const QuizDeleteModal = ({
       {
         params: {
           path: {
-            qid,
+            wid,
           }
         }
       },
@@ -32,7 +32,7 @@ const QuizDeleteModal = ({
         },
         onSuccess: () => {
           notifications.show({
-            title: 'クイズを削除しました',
+            title: '問題集を削除しました',
             message: '',
           });
         },
@@ -49,7 +49,7 @@ const QuizDeleteModal = ({
 
   return (
     <>
-      <Text>クイズを削除しますか？</Text>
+      <Text>問題集を削除しますか？</Text>
       <Text c="red" size="sm">※この変更は元に戻せません。</Text>
       <Group justify="space-between" mt="sm">
         <Button
@@ -67,4 +67,4 @@ const QuizDeleteModal = ({
   )
 }
 
-export default QuizDeleteModal;
+export default WorkbookDeleteModal;
