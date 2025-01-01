@@ -1,27 +1,31 @@
 import { ActionIcon, Button } from "@mantine/core";
 
 import classes from './styles/MylistModal.module.css';
-import { IconPencil } from "@tabler/icons-react";
+import { Icon, IconPencil } from "@tabler/icons-react";
 import { useIsMobile } from "@/contexts/isMobile";
 
 export interface MylistEditModalButtonProps {
+  icon?: Icon,
+  label?: string,
   onClick?: () => void,
 }
 
 const MylistEditModalButton = ({
+  icon: Icon = IconPencil,
+  label = '編集',
   onClick = () => {}
 }: MylistEditModalButtonProps) => {
   const isMobile = useIsMobile();
-  const icon = <IconPencil />;
+  // const icon = <IconPencil />;
 
   const DefaultButton = () => (
     <Button
       className={classes.button}
       variant="outline" 
       radius="xl" 
-      leftSection={icon}
+      leftSection={<Icon />}
       onClick={onClick}
-    >編集</Button>
+    >{ label }</Button>
   );
 
   const MobileButton = () => (
@@ -32,7 +36,7 @@ const MylistEditModalButton = ({
       variant="subtle"
       onClick={onClick}
     >
-      { icon }
+      <Icon />
     </ActionIcon>
   );
 
