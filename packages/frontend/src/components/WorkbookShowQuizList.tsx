@@ -1,29 +1,36 @@
 import { useEffect } from "react";
-import { Card, Group, Text, getGradient, useMantineTheme } from "@mantine/core";
+import { Card, Center, Group, Loader, Text, getGradient, useMantineTheme } from "@mantine/core";
 import useQuizzes from "@/hooks/useQuizzes";
 import { useWorkbooks } from "@/hooks/useWorkbooks";
 import QuizViewer from "./QuizViewer";
+import { Navigate } from "react-router-dom";
 
 interface Props {
   wid: string,
 }
 
 export default function({ wid }: Props) {
-  const isAll = (wid == 'all');
   const theme = useMantineTheme();
   const { setParams } = useQuizzes();
-  const { workbooks } = useWorkbooks(true);
+  const { workbooks, isLoading } = useWorkbooks(true);
   
-  const workbooksName = isAll 
-  ? 'すべてのクイズ' 
-  : workbooks?.find(list => list.wid == wid)?.name;
+  const workbook = workbooks?.find(list => list.wid == wid);
+  const workbooksName = workbook?.name;
 
   useEffect(() => {
     setParams({ 
       maxView: 100, 
-      wids: isAll ? undefined : [ wid ] 
-    })
+      wids: [ wid ],
+    });
   }, []);
+
+  if (isLoading) return <Center><Loader/></Center>;
+
+  const hasAccess = workbooks?.some((workbook) => workbook.wid === wid);
+
+  if (!hasAccess) {
+    return <Navigate to="/unauthorized" replace />;
+  }
 
   const CreateCard = () => (
     <Card 

@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { Navigate, useNavigate, useParams } from 'react-router-dom';
 
 import MylistDeleteModal from '@/components/MylistDeleteModal';
 import MylistEditModalButton from '@/components/MylistEditModalButton';
@@ -7,7 +7,7 @@ import QuizViewer from '@/components/QuizViewer';
 import { useMylists } from '@/hooks/useMylists';
 import useQuizzes from '@/hooks/useQuizzes';
 import { $api } from '@/utils/client';
-import { Card, getGradient, Group, Text, useMantineTheme } from '@mantine/core';
+import { Card, Center, getGradient, Group, Loader, Text, useMantineTheme } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { modals } from '@mantine/modals';
 
@@ -15,12 +15,11 @@ export default function Mylist(){
   const { mid } = useParams();
   const { setParams } = useQuizzes();
   const navigator = useNavigate();
-  const { mylists } = useMylists();
+  const theme = useMantineTheme();
+  const { mylists, isLoading } = useMylists();
   const { mutate: deleteMylist } = $api.useMutation("delete", "/mylists");
 
   const mylistName = mylists?.find(list => list.mid == mid)?.name;
-
-  const theme = useMantineTheme();
 
   useEffect(() => {
     setParams({
@@ -32,6 +31,14 @@ export default function Mylist(){
   if (!mid) {
     navigator('/404');
     return;
+  }
+
+  if (isLoading) return <Center><Loader/></Center>;
+  
+  const hasAccess = mylists?.some((mylist) => mylist.mid === mid);
+
+  if (!hasAccess) {
+    return <Navigate to="/unauthorized" replace />;
   }
 
   const toDelete = async () => {
