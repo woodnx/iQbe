@@ -23,6 +23,7 @@ COPY --from=builder "/iQbe/node_modules" "./node_modules"
 COPY --from=builder "/iQbe/packages/backend" "./packages/backend"
 COPY --from=builder "/iQbe/package.json" "./package.json"
 COPY --from=builder "/iQbe/.config" "./.config"
+COPY --from=builder "/iQbe/package-lock.json" "./package-lock.json"
 COPY . ./
 
 RUN echo -n "JWT_SECRET_KEY=" >> ./.config.env \
