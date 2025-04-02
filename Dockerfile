@@ -3,7 +3,7 @@ ENV NODE_ENV production
 
 WORKDIR /iQbe
 
-COPY --link [ "package.json", "./"]
+COPY --link ["package.json", "./"]
 COPY --link ["scripts", "./scripts"]
 COPY --link ["packages/backend/package.json", "./packages/backend/"]
 COPY --link ["packages/frontend/package.json", "./packages/frontend/"]
@@ -19,11 +19,12 @@ RUN npm run build
 FROM node:22-slim AS prod
 
 WORKDIR /iQbe
+USER node
 
-COPY --from=builder "/iQbe/packages/backend/dist" "./packages/backend/dist"
-COPY --from=builder "/iQbe/node_modules" "./node_modules"
-COPY --from=builder "/iQbe/package.json" "./package.json"
+COPY --chown=node:node --from=builder "/iQbe/packages/backend/dist" "./packages/backend/dist"
+COPY --chown=node:node --from=builder "/iQbe/node_modules" "./node_modules"
+COPY --chown=node:node --from=builder "/iQbe/package.json" "./package.json"
 
 EXPOSE 9000
 
-CMD  npm run start
+CMD npm run start
