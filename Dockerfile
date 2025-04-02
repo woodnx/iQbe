@@ -3,11 +3,10 @@ ENV NODE_ENV production
 
 WORKDIR /iQbe
 
-COPY package.json ./
-COPY scripts ./scripts
-COPY packages/backend/package.json ./packages/backend/
-COPY packages/frontend/package.json ./packages/frontend/
-COPY packages/api/package.json ./packages/api/
+COPY --link [ "package.json", "./"]
+COPY --link ["scripts", "./scripts"]
+COPY --link ["packages/backend/package.json", "./packages/backend/"]
+COPY --link ["packages/frontend/package.json", "./packages/frontend/"]
 
 RUN npm install --omit=dev
 
