@@ -25,6 +25,7 @@
     }
   },
   "devDependencies": {
+    "openapi-fetch": "^0.13.5",
     "openapi-typescript": "^7.3.0",
     "tsup": "^8.0.2",
     "tsx": "^4.7.1",
