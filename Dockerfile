@@ -1,7 +1,4 @@
 FROM node:22-slim 
-ARG NODE_ENV production
-
-EXPOSE 9000
 
 WORKDIR /iQbe
 COPY . ./
