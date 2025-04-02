@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.0.2](https://github.com/woodnx/iQbe/compare/v4.0.1...v4.0.2) (2025-04-02)
+
+
+### Bug Fixes
+
+* build using docker ([#211](https://github.com/woodnx/iQbe/issues/211)) ([0056b52](https://github.com/woodnx/iQbe/commit/0056b52d0cda1b54a46e46b4ac72fe714df61b61))
+
 ## [4.0.1](https://github.com/woodnx/iQbe/compare/v4.0.0...v4.0.1) (2025-04-02)
 
 
