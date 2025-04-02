@@ -11,7 +11,7 @@ services:
       - db
     volumes:
       - /node_modules
-      - .:iQbe
+      - .:/iQbe
   db:
     image: mysql:9.1
     container_name: iQbe-db
