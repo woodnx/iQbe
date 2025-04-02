@@ -25,7 +25,7 @@ COPY --from=builder "/iQbe/package.json" "./package.json"
 COPY --from=builder "/iQbe/.config" "./.config"
 COPY . ./
 
-RUN echo -n "JWT_SECRET_KEY=" >> ./.config.env \\
+RUN echo -n "JWT_SECRET_KEY=" >> ./.config.env \
     node -e "console.log(require('crypto').randomBytes(32).toString('hex'));" >> ./.config.env
 
 EXPOSE 9000
