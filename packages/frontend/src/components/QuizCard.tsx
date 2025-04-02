@@ -75,7 +75,6 @@ export default function QuizCard({
             ?
             <QuizWorkbookBadge
               workbook={quiz.workbook}
-              levelColor='dark'
             />
             :
             null 

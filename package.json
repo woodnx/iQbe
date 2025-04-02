@@ -10,10 +10,10 @@
   "private": true,
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "env-cmd -f .env node ./scripts/build.mjs",
-    "start": "cd packages/backend/dist && env-cmd -f ../../../.env node index.js",
+    "build": "./node_modules/.bin/env-cmd -f .env node ./scripts/build.mjs",
+    "start": "./node_modules/.bin/env-cmd -f .env npm run start -w packages/backend",
     "clean": "node ./scripts/clean.mjs",
-    "dev": "env-cmd -f .env node ./scripts/dev.mjs",
+    "dev": "./node_modules/.bin/env-cmd -f .env node ./scripts/dev.mjs",
     "api": "npm run build -w packages/api",
     "migrate:create": "cd packages/backend && env-cmd -f ../../.env npm run migrate:create",
     "migrate:exe": "cd packages/backend && env-cmd -f ../../.env npm run migrate:exe",
@@ -28,6 +28,7 @@
   "author": "woodnext",
   "license": "ISC",
   "dependencies": {
+    "env-cmd": "^10.1.0",
     "ps-tree": "^1.2.0"
   }
 }
