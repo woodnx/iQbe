@@ -9,8 +9,6 @@ services:
       - "9000:9000"
     depends_on:
       - db
-    volumes:
-      - .:/iQbe
   db:
     image: mysql:9.1
     container_name: iQbe-db
