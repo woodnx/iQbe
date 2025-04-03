@@ -22,7 +22,7 @@ COPY packages/backend/package*.json ./packages/backend/
 COPY packages/frontend/package*.json ./packages/frontend/
 COPY package*.json ./
 
-RUN npm install --omit=dev
+RUN npm install
 COPY . .
 
 RUN npm run build
