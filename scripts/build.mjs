@@ -6,6 +6,9 @@ try {
   spawnSync('npm', [ 'run', 'clean' ], { stdio: 'inherit' });
 
   // build frontend
+  spawnSync('npm', [ 'run', 'build', '-w', 'packages/api' ], { stdio: 'inherit' });
+
+  // build frontend
   spawnSync('npm', [ 'run', 'build', '-w', 'packages/frontend' ], { stdio: 'inherit' });
 
   // build backend

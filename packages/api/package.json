@@ -8,16 +8,6 @@
       "import": "./dist/index.mjs",
       "types": "./dist/index.d.ts"
     },
-    "./types": {
-      "require": "./dist/types.js",
-      "import": "./dist/types.mjs",
-      "types": "./dist/types.d.ts"
-    },
-    "./predicates": {
-      "require": "./dist/predicates.js",
-      "import": "./dist/predicates.mjs",
-      "types": "./dist/predicates.d.ts"
-    },
     "./schema": {
       "require": "./dist/schema.js",
       "import": "./dist/schema.mjs",

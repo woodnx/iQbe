@@ -9,6 +9,7 @@ RUN echo -n "JWT_SECRET_KEY=" >> ./.config.env \
 RUN npm install
 COPY . ./
 
+RUN npm run build -w packages/api
 RUN npm run build
 
 CMD npm run start
