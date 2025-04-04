@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.0.3](https://github.com/woodnx/iQbe/compare/v4.0.2...v4.0.3) (2025-04-04)
+
+
+### Bug Fixes
+
+* Suppot docker deploy ([#213](https://github.com/woodnx/iQbe/issues/213)) ([cee524b](https://github.com/woodnx/iQbe/commit/cee524b0fa49ecc33634c2f4e314ea2070f563b8))
+
 ## [4.0.2](https://github.com/woodnx/iQbe/compare/v4.0.1...v4.0.2) (2025-04-02)
 
 
