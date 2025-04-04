@@ -9,19 +9,17 @@ services:
       - "9000:9000"
     depends_on:
       - db
-    volumes:
-      - /node_modules
-      - .:/iQbe
   db:
     image: mysql:9.1
     container_name: iQbe-db
     restart: always
     env_file:
-      - .env
+      - .config/.env
     ports:
       - "3306:3306"
     volumes:
       - iqbe-data:/var/lib/mysql
+      - ./db/conf.d:/etc/mysql/conf.d
     networks:
       - iqbe-network
 
