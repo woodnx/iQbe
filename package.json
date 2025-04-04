@@ -1,6 +1,6 @@
 {
   "name": "iqbe",
-  "version": "4.0.2",
+  "version": "4.0.3",
   "description": "A powerful tool to enhance your quiz skills more fun and effective. ",
   "workspaces": [
     "packages/frontend",
@@ -13,13 +13,13 @@
     "build": "./node_modules/.bin/env-cmd -f .config/.env node ./scripts/build.mjs",
     "start": "./node_modules/.bin/env-cmd -f .config/.env npm run -w packages/backend start",
     "clean": "node ./scripts/clean.mjs",
-    "dev":   "./node_modules/.bin/env-cmd -f .config/.env node ./scripts/dev.mjs",
+    "dev": "./node_modules/.bin/env-cmd -f .config/.env node ./scripts/dev.mjs",
     "api": "npm run build -w packages/api",
     "migrate:create": "./node_modules/.bin/env-cmd -f .config/.env npm run -w packages/backend migrate:create",
-    "migrate:exe":    "./node_modules/.bin/env-cmd -f .config/.env npm run -w packages/backend migrate:exe",
-    "migrate:dev":    "./node_modules/.bin/env-cmd -f .config/.env npm run -w packages/backend migrate:exe",
+    "migrate:exe": "./node_modules/.bin/env-cmd -f .config/.env npm run -w packages/backend migrate:exe",
+    "migrate:dev": "./node_modules/.bin/env-cmd -f .config/.env npm run -w packages/backend migrate:exe",
     "migrate:status": "./node_modules/.bin/env-cmd -f .config/.env npm run -w packages/backend migrate:status",
-    "migrate:reset":  "./node_modules/.bin/env-cmd -f .config/.env npm run -w packages/backend migrate:reset"
+    "migrate:reset": "./node_modules/.bin/env-cmd -f .config/.env npm run -w packages/backend migrate:reset"
   },
   "repository": {
     "type": "git",
