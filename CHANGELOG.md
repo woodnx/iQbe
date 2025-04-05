@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.0.5](https://github.com/woodnx/iQbe/compare/v4.0.4...v4.0.5) (2025-04-05)
+
+
+### Bug Fixes
+
+* Throws CORS error when production. ([#219](https://github.com/woodnx/iQbe/issues/219)) ([61e4f39](https://github.com/woodnx/iQbe/commit/61e4f3932a4e0a8d825326f981b75c4ace7ae6d6)), closes [#218](https://github.com/woodnx/iQbe/issues/218)
+
 ## [4.0.4](https://github.com/woodnx/iQbe/compare/v4.0.3...v4.0.4) (2025-04-05)
 
 
