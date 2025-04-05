@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.0.4](https://github.com/woodnx/iQbe/compare/v4.0.3...v4.0.4) (2025-04-05)
+
+
+### Bug Fixes
+
+* Not working `/welcome` page ([#216](https://github.com/woodnx/iQbe/issues/216)) ([d3d3b48](https://github.com/woodnx/iQbe/commit/d3d3b48f1530d27c9d348ded507660bc3f9d957f)), closes [#215](https://github.com/woodnx/iQbe/issues/215)
+
 ## [4.0.3](https://github.com/woodnx/iQbe/compare/v4.0.2...v4.0.3) (2025-04-04)
 
 
