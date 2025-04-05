@@ -20,13 +20,7 @@ services:
     volumes:
       - iqbe-data:/var/lib/mysql
       - ./db/conf.d:/etc/mysql/conf.d
-    networks:
-      - iqbe-network
 
 volumes:
   iqbe-data:
     driver: local
-
-networks:
-  iqbe-network:
-    driver: bridge
