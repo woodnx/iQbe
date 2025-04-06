@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.0.6](https://github.com/woodnx/iQbe/compare/v4.0.5...v4.0.6) (2025-04-06)
+
+
+### Bug Fixes
+
+* favorite query error Fixes [#221](https://github.com/woodnx/iQbe/issues/221) ([#223](https://github.com/woodnx/iQbe/issues/223)) ([1dedbef](https://github.com/woodnx/iQbe/commit/1dedbef272fe65e19719adfeb434e987ea20465b))
+
 ## [4.0.5](https://github.com/woodnx/iQbe/compare/v4.0.4...v4.0.5) (2025-04-05)
 
 
