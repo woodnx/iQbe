@@ -628,7 +628,7 @@ export default class QuizInfra implements IQuizRepository, IQuizQueryService {
     .execute()
     .then(users => users.map(u => u.user_id));
 
-    const isChangedVisibleUser = isEqual(
+    const isChangedVisibleUser = !isEqual(
       uniq(sortBy(visibleUserIds)),
       uniq(sortBy(oldVisibleUserIds)),
     );
