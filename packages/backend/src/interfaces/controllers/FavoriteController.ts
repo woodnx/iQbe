@@ -3,9 +3,7 @@ import { typedAsyncWrapper } from "@/utils";
 import { ApiError } from "api";
 
 export default class FavoriteController {
-  constructor(
-    private favoriteUseCase: FavoriteUseCase,
-  ) {}
+  constructor(private favoriteUseCase: FavoriteUseCase) {}
 
   like() {
     return typedAsyncWrapper<"/like", "post">(async (req, res) => {

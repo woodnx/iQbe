@@ -1,25 +1,34 @@
-import { paths } from 'api/schema';
+import { paths } from "api/schema";
 
-import QuizEditForm from '@/components/QuizEditForm';
-import { $api } from '@/utils/client';
-import { Tabs } from '@mantine/core';
+import QuizEditForm from "@/components/QuizEditForm";
+import { $api } from "@/utils/client";
+import { Tabs } from "@mantine/core";
 
-import CsvFileImporter from './CsvFileImporter';
-import { notifications } from '@mantine/notifications';
+import CsvFileImporter from "./CsvFileImporter";
+import { notifications } from "@mantine/notifications";
 
-type QuizEditSubmitValues = paths["/quizzes"]["post"]["requestBody"]["content"]["application/json"];
+type QuizEditSubmitValues =
+  paths["/quizzes"]["post"]["requestBody"]["content"]["application/json"];
 
 export interface Element {
-  question: string,
-  answer: string,
-  anotherAnswer?: string | null,
+  question: string;
+  answer: string;
+  anotherAnswer?: string | null;
 }
 
 export default function CreateDashboard() {
   const { mutate } = $api.useMutation("post", "/quizzes");
 
-  const submit = ({ question, answer, category, tags,  wid, isPublic }: QuizEditSubmitValues) => {
-    mutate({ 
+  const submit = ({
+    question,
+    answer,
+    category,
+    tags,
+    wid,
+    isPublic,
+  }: QuizEditSubmitValues) => {
+    mutate(
+      {
         body: {
           question,
           answer,
@@ -27,22 +36,23 @@ export default function CreateDashboard() {
           tags,
           wid,
           isPublic,
-        }
-      }, {
-        onSuccess:() => {
+        },
+      },
+      {
+        onSuccess: () => {
           notifications.show({
-            title: '新しいクイズを作成しました',
-            message: '',
+            title: "新しいクイズを作成しました",
+            message: "",
           });
         },
         onError: () => {
           notifications.show({
-            title: '何らかの障害が発生しました',
-            message: '何度も続く場合はサポート担当に問い合わせてください',
-            color: 'red',
+            title: "何らかの障害が発生しました",
+            message: "何度も続く場合はサポート担当に問い合わせてください",
+            color: "red",
           });
-        }
-      }
+        },
+      },
     );
   };
 
@@ -55,18 +65,12 @@ export default function CreateDashboard() {
         </Tabs.List>
 
         <Tabs.Panel value="single" pt="xs">
-          <QuizEditForm 
-            question=''
-            answer=''
-            mb={16} 
-            onSubmit={submit}
-          />
+          <QuizEditForm question="" answer="" mb={16} onSubmit={submit} />
         </Tabs.Panel>
         <Tabs.Panel value="file" pt="xs">
           <CsvFileImporter />
         </Tabs.Panel>
       </Tabs>
-      
     </>
-  )
+  );
 }

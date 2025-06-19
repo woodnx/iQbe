@@ -3,9 +3,7 @@ import Tag from ".";
 import ITagRepository from "./ITagRepository";
 
 export default class TagService {
-  constructor(
-    private tagRepository: ITagRepository,
-  ) {}
+  constructor(private tagRepository: ITagRepository) {}
 
   async existTagByLabel(label: string): Promise<boolean> {
     const tag = await this.tagRepository.findByLabel(label);
@@ -29,8 +27,7 @@ export default class TagService {
     for (const label of tagsToRemove) {
       const tag = await this.tagRepository.findByLabel(label);
 
-      if (!tag) 
-        throw new Error('Not found tag such as label');
+      if (!tag) throw new Error("Not found tag such as label");
 
       tag.decrementTagUsage();
 

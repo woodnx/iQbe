@@ -5,7 +5,7 @@ const db_info = {
   user: process.env.MARIADB_USER,
   password: process.env.MARIADB_PASSWORD,
   host: process.env.MARIADB_HOST,
-}
+};
 
 // Update with your config settings.
 
@@ -15,7 +15,7 @@ const config: { [key: string]: Knex.Config } = {
     connection: db_info,
     pool: {
       min: 2,
-      max: 10
+      max: 10,
     },
   },
 
@@ -24,7 +24,7 @@ const config: { [key: string]: Knex.Config } = {
     connection: db_info,
     pool: {
       min: 2,
-      max: 10
+      max: 10,
     },
   },
 
@@ -33,10 +33,9 @@ const config: { [key: string]: Knex.Config } = {
     connection: db_info,
     pool: {
       min: 2,
-      max: 10
+      max: 10,
     },
-  }
-
+  },
 };
 
 export default config;

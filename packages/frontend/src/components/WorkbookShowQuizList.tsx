@@ -1,5 +1,13 @@
 import { useEffect } from "react";
-import { Card, Center, Group, Loader, Text, getGradient, useMantineTheme } from "@mantine/core";
+import {
+  Card,
+  Center,
+  Group,
+  Loader,
+  Text,
+  getGradient,
+  useMantineTheme,
+} from "@mantine/core";
 import useQuizzes from "@/hooks/useQuizzes";
 import { useWorkbooks } from "@/hooks/useWorkbooks";
 import QuizViewer from "./QuizViewer";
@@ -9,25 +17,30 @@ import { IconTrash } from "@tabler/icons-react";
 import { modals } from "@mantine/modals";
 
 interface Props {
-  wid: string,
+  wid: string;
 }
 
-export default function({ wid }: Props) {
+export default function ({ wid }: Props) {
   const theme = useMantineTheme();
   const { setParams } = useQuizzes();
   const { workbooks, isLoading } = useWorkbooks(true);
 
   useEffect(() => {
-    setParams({ 
-      maxView: 100, 
-      wids: [ wid ],
+    setParams({
+      maxView: 100,
+      wids: [wid],
     });
   }, []);
 
-  if (isLoading) return <Center><Loader/></Center>;
+  if (isLoading)
+    return (
+      <Center>
+        <Loader />
+      </Center>
+    );
 
-  const workbook = workbooks?.find(list => list.wid == wid);
-  const name = workbook?.name || '';
+  const workbook = workbooks?.find((list) => list.wid == wid);
+  const name = workbook?.name || "";
   const date = workbook?.date;
 
   const hasAccess = workbooks?.some((workbook) => workbook.wid === wid);
@@ -37,42 +50,47 @@ export default function({ wid }: Props) {
   }
 
   const CreateCard = () => (
-    <Card 
+    <Card
       mb="xs"
-      w="100%" 
+      w="100%"
       withBorder
       style={{
-        backgroundImage: getGradient({ deg: 45, from: 'indigo', to: 'cyan' }, theme),
+        backgroundImage: getGradient(
+          { deg: 45, from: "indigo", to: "cyan" },
+          theme,
+        ),
         color: `var(--mantine-color-white)`,
       }}
     >
       <Group justify="space-between">
-        <Text fw={700} fz={25}>{ name }</Text>
+        <Text fw={700} fz={25}>
+          {name}
+        </Text>
         <Group>
-          <MylistEditModalButton 
+          <MylistEditModalButton
             onClick={() => {
               modals.openContextModal({
-                modal: 'workbookEdit',
-                title: '問題集の編集',
+                modal: "workbookEdit",
+                title: "問題集の編集",
                 innerProps: {
                   wid,
                   name,
                   date: date || undefined,
-                }
-              })
+                },
+              });
             }}
           />
-          <MylistEditModalButton 
+          <MylistEditModalButton
             icon={IconTrash}
             label="削除"
             onClick={() => {
               modals.openContextModal({
-                modal: 'workbookDelete',
-                title: '問題集の削除',
+                modal: "workbookDelete",
+                title: "問題集の削除",
                 innerProps: {
                   wid,
-                }
-              })
+                },
+              });
             }}
           />
         </Group>
@@ -82,9 +100,7 @@ export default function({ wid }: Props) {
 
   return (
     <>
-      <QuizViewer
-        headerCard={<CreateCard/>}
-      />
+      <QuizViewer headerCard={<CreateCard />} />
     </>
   );
 }

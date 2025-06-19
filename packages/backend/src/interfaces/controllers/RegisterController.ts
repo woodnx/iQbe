@@ -1,10 +1,8 @@
-import RegisterUseCase from '@/applications/usecases/RegisterUseCase';
-import { typedAsyncWrapper } from '@/utils';
+import RegisterUseCase from "@/applications/usecases/RegisterUseCase";
+import { typedAsyncWrapper } from "@/utils";
 
 export default class RegisterController {
-  constructor(
-    private registerUseCase: RegisterUseCase,
-  ) {}
+  constructor(private registerUseCase: RegisterUseCase) {}
 
   register() {
     return typedAsyncWrapper<"/register", "post">(async (req, res) => {

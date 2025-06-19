@@ -4,19 +4,17 @@ import CategoryCard from "./CategoryCard";
 import { useCategories } from "@/hooks/useCategories";
 import CategoryPresetButton from "./CategoryPresetButton";
 
-export interface CategoryInputProps {
-  
-}
+export interface CategoryInputProps {}
 
 export default function CategoryInput({}: CategoryInputProps) {
   const { categories } = useCategories();
 
-  const content = categories?.map(category => (
+  const content = categories?.map((category) => (
     <CategoryCard
       mt="md"
       id={category.id}
       name={category.name}
-      description={category.description || ''}
+      description={category.description || ""}
       disabled={category.disabled}
       sub={category.sub || []}
       key={category.id}
@@ -26,20 +24,18 @@ export default function CategoryInput({}: CategoryInputProps) {
   return (
     <>
       <Group justify="space-between">
-        <Title order={3} my="md">ジャンルの編集</Title>
-        <CategoryCreateModalButton 
+        <Title order={3} my="md">
+          ジャンルの編集
+        </Title>
+        <CategoryCreateModalButton
           isSub={false}
           parentId={undefined}
           parentName={undefined}
         />
       </Group>
-      { content }
+      {content}
       <Center mt="md">
-        <CategoryPresetButton 
-          size="lg" 
-          radius="xl"
-          color="green"
-        />
+        <CategoryPresetButton size="lg" radius="xl" color="green" />
       </Center>
     </>
   );

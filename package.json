@@ -30,5 +30,8 @@
   "dependencies": {
     "env-cmd": "^10.1.0",
     "ps-tree": "^1.2.0"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.0.0"
   }
 }

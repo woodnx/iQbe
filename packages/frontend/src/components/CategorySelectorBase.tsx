@@ -1,16 +1,24 @@
-import { CloseButton, Combobox, Input, InputBase, ScrollArea, Text, useCombobox } from "@mantine/core";
-import type { components } from 'api/schema';
+import {
+  CloseButton,
+  Combobox,
+  Input,
+  InputBase,
+  ScrollArea,
+  Text,
+  useCombobox,
+} from "@mantine/core";
+import type { components } from "api/schema";
 
 type Category = components["schemas"]["Category"];
 
 interface CategorySelectorBaseProps {
-  data: Category[] | undefined,
-  value?: Category,
-  label?: string,
-  placeholder?: string,
-  disabled?: boolean,
-  onChange?: (value: Category | undefined) => void,
-  onClear?: () => void,
+  data: Category[] | undefined;
+  value?: Category;
+  label?: string;
+  placeholder?: string;
+  disabled?: boolean;
+  onChange?: (value: Category | undefined) => void;
+  onClear?: () => void;
 }
 
 export default function CategorySelectorBase({
@@ -27,7 +35,11 @@ export default function CategorySelectorBase({
   });
 
   const options = data?.map(({ id, name, description }) => (
-    <Combobox.Option value={String(id)} key={id} bg={value?.id == id ? 'blue.1' : undefined}>
+    <Combobox.Option
+      value={String(id)}
+      key={id}
+      bg={value?.id == id ? "blue.1" : undefined}
+    >
       <Text size="sm">{name}</Text>
       <Text size="xs" opacity={0.65}>
         {description}
@@ -41,7 +53,7 @@ export default function CategorySelectorBase({
     <Combobox
       store={combobox}
       onOptionSubmit={(val) => {
-        onChange(data?.find(d => d.id == Number(val)));
+        onChange(data?.find((d) => d.id == Number(val)));
         combobox.closeDropdown();
       }}
     >
@@ -57,30 +69,30 @@ export default function CategorySelectorBase({
               <CloseButton
                 size="sm"
                 onMouseDown={(e) => e.preventDefault()}
-                onClick={() => { 
+                onClick={() => {
                   onChange(undefined);
                   onClear();
                 }}
                 aria-label="Clear value"
               />
             ) : (
-              <Combobox.Chevron/>
+              <Combobox.Chevron />
             )
           }
           onClick={() => combobox.toggleDropdown()}
-          rightSectionPointerEvents={value == null ? 'none' : 'all'}
+          rightSectionPointerEvents={value == null ? "none" : "all"}
         >
-          { 
-            display 
-            ? <Text lineClamp={1} fz="sm">
-                { display }
-              </Text> 
-            : <Input.Placeholder>
-                <Text lineClamp={1} fz="sm">
-                  {placeholder || 'ジャンルを選択'}
-                </Text> 
-              </Input.Placeholder>
-          }
+          {display ? (
+            <Text lineClamp={1} fz="sm">
+              {display}
+            </Text>
+          ) : (
+            <Input.Placeholder>
+              <Text lineClamp={1} fz="sm">
+                {placeholder || "ジャンルを選択"}
+              </Text>
+            </Input.Placeholder>
+          )}
         </InputBase>
       </Combobox.Target>
 
@@ -92,5 +104,5 @@ export default function CategorySelectorBase({
         </Combobox.Options>
       </Combobox.Dropdown>
     </Combobox>
-  )
+  );
 }

@@ -11,10 +11,10 @@ export default class PracticeUseCase {
   ) {}
 
   async addPractice(
-    uid: string, 
-    qid: string, 
-    judgement: number, 
-    pressedWordPosition?: number
+    uid: string,
+    qid: string,
+    judgement: number,
+    pressedWordPosition?: number,
   ) {
     const historyService = new HistoryService(
       this.userRepository,

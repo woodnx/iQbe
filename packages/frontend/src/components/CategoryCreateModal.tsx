@@ -1,19 +1,19 @@
-import { components } from 'api/schema';
+import { components } from "api/schema";
 
-import { $api } from '@/utils/client';
-import { ContextModalProps } from '@mantine/modals';
-import { useQueryClient } from '@tanstack/react-query';
+import { $api } from "@/utils/client";
+import { ContextModalProps } from "@mantine/modals";
+import { useQueryClient } from "@tanstack/react-query";
 
-import CategoryEditForm from './CategoryEditForm';
+import CategoryEditForm from "./CategoryEditForm";
 
 export interface CategoryCreateModalInnerProps<T extends boolean> {
-  name: string,
-  description?: string,
-  isSub: T,
-  parentId: T extends true ? number : undefined,
+  name: string;
+  description?: string;
+  isSub: T;
+  parentId: T extends true ? number : undefined;
 }
 
-type Category = components['schemas']['Category'];
+type Category = components["schemas"]["Category"];
 
 export default function CategoryCreateModal<T extends boolean>({
   context,
@@ -30,24 +30,24 @@ export default function CategoryCreateModal<T extends boolean>({
 
       queryClient.setQueryData(queryKey, (old: Category[]) => {
         if (formProps.isSub) {
-          const parent = old.find(c => c.id === formProps.parentId);
+          const parent = old.find((c) => c.id === formProps.parentId);
           if (!!parent) {
             const sub = parent.sub || [];
-            return old.map(c => 
-              (c.id === formProps.parentId) 
-              ? { ...parent, sub: [ ...sub, body ] } 
-              : c
+            return old.map((c) =>
+              c.id === formProps.parentId
+                ? { ...parent, sub: [...sub, body] }
+                : c,
             );
           }
         } else {
-          return [ ...old, body]
+          return [...old, body];
         }
       });
 
       return { previous };
     },
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey })
+      queryClient.invalidateQueries({ queryKey });
     },
   });
 
@@ -57,20 +57,17 @@ export default function CategoryCreateModal<T extends boolean>({
     parentId: T extends true ? number : undefined,
     description?: string,
   ) => {
-    edit({ body: {
-      name,
-      description,
-      parentId,
-      disabled,
-    }});
-    
-    context.closeModal(modalId);
-  }
+    edit({
+      body: {
+        name,
+        description,
+        parentId,
+        disabled,
+      },
+    });
 
-  return(
-    <CategoryEditForm
-      {...formProps}
-      onSubmit={submit}
-    />
-  );
+    context.closeModal(modalId);
+  };
+
+  return <CategoryEditForm {...formProps} onSubmit={submit} />;
 }

@@ -8,7 +8,7 @@ export default class User {
     private _modified: Date,
     private _nickname?: string,
     private _permission?: string,
-    private _photoUrl?: string
+    private _photoUrl?: string,
   ) {}
 
   reconstruct(
@@ -20,7 +20,7 @@ export default class User {
     modified: Date,
     nickname?: string,
     permission?: string,
-    photoUrl?: string
+    photoUrl?: string,
   ): void {
     this._uid = uid;
     this._passwd = passwd;
@@ -48,7 +48,7 @@ export default class User {
   setPhotoUrl(photoUrl: string | undefined) {
     this._photoUrl = photoUrl;
   }
-  
+
   get passwd(): string {
     return this._passwd;
   }
@@ -58,7 +58,7 @@ export default class User {
   }
 
   get username(): string {
-    return this._username
+    return this._username;
   }
 
   get email(): string {
@@ -84,5 +84,4 @@ export default class User {
   get modified(): Date {
     return this._modified;
   }
-
 }

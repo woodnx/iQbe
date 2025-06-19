@@ -5,23 +5,23 @@ import WorkbookCreateForm from "./WorkbookCreateForm";
 import { IconPlus } from "@tabler/icons-react";
 import { useQueryClient } from "@tanstack/react-query";
 
-interface Props extends BoxProps {
-}
+interface Props extends BoxProps {}
 
-export default function WorkbookCreateModalButton({
-}: Props) {
-  const [ creating, create ] = useDisclosure(false);
+export default function WorkbookCreateModalButton({}: Props) {
+  const [creating, create] = useDisclosure(false);
   const { mutateAsync } = $api.useMutation("post", "/workbooks");
   const queryClient = useQueryClient();
 
   const createWorkbook = async (name: string, published?: Date) => {
     try {
-      await mutateAsync({body: {
-        name,
-        published,
-      }});
+      await mutateAsync({
+        body: {
+          name,
+          published,
+        },
+      });
       queryClient.invalidateQueries();
-    } catch(e) {
+    } catch (e) {
       return;
     }
     create.close();
@@ -29,23 +29,22 @@ export default function WorkbookCreateModalButton({
 
   return (
     <>
-      <Modal 
-        centered 
-        title="問題集の新規作成" 
+      <Modal
+        centered
+        title="問題集の新規作成"
         zIndex={100}
-        opened={creating} 
-        onClose={create.close} 
+        opened={creating}
+        onClose={create.close}
       >
-        <WorkbookCreateForm
-          onSubmit={createWorkbook}
-          onClose={create.close}
-        />
+        <WorkbookCreateForm onSubmit={createWorkbook} onClose={create.close} />
       </Modal>
-      <Button 
+      <Button
         variant="outline"
         leftSection={<IconPlus />}
         onClick={create.open}
-      >問題集の新規作成</Button>
+      >
+        問題集の新規作成
+      </Button>
     </>
   );
 }

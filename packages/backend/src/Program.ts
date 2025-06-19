@@ -4,20 +4,20 @@ import { EventEmitterDomainEventPublisher } from "./interfaces/infra/DomainEvent
 import { EventEmitterDomainEventSubscriber } from "./interfaces/infra/DomainEvent/EventEmitterDomainEventSubscriber";
 
 container.register(
-  'IDataAccessClientManager', 
+  "IDataAccessClientManager",
   {
     useClass: KyselyClientManager,
   },
   {
     lifecycle: Lifecycle.ResolutionScoped,
-  }
+  },
 );
 
 // DomainEvent
-container.register('IDomainEventPublisher', {
+container.register("IDomainEventPublisher", {
   useClass: EventEmitterDomainEventPublisher,
 });
 
-container.register('IDomainEventSubscriber', {
+container.register("IDomainEventSubscriber", {
   useClass: EventEmitterDomainEventSubscriber,
 });

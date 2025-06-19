@@ -1,8 +1,8 @@
-import { BoxProps, Group, Radio, RadioGroup } from '@mantine/core';
+import { BoxProps, Group, Radio, RadioGroup } from "@mantine/core";
 
 interface FilteringTagMatchAllProps extends BoxProps {
-  value?: boolean,
-  onChange?: (value: boolean) => void
+  value?: boolean;
+  onChange?: (value: boolean) => void;
 }
 
 export default function FilteringTagMatchAll({
@@ -10,7 +10,7 @@ export default function FilteringTagMatchAll({
   onChange = () => {},
   ...others
 }: FilteringTagMatchAllProps) {
-  const matchAll = value ? 'and' : 'or';
+  const matchAll = value ? "and" : "or";
 
   return (
     <RadioGroup
@@ -18,15 +18,15 @@ export default function FilteringTagMatchAll({
       label="タグの検索オプション"
       value={matchAll}
       onChange={(value) => {
-        const v = value == 'and' ? true : false;
+        const v = value == "and" ? true : false;
         onChange(v);
       }}
       {...others}
     >
       <Group>
-        <Radio value="or" label="OR検索"/>
-        <Radio value="and" label="AND検索"/>
+        <Radio value="or" label="OR検索" />
+        <Radio value="and" label="AND検索" />
       </Group>
     </RadioGroup>
-  )
+  );
 }

@@ -1,9 +1,9 @@
-import { ApiError } from 'api';
+import { ApiError } from "api";
 
-import Workbook from '@/domains/Workbook';
-import IWorkbookRepository from '@/domains/Workbook/IWorkbookRepository';
-import WorkbookService from '@/domains/Workbook/WorkbookService';
-import { typedAsyncWrapper } from '@/utils';
+import Workbook from "@/domains/Workbook";
+import IWorkbookRepository from "@/domains/Workbook/IWorkbookRepository";
+import WorkbookService from "@/domains/Workbook/WorkbookService";
+import { typedAsyncWrapper } from "@/utils";
 
 export default class WorkbookController {
   constructor(
@@ -15,16 +15,18 @@ export default class WorkbookController {
     return typedAsyncWrapper<"/workbooks", "get">(async (req, res) => {
       const uid = req.user.uid;
       const workbooks = await this.workbookRepository.findManyByUid(uid);
-    
-      res.status(200).send(workbooks.map(w => ({
-        wid: w.wid,
-        name: w.name,
-        date: w.date || undefined,
-        creatorId: w.creatorUid,
-        levelId: w.levelId,
-        color: w.color,
-      })));
-    })
+
+      res.status(200).send(
+        workbooks.map((w) => ({
+          wid: w.wid,
+          name: w.name,
+          date: w.date || undefined,
+          creatorId: w.creatorUid,
+          levelId: w.levelId,
+          color: w.color,
+        })),
+      );
+    });
   }
 
   getFromWid() {
@@ -34,7 +36,7 @@ export default class WorkbookController {
 
       const workbook = await this.workbookRepository.findByWid(wid);
 
-      if (!workbook) throw new ApiError().invalidParams('workbook not found');
+      if (!workbook) throw new ApiError().invalidParams("workbook not found");
 
       res.status(200).send({
         wid: workbook.wid,
@@ -51,16 +53,18 @@ export default class WorkbookController {
     return typedAsyncWrapper<"/workbooks/all", "get">(async (req, res) => {
       const uid = req.user.uid;
       const workbooks = await this.workbookRepository.findManyByUid(uid);
-    
-      res.status(200).send(workbooks.map(w => ({
-        wid: w.wid,
-        name: w.name,
-        date: w.date || undefined,
-        creatorId: w.creatorUid,
-        levelId: w.levelId,
-        color: w.color,
-      })));
-    })
+
+      res.status(200).send(
+        workbooks.map((w) => ({
+          wid: w.wid,
+          name: w.name,
+          date: w.date || undefined,
+          creatorId: w.creatorUid,
+          levelId: w.levelId,
+          color: w.color,
+        })),
+      );
+    });
   }
 
   post() {
@@ -70,14 +74,7 @@ export default class WorkbookController {
       const date = req.body.published || null;
 
       const wid = this.workbookService.generateWid();
-      const workbook = new Workbook(
-        wid,
-        name,
-        date,
-        uid,
-        null,
-        null,
-      );
+      const workbook = new Workbook(wid, name, date, uid, null, null);
 
       await this.workbookRepository.save(workbook);
 
@@ -126,14 +123,16 @@ export default class WorkbookController {
       await this.workbookRepository.delete(wid);
       const workbooks = await this.workbookRepository.findManyByUid(uid);
 
-      res.status(200).send(workbooks.map(w => ({
-        wid: w.wid,
-        name: w.name,
-        date: w.date || undefined,
-        creatorId: w.creatorUid,
-        levelId: w.levelId,
-        color: w.color,
-      })));
+      res.status(200).send(
+        workbooks.map((w) => ({
+          wid: w.wid,
+          name: w.name,
+          date: w.date || undefined,
+          creatorId: w.creatorUid,
+          levelId: w.levelId,
+          color: w.color,
+        })),
+      );
     });
   }
 }

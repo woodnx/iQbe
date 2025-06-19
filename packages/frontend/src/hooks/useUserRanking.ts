@@ -2,12 +2,16 @@ import { Period } from "@/plugins/dayjs";
 import { $api } from "@/utils/client";
 
 export const useAllUserRanking = (period: Period) => {
-  const { data: allUserRanking, error, isLoading } = $api.useQuery("get", "/analysis/ranking/all/{period}", {
+  const {
+    data: allUserRanking,
+    error,
+    isLoading,
+  } = $api.useQuery("get", "/analysis/ranking/all/{period}", {
     params: {
       path: {
         period,
-      }
-    }
+      },
+    },
   });
 
   return {
@@ -15,10 +19,14 @@ export const useAllUserRanking = (period: Period) => {
     isLoading,
     error,
   };
-}
+};
 
 export const usePersonalRank = (period: Period) => {
-  const { data: personalRank, error, isLoading } = $api.useQuery("get", "/analysis/ranking/personal/{period}", {
+  const {
+    data: personalRank,
+    error,
+    isLoading,
+  } = $api.useQuery("get", "/analysis/ranking/personal/{period}", {
     params: {
       path: {
         period,
@@ -31,4 +39,4 @@ export const usePersonalRank = (period: Period) => {
     isLoading,
     error,
   };
-}
+};

@@ -13,12 +13,7 @@ export default class Mylist {
     _created: Date,
     _quizzes: number[],
   ): Mylist {
-    return new Mylist(
-      _mid,
-      _creator_uid,
-      _name,
-      _created,
-    );
+    return new Mylist(_mid, _creator_uid, _name, _created);
   }
 
   rename(name: string) {

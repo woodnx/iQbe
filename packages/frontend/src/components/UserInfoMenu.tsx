@@ -16,20 +16,24 @@ export default function UserInfoMenu() {
       </Menu.Target>
 
       <Menu.Dropdown>
-        <Menu.Item 
-          leftSection={<IconSettings style={{ width: rem(14), height: rem(14) }} />}
-          onClick={() => navigate('/setting')}
+        <Menu.Item
+          leftSection={
+            <IconSettings style={{ width: rem(14), height: rem(14) }} />
+          }
+          onClick={() => navigate("/setting")}
         >
           ユーザ設定
         </Menu.Item>
 
-        <Menu.Item 
-          leftSection={<IconLogout style={{ width: rem(14), height: rem(14) }} />}
+        <Menu.Item
+          leftSection={
+            <IconLogout style={{ width: rem(14), height: rem(14) }} />
+          }
           onClick={logoutUser}
         >
           ログアウト
         </Menu.Item>
       </Menu.Dropdown>
     </Menu>
-  )
+  );
 }

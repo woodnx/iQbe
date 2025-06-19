@@ -11,13 +11,13 @@ export default class RegisteredQuizService {
   ) {}
 
   async add(mid: string, qid: string) {
-    const [ mylist, quiz ] = await Promise.all([
+    const [mylist, quiz] = await Promise.all([
       this.mylistRepository.findByMid(mid),
       this.quizRepository.findByQid(qid),
     ]);
 
     if (!mylist || !quiz) {
-      throw new Error('Mylist or quiz not found');
+      throw new Error("Mylist or quiz not found");
     }
 
     const registeredQuiz = new RegisteredQuiz(mylist, quiz);
@@ -25,13 +25,13 @@ export default class RegisteredQuizService {
   }
 
   async delete(mid: string, qid: string) {
-    const [ mylist, quiz ] = await Promise.all([
+    const [mylist, quiz] = await Promise.all([
       this.mylistRepository.findByMid(mid),
       this.quizRepository.findByQid(qid),
     ]);
 
     if (!mylist || !quiz) {
-      throw new Error('Mylist or quiz not found');
+      throw new Error("Mylist or quiz not found");
     }
 
     const registeredQuiz = new RegisteredQuiz(mylist, quiz);

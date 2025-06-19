@@ -2,8 +2,8 @@ import { Select, SelectProps } from "@mantine/core";
 import { useWorkbooks } from "@/hooks/useWorkbooks";
 
 interface Props extends SelectProps {
-  value?: string | null,
-  onChange?: (value: string | null) => void,
+  value?: string | null;
+  onChange?: (value: string | null) => void;
 }
 
 export default function WorkbookSelector({
@@ -12,7 +12,7 @@ export default function WorkbookSelector({
   ...others
 }: Props) {
   const { workbooks } = useWorkbooks();
-  const data = workbooks?.map(w => ({ ...w, value: w.wid, label: w.name}));
+  const data = workbooks?.map((w) => ({ ...w, value: w.wid, label: w.name }));
 
   return (
     <Select

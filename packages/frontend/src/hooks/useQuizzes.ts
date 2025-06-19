@@ -1,21 +1,25 @@
-import { QuizRequestParams } from '../types'
-import { $api } from '@/utils/client'
-import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { QuizRequestParams } from "../types";
+import { $api } from "@/utils/client";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 const useQuizzes = (
   initialParams: QuizRequestParams = { maxView: 100 },
   shouldFetch = true,
 ) => {
-  const { data: params, } = useQuery({
-    queryKey: ['params'],
+  const { data: params } = useQuery({
+    queryKey: ["params"],
     initialData: initialParams,
   });
   const queryClient = useQueryClient();
   const setParams = (v: QuizRequestParams) => {
-    queryClient.setQueryData(['params'], v);
+    queryClient.setQueryData(["params"], v);
   };
-  
-  const { data: quizzes, error, isLoading } = $api.useQuery('get', `/quizzes`, {
+
+  const {
+    data: quizzes,
+    error,
+    isLoading,
+  } = $api.useQuery("get", `/quizzes`, {
     params: {
       query: {
         page: params.page,
@@ -32,10 +36,10 @@ const useQuizzes = (
         categories: params.categories,
         tags: params.tags,
         tagMatchAll: params.tagMatchAll,
-      }
+      },
     },
     enabled: shouldFetch,
-  })
+  });
 
   return {
     quizzes,
@@ -43,7 +47,7 @@ const useQuizzes = (
     error,
     params,
     setParams,
-  }
-}
+  };
+};
 
-export default useQuizzes
+export default useQuizzes;

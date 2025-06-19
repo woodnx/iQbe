@@ -2,15 +2,11 @@ import { Box, Slider, SliderProps, Text } from "@mantine/core";
 
 interface Props extends SliderProps {}
 
-export default function ({
-  value,
-  onChange,
-  ...others
-}: Props){
+export default function ({ value, onChange, ...others }: Props) {
   return (
     <Box {...others}>
       <Text fz="sm">表示問題数</Text>
-      <Slider 
+      <Slider
         label={`${value}問`}
         min={1}
         max={100}
@@ -19,5 +15,5 @@ export default function ({
         onChange={onChange}
       />
     </Box>
-  )
+  );
 }

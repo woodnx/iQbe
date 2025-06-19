@@ -1,18 +1,17 @@
-import { useEffect } from 'react';
-import QuizViewer from '@/components/QuizViewer'
-import useQuizzes from '@/hooks/useQuizzes';
+import { useEffect } from "react";
+import QuizViewer from "@/components/QuizViewer";
+import useQuizzes from "@/hooks/useQuizzes";
 
 export default function Search() {
   const { setParams } = useQuizzes();
 
   useEffect(() => {
-    setParams({ maxView: 100, isFavorite: true })
-  }, []); 
+    setParams({ maxView: 100, isFavorite: true });
+  }, []);
 
   return (
     <>
-      <QuizViewer
-      />
+      <QuizViewer />
     </>
-  )
+  );
 }

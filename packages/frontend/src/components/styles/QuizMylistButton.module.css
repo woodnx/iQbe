@@ -1,9 +1,6 @@
 .button {
   border-radius: var(--mantine-radius-xl);
   &:hover {
-    background-color: light-dark(
-      var(--mantine-gray-0),
-      var(--mantine-dark-5)
-    );
+    background-color: light-dark(var(--mantine-gray-0), var(--mantine-dark-5));
   }
 }

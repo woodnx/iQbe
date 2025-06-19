@@ -1,12 +1,12 @@
-import { Box, BoxProps, Grid,  Text } from "@mantine/core";
+import { Box, BoxProps, Grid, Text } from "@mantine/core";
 import { useWorkbooks } from "@/hooks/useWorkbooks";
 import WorkbookCreateModalButton from "./WorkbookCreateModalButton";
 import WorkbookSelector from "./WorkbookSelector";
 
 interface Props extends BoxProps {
-  value?: string | null,
-  onChange?: (value: string | null) => void,
-  disabled?: boolean,
+  value?: string | null;
+  onChange?: (value: string | null) => void;
+  disabled?: boolean;
 }
 
 export default function WorkbookCreateAndSelector({
@@ -19,10 +19,11 @@ export default function WorkbookCreateAndSelector({
 
   return (
     <Box {...others}>
-      <Text fz="sm" mb={0} >問題集の設定</Text>
+      <Text fz="sm" mb={0}>
+        問題集の設定
+      </Text>
       <Grid>
-        {
-          (workbooks && workbooks?.length > 0) &&
+        {workbooks && workbooks?.length > 0 && (
           <Grid.Col pb={0}>
             <WorkbookSelector
               value={value}
@@ -30,13 +31,12 @@ export default function WorkbookCreateAndSelector({
               disabled={disabled}
             />
           </Grid.Col>
-        }
-        { 
-          !disabled && 
+        )}
+        {!disabled && (
           <Grid.Col span={12}>
             <WorkbookCreateModalButton />
           </Grid.Col>
-        }
+        )}
       </Grid>
     </Box>
   );

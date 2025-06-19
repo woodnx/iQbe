@@ -1,75 +1,76 @@
-import { useCallback, useEffect, useRef, useState } from "react"
-import { useCounter } from "@mantine/hooks"
+import { useCallback, useEffect, useRef, useState } from "react";
+import { useCounter } from "@mantine/hooks";
 
 export interface formInputProps {
-  value: string,
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void
+  value: string;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
-export type formInputReset = () => void
+export type formInputReset = () => void;
 
 export const useInput = (
   initialValue: string,
-): [
-  formInputProps,
-  formInputReset
-] => {
-  const [ value, setValue ] = useState<string>(initialValue)
+): [formInputProps, formInputReset] => {
+  const [value, setValue] = useState<string>(initialValue);
 
-  const props = { 
-    value, 
-    onChange: (e: React.ChangeEvent<HTMLInputElement>) => setValue(e.currentTarget.value) 
-  }
-  const resetValue = () => setValue(initialValue)
+  const props = {
+    value,
+    onChange: (e: React.ChangeEvent<HTMLInputElement>) =>
+      setValue(e.currentTarget.value),
+  };
+  const resetValue = () => setValue(initialValue);
 
-  return [
-    props, resetValue
-  ]
-}
+  return [props, resetValue];
+};
 
 export const useTypewriter = (
   initialText: string,
   typeSpeed: number,
   afterCallback = () => {},
 ): {
-  text: string,
-  set: (newtext: string) => void,
-  start: () => void,
-  pause: () => void,
-  stop: () => void,
-  reset: () => void,
-  typing: boolean,
-  pausing: boolean,
-  stopping: boolean,
-  done: boolean,
+  text: string;
+  set: (newtext: string) => void;
+  start: () => void;
+  pause: () => void;
+  stop: () => void;
+  reset: () => void;
+  typing: boolean;
+  pausing: boolean;
+  stopping: boolean;
+  done: boolean;
 } => {
   const wordLength = initialText.length;
-  const [ text, setText ] = useState('');
-  const [ textIdx, { increment, reset: resetCounter } ] = useCounter(0, { min:0, max: wordLength });
-  const [ intervalId, setIntervalId ] = useState<NodeJS.Timeout | null>(null);
-  const [ typing, setTyping ] = useState(false);
-  const [ pausing, setPausing ] = useState(false);
-  const [ stopping, setStopping ] = useState(false);
-  const [ done, setDone ] = useState(false);
+  const [text, setText] = useState("");
+  const [textIdx, { increment, reset: resetCounter }] = useCounter(0, {
+    min: 0,
+    max: wordLength,
+  });
+  const [intervalId, setIntervalId] = useState<NodeJS.Timeout | null>(null);
+  const [typing, setTyping] = useState(false);
+  const [pausing, setPausing] = useState(false);
+  const [stopping, setStopping] = useState(false);
+  const [done, setDone] = useState(false);
 
   const typewriter = () => {
     setText(initialText.slice(0, textIdx));
     increment();
-    if (textIdx >= wordLength){
+    if (textIdx >= wordLength) {
       if (!!intervalId) clearInterval(intervalId);
       afterCallback();
     }
-  }
+  };
 
   const typewriterRef = useRef<() => void>(typewriter);
-  
+
   useEffect(() => {
     typewriterRef.current = typewriter;
   }, [typewriter]);
 
   useEffect(() => {
     if (typing) {
-      const tick = () => {typewriterRef.current()};
+      const tick = () => {
+        typewriterRef.current();
+      };
       const id = setInterval(tick, typeSpeed);
       setIntervalId(id);
 
@@ -86,14 +87,14 @@ export const useTypewriter = (
 
   const set = (newtext: string) => {
     setText(newtext);
-  }
+  };
 
   const start = () => {
     setTyping(true);
     setPausing(false);
     setStopping(false);
     setDone(false);
-  }
+  };
 
   const pause = () => {
     if (!!intervalId) clearInterval(intervalId);
@@ -101,7 +102,7 @@ export const useTypewriter = (
     setPausing(true);
     setStopping(false);
     setDone(false);
-  }
+  };
 
   const stop = () => {
     if (!!intervalId) clearInterval(intervalId);
@@ -111,7 +112,7 @@ export const useTypewriter = (
     setStopping(true);
     setDone(false);
     resetCounter();
-  }
+  };
 
   const reset = () => {
     if (!!intervalId) clearInterval(intervalId);
@@ -119,9 +120,9 @@ export const useTypewriter = (
     setPausing(false);
     setStopping(false);
     setDone(false);
-    setText('');
+    setText("");
     resetCounter();
-  }
+  };
 
   return {
     text,
@@ -135,37 +136,37 @@ export const useTypewriter = (
     stopping,
     done,
   };
-}
+};
 
 export const useTimer = (
   initialTime: number,
   interval: number,
   afterCallback = () => {},
 ): {
-  time: number,
-  start: () => void,
-  pause: () => void,
-  stop: () => void,
-  reset: () => void,
-  counting: boolean,
-  pausing: boolean,
-  stopping: boolean,
-  done: boolean,
+  time: number;
+  start: () => void;
+  pause: () => void;
+  stop: () => void;
+  reset: () => void;
+  counting: boolean;
+  pausing: boolean;
+  stopping: boolean;
+  done: boolean;
 } => {
-  const [ time, setTime ] = useState(initialTime);
-  const [ intervalId, setIntervalId ] = useState<NodeJS.Timeout | null>(null);
-  const [ counting, setCounting ] = useState(false);
-  const [ pausing, setPausing ] = useState(false);
-  const [ stopping, setStopping ] = useState(false);
-  const [ done, setDone ] = useState(false);
+  const [time, setTime] = useState(initialTime);
+  const [intervalId, setIntervalId] = useState<NodeJS.Timeout | null>(null);
+  const [counting, setCounting] = useState(false);
+  const [pausing, setPausing] = useState(false);
+  const [stopping, setStopping] = useState(false);
+  const [done, setDone] = useState(false);
 
   const counter = () => {
-    setTime(p => p - interval);
-    if (time <= 0){
+    setTime((p) => p - interval);
+    if (time <= 0) {
       if (!!intervalId) clearInterval(intervalId);
       afterCallback();
     }
-  }
+  };
 
   const counterRef = useRef<() => void>(counter);
 
@@ -175,7 +176,9 @@ export const useTimer = (
 
   useEffect(() => {
     if (counting) {
-      const tick = () => {counterRef.current()};
+      const tick = () => {
+        counterRef.current();
+      };
       const id = setInterval(tick, interval);
       setIntervalId(id);
 
@@ -195,14 +198,14 @@ export const useTimer = (
     setPausing(false);
     setStopping(false);
     setDone(false);
-  }
+  };
 
   const pause = () => {
     setCounting(false);
     setPausing(true);
     setStopping(false);
     setDone(false);
-  }
+  };
 
   const stop = () => {
     if (!!intervalId) clearInterval(intervalId);
@@ -211,7 +214,7 @@ export const useTimer = (
     setStopping(true);
     setDone(false);
     setTime(0);
-  }
+  };
 
   const reset = () => {
     if (!!intervalId) clearInterval(intervalId);
@@ -220,7 +223,7 @@ export const useTimer = (
     setStopping(false);
     setDone(false);
     setTime(initialTime);
-  }
+  };
 
   return {
     time,
@@ -233,20 +236,20 @@ export const useTimer = (
     stopping,
     done,
   };
-}
+};
 
 export const useAnimationFrame = (callback = () => {}) => {
   const reqIdRef = useRef<number>();
 
   const loop = useCallback(() => {
     reqIdRef.current = requestAnimationFrame(loop);
-    callback()
+    callback();
   }, [callback]);
 
   useEffect(() => {
     reqIdRef.current = requestAnimationFrame(loop);
-    return () => { 
-      if (reqIdRef.current) cancelAnimationFrame(reqIdRef.current) 
+    return () => {
+      if (reqIdRef.current) cancelAnimationFrame(reqIdRef.current);
     };
   }, [loop]);
-}
+};

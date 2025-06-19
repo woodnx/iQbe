@@ -6,9 +6,9 @@ export default function LoginLayout() {
     <>
       <AppShell>
         <Container size="sm" mt={100}>
-          <Outlet/>
+          <Outlet />
         </Container>
       </AppShell>
     </>
-  )
+  );
 }

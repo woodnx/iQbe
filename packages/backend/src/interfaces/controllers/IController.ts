@@ -4,12 +4,10 @@ import { asyncWrapper, typedAsyncWrapper } from "@/utils";
 import { ApiError } from "api";
 
 export default class IController {
-  constructor(
-    private userRepository: IUserRepository
-  ) {}
+  constructor(private userRepository: IUserRepository) {}
 
   get() {
-    return typedAsyncWrapper<'/i', 'get'>(async (req, res) => {
+    return typedAsyncWrapper<"/i", "get">(async (req, res) => {
       const uid = req.user.uid;
 
       const i = await this.userRepository.findByUid(uid);
@@ -24,18 +22,18 @@ export default class IController {
         modified: format(i.modified),
         permission: i.permission,
         photoURL: i.photoUrl,
-      })
+      });
     });
   }
 
   put() {
-    return typedAsyncWrapper<'/i', 'put'>(async (req, res) => {
+    return typedAsyncWrapper<"/i", "put">(async (req, res) => {
       const username = req.body.username;
       const nickname = req.body.nickname || undefined;
       const uid = req.user.uid;
 
       const i = await this.userRepository.findByUid(uid);
-      
+
       if (!i) throw new ApiError().invalidParams();
 
       i.editNickname(nickname);
@@ -52,20 +50,20 @@ export default class IController {
         permission: i.permission,
         photoURL: i.photoUrl,
       });
-    })
+    });
   }
 
   registerProfileImage() {
     return asyncWrapper(async (req, res) => {
       const file = req.file;
       const uid = req.user.uid;
-      
+
       if (!file) {
         throw new ApiError({
           title: "NO_FILE",
           detail: "No file uploaded.",
           type: "about:blank",
-          status: 400
+          status: 400,
         });
       }
       const filename = file.filename;

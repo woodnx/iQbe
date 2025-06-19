@@ -1,9 +1,9 @@
-import { ApiError } from 'api';
-import { isArray } from 'lodash';
+import { ApiError } from "api";
+import { isArray } from "lodash";
 
-import IQuizQueryService from '@/applications/queryservices/IQuizQueryService';
-import QuizUseCase from '@/applications/usecases/QuizUseCase';
-import { typedAsyncWrapper } from '@/utils';
+import IQuizQueryService from "@/applications/queryservices/IQuizQueryService";
+import QuizUseCase from "@/applications/usecases/QuizUseCase";
+import { typedAsyncWrapper } from "@/utils";
 
 export default class QuizController {
   constructor(
@@ -12,29 +12,37 @@ export default class QuizController {
   ) {}
 
   get() {
-    return typedAsyncWrapper<'/quizzes', "get">(async (req, res) => {
+    return typedAsyncWrapper<"/quizzes", "get">(async (req, res) => {
       if (!req.query) return;
 
-      const page     = !!req.query.page     ? Number(req.query.page)    : 1;
-      const maxView  = !!req.query.maxView || Number(req.query.maxView) <= 100  ? Number(req.query.maxView) : 100;
-      const seed     = !!req.query.seed     ? Number(req.query.seed)    : undefined;
-      const wids     = req.query.wids || [];
+      const page = !!req.query.page ? Number(req.query.page) : 1;
+      const maxView =
+        !!req.query.maxView || Number(req.query.maxView) <= 100
+          ? Number(req.query.maxView)
+          : 100;
+      const seed = !!req.query.seed ? Number(req.query.seed) : undefined;
+      const wids = req.query.wids || [];
       const keyword = req.query.keyword || undefined;
-      const keywordOption = (req.query.keywordOption) || undefined;
+      const keywordOption = req.query.keywordOption || undefined;
       const uid = req.user.uid;
-      const since = ('since' in req.query) ? Number(req.query.since) || undefined : undefined;
-      const until = ('until' in req.query) ? Number(req.query.until) || undefined : undefined;
-      const mid = req.query && ('mid' in req.query) ? req.query.mid || undefined : undefined;
+      const since =
+        "since" in req.query ? Number(req.query.since) || undefined : undefined;
+      const until =
+        "until" in req.query ? Number(req.query.until) || undefined : undefined;
+      const mid =
+        req.query && "mid" in req.query
+          ? req.query.mid || undefined
+          : undefined;
       const isFavorite = !!req.query.isFavorite;
       const judgements = req.query.judgements
-        ? isArray(req.query.judgements) 
-        ? req.query.judgements 
-        : [ req.query.judgements ]
+        ? isArray(req.query.judgements)
+          ? req.query.judgements
+          : [req.query.judgements]
         : undefined;
       const categories = req.query.categories || undefined;
       const tags = req.query.tags || undefined;
       const tagMatchAll = req.query.tagMatchAll;
-      
+
       const quizzes = await this.quizQueryService.findMany(uid, {
         page,
         maxView,
@@ -57,21 +65,26 @@ export default class QuizController {
   }
 
   size() {
-    return typedAsyncWrapper<'/quizzes/size', "get">(async (req, res) => {
+    return typedAsyncWrapper<"/quizzes/size", "get">(async (req, res) => {
       if (!req.query) return;
 
       const wids = req.query.wids || [];
       const keyword = req.query.keyword || undefined;
-      const keywordOption = (req.query.keywordOption) || undefined;
+      const keywordOption = req.query.keywordOption || undefined;
       const uid = req.user.uid;
-      const since = ('since' in req.query) ? Number(req.query.since) || undefined : undefined;
-      const until = ('until' in req.query) ? Number(req.query.until) || undefined : undefined;
-      const mid = req.query && ('mid' in req.query) ? req.query.mid || undefined : undefined;
+      const since =
+        "since" in req.query ? Number(req.query.since) || undefined : undefined;
+      const until =
+        "until" in req.query ? Number(req.query.until) || undefined : undefined;
+      const mid =
+        req.query && "mid" in req.query
+          ? req.query.mid || undefined
+          : undefined;
       const isFavorite = !!req.query.isFavorite;
       const judgements = req.query.judgements
-        ? isArray(req.query.judgements) 
-        ? req.query.judgements 
-        : [ req.query.judgements ]
+        ? isArray(req.query.judgements)
+          ? req.query.judgements
+          : [req.query.judgements]
         : undefined;
 
       const size = await this.quizQueryService.count(uid, {
@@ -92,7 +105,7 @@ export default class QuizController {
   post() {
     return typedAsyncWrapper<"/quizzes", "post">(async (req, res) => {
       const question: string | undefined = req.body.question;
-      const answer:   string | undefined = req.body.answer;
+      const answer: string | undefined = req.body.answer;
       const anotherAnswer = req.body.anotherAnswer || undefined;
       const tags = req.body.tags || [];
       const category = req.body.category || undefined;
@@ -134,7 +147,7 @@ export default class QuizController {
       }
 
       await this.quizUseCase.addQuizzes(
-        records.map(r => ({
+        records.map((r) => ({
           question: r.question,
           answer: r.answer,
           anotherAnswer: r.anotherAnswer || undefined,
@@ -144,8 +157,8 @@ export default class QuizController {
           subCategoryId: r.subCategory || undefined,
           limitedUser: r.limitedUser || [],
           uid,
-        }))
-      )
+        })),
+      );
 
       res.status(201).send();
     });
@@ -186,8 +199,7 @@ export default class QuizController {
     return typedAsyncWrapper<"/quizzes/{qid}", "delete">(async (req, res) => {
       const qid = req.params.qid;
 
-      if (!qid) 
-        throw new ApiError().internalProblems();
+      if (!qid) throw new ApiError().internalProblems();
 
       await this.quizUseCase.deleteQuiz(qid);
 

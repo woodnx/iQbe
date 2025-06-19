@@ -1,15 +1,24 @@
 import { client } from "@/utils/client";
-import { Flex, Loader, Space, Text, TextInput, TextInputProps } from "@mantine/core";
+import {
+  Flex,
+  Loader,
+  Space,
+  Text,
+  TextInput,
+  TextInputProps,
+} from "@mantine/core";
 import { useDebouncedCallback } from "@mantine/hooks";
 import { IconAlertCircle, IconCheck } from "@tabler/icons-react";
 import { useState } from "react";
 
 function checkUsernameAvailable(username: string): Promise<boolean> {
-  return client.POST("/auth/available", { body: { username }}).then(({ data }) => !!data?.available);
+  return client
+    .POST("/auth/available", { body: { username } })
+    .then(({ data }) => !!data?.available);
 }
 
 export interface UsernameInputProps extends TextInputProps {
-  isValid?: boolean,
+  isValid?: boolean;
 }
 
 export default function UsernameInput({
@@ -18,8 +27,8 @@ export default function UsernameInput({
   onChange = () => {},
   ...others
 }: UsernameInputProps) {
-  const [ available, setAvailable ] = useState(false);
-  const [ loading, setLoading ] = useState(false);
+  const [available, setAvailable] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const handleCheck = useDebouncedCallback(async (username: string) => {
     setLoading(true);
@@ -30,43 +39,48 @@ export default function UsernameInput({
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     onChange(event);
     handleCheck(event.currentTarget.value);
-  }
+  };
 
   const Description = () => (
     <>
-      { 
-        !isValid ? 
+      {!isValid ? (
         <Flex align="center">
-          <IconAlertCircle size={14} color="red"/>
-          <Text span c="red" mx={5}>無効なユーザ名です</Text>
-          <IconAlertCircle size={14} color="red"/>
+          <IconAlertCircle size={14} color="red" />
+          <Text span c="red" mx={5}>
+            無効なユーザ名です
+          </Text>
+          <IconAlertCircle size={14} color="red" />
         </Flex>
-        : !available ?
+      ) : !available ? (
         <Flex align="center">
-          <IconAlertCircle size={14} color="red"/>
-          <Text span c="red" mx={5}>このユーザ名はすでに使われています</Text>
-          <IconAlertCircle size={14} color="red"/>
+          <IconAlertCircle size={14} color="red" />
+          <Text span c="red" mx={5}>
+            このユーザ名はすでに使われています
+          </Text>
+          <IconAlertCircle size={14} color="red" />
         </Flex>
-        : 
+      ) : (
         <Flex align="center">
-          <IconCheck size={14} color="green"/>
-          <Space w={5}/>
-          <Text span c="green">使用可能なユーザ名です</Text>
+          <IconCheck size={14} color="green" />
+          <Space w={5} />
+          <Text span c="green">
+            使用可能なユーザ名です
+          </Text>
         </Flex>
-      }
+      )}
     </>
   );
 
   return (
-    <TextInput 
+    <TextInput
       withAsterisk
       label="ユーザ名"
-      description={<Description/>}
+      description={<Description />}
       leftSection="@"
       rightSection={loading && <Loader size={20} />}
       value={value}
       onChange={handleChange}
-      inputWrapperOrder={['label', 'input', 'description', 'error']}
+      inputWrapperOrder={["label", "input", "description", "error"]}
       {...others}
     />
   );

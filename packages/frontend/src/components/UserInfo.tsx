@@ -6,13 +6,14 @@ export default function UserInfo() {
 
   return (
     <Group wrap="nowrap">
-      <Avatar
-        size={60}
-        src={`http://localhost:9000${i.photoURL}`}
-      />
+      <Avatar size={60} src={`http://localhost:9000${i.photoURL}`} />
       <div>
-        <Text fz="xl" fw="bold" lineClamp={1}>{i.nickname}</Text>
-        <Text fz="sm" c="gray"  lineClamp={1}>@{i.username}</Text>
+        <Text fz="xl" fw="bold" lineClamp={1}>
+          {i.nickname}
+        </Text>
+        <Text fz="sm" c="gray" lineClamp={1}>
+          @{i.username}
+        </Text>
       </div>
     </Group>
   );
