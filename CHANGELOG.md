@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.1.1](https://github.com/woodnx/iQbe/compare/v4.1.0...v4.1.1) (2025-06-25)
+
+
+### Bug Fixes
+
+* build error ([#236](https://github.com/woodnx/iQbe/issues/236)) ([2fbb9f7](https://github.com/woodnx/iQbe/commit/2fbb9f7728394e3374e3559af97498cf631e4e54))
+
 ## [4.1.0](https://github.com/woodnx/iQbe/compare/v4.0.6...v4.1.0) (2025-06-25)
 
 
