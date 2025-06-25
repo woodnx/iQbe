@@ -1,15 +1,15 @@
-import { ApiError } from 'api';
+import { ApiError } from "api";
 
-import Mylist from '@/domains/Mylist';
-import IMylistRepository from '@/domains/Mylist/IMylistRepository';
-import MylistService from '@/domains/Mylist/MylistService';
-import { typedAsyncWrapper } from '@/utils';
+import Mylist from "@/domains/Mylist";
+import IMylistRepository from "@/domains/Mylist/IMylistRepository";
+import MylistService from "@/domains/Mylist/MylistService";
+import { typedAsyncWrapper } from "@/utils";
 
 export default class MylistController {
   constructor(
     private mylistRepository: IMylistRepository,
     private mylistService: MylistService,
-  ){}
+  ) {}
 
   get() {
     return typedAsyncWrapper<"/mylists", "get">(async (req, res) => {
@@ -17,11 +17,13 @@ export default class MylistController {
 
       const mylists = await this.mylistRepository.findManyByCreatorUid(uid);
 
-      res.status(200).send(mylists.map(m => ({
-        mid: m.mid,
-        name: m.name,
-        created: m.created,
-      })));
+      res.status(200).send(
+        mylists.map((m) => ({
+          mid: m.mid,
+          name: m.name,
+          created: m.created,
+        })),
+      );
     });
   }
 
@@ -33,7 +35,7 @@ export default class MylistController {
 
       if (!listName) throw new ApiError().invalidParams();
       const mid = this.mylistService.genereateMid();
-      
+
       const mylist = new Mylist(mid, uid, listName, now);
 
       await this.mylistRepository.save(mylist);
@@ -54,7 +56,7 @@ export default class MylistController {
 
       const mylist = await this.mylistRepository.findByMid(mid);
       if (!mylist) throw new ApiError().invalidParams();
-      
+
       mylist.rename(listName);
       await this.mylistRepository.update(mylist);
 
@@ -78,11 +80,13 @@ export default class MylistController {
       await this.mylistRepository.delete(mylist);
       const mylists = await this.mylistRepository.findManyByCreatorUid(uid);
 
-      res.send(mylists.map(m => ({
-        mid: m.mid,
-        name: m.name,
-        created: m.created,
-      })));
+      res.send(
+        mylists.map((m) => ({
+          mid: m.mid,
+          name: m.name,
+          created: m.created,
+        })),
+      );
     });
   }
 }

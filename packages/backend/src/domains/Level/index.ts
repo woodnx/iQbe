@@ -14,6 +14,6 @@ export default class Level {
   }
 
   get color() {
-    return this._color
+    return this._color;
   }
 }

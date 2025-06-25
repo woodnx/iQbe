@@ -1,14 +1,14 @@
-import { ActionIcon, Button, BoxProps } from "@mantine/core"
-import { IconArrowsShuffle } from "@tabler/icons-react"
+import { ActionIcon, Button, BoxProps } from "@mantine/core";
+import { IconArrowsShuffle } from "@tabler/icons-react";
 import { useIsMobile } from "@/contexts/isMobile";
 
 interface QuizShuffleButton extends BoxProps {
-  apply: (seed: number) => void
+  apply: (seed: number) => void;
 }
 
-export default function QuizShuffleButton({ 
-  apply, 
-  ...others 
+export default function QuizShuffleButton({
+  apply,
+  ...others
 }: QuizShuffleButton) {
   const random = Math.floor(Math.random() * 100000);
   const isMobile = useIsMobile();
@@ -16,27 +16,26 @@ export default function QuizShuffleButton({
   const defaultButton = (
     <Button
       onClick={() => apply(random)}
-      leftSection={<IconArrowsShuffle/>}
+      leftSection={<IconArrowsShuffle />}
       variant="outline"
       color="blue"
-      { ...others }
-    >シャッフル</Button>
+      {...others}
+    >
+      シャッフル
+    </Button>
   );
 
   const mobileButton = (
-    <ActionIcon 
+    <ActionIcon
       onClick={() => apply(random)}
-      size="lg" 
-      radius="xl" 
+      size="lg"
+      radius="xl"
       variant="outline"
       color="blue"
     >
-      <IconArrowsShuffle/>
+      <IconArrowsShuffle />
     </ActionIcon>
-  )
+  );
 
-
-  return (
-    isMobile ? mobileButton : defaultButton
-  )
+  return isMobile ? mobileButton : defaultButton;
 }

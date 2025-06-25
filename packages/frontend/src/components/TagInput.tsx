@@ -4,9 +4,9 @@ import { useDebouncedValue } from "@mantine/hooks";
 import { useState } from "react";
 
 export interface TagInputProps {
-  value?: string[],
-  onChange?: (values: string[]) => void,
-  disabled?: boolean
+  value?: string[];
+  onChange?: (values: string[]) => void;
+  disabled?: boolean;
 }
 
 export default function TagInput({
@@ -14,21 +14,21 @@ export default function TagInput({
   onChange = () => {},
   disabled,
 }: TagInputProps) {
-  const [ search, setSearch ] = useState('');
-  const [ debounced ] = useDebouncedValue(search, 500);
+  const [search, setSearch] = useState("");
+  const [debounced] = useDebouncedValue(search, 500);
 
-  const { data: searchedTags } = $api.useQuery('get', '/tags', {
+  const { data: searchedTags } = $api.useQuery("get", "/tags", {
     params: {
       query: {
         q: debounced,
-      }
-    }
+      },
+    },
   });
 
-  const data = searchedTags?.map((item) => item.label); 
-  
+  const data = searchedTags?.map((item) => item.label);
+
   return (
-    <TagsInput 
+    <TagsInput
       label="タグの編集"
       placeholder="Space/Enterで区切り文字"
       clearable
@@ -39,7 +39,7 @@ export default function TagInput({
       data={data}
       disabled={disabled}
       onChange={(value) => {
-        onChange(value)
+        onChange(value);
       }}
     />
   );

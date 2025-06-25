@@ -4,47 +4,51 @@ import { IconStar, IconStarFilled } from "@tabler/icons-react";
 import { $api } from "@/utils/client";
 
 interface QuizFavoriteButtonProps {
-  isFavorite: boolean,
-  qid: string
+  isFavorite: boolean;
+  qid: string;
 }
 
-export default function QuizFavoriteButton({ 
-  isFavorite: innerIsFavorite, 
+export default function QuizFavoriteButton({
+  isFavorite: innerIsFavorite,
   qid,
 }: QuizFavoriteButtonProps) {
-  const [ isFavorite, setFavorite ] = useState(innerIsFavorite);
+  const [isFavorite, setFavorite] = useState(innerIsFavorite);
   const { mutate: like } = $api.useMutation("post", "/like");
   const { mutate: unlike } = $api.useMutation("post", "/unlike");
-  
+
   const addFavoriteList = async () => {
     if (isFavorite) {
       try {
-        unlike({ body: {
-          qid,
-        }});
+        unlike({
+          body: {
+            qid,
+          },
+        });
         setFavorite(!isFavorite);
-      } catch(e) {
+      } catch (e) {
         return;
       }
-    }else {
+    } else {
       try {
-        like({ body: {
-          qid,
-        }});
+        like({
+          body: {
+            qid,
+          },
+        });
         setFavorite(!isFavorite);
-      } catch(e) {
+      } catch (e) {
         return;
       }
     }
   };
 
   return (
-    <ActionIcon 
-      color={isFavorite ? 'yellow.5' : 'gray'}
-      onClick={addFavoriteList} 
+    <ActionIcon
+      color={isFavorite ? "yellow.5" : "gray"}
+      onClick={addFavoriteList}
       variant="subtle"
     >
-      {isFavorite ? <IconStarFilled/> : <IconStar/>}
+      {isFavorite ? <IconStarFilled /> : <IconStar />}
     </ActionIcon>
   );
 }

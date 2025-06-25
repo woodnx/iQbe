@@ -5,9 +5,9 @@ import useQuizzes from "@/hooks/useQuizzes";
 import useQuizSize from "@/hooks/useQuizSize";
 
 function shuffleSequense(n: number) {
-  const a = [ ...Array(n).keys() ];
+  const a = [...Array(n).keys()];
 
-  for(let i = a.length -1; i > 0; i--){
+  for (let i = a.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     const tmp = a[i];
     a[i] = a[j];
@@ -18,14 +18,16 @@ function shuffleSequense(n: number) {
 }
 
 export default function Practice() {
-  const [ searchParams ] = useSearchParams();
-  const [ shouldFetch, setShouldFetch ] = useState(false);
-  const path = searchParams.get('path');
+  const [searchParams] = useSearchParams();
+  const [shouldFetch, setShouldFetch] = useState(false);
+  const path = searchParams.get("path");
   const isTransfer = !!path;
 
   const { quizzes, params } = useQuizzes(undefined, shouldFetch || isTransfer);
   const { quizzesSize } = useQuizSize(params);
-  const shuffledList = isTransfer ? shuffleSequense(quizzes?.length || 0) : [...Array(quizzes?.length || 0).keys()];
+  const shuffledList = isTransfer
+    ? shuffleSequense(quizzes?.length || 0)
+    : [...Array(quizzes?.length || 0).keys()];
 
   return (
     <>
@@ -37,5 +39,5 @@ export default function Practice() {
         onFilter={() => setShouldFetch(true)}
       />
     </>
-  )
+  );
 }

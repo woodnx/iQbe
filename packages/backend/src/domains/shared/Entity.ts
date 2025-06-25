@@ -1,4 +1,4 @@
-export default class Entity <T> {
+export default class Entity<T> {
   protected readonly _value: T;
 
   constructor(value: T) {

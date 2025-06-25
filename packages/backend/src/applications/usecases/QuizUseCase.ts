@@ -1,15 +1,16 @@
-import { ApiError } from 'api';
-import { components } from 'api/schema';
+import { ApiError } from "api";
+import { components } from "api/schema";
 
-import Quiz from '@/domains/Quiz';
-import IQuizRepository from '@/domains/Quiz/IQuizRepository';
-import QuizService from '@/domains/Quiz/QuizService';
-import ITagRepository from '@/domains/Tag/ITagRepository';
-import TagService from '@/domains/Tag/TagService';
+import Quiz from "@/domains/Quiz";
+import IQuizRepository from "@/domains/Quiz/IQuizRepository";
+import QuizService from "@/domains/Quiz/QuizService";
+import ITagRepository from "@/domains/Tag/ITagRepository";
+import TagService from "@/domains/Tag/TagService";
 
-import ITransactionManager from '../shared/ITransactionManager';
+import ITransactionManager from "../shared/ITransactionManager";
 
-type QuizDTO = components["responses"]["QuizResponse"]["content"]["application/json"];
+type QuizDTO =
+  components["responses"]["QuizResponse"]["content"]["application/json"];
 
 export default class QuizUseCase {
   constructor(
@@ -38,7 +39,7 @@ export default class QuizUseCase {
       answer,
       tagLabels,
       uid,
-      isPublic ? [] : [ uid ],
+      isPublic ? [] : [uid],
       anotherAnswer,
       wid,
       categoryId,
@@ -63,59 +64,61 @@ export default class QuizUseCase {
       total: quiz.total,
       isFavorite: false,
       registerdMylist: [],
-    }
+    };
   }
 
   async addQuizzes(
     quizzes: {
-      question: string,
-      answer: string,
-      limitedUser: string[],
-      tagLabels: string[],
-      uid: string,
-      anotherAnswer?: string,
-      categoryId?: number,
-      wid?: string,
+      question: string;
+      answer: string;
+      limitedUser: string[];
+      tagLabels: string[];
+      uid: string;
+      anotherAnswer?: string;
+      categoryId?: number;
+      wid?: string;
     }[],
   ): Promise<QuizDTO[]> {
     const quizService = new QuizService();
 
     const dto = await this.transactionManager.begin(async () => {
-      return Promise.all(quizzes.map(async (_quiz) => {
-        const qid = quizService.generateQid();
+      return Promise.all(
+        quizzes.map(async (_quiz) => {
+          const qid = quizService.generateQid();
 
-        const quiz = Quiz.create(
-          qid,
-          _quiz.question,
-          _quiz.answer,
-          _quiz.tagLabels,
-          _quiz.uid,
-          _quiz.limitedUser,
-          _quiz.anotherAnswer,
-          _quiz.wid,
-          _quiz.categoryId,
-        );
+          const quiz = Quiz.create(
+            qid,
+            _quiz.question,
+            _quiz.answer,
+            _quiz.tagLabels,
+            _quiz.uid,
+            _quiz.limitedUser,
+            _quiz.anotherAnswer,
+            _quiz.wid,
+            _quiz.categoryId,
+          );
 
-        await this.quizRepository.save(quiz);
+          await this.quizRepository.save(quiz);
 
-        return {
-          qid: quiz.qid,
-          question: quiz.question,
-          answer: quiz.answer,
-          anotherAnswer: quiz.anotherAnswer,
-          wid: quiz.wid,
-          tagLabels: _quiz.tagLabels,
-          categoryId: quiz.categoryId,
-          creatorId: quiz.creatorUid,
-          isPublic: quiz.isPublic(),
-          right: quiz.right,
-          total: quiz.total,
-          isFavorite: false,
-        }
-      }))
+          return {
+            qid: quiz.qid,
+            question: quiz.question,
+            answer: quiz.answer,
+            anotherAnswer: quiz.anotherAnswer,
+            wid: quiz.wid,
+            tagLabels: _quiz.tagLabels,
+            categoryId: quiz.categoryId,
+            creatorId: quiz.creatorUid,
+            isPublic: quiz.isPublic(),
+            right: quiz.right,
+            total: quiz.total,
+            isFavorite: false,
+          };
+        }),
+      );
     });
 
-    return dto || []; 
+    return dto || [];
   }
 
   async editQuiz(
@@ -132,20 +135,20 @@ export default class QuizUseCase {
     const tagService = new TagService(this.tagRepository);
     const editable = quiz?.isEditable(uid);
 
-    if (!quiz) 
+    if (!quiz)
       throw new ApiError({
-        title: 'NO_QUIZ',
-        detail: 'This qid is not available id',
+        title: "NO_QUIZ",
+        detail: "This qid is not available id",
         status: 400,
-        type: 'about:blank'
+        type: "about:blank",
       });
 
-    if (!editable) 
+    if (!editable)
       throw new ApiError({
-        title: 'NOT_EDITABLE_QUIZ',
-        detail: 'This quiz is not able to edit',
+        title: "NOT_EDITABLE_QUIZ",
+        detail: "This quiz is not able to edit",
         status: 403,
-        type: 'about:blank'
+        type: "about:blank",
       });
 
     quiz.editQuestion(question);
@@ -157,16 +160,16 @@ export default class QuizUseCase {
     // タグ付与処理
     const currentTags = quiz.tagLabels;
     quiz.editTags(tagLabels);
-    
-    const tagsToAdd = tagLabels.filter(tag => !currentTags.includes(tag));
-    const tagsToRemove = currentTags.filter(tag => !tagLabels.includes(tag));
-    
+
+    const tagsToAdd = tagLabels.filter((tag) => !currentTags.includes(tag));
+    const tagsToRemove = currentTags.filter((tag) => !tagLabels.includes(tag));
+
     await this.transactionManager.begin(async () => {
       await tagService.manageTagsToAdd(tagsToAdd);
       await this.quizRepository.update(quiz, tagsToAdd, tagsToRemove);
       await tagService.manageTagsToRemove(tagsToRemove);
     });
-    
+
     return {
       qid: quiz.qid,
       question: quiz.question,
@@ -180,19 +183,19 @@ export default class QuizUseCase {
       right: quiz.right,
       total: quiz.total,
       isFavorite: false,
-    }
+    };
   }
 
   async deleteQuiz(qid: string): Promise<void> {
     const tagService = new TagService(this.tagRepository);
     const quiz = await this.quizRepository.findByQid(qid);
 
-    if (!quiz) 
+    if (!quiz)
       throw new ApiError({
-        title: 'NO_QUIZ',
-        detail: 'This qid is not available id',
+        title: "NO_QUIZ",
+        detail: "This qid is not available id",
         status: 400,
-        type: 'about:blank'
+        type: "about:blank",
       });
 
     await this.quizRepository.delete(quiz);

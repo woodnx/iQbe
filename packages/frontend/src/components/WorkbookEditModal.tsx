@@ -1,34 +1,34 @@
-import { $api } from '@/utils/client';
-import { BoxProps } from '@mantine/core';
-import { ContextModalProps } from '@mantine/modals';
+import { $api } from "@/utils/client";
+import { BoxProps } from "@mantine/core";
+import { ContextModalProps } from "@mantine/modals";
 
-import WorkbookCreateForm from './WorkbookCreateForm';
+import WorkbookCreateForm from "./WorkbookCreateForm";
 
 interface WorkbookEditModalInnerProps extends BoxProps {
-  wid: string,
-  name: string,
-  date?: Date
+  wid: string;
+  name: string;
+  date?: Date;
 }
 
 export default function WorkbookEditModal({
-  context, 
-  id, 
+  context,
+  id,
   innerProps,
-}: ContextModalProps<WorkbookEditModalInnerProps>){
+}: ContextModalProps<WorkbookEditModalInnerProps>) {
   const { wid, name, date } = innerProps;
   const { mutate } = $api.useMutation("put", "/workbooks/{wid}");
 
   const toEdit = async (name: string, published?: Date) => {
-    mutate({ 
+    mutate({
       body: {
         name,
         published,
       },
       params: {
         path: {
-          wid
-        }
-      }
+          wid,
+        },
+      },
     });
     context.closeModal(id);
   };

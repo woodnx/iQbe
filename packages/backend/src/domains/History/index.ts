@@ -17,7 +17,7 @@ export default class History {
     return this._user;
   }
 
-  get pressedWordPosition(): number | null{
+  get pressedWordPosition(): number | null {
     return this._pressedWordPosiston;
   }
 

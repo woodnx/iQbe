@@ -1,7 +1,11 @@
-import { $api } from '@/utils/client';
+import { $api } from "@/utils/client";
 
 export const useHistories = (since: number, until: number) => {
-  const  { data: histories, error, isLoading } = $api.useQuery("get", "/histories/{since}/{until}", {
+  const {
+    data: histories,
+    error,
+    isLoading,
+  } = $api.useQuery("get", "/histories/{since}/{until}", {
     params: {
       path: {
         since,
@@ -14,5 +18,5 @@ export const useHistories = (since: number, until: number) => {
     histories,
     error,
     isLoading,
-  }
-}
+  };
+};

@@ -10,21 +10,12 @@ export default function Setting() {
   return (
     <Container size="md">
       <Title>設定</Title>
-      
+
       <Tabs mt="lg" defaultValue="profile">
         <Tabs.List grow>
-          <Tabs.Tab value="profile">
-            プロフィール
-          </Tabs.Tab>
-          <Tabs.Tab value="account">
-            アカウント
-          </Tabs.Tab>
-          {
-            isSuperUser && 
-            <Tabs.Tab value="server">
-              サーバ
-            </Tabs.Tab>
-          }
+          <Tabs.Tab value="profile">プロフィール</Tabs.Tab>
+          <Tabs.Tab value="account">アカウント</Tabs.Tab>
+          {isSuperUser && <Tabs.Tab value="server">サーバ</Tabs.Tab>}
         </Tabs.List>
 
         <Tabs.Panel value="profile">
@@ -40,5 +31,5 @@ export default function Setting() {
         </Tabs.Panel>
       </Tabs>
     </Container>
-  )
+  );
 }

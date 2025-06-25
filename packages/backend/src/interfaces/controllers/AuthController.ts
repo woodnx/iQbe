@@ -1,12 +1,10 @@
-import { ApiError } from 'api';
+import { ApiError } from "api";
 
-import AuthUseCase from '@/applications/usecases/AuthUseCase';
-import { typedAsyncWrapper } from '@/utils';
+import AuthUseCase from "@/applications/usecases/AuthUseCase";
+import { typedAsyncWrapper } from "@/utils";
 
 export default class AuthController {
-  constructor(
-    private authUseCase: AuthUseCase,
-  ) {}
+  constructor(private authUseCase: AuthUseCase) {}
 
   login() {
     return typedAsyncWrapper<"/auth/login", "post">(async (req, res) => {
@@ -20,7 +18,7 @@ export default class AuthController {
       const data = await this.authUseCase.loginUser(username, password);
 
       res.status(200).send(data);
-    })
+    });
   }
 
   signup() {
@@ -40,21 +38,24 @@ export default class AuthController {
         email || "",
         inviteCode,
       );
-      
+
       res.status(200).send(data);
     });
   }
 
   token() {
     return typedAsyncWrapper<"/auth/token", "post">(async (req, res) => {
-      const refreshToken= req.body.refreshToken;
+      const refreshToken = req.body.refreshToken;
       const uid = req.body.uid;
 
       if (!refreshToken || !uid) {
         throw new ApiError().invalidParams();
       }
 
-      const { accessToken, user } = await this.authUseCase.getToken(uid, refreshToken);
+      const { accessToken, user } = await this.authUseCase.getToken(
+        uid,
+        refreshToken,
+      );
 
       res.status(200).send({ accessToken, user });
     });
@@ -65,13 +66,17 @@ export default class AuthController {
       const email = req.body.email;
       const password = req.body.password;
       const username = req.body.username;
-    
+
       if (!email || !password || !username) {
         throw new ApiError().invalidParams();
       }
-    
-      const data = await this.authUseCase.registerUser(username, email, password);
-    
+
+      const data = await this.authUseCase.registerUser(
+        username,
+        email,
+        password,
+      );
+
       res.status(200).send({
         ...data,
       });
@@ -81,13 +86,13 @@ export default class AuthController {
   available() {
     return typedAsyncWrapper<"/auth/available", "post">(async (req, res) => {
       const username = req.body.username || undefined;
-    
+
       if (!username) {
-       throw new ApiError().invalidParams();
+        throw new ApiError().invalidParams();
       }
-    
+
       const available = await this.authUseCase.available(username);
-    
+
       res.status(200).send({
         available,
       });

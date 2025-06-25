@@ -10,17 +10,22 @@ export default class HistoryService {
     private historyRepository: IHistoryRepository,
   ) {}
 
-  async add(uid: string, qid: string, judgement: number, pressedWordPosition: number | null) {
-    const [ user, quiz ] = await Promise.all([
+  async add(
+    uid: string,
+    qid: string,
+    judgement: number,
+    pressedWordPosition: number | null,
+  ) {
+    const [user, quiz] = await Promise.all([
       this.userRepository.findByUid(uid),
       this.quizRepository.findByQid(qid),
     ]);
 
     if (!user || !quiz) {
-      throw new Error('no find user or quiz');
+      throw new Error("no find user or quiz");
     }
 
     const history = new History(quiz, user, pressedWordPosition, judgement);
-    await this.historyRepository.add(history)
+    await this.historyRepository.add(history);
   }
 }

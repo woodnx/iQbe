@@ -3,13 +3,13 @@ import CategoryRepository from "@/domains/Category/ICategoryRepository";
 import ITransactionManager from "../shared/ITransactionManager";
 
 type CategoryDAO = {
-  name: string,
-  description?: string | null,
+  name: string;
+  description?: string | null;
   sub?: {
-    name: string,
-    description?: string | null,
-  }[]
-}
+    name: string;
+    description?: string | null;
+  }[];
+};
 
 export default class CategoryUseCase {
   constructor(
@@ -23,7 +23,12 @@ export default class CategoryUseCase {
     return category;
   }
 
-  async addCategory(name: string, description: string | null, parentId: number | null, disabled: boolean) {
+  async addCategory(
+    name: string,
+    description: string | null,
+    parentId: number | null,
+    disabled: boolean,
+  ) {
     const category = Category.create(
       name,
       description,
@@ -39,51 +44,53 @@ export default class CategoryUseCase {
       const existingCategories = await this.categoryRepository.getAll();
 
       for (const presetCategory of presetCategories) {
-        const _category = existingCategories
-          .filter(c => c.name === presetCategory.name);
-        
-        const category = (_category.length == 0)
-        ? Category.create(
-          presetCategory.name,
-          presetCategory.description || null,
-          -1, // -1 means no parent
-          false,
-        )
-        : _category[0];
-  
+        const _category = existingCategories.filter(
+          (c) => c.name === presetCategory.name,
+        );
+
+        const category =
+          _category.length == 0
+            ? Category.create(
+                presetCategory.name,
+                presetCategory.description || null,
+                -1, // -1 means no parent
+                false,
+              )
+            : _category[0];
+
         await this.categoryRepository.save(category);
 
         const id = await this.categoryRepository
-        .findByName(presetCategory.name)
-        .then((category) => category?.id);
+          .findByName(presetCategory.name)
+          .then((category) => category?.id);
 
-        if (!id) 
-          throw new Error('Category not found');
+        if (!id) throw new Error("Category not found");
 
         const subCategories = presetCategory.sub || [];
         for (const sub of subCategories) {
-          const _subCategory = existingCategories
-            .filter(c => c.name === sub.name);
+          const _subCategory = existingCategories.filter(
+            (c) => c.name === sub.name,
+          );
 
-          const subCategory = (_subCategory.length == 0) 
-          ? Category.create(
-            sub.name,
-            sub.description || null,
-            id,
-            false,
-          )
-          : _subCategory[0];
-          
+          const subCategory =
+            _subCategory.length == 0
+              ? Category.create(sub.name, sub.description || null, id, false)
+              : _subCategory[0];
+
           await this.categoryRepository.save(subCategory);
         }
       }
     });
   }
 
-  async editCategory(id: number, description: string | null, disabled: boolean) {
+  async editCategory(
+    id: number,
+    description: string | null,
+    disabled: boolean,
+  ) {
     const category = await this.categoryRepository.findById(id);
 
-    if (!category) throw new Error('Category not found');
+    if (!category) throw new Error("Category not found");
 
     category.editDescription(description);
     disabled && category.disable();
@@ -94,9 +101,8 @@ export default class CategoryUseCase {
   async deleteCategory(id: number) {
     const category = await this.categoryRepository.findById(id);
 
-    if (!category) 
-      throw new Error('Category not found');
-    
+    if (!category) throw new Error("Category not found");
+
     this.categoryRepository.delete(category);
   }
 }

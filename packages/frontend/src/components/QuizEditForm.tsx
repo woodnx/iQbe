@@ -1,25 +1,34 @@
-import { components, paths } from 'api/schema';
+import { components, paths } from "api/schema";
 
-import { useIsSuperUser } from '@/hooks/useLoginedUser';
-import { BoxProps, Button, Card, Grid, Group, Switch, Textarea } from '@mantine/core';
-import { isNotEmpty, useForm } from '@mantine/form';
+import { useIsSuperUser } from "@/hooks/useLoginedUser";
+import {
+  BoxProps,
+  Button,
+  Card,
+  Grid,
+  Group,
+  Switch,
+  Textarea,
+} from "@mantine/core";
+import { isNotEmpty, useForm } from "@mantine/form";
 
-import CategorySelector from './CategorySelector';
-import TagInput from './TagInput';
-import WorkbookCreateAndSelector from './WorkbookCreateAndSelector';
+import CategorySelector from "./CategorySelector";
+import TagInput from "./TagInput";
+import WorkbookCreateAndSelector from "./WorkbookCreateAndSelector";
 
-type QuizEditSubmitValues = paths["/quizzes"]["post"]["requestBody"]["content"]["application/json"];
+type QuizEditSubmitValues =
+  paths["/quizzes"]["post"]["requestBody"]["content"]["application/json"];
 type Category = components["schemas"]["Category"];
 
 interface QuizEditFormProps extends BoxProps {
-  question: string,
-  answer: string,
-  wid?: string,
-  category?: Category[],
-  tags?: string[],
-  isPublic?: boolean,
-  onSubmit?: (v: QuizEditSubmitValues) => void,
-  disabled?: boolean,
+  question: string;
+  answer: string;
+  wid?: string;
+  category?: Category[];
+  tags?: string[];
+  isPublic?: boolean;
+  onSubmit?: (v: QuizEditSubmitValues) => void;
+  disabled?: boolean;
 }
 
 export default function QuizEditForm({
@@ -53,26 +62,28 @@ export default function QuizEditForm({
   const submit = (v: QuizEditSubmitValues) => {
     onSubmit(v);
     form.reset();
-  }
+  };
 
   return (
     <Card padding={0} {...others}>
-      <form onSubmit={form.onSubmit(v => {
-        const { category, ...value } = v;
-        const categoryId = 
-          category && category.length > 1 ?
-          category[1].id :
-          category && category.length > 0 ?
-          category[0].id :
-          undefined;
+      <form
+        onSubmit={form.onSubmit((v) => {
+          const { category, ...value } = v;
+          const categoryId =
+            category && category.length > 1
+              ? category[1].id
+              : category && category.length > 0
+                ? category[0].id
+                : undefined;
 
-        submit({ 
-          ...value,
-          category: categoryId, 
-        });
-      })}>
+          submit({
+            ...value,
+            category: categoryId,
+          });
+        })}
+      >
         <Textarea
-          {...form.getInputProps('question')}
+          {...form.getInputProps("question")}
           placeholder="問題文を入力"
           label="問題文"
           variant="filled"
@@ -82,7 +93,7 @@ export default function QuizEditForm({
           disabled={disabled}
         />
         <Textarea
-          {...form.getInputProps('answer')}
+          {...form.getInputProps("answer")}
           placeholder="解答を入力"
           label="解答"
           variant="filled"
@@ -90,42 +101,37 @@ export default function QuizEditForm({
           mb="sm"
           disabled={disabled}
         />
-        <CategorySelector 
-          {...form.getInputProps('category')}
+        <CategorySelector
+          {...form.getInputProps("category")}
           mb="sm"
           disabled={disabled}
         />
         <Grid>
           <Grid.Col span={8}>
-            <TagInput 
-              {...form.getInputProps('tags')}
-              disabled={disabled}
-            />
+            <TagInput {...form.getInputProps("tags")} disabled={disabled} />
           </Grid.Col>
           <Grid.Col span={8}>
             <WorkbookCreateAndSelector
               mb="md"
-              {...form.getInputProps('wid')}
+              {...form.getInputProps("wid")}
               disabled={disabled}
             />
           </Grid.Col>
         </Grid>
         <Group justify="space-between" mt="sm">
           <Switch
-            {...form.getInputProps('isPublic', {type: 'checkbox'})}
+            {...form.getInputProps("isPublic", { type: "checkbox" })}
             disabled={!isSuperUser || disabled}
             label="クイズを公開する"
             my="sm"
           />
-          { 
-            !disabled && 
-            <Button
-              disabled={!form.isValid()}
-              type="submit"
-            >保存</Button>
-          }
+          {!disabled && (
+            <Button disabled={!form.isValid()} type="submit">
+              保存
+            </Button>
+          )}
         </Group>
       </form>
     </Card>
-  )
+  );
 }

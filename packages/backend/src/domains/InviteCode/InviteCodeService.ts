@@ -1,12 +1,10 @@
-import { ApiError } from 'api';
+import { ApiError } from "api";
 
-import InviteCode from './';
-import IInviteCodeRepository from './IInviteCodeRepository';
+import InviteCode from "./";
+import IInviteCodeRepository from "./IInviteCodeRepository";
 
 export default class InviteCodeService {
-  constructor(
-    private inviteCodeRepository: IInviteCodeRepository,
-  ) {}
+  constructor(private inviteCodeRepository: IInviteCodeRepository) {}
 
   public async checkAvailable(inviteCode: InviteCode) {
     const code = await this.inviteCodeRepository.findByCode(inviteCode.code);
@@ -20,6 +18,6 @@ export default class InviteCodeService {
       });
     }
 
-    return !code.used
+    return !code.used;
   }
 }

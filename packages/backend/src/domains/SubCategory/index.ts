@@ -6,17 +6,12 @@ export default class SubCategory {
     private _parentId: number,
   ) {}
 
-  static create(
-    name: string,
-    description: string | null,
-    parentId: number,
-  ) {
+  static create(name: string, description: string | null, parentId: number) {
     return new SubCategory(null, name, description, parentId);
   }
-  
+
   get id(): number {
-    if (!this._id) 
-      throw new Error('SubCategory id is not defined');
+    if (!this._id) throw new Error("SubCategory id is not defined");
     return this._id;
   }
 

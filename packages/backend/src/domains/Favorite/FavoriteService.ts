@@ -11,13 +11,13 @@ export default class FavoriteService {
   ) {}
 
   async add(uid: string, qid: string) {
-    const [ user, quiz ] = await Promise.all([
+    const [user, quiz] = await Promise.all([
       this.userRepository.findByUid(uid),
-      this.quizRepository.findByQid(qid)
+      this.quizRepository.findByQid(qid),
     ]);
-    
+
     if (!user || !quiz) {
-      throw new Error('User or quiz not found');
+      throw new Error("User or quiz not found");
     }
 
     const favorite = new Favorite(user, quiz);
@@ -25,13 +25,13 @@ export default class FavoriteService {
   }
 
   async delete(uid: string, qid: string) {
-    const [ user, quiz ] = await Promise.all([
+    const [user, quiz] = await Promise.all([
       this.userRepository.findByUid(uid),
-      this.quizRepository.findByQid(qid)
+      this.quizRepository.findByQid(qid),
     ]);
 
     if (!user || !quiz) {
-      throw new Error('User or item not found');
+      throw new Error("User or item not found");
     }
 
     const favorite = new Favorite(user, quiz);

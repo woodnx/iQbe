@@ -1,9 +1,9 @@
 import { BoxProps, Grid, SimpleGrid } from "@mantine/core";
 
-interface Props extends BoxProps{
-  width?: string | number,
-  horizonal?: boolean,
-  withname?: boolean,
+interface Props extends BoxProps {
+  width?: string | number;
+  horizonal?: boolean;
+  withname?: boolean;
 }
 
 export default function Logo({
@@ -11,9 +11,9 @@ export default function Logo({
   horizonal = false,
   withname = true,
   ...others
-}: Props) {  
+}: Props) {
   const HorizonalLogo = (
-    <Grid justify="center" align="center"  {...others}>
+    <Grid justify="center" align="center" {...others}>
       <Grid.Col span={6}>
         <img src="../../iqbe.png" width={width} />
       </Grid.Col>
@@ -24,7 +24,7 @@ export default function Logo({
   );
 
   const NamedLogo = (
-    <SimpleGrid cols={1} >
+    <SimpleGrid cols={1}>
       <img src="../../iqbe.png" width={width} />
       <img src="../../iqbe-name.png" width={width} />
     </SimpleGrid>
@@ -32,10 +32,13 @@ export default function Logo({
 
   return (
     <>
-    {
-    !withname ?
-    <img src="../../iqbe.png" width={width} />
-    : horizonal ?  HorizonalLogo : NamedLogo}
+      {!withname ? (
+        <img src="../../iqbe.png" width={width} />
+      ) : horizonal ? (
+        HorizonalLogo
+      ) : (
+        NamedLogo
+      )}
     </>
   );
 }

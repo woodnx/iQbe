@@ -1,21 +1,21 @@
-import { components } from 'api/schema';
+import { components } from "api/schema";
 
-import { $api } from '@/utils/client';
-import { ContextModalProps } from '@mantine/modals';
+import { $api } from "@/utils/client";
+import { ContextModalProps } from "@mantine/modals";
 
-import CategoryEditForm from './CategoryEditForm';
-import { useQueryClient } from '@tanstack/react-query';
+import CategoryEditForm from "./CategoryEditForm";
+import { useQueryClient } from "@tanstack/react-query";
 
 export interface CategoryEditModalInnerProps<T extends boolean> {
-  name: string,
-  description?: string,
-  disabled: boolean,
-  isSub: T,
-  parentId: T extends true ? number : undefined,
-  id: number,
+  name: string;
+  description?: string;
+  disabled: boolean;
+  isSub: T;
+  parentId: T extends true ? number : undefined;
+  id: number;
 }
 
-type Category = components['schemas']['Category'];
+type Category = components["schemas"]["Category"];
 
 export default function CategoryEditModal<T extends boolean>({
   context,
@@ -31,22 +31,22 @@ export default function CategoryEditModal<T extends boolean>({
       const previous = queryClient.getQueryData(queryKey);
 
       queryClient.setQueryData(queryKey, (old: Category[] | undefined) => {
-        const data = old?.map(c => {
+        const data = old?.map((c) => {
           if (formProps.isSub) {
             if (c.id === formProps.parentId) {
               return {
                 ...c,
-                sub: c.sub?.map(sub => 
-                  (sub.id === id) ? { ...sub, ...body, } :sub
+                sub: c.sub?.map((sub) =>
+                  sub.id === id ? { ...sub, ...body } : sub,
                 ),
               };
             }
             return c;
           } else {
-            return c.id === id ? { ...c, ...body } : c
+            return c.id === id ? { ...c, ...body } : c;
           }
         });
-        
+
         return data;
       });
 
@@ -55,31 +55,29 @@ export default function CategoryEditModal<T extends boolean>({
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey });
     },
-  },);
+  });
 
-  const submit = (
-    name: string,
-    disabled: boolean,
-    description?: string,
-  ) => {
-    edit({ 
+  const submit = (name: string, disabled: boolean, description?: string) => {
+    edit({
       body: {
         name,
         description,
         disabled,
       },
-      params: { 
+      params: {
         path: { id },
-      }
+      },
     });
 
     context.closeModal(modalId);
-  }
+  };
 
-  return(
+  return (
     <CategoryEditForm
       {...formProps}
-      onSubmit={(name, disabled, _, description) => submit(name, disabled, description)}
+      onSubmit={(name, disabled, _, description) =>
+        submit(name, disabled, description)
+      }
     />
   );
 }

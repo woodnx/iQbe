@@ -1,12 +1,12 @@
-import { QuizRequestParams } from '@/types';
-import { ContextModalProps } from '@mantine/modals';
+import { QuizRequestParams } from "@/types";
+import { ContextModalProps } from "@mantine/modals";
 
-import FilteringForm from './FilteringForm';
+import FilteringForm from "./FilteringForm";
 
 interface FilteringContextModalInnerProps {
-  isFilterKeyword?: boolean,
-  onSubmit?: (params: QuizRequestParams) => void,
-};
+  isFilterKeyword?: boolean;
+  onSubmit?: (params: QuizRequestParams) => void;
+}
 
 export default function FilteringContextModal({
   id,
@@ -17,7 +17,7 @@ export default function FilteringContextModal({
 
   return (
     <>
-      <FilteringForm 
+      <FilteringForm
         isFilterKeyword={isFilterKeyword}
         onSubmit={(v) => {
           onSubmit(v);

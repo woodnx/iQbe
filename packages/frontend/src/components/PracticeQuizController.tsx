@@ -1,13 +1,17 @@
 import { Button, Center, BoxProps, Group } from "@mantine/core";
-import { IconChevronsRight, IconPlaystationCircle, IconX } from "@tabler/icons-react";
+import {
+  IconChevronsRight,
+  IconPlaystationCircle,
+  IconX,
+} from "@tabler/icons-react";
 import PracticeQuizButton from "./PracticeQuizButton";
 import { useState } from "react";
 
 interface Props extends BoxProps {
-  canPress?: boolean,
-  canJudge?: boolean,
-  onJudge: (judgement: number) => void,
-  onPress: () => void,
+  canPress?: boolean;
+  canJudge?: boolean;
+  onJudge: (judgement: number) => void;
+  onPress: () => void;
 }
 
 export function PracticeQuizController({
@@ -17,39 +21,52 @@ export function PracticeQuizController({
   onPress,
   ...others
 }: Props) {
-  const [ isPressed, setIsPressed ] = useState(false);
+  const [isPressed, setIsPressed] = useState(false);
 
   const pressed = () => {
     onPress();
     setIsPressed(true);
-  }
+  };
 
   const judge = (judge: number) => {
     onJudge(judge);
     setIsPressed(false);
-  }
-  
+  };
+
   return (
     <>
       <Group justify="center" grow {...others}>
-        <Button fullWidth size="xl" color="red" onClick={() => judge(1)} disabled={!canJudge || !isPressed}>
-          <IconPlaystationCircle/>
+        <Button
+          fullWidth
+          size="xl"
+          color="red"
+          onClick={() => judge(1)}
+          disabled={!canJudge || !isPressed}
+        >
+          <IconPlaystationCircle />
         </Button>
-        <Button fullWidth size="xl" color="gray" onClick={() => judge(2)} disabled={!canJudge || isPressed}>
-          <IconChevronsRight/>
+        <Button
+          fullWidth
+          size="xl"
+          color="gray"
+          onClick={() => judge(2)}
+          disabled={!canJudge || isPressed}
+        >
+          <IconChevronsRight />
         </Button>
-        <Button fullWidth size="xl" color="blue" onClick={() => judge(0)} disabled={!canJudge || !isPressed}>
-          <IconX/>
+        <Button
+          fullWidth
+          size="xl"
+          color="blue"
+          onClick={() => judge(0)}
+          disabled={!canJudge || !isPressed}
+        >
+          <IconX />
         </Button>
       </Group>
       <Center mt="sm">
-        <PracticeQuizButton 
-          w={280}
-          onClick={pressed}
-          disabled={!canPress}
-        />
+        <PracticeQuizButton w={280} onClick={pressed} disabled={!canPress} />
       </Center>
     </>
-    
-  )
+  );
 }

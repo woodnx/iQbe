@@ -1,20 +1,20 @@
-import useQuizzes from '@/hooks/useQuizzes';
-import { Button, Group } from '@mantine/core';
-import { useForm } from '@mantine/form';
-import { IconSearch } from '@tabler/icons-react';
+import useQuizzes from "@/hooks/useQuizzes";
+import { Button, Group } from "@mantine/core";
+import { useForm } from "@mantine/form";
+import { IconSearch } from "@tabler/icons-react";
 
-import FilteringCategories from './FilteringCategories';
-import FilteringQuizNumber from './FilteringQuizNumber';
-import FilteringTagMatchAll from './FilteringTagMatchAll';
-import FilteringTags from './FilteringTags';
-import FilteringWorkbook from './FilteringWorkbook';
-import { QuizRequestParams } from '@/types';
-import FilteringWord from './FilteringWord';
+import FilteringCategories from "./FilteringCategories";
+import FilteringQuizNumber from "./FilteringQuizNumber";
+import FilteringTagMatchAll from "./FilteringTagMatchAll";
+import FilteringTags from "./FilteringTags";
+import FilteringWorkbook from "./FilteringWorkbook";
+import { QuizRequestParams } from "@/types";
+import FilteringWord from "./FilteringWord";
 
 interface FilteringModalProps {
-  isFilterKeyword?: boolean,
-  onSubmit?: (params: QuizRequestParams,) => void,
-};
+  isFilterKeyword?: boolean;
+  onSubmit?: (params: QuizRequestParams) => void;
+}
 
 export default function FilteringModal({
   isFilterKeyword = false,
@@ -30,41 +30,35 @@ export default function FilteringModal({
       categories: params.categories,
       tags: params.tags,
       tagMatchAll: params.tagMatchAll,
-    }
+    },
   });
 
   return (
     <>
-      {
-        isFilterKeyword && <FilteringWord 
-          wordInputProps={form.getInputProps('keyword')}
-          wordSearchOption={form.getInputProps('keywordOption', { type: 'checkbox' })}
+      {isFilterKeyword && (
+        <FilteringWord
+          wordInputProps={form.getInputProps("keyword")}
+          wordSearchOption={form.getInputProps("keywordOption", {
+            type: "checkbox",
+          })}
           mb="lg"
         />
-      }
-      <FilteringWorkbook
-        {...form.getInputProps('wids')}
+      )}
+      <FilteringWorkbook {...form.getInputProps("wids")} mb="lg" />
+      <FilteringCategories {...form.getInputProps("categories")} mb="lg" />
+      <FilteringTags {...form.getInputProps("tags")} />
+      <FilteringTagMatchAll
+        {...form.getInputProps("tagMatchAll", { type: "checkbox" })}
         mb="lg"
       />
-      <FilteringCategories 
-        {...form.getInputProps('categories')}
-        mb="lg"
-      />
-      <FilteringTags 
-        {...form.getInputProps('tags')}
-      />
-      <FilteringTagMatchAll 
-        {...form.getInputProps('tagMatchAll', { type: 'checkbox' })}
-        mb="lg"
-      />
-      <FilteringQuizNumber
-        {...form.getInputProps('maxView')}
-      />
+      <FilteringQuizNumber {...form.getInputProps("maxView")} />
       <Group mt="lg" justify="right">
-        <Button 
-          leftSection={<IconSearch/>}
+        <Button
+          leftSection={<IconSearch />}
           onClick={() => onSubmit(form.getValues())}
-        >検索</Button>
+        >
+          検索
+        </Button>
       </Group>
     </>
   );

@@ -27,6 +27,6 @@ export default class InviteCode {
   }
 
   get created(): Date {
-    return this._created; 
+    return this._created;
   }
 }

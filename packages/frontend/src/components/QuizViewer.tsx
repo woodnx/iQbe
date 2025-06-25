@@ -1,40 +1,40 @@
-import { ReactNode, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { ReactNode, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
-import QuizControllBar from '@/components/QuizControllBar';
-import QuizHiddenAnswerButton from '@/components/QuizHiddenAnswerButton';
-import QuizList from '@/components/QuizList';
-import QuizPagination from '@/components/QuizPagination';
-import QuizShuffleButton from '@/components/QuizShuffleButton';
-import { useHistories } from '@/hooks/useHistories';
-import useQuizSize from '@/hooks/useQuizSize';
-import useQuizzes from '@/hooks/useQuizzes';
-import dayjs from '@/plugins/dayjs';
-import { Judgement, QuizRequestParams } from '@/types';
-import { Center, Group, Stack } from '@mantine/core';
+import QuizControllBar from "@/components/QuizControllBar";
+import QuizHiddenAnswerButton from "@/components/QuizHiddenAnswerButton";
+import QuizList from "@/components/QuizList";
+import QuizPagination from "@/components/QuizPagination";
+import QuizShuffleButton from "@/components/QuizShuffleButton";
+import { useHistories } from "@/hooks/useHistories";
+import useQuizSize from "@/hooks/useQuizSize";
+import useQuizzes from "@/hooks/useQuizzes";
+import dayjs from "@/plugins/dayjs";
+import { Judgement, QuizRequestParams } from "@/types";
+import { Center, Group, Stack } from "@mantine/core";
 
-import FilteringModalButton from './FilteringModalButton';
-import HistoryDateRange from './HistoryDateRange';
-import HistorySelectJudgement from './HistorySelectJudgement';
-import QuizTransfarButton from './QuizTransfarButton';
+import FilteringModalButton from "./FilteringModalButton";
+import HistoryDateRange from "./HistoryDateRange";
+import HistorySelectJudgement from "./HistorySelectJudgement";
+import QuizTransfarButton from "./QuizTransfarButton";
 
 interface Props {
-  headerCard?: ReactNode,
-  isHistory?: boolean,
-  initialParams?: QuizRequestParams,
+  headerCard?: ReactNode;
+  isHistory?: boolean;
+  initialParams?: QuizRequestParams;
 }
 
-export default function({
+export default function ({
   initialParams = { maxView: 100 },
   headerCard = <></>,
   isHistory = false,
 }: Props) {
-  const [ activePage, setPage ] = useState(1);
-  const [ isHidden, setIsHidden ] = useState(false);
-  const [ judgements, setJudgements ] = useState<Judgement[]>([]);
-  const [ dates, setDates ] = useState<number[]>([ 
-    dayjs().startOf('day').valueOf(),
-    dayjs().endOf('day').valueOf(),
+  const [activePage, setPage] = useState(1);
+  const [isHidden, setIsHidden] = useState(false);
+  const [judgements, setJudgements] = useState<Judgement[]>([]);
+  const [dates, setDates] = useState<number[]>([
+    dayjs().startOf("day").valueOf(),
+    dayjs().endOf("day").valueOf(),
   ]);
   const navigate = useNavigate();
   const { quizzes, params, setParams } = useQuizzes(initialParams);
@@ -47,8 +47,8 @@ export default function({
   const size = !!quizzes && !!quizzes.length && !!quizzesSize ? quizzesSize : 0;
 
   const toFilter = (
-    workbooks?: string | string[], 
-    keyword?: string, 
+    workbooks?: string | string[],
+    keyword?: string,
     keywordOption?: number,
     categories?: number | number[],
     tags?: string | string[],
@@ -56,62 +56,54 @@ export default function({
     perPage?: number,
   ) => {
     setPage(1);
-    setParams({ 
-      ...params, 
-      page: 1, 
+    setParams({
+      ...params,
+      page: 1,
       seed: undefined,
       maxView: perPage,
-      wids: workbooks, 
-      keyword, 
+      wids: workbooks,
+      keyword,
       keywordOption: Number(keywordOption),
       categories,
       tags,
       tagMatchAll,
     });
-  }
+  };
 
-  const toShuffle = (
-    seed: number
-  ) => {
+  const toShuffle = (seed: number) => {
     setPage(1);
     setParams({
       ...params,
       page: 1,
-      seed
+      seed,
     });
-  }
+  };
 
-  const changePage = (
-    page: number
-  ) => {
+  const changePage = (page: number) => {
     setPage(page);
-    setParams({...params, page});
-  }
+    setParams({ ...params, page });
+  };
 
   const toTransfar = () => {
     navigate(`/practice?path=/transfer`);
-  }
+  };
 
-  const changeJudgement = (
-    judgements: Judgement[]
-  ) => {
-    setJudgements(judgements)
+  const changeJudgement = (judgements: Judgement[]) => {
+    setJudgements(judgements);
     setParams({
       ...params,
-      judgements
-    })
-  }
+      judgements,
+    });
+  };
 
-  const changeDates = (
-    dates: number[],
-  ) => {
+  const changeDates = (dates: number[]) => {
     setDates(dates);
     setParams({
       ...params,
       since: dates[0],
-      until: dates[1]
+      until: dates[1],
     });
-  }
+  };
 
   return (
     <>
@@ -121,12 +113,8 @@ export default function({
         header={headerCard}
         buttons={
           <Group>
-            <FilteringModalButton 
-              onSubmit={toFilter}
-            />
-            <QuizShuffleButton
-              apply={toShuffle}
-            />
+            <FilteringModalButton onSubmit={toFilter} />
+            <QuizShuffleButton apply={toShuffle} />
             <QuizHiddenAnswerButton
               isHidden={isHidden}
               onToggle={setIsHidden}
@@ -139,25 +127,22 @@ export default function({
         }
         pagination={
           <Stack gap={2}>
-            {isHistory ? 
-            <>
-              <Center mt={0}>
-                <HistorySelectJudgement
-                  judgements={judgements}
-                  right={right}
-                  wrong={wrong}
-                  throgh={through}
-                  onSelect={changeJudgement}
-                />
-              </Center>
-              <Center mt={0}>
-                <HistoryDateRange
-                  dates={dates}
-                  onChangeDates={changeDates}
-                />
-              </Center>
-            </>
-            : null}
+            {isHistory ? (
+              <>
+                <Center mt={0}>
+                  <HistorySelectJudgement
+                    judgements={judgements}
+                    right={right}
+                    wrong={wrong}
+                    throgh={through}
+                    onSelect={changeJudgement}
+                  />
+                </Center>
+                <Center mt={0}>
+                  <HistoryDateRange dates={dates} onChangeDates={changeDates} />
+                </Center>
+              </>
+            ) : null}
             <Center mt="sm">
               <QuizPagination
                 page={activePage}
@@ -174,7 +159,7 @@ export default function({
         perPage={params?.maxView || 0}
         isHidden={isHidden}
         coloring={isHistory}
-      />  
+      />
     </>
-  )
+  );
 }

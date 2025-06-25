@@ -2,24 +2,24 @@ import { Pagination } from "@mantine/core";
 import { useIsMobile } from "@/contexts/isMobile";
 
 interface QuizPaginationProps {
-  page: number,
-  total: number,
-  setPage: (value: number) => void,
-};
+  page: number;
+  total: number;
+  setPage: (value: number) => void;
+}
 
-export default function QuizPagination({ 
-  page, 
-  setPage, 
+export default function QuizPagination({
+  page,
+  setPage,
   total,
 }: QuizPaginationProps) {
   const isMobile = useIsMobile();
   return (
-    <Pagination 
+    <Pagination
       total={total}
-      value={page} 
+      value={page}
       onChange={setPage}
       withEdges
-      size={isMobile ? 'sm' : 'md'}
+      size={isMobile ? "sm" : "md"}
     />
   );
 }

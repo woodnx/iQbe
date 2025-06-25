@@ -1,4 +1,4 @@
-export default class Tag {  
+export default class Tag {
   private constructor(
     private readonly _id: number | null,
     private readonly _label: string,
@@ -6,12 +6,8 @@ export default class Tag {
     private _usageCount: number,
   ) {}
 
-  static create(
-    label: string,
-  ) {
-    return new Tag(
-      null, label, new Date(), 0,
-    );
+  static create(label: string) {
+    return new Tag(null, label, new Date(), 0);
   }
 
   static reconstruct(
@@ -34,8 +30,7 @@ export default class Tag {
   }
 
   get id(): number {
-    if (this._id == null) 
-      throw new Error('id is not defined');
+    if (this._id == null) throw new Error("id is not defined");
 
     return this._id;
   }

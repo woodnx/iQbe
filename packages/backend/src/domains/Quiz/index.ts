@@ -49,7 +49,7 @@ export default class Quiz {
     creatorUid: string,
     visibleUids: string[],
     wid: string | null,
-    anotherAnswer: string | null, 
+    anotherAnswer: string | null,
     categoryId: number | null,
   ) {
     return new Quiz(
@@ -76,7 +76,7 @@ export default class Quiz {
   }
 
   editAnotherAnswer(anotherAnswer: string | null) {
-    this._anotherAnswer = anotherAnswer
+    this._anotherAnswer = anotherAnswer;
   }
 
   editCategoryId(categoryId: number | null) {
@@ -92,7 +92,7 @@ export default class Quiz {
   }
 
   isPublic(): boolean {
-    return !!(this.visibleUids.length == 0)
+    return !!(this.visibleUids.length == 0);
   }
 
   isPrivate(): boolean {
