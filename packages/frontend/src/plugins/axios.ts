@@ -1,6 +1,6 @@
+import { components } from "api/schema";
 import _axios, { AxiosError } from "axios";
 import { getIdToken } from "./auth";
-import { components } from "api/schema";
 
 type Error = components["schemas"]["Error"];
 
@@ -40,9 +40,10 @@ axios.interceptors.response.use(
       });
     }
 
-    // @ts-ignore
     if (
+      // @ts-ignore
       error.response?.data === "no token" ||
+      // @ts-ignore
       error.response?.data === "invalid token"
     ) {
       localStorage.setItem("accessToken", "");
