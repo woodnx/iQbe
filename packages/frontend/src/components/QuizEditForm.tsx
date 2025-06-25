@@ -1,16 +1,6 @@
-import { components, paths } from "api/schema";
-
-import { useIsSuperUser } from "@/hooks/useLoginedUser";
-import {
-  BoxProps,
-  Button,
-  Card,
-  Grid,
-  Group,
-  Switch,
-  Textarea,
-} from "@mantine/core";
+import { BoxProps, Button, Card, Grid, Group, Textarea } from "@mantine/core";
 import { isNotEmpty, useForm } from "@mantine/form";
+import { components, paths } from "api/schema";
 
 import CategorySelector from "./CategorySelector";
 import TagInput from "./TagInput";
@@ -26,7 +16,6 @@ interface QuizEditFormProps extends BoxProps {
   wid?: string;
   category?: Category[];
   tags?: string[];
-  isPublic?: boolean;
   onSubmit?: (v: QuizEditSubmitValues) => void;
   disabled?: boolean;
 }
@@ -37,18 +26,14 @@ export default function QuizEditForm({
   wid,
   category,
   tags,
-  isPublic,
   onSubmit = () => {},
   disabled,
   ...others
 }: QuizEditFormProps) {
-  const isSuperUser = useIsSuperUser();
-
   const form = useForm({
     initialValues: {
       question,
       answer,
-      isPublic,
       category,
       tags,
       wid,
@@ -119,12 +104,6 @@ export default function QuizEditForm({
           </Grid.Col>
         </Grid>
         <Group justify="space-between" mt="sm">
-          <Switch
-            {...form.getInputProps("isPublic", { type: "checkbox" })}
-            disabled={!isSuperUser || disabled}
-            label="クイズを公開する"
-            my="sm"
-          />
           {!disabled && (
             <Button disabled={!form.isValid()} type="submit">
               保存

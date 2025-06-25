@@ -1,7 +1,6 @@
 import { components } from "api/schema";
 import dayjs from "dayjs";
 import { sql } from "kysely";
-import { isEqual, sortBy, uniq } from "lodash";
 
 import IQuizQueryService, {
   countOption,
@@ -9,9 +8,8 @@ import IQuizQueryService, {
 } from "@/applications/queryservices/IQuizQueryService";
 import Quiz from "@/domains/Quiz";
 import IQuizRepository from "@/domains/Quiz/IQuizRepository";
-
-import KyselyClientManager from "./kysely/KyselyClientManager";
 import CategoryInfra from "./CategoryInfra";
+import KyselyClientManager from "./kysely/KyselyClientManager";
 
 type QuizDTO = components["schemas"]["Quiz"];
 
@@ -88,11 +86,6 @@ export default class QuizInfra implements IQuizRepository, IQuizQueryService {
       .leftJoin("workbooks", "quizzes.workbook_id", "workbooks.id")
       .leftJoin("levels", "workbooks.level_id", "levels.id")
       .innerJoin("users", "users.id", "quizzes.creator_id")
-      .leftJoin(
-        "quiz_visible_users",
-        "quiz_visible_users.quiz_id",
-        "quizzes.id",
-      )
       .select(({ fn }) => [
         "quizzes.id as id",
         "quizzes.qid as qid",
@@ -107,13 +100,7 @@ export default class QuizInfra implements IQuizRepository, IQuizQueryService {
           "total",
         ),
         fn.countAll<number>().over().as("size"),
-      ])
-      .where(({ eb, or }) =>
-        or([
-          eb("quiz_visible_users.user_id", "is", null),
-          eb("quiz_visible_users.user_id", "=", userId),
-        ]),
-      );
+      ]);
 
     if (!!option.wids && option.wids.length)
       if (Array.isArray(option.wids))
@@ -465,7 +452,6 @@ export default class QuizInfra implements IQuizRepository, IQuizQueryService {
       quiz.total,
       quiz.right || 0,
       quiz.creatorUid,
-      visibleUser || [],
       quiz.anotherAnswer,
       quiz.wid,
       quiz.categoryId,
@@ -508,17 +494,7 @@ export default class QuizInfra implements IQuizRepository, IQuizQueryService {
           .where("quizzes.id", "=", quizId)
           .executeTakeFirstOrThrow();
 
-        const [visibleUser, tags] = await Promise.all([
-          client
-            .selectFrom("quiz_visible_users")
-            .innerJoin("users", "users.id", "quiz_visible_users.user_id")
-            .select(["uid"])
-            .where(({ eb, and }) =>
-              and([eb("quiz_visible_users.quiz_id", "=", quizId)]),
-            )
-            .execute()
-            .then((users) => users?.map((u) => u.uid)),
-
+        const [tags] = await Promise.all([
           client
             .selectFrom("tagging")
             .innerJoin("tags", "tagging.tag_id", "tags.id")
@@ -536,7 +512,6 @@ export default class QuizInfra implements IQuizRepository, IQuizQueryService {
           quiz.total,
           quiz.right || 0,
           quiz.creatorUid,
-          visibleUser || [],
           quiz.anotherAnswer,
           quiz.wid,
           quiz.categoryId,
@@ -610,33 +585,6 @@ export default class QuizInfra implements IQuizRepository, IQuizQueryService {
           .execute(),
       ),
     );
-
-    // Visibleなユーザの処理
-    if (!quiz.isPublic()) {
-      const visibleUser = !!quiz.visibleUids.length
-        ? await Promise.all(
-            quiz.visibleUids.map(async (user) => {
-              return (
-                await client
-                  .selectFrom("users")
-                  .select("id")
-                  .where("uid", "=", user)
-                  .executeTakeFirstOrThrow()
-              ).id;
-            }),
-          )
-        : [userId];
-
-      for (const user of visibleUser) {
-        await client
-          .insertInto("quiz_visible_users")
-          .values({
-            quiz_id: quizId,
-            user_id: user,
-          })
-          .execute();
-      }
-    }
   }
 
   async update(
@@ -662,32 +610,6 @@ export default class QuizInfra implements IQuizRepository, IQuizQueryService {
         .then((u) => u.id),
     ]);
 
-    const visibleUserIds = !!quiz.visibleUids.length
-      ? await Promise.all(
-          quiz.visibleUids.map(async (user) => {
-            return client
-              .selectFrom("users")
-              .select("id")
-              .where("uid", "=", user)
-              .executeTakeFirstOrThrow()
-              .then((user) => user.id);
-          }),
-        )
-      : [userId];
-
-    const oldVisibleUserIds = await client
-      .selectFrom("quiz_visible_users")
-      .innerJoin("quizzes", "quiz_visible_users.quiz_id", "quizzes.id")
-      .select("user_id")
-      .where("quizzes.qid", "=", quiz.qid)
-      .execute()
-      .then((users) => users.map((u) => u.user_id));
-
-    const isChangedVisibleUser = !isEqual(
-      uniq(sortBy(visibleUserIds)),
-      uniq(sortBy(oldVisibleUserIds)),
-    );
-
     await client
       .updateTable("quizzes")
       .set({
@@ -701,55 +623,11 @@ export default class QuizInfra implements IQuizRepository, IQuizQueryService {
       .where("qid", "=", quiz.qid)
       .executeTakeFirstOrThrow();
 
-    const quizId = await client
-      .selectFrom("quizzes")
-      .select("id")
-      .where("qid", "=", quiz.qid)
-      .executeTakeFirstOrThrow()
-      .then((quiz) => quiz.id);
-
     for (const tag of tagsToAdd) {
       await this.addTagToQuiz(quiz.qid, tag);
     }
     for (const tag of tagsToRemove) {
       await this.removeTagFromQuiz(quiz.qid, tag);
-    }
-
-    if (isChangedVisibleUser) {
-      if (quiz.isPublic()) {
-        // limited / private -> publicに変更
-        await client
-          .deleteFrom("quiz_visible_users")
-          .where("quiz_id", "=", quizId)
-          .execute();
-      } else {
-        // public -> private / limited or private -> limited
-        const visibleUser = visibleUserIds.filter((u) =>
-          oldVisibleUserIds.includes(u),
-        );
-        const unVisibleUser = oldVisibleUserIds.filter((u) =>
-          visibleUserIds.includes(u),
-        );
-
-        for (const user of visibleUser) {
-          await client
-            .insertInto("quiz_visible_users")
-            .values({
-              quiz_id: quizId,
-              user_id: user,
-            })
-            .execute();
-        }
-
-        for (const user of unVisibleUser) {
-          await client
-            .deleteFrom("quiz_visible_users")
-            .where(({ eb, and }) =>
-              and([eb("quiz_id", "=", quizId), eb("user_id", "=", user)]),
-            )
-            .execute();
-        }
-      }
     }
   }
 

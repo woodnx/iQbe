@@ -13,7 +13,6 @@ export type AddQuizUseCaseCommand = {
   question: string;
   answer: string;
   tagLabels: string[];
-  isPublic: boolean;
   uid: string;
   anotherAnswer?: string;
   categoryId?: number;
@@ -31,7 +30,6 @@ export class AddQuizUseCase {
     question,
     answer,
     tagLabels,
-    isPublic,
     uid,
     anotherAnswer,
     categoryId,
@@ -47,7 +45,6 @@ export class AddQuizUseCase {
       answer,
       tagLabels,
       uid,
-      isPublic ? [] : [uid],
       anotherAnswer,
       wid,
       categoryId,
@@ -67,7 +64,6 @@ export class AddQuizUseCase {
       tagLabels: quiz.tagLabels,
       categoryId: quiz.categoryId,
       creatorId: quiz.creatorUid,
-      isPublic: quiz.isPublic(),
       right: quiz.right,
       total: quiz.total,
       isFavorite: false,

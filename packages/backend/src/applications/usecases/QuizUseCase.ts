@@ -23,7 +23,6 @@ export default class QuizUseCase {
     question: string,
     answer: string,
     tagLabels: string[],
-    isPublic: boolean,
     uid: string,
     anotherAnswer?: string,
     categoryId?: number,
@@ -39,7 +38,6 @@ export default class QuizUseCase {
       answer,
       tagLabels,
       uid,
-      isPublic ? [] : [uid],
       anotherAnswer,
       wid,
       categoryId,
@@ -59,7 +57,6 @@ export default class QuizUseCase {
       tagLabels: quiz.tagLabels,
       categoryId: quiz.categoryId,
       creatorId: quiz.creatorUid,
-      isPublic: quiz.isPublic(),
       right: quiz.right,
       total: quiz.total,
       isFavorite: false,
@@ -71,7 +68,6 @@ export default class QuizUseCase {
     quizzes: {
       question: string;
       answer: string;
-      limitedUser: string[];
       tagLabels: string[];
       uid: string;
       anotherAnswer?: string;
@@ -92,7 +88,6 @@ export default class QuizUseCase {
             _quiz.answer,
             _quiz.tagLabels,
             _quiz.uid,
-            _quiz.limitedUser,
             _quiz.anotherAnswer,
             _quiz.wid,
             _quiz.categoryId,
@@ -109,7 +104,6 @@ export default class QuizUseCase {
             tagLabels: _quiz.tagLabels,
             categoryId: quiz.categoryId,
             creatorId: quiz.creatorUid,
-            isPublic: quiz.isPublic(),
             right: quiz.right,
             total: quiz.total,
             isFavorite: false,
@@ -179,7 +173,6 @@ export default class QuizUseCase {
       tagLabels: quiz.tagLabels,
       categoryId: quiz.categoryId,
       creatorId: quiz.creatorUid,
-      isPublic: quiz.isPublic(),
       right: quiz.right,
       total: quiz.total,
       isFavorite: false,

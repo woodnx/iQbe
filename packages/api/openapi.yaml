@@ -1035,12 +1035,6 @@ paths:
                     type: string
                   category:
                     type: number
-                  isPublic: 
-                    type: boolean
-                  limitedUser:
-                    type: array
-                    items: 
-                      type: string
                 required:
                   - question
                   - answer
@@ -1094,12 +1088,6 @@ paths:
                     type: string
                   category:
                     type: number
-                  isPublic: 
-                    type: boolean
-                  limitedUser:
-                    type: array
-                    items: 
-                      type: string
                 required:
                   - question
                   - answer
@@ -1212,12 +1200,6 @@ paths:
                           type: number
                         subCategory:
                           type: number
-                        isPublic: 
-                          type: boolean
-                        limitedUser:
-                          type: array
-                          items: 
-                            type: string
                       required:
                         - question
                         - answer
@@ -2312,13 +2294,6 @@ components:
           readOnly: true
         creatorId:
           type: string
-        isPublic: 
-          type: boolean
-        limitedUser:
-          type: array
-          items:
-            type: number
-          writeOnly: true
         isFavorite:
           type: boolean
           readOnly: true

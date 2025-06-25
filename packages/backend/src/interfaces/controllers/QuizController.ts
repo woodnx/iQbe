@@ -110,23 +110,16 @@ export default class QuizController {
       const tags = req.body.tags || [];
       const category = req.body.category || undefined;
       const wid = req.body.wid || undefined;
-      const limitedUser = req.body.limitedUser || [];
-      const isPublic = !!req.body.isPublic;
       const uid = req.user.uid;
 
       if (!question || !answer) {
         throw new ApiError().invalidParams();
       }
 
-      if (isPublic && !req.user.isSuperUser) {
-        throw new ApiError().accessDenied();
-      }
-
       await this.quizUseCase.addQuiz(
         question,
         answer,
         tags,
-        isPublic,
         uid,
         anotherAnswer,
         category,
@@ -155,7 +148,6 @@ export default class QuizController {
           wid: r.wid || undefined,
           categoryId: r.category || undefined,
           subCategoryId: r.subCategory || undefined,
-          limitedUser: r.limitedUser || [],
           uid,
         })),
       );
@@ -173,7 +165,6 @@ export default class QuizController {
       const category = req.body.category || undefined;
       const tags = req.body.tags || [];
       const wid = req.body.wid || undefined;
-      const limitedUser = req.body.limitedUser || [];
       const uid = req.user.uid;
 
       if (!question || !answer || !qid) {

@@ -84,7 +84,6 @@ export class EditQuizUseCase {
       tagLabels: quiz.tagLabels,
       categoryId: quiz.categoryId,
       creatorId: quiz.creatorUid,
-      isPublic: quiz.isPublic(),
       right: quiz.right,
       total: quiz.total,
       isFavorite: false,
