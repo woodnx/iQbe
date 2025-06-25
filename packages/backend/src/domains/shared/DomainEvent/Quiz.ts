@@ -10,7 +10,6 @@ export type QuizDomainEventBody = {
   tags: string[];
   category: number | null;
   creatorId: string;
-  isPublic: boolean;
   right: number;
   total: number;
   isFavorite: boolean;
@@ -42,7 +41,6 @@ export class QuizDomainEventFactory {
       tags: this.quiz.tagLabels,
       category: this.quiz.categoryId,
       creatorId: this.quiz.creatorUid,
-      isPublic: this.quiz.isPublic(),
       right: this.quiz.right,
       total: this.quiz.total,
       isFavorite: false,

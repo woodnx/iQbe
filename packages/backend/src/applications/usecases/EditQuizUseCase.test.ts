@@ -23,7 +23,6 @@ describe("EditQuizUseCase", () => {
         "Initial Answer",
         ["tag1", "tag2"],
         "test-user",
-        [],
         "Initial Another Answer",
         "test-wid",
         1,

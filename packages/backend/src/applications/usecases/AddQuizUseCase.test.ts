@@ -18,7 +18,6 @@ describe("AddQuizUseCase", () => {
       question: "",
       answer: "",
       tagLabels: [],
-      isPublic: true,
       uid: "test-user",
       anotherAnswer: "test-answer",
       categoryId: 1,
