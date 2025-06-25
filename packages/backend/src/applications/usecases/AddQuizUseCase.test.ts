@@ -3,7 +3,7 @@ import { InMemoryTagInfra } from "@/interfaces/infra/InMemory/TagInfra";
 import { MockTransactionManager } from "../shared/MockTransactionManager";
 import { AddQuizUseCase, AddQuizUseCaseCommand } from "./AddQuizUseCase";
 
-describe("RegisterBookApplicationService", () => {
+describe("AddQuizUseCase", () => {
   it("idが重複しないときクイズが正常に作成できる", async () => {
     const quizRepository = new InMemoryQuizInfra();
     const tagRepository = new InMemoryTagInfra();
