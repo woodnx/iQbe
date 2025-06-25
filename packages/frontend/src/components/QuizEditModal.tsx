@@ -1,8 +1,7 @@
-import { components, paths } from "api/schema";
-
-import { $api } from "@/utils/client";
 import { ContextModalProps } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
+import { components, paths } from "api/schema";
+import { $api } from "@/utils/client";
 
 import QuizEditForm from "./QuizEditForm";
 
@@ -17,7 +16,6 @@ interface Props {
   wid?: string;
   category?: Category[];
   tags?: string[];
-  isPublic: boolean;
 }
 
 export default function ({
@@ -33,7 +31,6 @@ export default function ({
     tags,
     category,
     wid,
-    isPublic,
   }: QuizEditSubmitValues) => {
     mutate(
       {
@@ -43,7 +40,6 @@ export default function ({
           category,
           tags,
           wid,
-          isPublic,
         },
         params: { path: { qid } },
       },

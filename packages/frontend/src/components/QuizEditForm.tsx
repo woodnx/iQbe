@@ -16,7 +16,6 @@ interface QuizEditFormProps extends BoxProps {
   wid?: string;
   category?: Category[];
   tags?: string[];
-  isPublic?: boolean;
   onSubmit?: (v: QuizEditSubmitValues) => void;
   disabled?: boolean;
 }
@@ -27,7 +26,6 @@ export default function QuizEditForm({
   wid,
   category,
   tags,
-  isPublic,
   onSubmit = () => {},
   disabled,
   ...others
@@ -36,7 +34,6 @@ export default function QuizEditForm({
     initialValues: {
       question,
       answer,
-      isPublic,
       category,
       tags,
       wid,

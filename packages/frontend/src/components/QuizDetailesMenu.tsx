@@ -1,11 +1,11 @@
 import { ActionIcon, Menu, rem, ScrollArea } from "@mantine/core";
+import { modals } from "@mantine/modals";
 import {
   IconDots,
   IconInfoCircle,
   IconPencil,
   IconTrash,
 } from "@tabler/icons-react";
-import { modals } from "@mantine/modals";
 import { components } from "api/schema";
 
 type Quiz = components["schemas"]["Quiz"];
@@ -15,16 +15,7 @@ interface Props {
 }
 
 export default function ({ quiz }: Props) {
-  const {
-    qid,
-    question,
-    answer,
-    workbook,
-    tags,
-    category,
-    isPublic,
-    creatorId,
-  } = quiz;
+  const { qid, question, answer, workbook, tags, category, creatorId } = quiz;
   const uid = localStorage.getItem("uid");
   const isCreated = creatorId == uid;
 
@@ -71,7 +62,6 @@ export default function ({ quiz }: Props) {
                   wid: workbook?.wid,
                   tags: tags?.map((tag) => tag.label),
                   category: category || undefined,
-                  isPublic,
                 },
                 size: "xl",
                 zIndex: 200,

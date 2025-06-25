@@ -1,10 +1,10 @@
-import { useState } from "react";
-import { Button, Card, BoxProps, Flex, Group, Text } from "@mantine/core";
-import QuizMylistButton from "./QuizMylistButton";
-import QuizFavoriteButton from "./QuizFavoriteButton";
-import { QuizWorkbookBadge } from "./QuizWorkbookBadge";
-import QuizDetailsMenu from "./QuizDetailesMenu";
+import { BoxProps, Button, Card, Flex, Group, Text } from "@mantine/core";
 import { components } from "api/schema";
+import { useState } from "react";
+import QuizDetailsMenu from "./QuizDetailesMenu";
+import QuizFavoriteButton from "./QuizFavoriteButton";
+import QuizMylistButton from "./QuizMylistButton";
+import { QuizWorkbookBadge } from "./QuizWorkbookBadge";
 
 type Quiz = components["schemas"]["Quiz"];
 

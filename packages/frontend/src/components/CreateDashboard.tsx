@@ -1,11 +1,9 @@
+import { Tabs } from "@mantine/core";
+import { notifications } from "@mantine/notifications";
 import { paths } from "api/schema";
-
 import QuizEditForm from "@/components/QuizEditForm";
 import { $api } from "@/utils/client";
-import { Tabs } from "@mantine/core";
-
 import CsvFileImporter from "./CsvFileImporter";
-import { notifications } from "@mantine/notifications";
 
 type QuizEditSubmitValues =
   paths["/quizzes"]["post"]["requestBody"]["content"]["application/json"];
@@ -25,7 +23,6 @@ export default function CreateDashboard() {
     category,
     tags,
     wid,
-    isPublic,
   }: QuizEditSubmitValues) => {
     mutate(
       {
@@ -35,7 +32,6 @@ export default function CreateDashboard() {
           category,
           tags,
           wid,
-          isPublic,
         },
       },
       {
