@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.1.0](https://github.com/woodnx/iQbe/compare/v4.0.6...v4.1.0) (2025-06-25)
+
+
+### Features
+
+* stopped creating published quiz ([#234](https://github.com/woodnx/iQbe/issues/234)) ([123d4a2](https://github.com/woodnx/iQbe/commit/123d4a2a6ec57c8d8db9b2fae511c174449f4535))
+
 ## [4.0.6](https://github.com/woodnx/iQbe/compare/v4.0.5...v4.0.6) (2025-04-06)
 
 
