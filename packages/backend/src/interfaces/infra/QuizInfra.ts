@@ -424,17 +424,7 @@ export default class QuizInfra implements IQuizRepository, IQuizQueryService {
       .where("quizzes.qid", "=", qid)
       .executeTakeFirstOrThrow();
 
-    const [visibleUser, tags] = await Promise.all([
-      client
-        .selectFrom("quiz_visible_users")
-        .innerJoin("users", "users.id", "quiz_visible_users.user_id")
-        .select(["uid"])
-        .where(({ eb, and }) =>
-          and([eb("quiz_visible_users.quiz_id", "=", quiz.quizId)]),
-        )
-        .execute()
-        .then((users) => users?.map((u) => u.uid)),
-
+    const [tags] = await Promise.all([
       client
         .selectFrom("tagging")
         .innerJoin("tags", "tagging.tag_id", "tags.id")
