@@ -1,5 +1,5 @@
-import { Card, BoxProps, Overlay, Progress, Text } from "@mantine/core";
-import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
+import { BoxProps, Card, Overlay, Progress, Text } from "@mantine/core";
+import { buildStyles, CircularProgressbar } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
 import { useIsMobile } from "@/contexts/isMobile";
 

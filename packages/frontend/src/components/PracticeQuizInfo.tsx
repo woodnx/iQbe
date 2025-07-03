@@ -1,9 +1,9 @@
-import { Card, BoxProps, Group, Overlay, Text } from "@mantine/core";
+import { BoxProps, Card, Group, Overlay, Text } from "@mantine/core";
+import { components } from "api/schema";
 import { useIsMobile } from "@/contexts/isMobile";
 import QuizFavoriteButton from "./QuizFavoriteButton";
-import { QuizWorkbookBadge } from "./QuizWorkbookBadge";
 import QuizMylistButton from "./QuizMylistButton";
-import { components } from "api/schema";
+import { QuizWorkbookBadge } from "./QuizWorkbookBadge";
 
 type Mylist = components["schemas"]["Mylist"];
 type Workbook = components["schemas"]["Workbook"];

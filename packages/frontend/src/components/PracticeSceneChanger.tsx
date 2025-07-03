@@ -1,7 +1,8 @@
+import { Card, Group, Loader, Overlay, Text } from "@mantine/core";
+import { useDisclosure } from "@mantine/hooks";
 import { components } from "api/schema";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-
 import FilteringModal from "@/components/FilteringModal";
 import FilteringModalButton from "@/components/FilteringModalButton";
 import PracticeQuitModal from "@/components/PracticeQuitModal";
@@ -13,8 +14,6 @@ import PracticeTypewriteQuiz from "@/components/PracticeTypewriteQuiz";
 import { useTimer, useTypewriter } from "@/hooks";
 import useQuizzes from "@/hooks/useQuizzes";
 import { $api } from "@/utils/client";
-import { Card, Group, Loader, Overlay, Text } from "@mantine/core";
-import { useDisclosure } from "@mantine/hooks";
 
 type Quiz = components["schemas"]["Quiz"];
 
