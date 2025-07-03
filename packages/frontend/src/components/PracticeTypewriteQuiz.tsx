@@ -1,5 +1,5 @@
-import { Card, BoxProps, Overlay, Progress, Text } from "@mantine/core";
-import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
+import { BoxProps, Card, Overlay, Progress, Text } from "@mantine/core";
+import { buildStyles, CircularProgressbar } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
 import { useIsMobile } from "@/contexts/isMobile";
 
@@ -34,7 +34,7 @@ export default function PracticeTypewriteQuiz({
             <div style={{ width: 100, height: 100 }}>
               <CircularProgressbar
                 value={countval}
-                text={`${Math.floor(count / 1000) + 1}`}
+                text={`${Math.floor(count / 1000)}`}
                 strokeWidth={14}
                 styles={buildStyles({
                   textSize: "30px",

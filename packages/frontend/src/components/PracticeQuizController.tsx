@@ -1,11 +1,11 @@
-import { Button, Center, BoxProps, Group } from "@mantine/core";
+import { BoxProps, Button, Center, Group } from "@mantine/core";
 import {
   IconChevronsRight,
   IconPlaystationCircle,
   IconX,
 } from "@tabler/icons-react";
-import PracticeQuizButton from "./PracticeQuizButton";
 import { useState } from "react";
+import PracticeQuizButton from "./PracticeQuizButton";
 
 interface Props extends BoxProps {
   canPress?: boolean;
