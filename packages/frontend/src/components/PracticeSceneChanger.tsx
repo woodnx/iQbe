@@ -50,8 +50,8 @@ export default function ({
   const typewriter = useTypewriter(quiz?.question || "", 100, () =>
     setScene(2),
   );
-  const countdown = useTimer(4000, 1000, () => setScene(4));
-  const through = useTimer(3000, 10, () => setScene(4));
+  const countdown = useTimer(5000, 1000, () => setScene(4));
+  const through = useTimer(3000, 100, () => setScene(4));
 
   useEffect(() => {
     switch (scene) {
@@ -210,7 +210,6 @@ export default function ({
           visible={scene != 3}
           time={through.time}
           count={countdown.time}
-          countlimit={4000}
         />
         <PracticeQuizInfo
           qid={quiz?.qid}

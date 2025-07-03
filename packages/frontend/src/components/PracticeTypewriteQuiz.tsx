@@ -34,7 +34,7 @@ export default function PracticeTypewriteQuiz({
             <div style={{ width: 100, height: 100 }}>
               <CircularProgressbar
                 value={countval}
-                text={`${Math.floor(count / 1000) + 1}`}
+                text={`${Math.floor(count / 1000)}`}
                 strokeWidth={14}
                 styles={buildStyles({
                   textSize: "30px",
