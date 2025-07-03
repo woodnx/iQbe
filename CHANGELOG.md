@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.1.2](https://github.com/woodnx/iQbe/compare/v4.1.1...v4.1.2) (2025-07-03)
+
+
+### Performance Improvements
+
+* Memoize `useInterval` system processing ([#243](https://github.com/woodnx/iQbe/issues/243)) ([6a1843a](https://github.com/woodnx/iQbe/commit/6a1843a94781dc8bc117d53a56d87c616b751796)), closes [#238](https://github.com/woodnx/iQbe/issues/238)
+
 ## [4.1.1](https://github.com/woodnx/iQbe/compare/v4.1.0...v4.1.1) (2025-06-25)
 
 
