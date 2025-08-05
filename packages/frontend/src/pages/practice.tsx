@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import PracticeSceneChanger from "@/components/PracticeSceneChanger";
-import useQuizzes from "@/hooks/useQuizzes";
 import useQuizSize from "@/hooks/useQuizSize";
+import useQuizzes from "@/hooks/useQuizzes";
 
 function shuffleSequense(n: number) {
   const a = [...Array(n).keys()];
@@ -25,9 +25,10 @@ export default function Practice() {
 
   const { quizzes, params } = useQuizzes(undefined, shouldFetch || isTransfer);
   const { quizzesSize } = useQuizSize(params);
-  const shuffledList = isTransfer
-    ? shuffleSequense(quizzes?.length || 0)
-    : [...Array(quizzes?.length || 0).keys()];
+  const shuffledList = useMemo(() => {
+    const length = quizzes?.length || 0;
+    return isTransfer ? shuffleSequense(length) : [...Array(length).keys()];
+  }, [quizzes?.length, isTransfer]);
 
   return (
     <>

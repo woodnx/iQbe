@@ -5,7 +5,7 @@ import { useInterval } from "./useInterval";
 export const useTypewriter = (
   initialText: string,
   typeSpeed: number,
-  afterCallback = () => {},
+  onComplete = () => {},
 ): {
   text: string;
   set: (newtext: string) => void;
@@ -36,9 +36,9 @@ export const useTypewriter = (
     if (textIdx + 1 >= wordLength) {
       setTyping(false);
       setDone(true);
-      afterCallback();
+      onComplete();
     }
-  }, [initialText, textIdx, wordLength, increment, afterCallback]);
+  }, [initialText, textIdx, wordLength, increment, onComplete]);
 
   useInterval(
     typewriterTick,

@@ -9,7 +9,7 @@ interface Props extends ImageProps {
   disabled?: boolean;
 }
 
-export default function PracticeQuizButton({
+export function PracticeQuizButton({
   onClick = () => {},
   disabled = false,
   ...others
