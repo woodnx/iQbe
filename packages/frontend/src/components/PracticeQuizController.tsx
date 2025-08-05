@@ -47,6 +47,12 @@ export function PracticeQuizController({
     }
   }, [scene]);
 
+  useEffect(() => {
+    if (quizScene == "preparation") {
+      setPressedWord(-1);
+    }
+  }, [quizScene]);
+
   const pressed = () => {
     setScene("pressed");
   };
