@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.1.3](https://github.com/woodnx/iQbe/compare/v4.1.2...v4.1.3) (2025-08-05)
+
+
+### Bug Fixes
+
+* an issue where the skip button could not be pressed after pressing the button and skipping ([#251](https://github.com/woodnx/iQbe/issues/251)) ([ebfcf18](https://github.com/woodnx/iQbe/commit/ebfcf187f0e751c7357cc29906ecb5c00a8b6518)), closes [#250](https://github.com/woodnx/iQbe/issues/250)
+
 ## [4.1.2](https://github.com/woodnx/iQbe/compare/v4.1.1...v4.1.2) (2025-07-03)
 
 
