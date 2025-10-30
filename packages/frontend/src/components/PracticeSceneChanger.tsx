@@ -2,7 +2,7 @@ import { Group, Loader, Overlay, Text } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { components } from "api/schema";
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "@tanstack/react-router";
 import FilteringModal from "@/components/FilteringModal";
 import FilteringModalButton from "@/components/FilteringModalButton";
 import PracticeQuitModal from "@/components/PracticeQuitModal";
@@ -113,7 +113,7 @@ export default function ({
 
   const stopQuiz = async (judgement: number) => {
     await record(judgement, -1);
-    navigator("/");
+    navigator({ to: "/" });
   };
 
   return (
@@ -157,7 +157,7 @@ export default function ({
           setNowNumber(0);
         }}
         onTry={filter.open}
-        onQuit={() => navigator("/")}
+        onQuit={() => navigator({ to: "/" })}
       />
       <Group justify="space-between">
         <FilteringModalButton onSubmit={toFilter} />

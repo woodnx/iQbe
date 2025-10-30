@@ -11,10 +11,10 @@ import {
 import useQuizzes from "@/hooks/useQuizzes";
 import { useWorkbooks } from "@/hooks/useWorkbooks";
 import QuizViewer from "./QuizViewer";
-import { Navigate } from "react-router-dom";
 import MylistEditModalButton from "./MylistEditModalButton";
 import { IconTrash } from "@tabler/icons-react";
 import { modals } from "@mantine/modals";
+import { useNavigate } from "@tanstack/react-router";
 
 interface Props {
   wid: string;
@@ -24,6 +24,7 @@ export default function ({ wid }: Props) {
   const theme = useMantineTheme();
   const { setParams } = useQuizzes();
   const { workbooks, isLoading } = useWorkbooks(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     setParams({
@@ -45,8 +46,14 @@ export default function ({ wid }: Props) {
 
   const hasAccess = workbooks?.some((workbook) => workbook.wid === wid);
 
+  useEffect(() => {
+    if (!isLoading && !hasAccess) {
+      navigate({ to: "/*", replace: true });
+    }
+  }, [hasAccess, isLoading, navigate]);
+
   if (!hasAccess) {
-    return <Navigate to="/unauthorized" replace />;
+    return null;
   }
 
   const CreateCard = () => (

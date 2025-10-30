@@ -1,5 +1,4 @@
 import { useEffect } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
 import {
   Button,
   Center,
@@ -11,6 +10,7 @@ import {
 import { isNotEmpty, matchesField, useForm } from "@mantine/form";
 import axios from "@/plugins/axios";
 import { useSetRequestResetPassword } from "@/contexts/requestResetPassword";
+import { useNavigate, useSearch } from "@tanstack/react-router";
 
 interface SubmitValue {
   username: string;
@@ -18,9 +18,10 @@ interface SubmitValue {
 }
 
 export default function ResetPassword() {
-  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const token = searchParams.get("token");
+  const { token } = useSearch({
+    from: "/reset-password",
+  });
   const setRequesting = useSetRequestResetPassword();
   const form = useForm({
     initialValues: {
@@ -49,16 +50,16 @@ export default function ResetPassword() {
       localStorage.setItem("uid", "");
       localStorage.setItem("accessToken", "");
       localStorage.setItem("refreshToken", "");
-      navigate("/");
+      navigate({ to: "/" });
     }
   };
 
   useEffect(() => {
     if (!token) {
-      navigate("/");
+      navigate({ to: "/" });
       setRequesting(true);
     }
-  }, []);
+  }, [navigate, setRequesting, token]);
 
   return (
     <Center>

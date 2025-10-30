@@ -1,5 +1,4 @@
 import { useEffect } from "react";
-import { Navigate, useNavigate, useParams } from "react-router-dom";
 
 import MylistDeleteModal from "@/components/MylistDeleteModal";
 import MylistEditModalButton from "@/components/MylistEditModalButton";
@@ -18,9 +17,12 @@ import {
 } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
 import { modals } from "@mantine/modals";
+import { useNavigate, useParams } from "@tanstack/react-router";
 
 export default function Mylist() {
-  const { mid } = useParams();
+  const { mid } = useParams({
+    from: "/mylist/$mid",
+  });
   const { setParams } = useQuizzes();
   const navigator = useNavigate();
   const theme = useMantineTheme();
@@ -36,11 +38,6 @@ export default function Mylist() {
     });
   }, [mid]);
 
-  if (!mid) {
-    navigator("/404");
-    return;
-  }
-
   if (isLoading)
     return (
       <Center>
@@ -50,8 +47,14 @@ export default function Mylist() {
 
   const hasAccess = mylists?.some((mylist) => mylist.mid === mid);
 
+  useEffect(() => {
+    if (!isLoading && !hasAccess) {
+      navigator({ to: "/*", replace: true });
+    }
+  }, [hasAccess, isLoading, navigator]);
+
   if (!hasAccess) {
-    return <Navigate to="/unauthorized" replace />;
+    return null;
   }
 
   const toDelete = async () => {
@@ -60,7 +63,7 @@ export default function Mylist() {
         mid,
       },
     });
-    navigator("/");
+    navigator({ to: "/" });
     notifications.show({
       title: "マイリストを削除しました",
       message: "",

@@ -1,5 +1,5 @@
 import { ReactNode, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "@tanstack/react-router";
 
 import QuizControllBar from "@/components/QuizControllBar";
 import QuizHiddenAnswerButton from "@/components/QuizHiddenAnswerButton";
@@ -85,7 +85,7 @@ export default function ({
   };
 
   const toTransfar = () => {
-    navigate(`/practice?path=/transfer`);
+    navigate({ to: "/practice", search: { path: "/transfer" } });
   };
 
   const changeJudgement = (judgements: Judgement[]) => {

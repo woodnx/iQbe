@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "@tanstack/react-router";
 
 import useQuizzes from "@/hooks/useQuizzes";
 import { ActionIcon, TextInput, TextInputProps } from "@mantine/core";
@@ -41,7 +41,7 @@ export default function QuizSearchInput(props: TextInputProps) {
                 innerProps: {
                   onSubmit: (v: QuizRequestParams) => {
                     setParams(v);
-                    navigate("/search");
+                    navigate({ to: "/search" });
                   },
                 },
               })
@@ -58,7 +58,7 @@ export default function QuizSearchInput(props: TextInputProps) {
             ...params,
             keyword: search,
           });
-          navigate("/search");
+          navigate({ to: "/search" });
         }
       }}
       {...props}

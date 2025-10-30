@@ -1,8 +1,8 @@
 import { useMemo, useState } from "react";
-import { useSearchParams } from "react-router-dom";
 import PracticeSceneChanger from "@/components/PracticeSceneChanger";
 import useQuizSize from "@/hooks/useQuizSize";
 import useQuizzes from "@/hooks/useQuizzes";
+import { useSearch } from "@tanstack/react-router";
 
 function shuffleSequense(n: number) {
   const a = [...Array(n).keys()];
@@ -18,9 +18,10 @@ function shuffleSequense(n: number) {
 }
 
 export default function Practice() {
-  const [searchParams] = useSearchParams();
   const [shouldFetch, setShouldFetch] = useState(false);
-  const path = searchParams.get("path");
+  const { path } = useSearch({
+    from: "/practice",
+  });
   const isTransfer = !!path;
 
   const { quizzes, params } = useQuizzes(undefined, shouldFetch || isTransfer);
