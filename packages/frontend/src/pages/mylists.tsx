@@ -49,7 +49,7 @@ export default function Mylist() {
 
   useEffect(() => {
     if (!isLoading && !hasAccess) {
-      navigator({ to: "/*", replace: true });
+      navigator({ to: "/not-found", replace: true });
     }
   }, [hasAccess, isLoading, navigator]);
 

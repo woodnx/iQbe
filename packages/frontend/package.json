@@ -3,6 +3,9 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "prebuild": "tsr generate",
+    "routes:generate": "tsr generate",
+    "routes:watch": "tsr watch",
     "watch": "vite",
     "build": "tsc && vite build",
     "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
@@ -33,9 +36,13 @@
     "recharts": "^2.10.4",
     "storejs": "^2.1.0",
     "swr": "^2.2.5",
+    "zod": "^4.1.12",
     "zustand": "^5.0.8"
   },
   "devDependencies": {
+    "@tanstack/router-cli": "^1.134.4",
+    "@tanstack/router-plugin": "^1.134.6",
+    "@tanstack/router-vite-plugin": "^1.134.6",
     "@types/react": "^18.2.47",
     "@types/react-dom": "^18.2.18",
     "@types/storejs": "^2.0.3",
