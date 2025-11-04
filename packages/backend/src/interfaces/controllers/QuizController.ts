@@ -8,7 +8,7 @@ import { typedAsyncWrapper } from "@/utils";
 export default class QuizController {
   constructor(
     private quizQueryService: IQuizQueryService,
-    private quizUseCase: QuizUseCase,
+    private quizUseCase: QuizUseCase
   ) {}
 
   get() {
@@ -34,11 +34,12 @@ export default class QuizController {
           ? req.query.mid || undefined
           : undefined;
       const isFavorite = !!req.query.isFavorite;
-      const judgements = req.query.judgements
-        ? isArray(req.query.judgements)
-          ? req.query.judgements
-          : [req.query.judgements]
-        : undefined;
+      const judgements =
+        req.query.judgements != null
+          ? Array.isArray(req.query.judgements)
+            ? req.query.judgements
+            : [req.query.judgements]
+          : undefined;
       const categories = req.query.categories || undefined;
       const tags = req.query.tags || undefined;
       const tagMatchAll = req.query.tagMatchAll;
@@ -123,7 +124,7 @@ export default class QuizController {
         uid,
         anotherAnswer,
         category,
-        wid,
+        wid
       );
 
       res.status(201).send();
@@ -149,7 +150,7 @@ export default class QuizController {
           categoryId: r.category || undefined,
           subCategoryId: r.subCategory || undefined,
           uid,
-        })),
+        }))
       );
 
       res.status(201).send();
@@ -179,7 +180,7 @@ export default class QuizController {
         tags,
         anotherAnswer,
         category,
-        wid,
+        wid
       );
 
       res.status(201).send();
