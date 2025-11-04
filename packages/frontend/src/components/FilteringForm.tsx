@@ -1,15 +1,13 @@
-import useQuizzes from "@/hooks/useQuizzes";
 import { Button, Group } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { IconSearch } from "@tabler/icons-react";
-
+import { QuizRequestParams } from "@/types";
 import FilteringCategories from "./FilteringCategories";
 import FilteringQuizNumber from "./FilteringQuizNumber";
 import FilteringTagMatchAll from "./FilteringTagMatchAll";
 import FilteringTags from "./FilteringTags";
-import FilteringWorkbook from "./FilteringWorkbook";
-import { QuizRequestParams } from "@/types";
 import FilteringWord from "./FilteringWord";
+import FilteringWorkbook from "./FilteringWorkbook";
 
 interface FilteringModalProps {
   isFilterKeyword?: boolean;
@@ -20,16 +18,15 @@ export default function FilteringModal({
   isFilterKeyword = false,
   onSubmit = () => {},
 }: FilteringModalProps) {
-  const { params } = useQuizzes();
   const form = useForm({
     initialValues: {
-      wids: params.wids,
-      keyword: params.keyword,
-      keywordOption: params.keywordOption,
-      maxView: params.maxView,
-      categories: params.categories,
-      tags: params.tags,
-      tagMatchAll: params.tagMatchAll,
+      wids: undefined,
+      keyword: "",
+      keywordOption: 1,
+      maxView: 100,
+      categories: undefined,
+      tags: undefined,
+      tagMatchAll: undefined,
     },
   });
 

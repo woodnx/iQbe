@@ -8,13 +8,12 @@ import {
   getGradient,
   useMantineTheme,
 } from "@mantine/core";
-import useQuizzes from "@/hooks/useQuizzes";
 import { useWorkbooks } from "@/hooks/useWorkbooks";
 import QuizViewer from "./QuizViewer";
 import MylistEditModalButton from "./MylistEditModalButton";
 import { IconTrash } from "@tabler/icons-react";
 import { modals } from "@mantine/modals";
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate, useRouter, useSearch } from "@tanstack/react-router";
 
 interface Props {
   wid: string;
@@ -22,16 +21,33 @@ interface Props {
 
 export default function ({ wid }: Props) {
   const theme = useMantineTheme();
-  const { setParams } = useQuizzes();
   const { workbooks, isLoading } = useWorkbooks(true);
   const navigate = useNavigate();
+  const router = useRouter();
+  const search = useSearch({ from: "/workbook/$wid" });
 
   useEffect(() => {
-    setParams({
-      maxView: 100,
-      wids: [wid],
+    const wids = search.wids;
+    const hasWid =
+      Array.isArray(wids) ? wids.includes(wid) : typeof wids === "string" ? wids === wid : false;
+    const needsWids = !hasWid;
+    const needsPage = !search.page;
+    const needsMaxView = !search.maxView;
+
+    if (!needsWids && !needsPage && !needsMaxView) return;
+
+    router.navigate({
+      to: "/workbook/$wid",
+      params: { wid },
+      search: (old) => ({
+        ...old,
+        page: old.page ?? 1,
+        maxView: old.maxView ?? 100,
+        wids: [wid],
+      }),
+      replace: true,
     });
-  }, []);
+  }, [router, search.wids, search.page, search.maxView, wid]);
 
   if (isLoading)
     return (
@@ -48,7 +64,7 @@ export default function ({ wid }: Props) {
 
   useEffect(() => {
     if (!isLoading && !hasAccess) {
-      navigate({ to: "/*", replace: true });
+      navigate({ to: "/not-found", replace: true });
     }
   }, [hasAccess, isLoading, navigate]);
 
@@ -107,7 +123,11 @@ export default function ({ wid }: Props) {
 
   return (
     <>
-      <QuizViewer headerCard={<CreateCard />} />
+      <QuizViewer
+        routeId="/workbook/$wid"
+        routeParams={{ wid }}
+        headerCard={<CreateCard />}
+      />
     </>
   );
 }

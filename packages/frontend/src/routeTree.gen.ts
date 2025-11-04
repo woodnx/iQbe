@@ -9,7 +9,6 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as WorkbookRouteImport } from './routes/workbook'
 import { Route as WelcomeRouteImport } from './routes/welcome'
 import { Route as SettingRouteImport } from './routes/setting'
 import { Route as SearchRouteImport } from './routes/search'
@@ -21,14 +20,10 @@ import { Route as HistoryRouteImport } from './routes/history'
 import { Route as FavoriteRouteImport } from './routes/favorite'
 import { Route as CreateRouteImport } from './routes/create'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as WorkbookWidRouteImport } from './routes/workbook.$wid'
+import { Route as WorkbookIndexRouteImport } from './routes/workbook/index'
+import { Route as WorkbookWidRouteImport } from './routes/workbook/$wid'
 import { Route as MylistMidRouteImport } from './routes/mylist.$mid'
 
-const WorkbookRoute = WorkbookRouteImport.update({
-  id: '/workbook',
-  path: '/workbook',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const WelcomeRoute = WelcomeRouteImport.update({
   id: '/welcome',
   path: '/welcome',
@@ -84,10 +79,15 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const WorkbookIndexRoute = WorkbookIndexRouteImport.update({
+  id: '/workbook/',
+  path: '/workbook/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const WorkbookWidRoute = WorkbookWidRouteImport.update({
-  id: '/$wid',
-  path: '/$wid',
-  getParentRoute: () => WorkbookRoute,
+  id: '/workbook/$wid',
+  path: '/workbook/$wid',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const MylistMidRoute = MylistMidRouteImport.update({
   id: '/mylist/$mid',
@@ -107,9 +107,9 @@ export interface FileRoutesByFullPath {
   '/search': typeof SearchRoute
   '/setting': typeof SettingRoute
   '/welcome': typeof WelcomeRoute
-  '/workbook': typeof WorkbookRouteWithChildren
   '/mylist/$mid': typeof MylistMidRoute
   '/workbook/$wid': typeof WorkbookWidRoute
+  '/workbook': typeof WorkbookIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -123,9 +123,9 @@ export interface FileRoutesByTo {
   '/search': typeof SearchRoute
   '/setting': typeof SettingRoute
   '/welcome': typeof WelcomeRoute
-  '/workbook': typeof WorkbookRouteWithChildren
   '/mylist/$mid': typeof MylistMidRoute
   '/workbook/$wid': typeof WorkbookWidRoute
+  '/workbook': typeof WorkbookIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -140,9 +140,9 @@ export interface FileRoutesById {
   '/search': typeof SearchRoute
   '/setting': typeof SettingRoute
   '/welcome': typeof WelcomeRoute
-  '/workbook': typeof WorkbookRouteWithChildren
   '/mylist/$mid': typeof MylistMidRoute
   '/workbook/$wid': typeof WorkbookWidRoute
+  '/workbook/': typeof WorkbookIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -158,9 +158,9 @@ export interface FileRouteTypes {
     | '/search'
     | '/setting'
     | '/welcome'
-    | '/workbook'
     | '/mylist/$mid'
     | '/workbook/$wid'
+    | '/workbook'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -174,9 +174,9 @@ export interface FileRouteTypes {
     | '/search'
     | '/setting'
     | '/welcome'
-    | '/workbook'
     | '/mylist/$mid'
     | '/workbook/$wid'
+    | '/workbook'
   id:
     | '__root__'
     | '/'
@@ -190,9 +190,9 @@ export interface FileRouteTypes {
     | '/search'
     | '/setting'
     | '/welcome'
-    | '/workbook'
     | '/mylist/$mid'
     | '/workbook/$wid'
+    | '/workbook/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -207,19 +207,13 @@ export interface RootRouteChildren {
   SearchRoute: typeof SearchRoute
   SettingRoute: typeof SettingRoute
   WelcomeRoute: typeof WelcomeRoute
-  WorkbookRoute: typeof WorkbookRouteWithChildren
   MylistMidRoute: typeof MylistMidRoute
+  WorkbookWidRoute: typeof WorkbookWidRoute
+  WorkbookIndexRoute: typeof WorkbookIndexRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/workbook': {
-      id: '/workbook'
-      path: '/workbook'
-      fullPath: '/workbook'
-      preLoaderRoute: typeof WorkbookRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/welcome': {
       id: '/welcome'
       path: '/welcome'
@@ -297,12 +291,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/workbook/': {
+      id: '/workbook/'
+      path: '/workbook'
+      fullPath: '/workbook'
+      preLoaderRoute: typeof WorkbookIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/workbook/$wid': {
       id: '/workbook/$wid'
-      path: '/$wid'
+      path: '/workbook/$wid'
       fullPath: '/workbook/$wid'
       preLoaderRoute: typeof WorkbookWidRouteImport
-      parentRoute: typeof WorkbookRoute
+      parentRoute: typeof rootRouteImport
     }
     '/mylist/$mid': {
       id: '/mylist/$mid'
@@ -313,18 +314,6 @@ declare module '@tanstack/react-router' {
     }
   }
 }
-
-interface WorkbookRouteChildren {
-  WorkbookWidRoute: typeof WorkbookWidRoute
-}
-
-const WorkbookRouteChildren: WorkbookRouteChildren = {
-  WorkbookWidRoute: WorkbookWidRoute,
-}
-
-const WorkbookRouteWithChildren = WorkbookRoute._addFileChildren(
-  WorkbookRouteChildren,
-)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
@@ -338,8 +327,9 @@ const rootRouteChildren: RootRouteChildren = {
   SearchRoute: SearchRoute,
   SettingRoute: SettingRoute,
   WelcomeRoute: WelcomeRoute,
-  WorkbookRoute: WorkbookRouteWithChildren,
   MylistMidRoute: MylistMidRoute,
+  WorkbookWidRoute: WorkbookWidRoute,
+  WorkbookIndexRoute: WorkbookIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

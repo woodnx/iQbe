@@ -1,7 +1,7 @@
-import FilteringForm from "@/components/FilteringForm";
-import { useIsMobile } from "@/contexts/isMobile";
 import { Modal } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
+import FilteringForm from "@/components/FilteringForm";
+import { useIsMobile } from "@/contexts/isMobile";
 
 interface FilteringModalProps {
   onSubmit: (
@@ -33,38 +33,36 @@ export default function FilteringModal({
   const innerOnClose = onClose || close;
 
   return (
-    <>
-      <Modal
-        opened={innerOpened}
-        onClose={() => innerOnClose()}
-        title="絞り込み"
-        size="lg"
-        fullScreen={isMobile}
-        pos="absolute"
-      >
-        <FilteringForm
-          isFilterKeyword={isFilterKeyword}
-          onSubmit={({
-            wids,
-            keyword,
-            keywordOption,
-            categories,
-            tags,
-            tagMatchAll,
-            maxView,
-          }) => {
-            onSubmit(
-              wids || undefined,
-              keyword || undefined,
-              keywordOption || undefined,
-              categories || undefined,
-              tags || undefined,
-              tagMatchAll || undefined,
-              maxView || undefined,
-            );
-          }}
-        />
-      </Modal>
-    </>
+    <Modal
+      opened={innerOpened}
+      onClose={() => innerOnClose()}
+      title="絞り込み"
+      size="lg"
+      fullScreen={isMobile}
+      pos="absolute"
+    >
+      <FilteringForm
+        isFilterKeyword={isFilterKeyword}
+        onSubmit={({
+          wids,
+          keyword,
+          keywordOption,
+          categories,
+          tags,
+          tagMatchAll,
+          maxView,
+        }) => {
+          onSubmit(
+            wids || undefined,
+            keyword || undefined,
+            keywordOption || undefined,
+            categories || undefined,
+            tags || undefined,
+            tagMatchAll || undefined,
+            maxView || undefined,
+          );
+        }}
+      />
+    </Modal>
   );
 }
