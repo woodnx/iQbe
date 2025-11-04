@@ -214,6 +214,7 @@ export default class QuizInfra implements IQuizRepository, IQuizQueryService {
           registerdMylist,
           tags,
           visibleUser,
+          judgement,
         ] = await Promise.all([
           quiz.categoryId
             ? this.categoryInfra.findChainById(quiz.categoryId)
@@ -267,6 +268,12 @@ export default class QuizInfra implements IQuizRepository, IQuizQueryService {
             .select(["uid"])
             .where(({ eb, and }) => and([eb("quiz_id", "=", quizId)]))
             .executeTakeFirst(),
+
+          client
+            .selectFrom("histories")
+            .select(["histories.judgement"])
+            .where(({ eb, and }) => and([eb("quiz_id", "=", quizId)]))
+            .executeTakeFirst(),
         ]);
 
         return {
@@ -282,6 +289,7 @@ export default class QuizInfra implements IQuizRepository, IQuizQueryService {
           registerdMylist,
           tags,
           workbook,
+          judgement: judgement?.judgement,
           category: category?.map((c) => ({
             id: c.id,
             name: c.name,
