@@ -26,7 +26,7 @@ export default function FilteringModal({
       maxView: 100,
       categories: undefined,
       tags: undefined,
-      tagMatchAll: undefined,
+      tagMatchAll: false,
     },
   });
 
@@ -44,10 +44,7 @@ export default function FilteringModal({
       <FilteringWorkbook {...form.getInputProps("wids")} mb="lg" />
       <FilteringCategories {...form.getInputProps("categories")} mb="lg" />
       <FilteringTags {...form.getInputProps("tags")} />
-      <FilteringTagMatchAll
-        {...form.getInputProps("tagMatchAll", { type: "checkbox" })}
-        mb="lg"
-      />
+      <FilteringTagMatchAll {...form.getInputProps("tagMatchAll")} mb="lg" />
       <FilteringQuizNumber {...form.getInputProps("maxView")} />
       <Group mt="lg" justify="right">
         <Button
