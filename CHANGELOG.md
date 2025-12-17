@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.1.4](https://github.com/woodnx/iQbe/compare/v4.1.3...v4.1.4) (2025-12-17)
+
+
+### Bug Fixes
+
+* filtering bug ([#256](https://github.com/woodnx/iQbe/issues/256)) ([4a3d33a](https://github.com/woodnx/iQbe/commit/4a3d33a59a7e0d2ae55f28492bdaeb9f2a6a63a9))
+
 ## [4.1.3](https://github.com/woodnx/iQbe/compare/v4.1.2...v4.1.3) (2025-08-05)
 
 
