@@ -1,5 +1,5 @@
 import type { components } from "@/gen/schema";
-type ErrorSchema = components["schemas"]["Error"]
+type ErrorSchema = components["schemas"]["Error"];
 
 export default class ApiError extends Error {
   private _schema: ErrorSchema;
@@ -19,7 +19,9 @@ export default class ApiError extends Error {
       title: "INVAILD_PARAMS",
       type: "about:blank",
       status: 400,
-      detail: detail || "This request contains invaild parameter. Please correct to the right ones.",
+      detail:
+        detail ||
+        "This request contains invaild parameter. Please correct to the right ones.",
     });
   }
 
@@ -28,7 +30,7 @@ export default class ApiError extends Error {
       title: "NO_USER",
       type: "about:blank",
       status: 400,
-      detail: detail || "No user with such a user name and password."
+      detail: detail || "No user with such a user name and password.",
     });
   }
 
@@ -37,7 +39,9 @@ export default class ApiError extends Error {
       title: "EXPIRED_TOKEN",
       type: "about:blank",
       status: 401,
-      detail: detail || "This authorization token have expired. Please refetch token.",
+      detail:
+        detail ||
+        "This authorization token have expired. Please refetch token.",
     });
   }
 
@@ -55,7 +59,9 @@ export default class ApiError extends Error {
       title: "NO_TOKEN",
       type: "about:blank",
       status: 401,
-      detail: detail || "Authorization token was not found. Please set authorization header.",
+      detail:
+        detail ||
+        "Authorization token was not found. Please set authorization header.",
     });
   }
 
@@ -64,7 +70,8 @@ export default class ApiError extends Error {
       title: "ACCESS_DENIED",
       type: "about:blank",
       status: 403,
-      detail: detail || "Access denied. Insufficient rights to access the resource.",
+      detail:
+        detail || "Access denied. Insufficient rights to access the resource.",
     });
   }
 

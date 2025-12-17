@@ -40,7 +40,7 @@ export default async function getCroppedImg(
     croppedAreaPixels.x,
     croppedAreaPixels.y,
     croppedAreaPixels.width,
-    croppedAreaPixels.height
+    croppedAreaPixels.height,
   );
 
   // canvasのサイズ指定(切り取り後の画像サイズに更新)

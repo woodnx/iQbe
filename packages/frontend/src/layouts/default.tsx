@@ -1,121 +1,139 @@
-import { useLayoutEffect, useState } from 'react';
-import { Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { useLayoutEffect, useState } from "react";
 
-import NavbarLink from '@/components/NavbarLink';
-import UserInfoMenu from '@/components/UserInfoMenu';
-import { useIsMobile } from '@/contexts/isMobile';
-import useHeaderHeight from '@/hooks/useHeaderHeight';
-import { useWorkbooks } from '@/hooks/useWorkbooks';
-import { ActionIcon, AppShell, Center, Container, Drawer, Group, Loader } from '@mantine/core';
-import { useDisclosure } from '@mantine/hooks';
-import { notifications } from '@mantine/notifications';
+import NavbarLink from "@/components/NavbarLink";
+import UserInfoMenu from "@/components/UserInfoMenu";
+import { useIsMobile } from "@/contexts/isMobile";
+import useHeaderHeight from "@/hooks/useHeaderHeight";
+import { useWorkbooks } from "@/hooks/useWorkbooks";
 import {
-    IconActivity, IconBook, IconBooks, IconHistory, IconHome, IconMenu2, IconPencil, IconSchool,
-    IconSearch, IconStar
-} from '@tabler/icons-react';
+  ActionIcon,
+  AppShell,
+  Center,
+  Container,
+  Drawer,
+  Group,
+  Loader,
+} from "@mantine/core";
+import { useDisclosure } from "@mantine/hooks";
+import { notifications } from "@mantine/notifications";
+import {
+  IconActivity,
+  IconBook,
+  IconBooks,
+  IconHistory,
+  IconHome,
+  IconMenu2,
+  IconPencil,
+  IconSchool,
+  IconSearch,
+  IconStar,
+} from "@tabler/icons-react";
+import {
+  Outlet,
+  useNavigate,
+  useRouterState,
+} from "@tanstack/react-router";
 
-import Logo from '../components/Logo';
-import { useMylists } from '../hooks/useMylists';
-import { checkAuth } from '../plugins/auth';
+import Logo from "../components/Logo";
+import { useMylists } from "../hooks/useMylists";
+import { checkAuth } from "../plugins/auth";
 
 const checkPathname = (pathname: string) => {
-  if (pathname === '/') return '/';
-  else if (pathname === '/search') return '/search';
-  else if (pathname === '/practice') return '/practice';
-  else if (pathname === '/favorite') return '/favorite';
-  else if (pathname === '/history') return '/history';
-  else if (pathname === '/setting') return '/setting';
-  else if (pathname === '/create') return '/create';
-  else if (pathname.includes('workbook')) return '/workbook';
-  else if (pathname.includes('mylist')) return '/mylist';
-  else return '';
+  if (pathname === "/") return "/";
+  else if (pathname === "/search") return "/search";
+  else if (pathname === "/practice") return "/practice";
+  else if (pathname === "/favorite") return "/favorite";
+  else if (pathname === "/history") return "/history";
+  else if (pathname === "/setting") return "/setting";
+  else if (pathname === "/create") return "/create";
+  else if (pathname.includes("workbook")) return "/workbook";
+  else if (pathname.includes("mylist")) return "/mylist";
+  else return "";
 };
 
 export default function DefaultLayout() {
-  const [ activeLink, setActiveLink ] = useState<string>("0");
-  const [ loading, setLoading ] = useState(true);
+  const [activeLink, setActiveLink] = useState<string>("0");
+  const [loading, setLoading] = useState(true);
   const [opened, { open, close }] = useDisclosure(false);
   const navigate = useNavigate();
-  const location = useLocation();
+  const { pathname } = useRouterState({
+    select: (state) => state.location,
+  });
   const { mylists } = useMylists(!loading);
   const { workbooks } = useWorkbooks(false, !loading);
   const isMobile = useIsMobile();
-  const { headerHeight }= useHeaderHeight();
+  const { headerHeight } = useHeaderHeight();
 
-  const mockMylists = mylists?.map(m => ({
+  const mockMylists = mylists?.map((m) => ({
     label: m.name,
-    link: `${m.mid}`
+    link: `${m.mid}`,
   }));
 
-  const mockWorkbooks = workbooks?.map(w => ({
+  const mockWorkbooks = workbooks?.map((w) => ({
     label: w.name,
-    link: `${w.wid}`
+    link: `${w.wid}`,
   }));
 
   const mockdata = [
     {
-      label: 'アクティビティ',
+      label: "アクティビティ",
       icon: IconActivity,
-      link: '/',
+      link: "/",
     },
     {
-      label: '問題集',
+      label: "問題集",
       icon: IconBook,
-      link: '/workbook',
-      links: mockWorkbooks
+      link: "/workbook",
+      links: mockWorkbooks,
     },
     {
-      label: '演習',
+      label: "演習",
       icon: IconSchool,
-      link: '/practice',
+      link: "/practice",
     },
     {
-      label: '作問',
+      label: "作問",
       icon: IconPencil,
-      link: '/create',
+      link: "/create",
     },
     {
-      label: 'お気に入り',
+      label: "お気に入り",
       icon: IconStar,
-      link: '/favorite'
+      link: "/favorite",
     },
     {
-      label: '履歴',
+      label: "履歴",
       icon: IconHistory,
-      link: '/history'
+      link: "/history",
     },
     {
-      label: 'マイリスト',
+      label: "マイリスト",
       icon: IconBooks,
-      link: '/mylist',
+      link: "/mylist",
       isTab: true,
-      links: [
-        ...mockMylists || [],
-      ]
+      links: [...(mockMylists || [])],
     },
   ];
 
-  const activeIdx = mockdata.findIndex((data) => 
-    checkPathname(location.pathname) === data.link
+  const activeIdx = mockdata.findIndex(
+    (data) => checkPathname(pathname) === data.link,
   );
 
   useLayoutEffect(() => {
     let ignore = false;
 
-    checkAuth()
-    .then((user) => {
+    checkAuth().then((user) => {
       if (ignore) return;
 
-      if(user == "please-move-welcome-page") {
-        navigate('/welcome');
+      if (user == "please-move-welcome-page") {
+        navigate({ to: "/welcome" });
         return;
-      }
-      else if (!user) {
-        navigate('/login');
+      } else if (!user) {
+        navigate({ to: "/login" });
         notifications.show({
-          title: 'Require Login',
-          message: 'Please login',
-          color: 'red',
+          title: "Require Login",
+          message: "Please login",
+          color: "red",
           withBorder: true,
         });
         return;
@@ -131,24 +149,26 @@ export default function DefaultLayout() {
     <AppShell.Navbar h="100%">
       <AppShell.Section grow p="md">
         <Group justify="space-between">
-          <Logo horizonal width={100} mb="xs"/>
+          <Logo horizonal width={100} mb="xs" />
         </Group>
-        {
-          mockdata.map((i,idx) =>
-            <NavbarLink
-              {...i}
-              key={idx}
-              isActive={activeIdx == idx}
-              activeLink={activeLink}
-              onNavigate={(link, linksIdx) => {
-                navigate(link);
-                setActiveLink(linksIdx !== undefined ? `${activeIdx}.${linksIdx}` : `${activeIdx}`);
-                close();
-              }}
-              my={5}
-            />
-          )
-        }
+        {mockdata.map((i, idx) => (
+          <NavbarLink
+            {...i}
+            key={idx}
+            isActive={activeIdx == idx}
+            activeLink={activeLink}
+            onNavigate={(link, linksIdx) => {
+              navigate({ to: link });
+              setActiveLink(
+                linksIdx !== undefined
+                  ? `${activeIdx}.${linksIdx}`
+                  : `${activeIdx}`,
+              );
+              close();
+            }}
+            my={5}
+          />
+        ))}
       </AppShell.Section>
       <AppShell.Section p="md">
         <UserInfoMenu />
@@ -157,14 +177,8 @@ export default function DefaultLayout() {
   );
 
   const Footer = () => (
-    <AppShell.Footer
-      withBorder={false}
-    >
-      <Group
-        p="sm"
-        justify="space-between"
-        align="center"
-      >
+    <AppShell.Footer withBorder={false}>
+      <Group p="sm" justify="space-between" align="center">
         <ActionIcon
           size={70}
           radius="xl"
@@ -172,7 +186,7 @@ export default function DefaultLayout() {
           color="gray"
           onClick={open}
         >
-          <IconMenu2 size="2rem"/>
+          <IconMenu2 size="2rem" />
         </ActionIcon>
         <ActionIcon
           size={70}
@@ -181,10 +195,10 @@ export default function DefaultLayout() {
           color="gray"
           onClick={() => {
             setActiveLink("0");
-            navigate('/');
+            navigate({ to: "/" });
           }}
         >
-          <IconHome size="2rem"/>
+          <IconHome size="2rem" />
         </ActionIcon>
         <ActionIcon
           size={70}
@@ -193,10 +207,10 @@ export default function DefaultLayout() {
           color="gray"
           onClick={() => {
             setActiveLink("1");
-            navigate('/search');
+            navigate({ to: "/search" });
           }}
         >
-          <IconSearch size="2rem"/>
+          <IconSearch size="2rem" />
         </ActionIcon>
         <ActionIcon
           size={70}
@@ -205,63 +219,63 @@ export default function DefaultLayout() {
           color="gray"
           onClick={() => {
             setActiveLink("3");
-            navigate('/practice');
+            navigate({ to: "/practice", search: { path: undefined } });
           }}
         >
-          <IconSchool size="2rem"/>
+          <IconSchool size="2rem" />
         </ActionIcon>
       </Group>
     </AppShell.Footer>
   );
 
   return (
-    <> {
-    loading
-    ?
-      <Center h="100vh">
-        <Loader variant="dots"/>
-      </Center>
-    :
-      <AppShell
-        padding="md"
-        layout="alt"
-        navbar={{
-          width: 250,
-          breakpoint: 'md',
-        }}
-        footer={{
-          height: 90,
-          collapsed: !isMobile
-        }}
-        header={{
-          height: headerHeight || 0,
-        }}
-      >
-        {
-          isMobile ?
-          <Drawer
-            opened={opened}
-            onClose={close}
-            size={270}
-            withCloseButton={false}
-            pos="absolute"
-          >
-            <Drawer.Body p={0} m={0}>
-              <Navbar/>
-            </Drawer.Body>
-          </Drawer>
-        :
-          <Navbar/>
-        }
+    <>
+      {" "}
+      {loading ? (
+        <Center h="100vh">
+          <Loader variant="dots" />
+        </Center>
+      ) : (
+        <AppShell
+          padding="md"
+          layout="alt"
+          navbar={{
+            width: 250,
+            breakpoint: "md",
+          }}
+          footer={{
+            height: 90,
+            collapsed: !isMobile,
+          }}
+          header={{
+            height: headerHeight || 0,
+          }}
+        >
+          {isMobile ? (
+            <Drawer
+              opened={opened}
+              onClose={close}
+              size={270}
+              withCloseButton={false}
+              pos="absolute"
+            >
+              <Drawer.Body p={0} m={0}>
+                <Navbar />
+              </Drawer.Body>
+            </Drawer>
+          ) : (
+            <Navbar />
+          )}
 
-        <Footer/>
+          <Footer />
 
-        <AppShell.Main>
-          <Container size="lg" px={0}>
-            <Outlet/>
-          </Container>
-        </AppShell.Main>
-      </AppShell>
-    } </>
+          <AppShell.Main>
+            <Container size="lg" px={0}>
+              <Outlet />
+            </Container>
+          </AppShell.Main>
+        </AppShell>
+      )}{" "}
+    </>
   );
 }

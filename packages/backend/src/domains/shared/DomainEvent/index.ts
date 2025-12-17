@@ -1,7 +1,7 @@
 import { nanoid } from "nanoid";
 
 export class DomainEvent<
-  T extends Record<string, unknown> = Record<string, unknown>
+  T extends Record<string, unknown> = Record<string, unknown>,
 > {
   private constructor(
     public readonly eventId: string,
@@ -12,7 +12,7 @@ export class DomainEvent<
 
   static create<T extends Record<string, unknown> = Record<string, unknown>>(
     eventBody: T,
-    eventName: string
+    eventName: string,
   ): DomainEvent<T> {
     return new DomainEvent(nanoid(), eventBody, eventName, new Date());
   }

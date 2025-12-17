@@ -2,7 +2,7 @@ import { ScrollArea, Table } from "@mantine/core";
 import { Element } from "./CreateDashboard";
 
 interface Props {
-  elements: Element[]
+  elements: Element[];
 }
 
 export default function PreviewCsvTable({ elements }: Props) {
@@ -31,5 +31,5 @@ export default function PreviewCsvTable({ elements }: Props) {
         </Table>
       </Table.ScrollContainer>
     </ScrollArea>
-  )
+  );
 }

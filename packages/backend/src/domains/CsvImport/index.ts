@@ -10,7 +10,7 @@ export default class CsvImport {
   }
 
   get answer() {
-    return this._answer
+    return this._answer;
   }
 
   get anotherAnswer() {

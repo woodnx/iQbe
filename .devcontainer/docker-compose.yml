@@ -16,10 +16,9 @@ services:
     restart: unless-stopped
     volumes:
       - mysql-data:/var/lib/mysql
+      - ../db/conf.d:/etc/mysql/conf.d
     env_file:
       - dev.env
-    command:
-      - --sql-mode=NO_ENGINE_SUBSTITUTION
     
 volumes:
   mysql-data:

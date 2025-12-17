@@ -16,10 +16,9 @@
 - OUTPUT
   - Exercises based on real competition scenarios
 
-- CREATE *now developing
-  - Easier to create questions than with Excel
-  - Easily record words of interest in a memo
-  - Import from Excel file
+- CREATE
+  - Easier to create questions
+  - Import from CSV file
 
 - ANALYZE
   - Visualize how much you have learned
@@ -36,3 +35,4 @@ This software uses following OSS.
 - Routing System: [React Router](https://reactrouter.com/en/main)
 - UI Framework: [Mantine](https://v6.mantine.dev/)
 - Icons: [Tabler Icons](https://tablericons.com/)
+- Server: [Express](https://expressjs.com/)

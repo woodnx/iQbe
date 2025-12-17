@@ -1,25 +1,27 @@
 {
   "name": "iqbe",
-  "version": "3.8.0",
+  "version": "4.1.2",
   "description": "A powerful tool to enhance your quiz skills more fun and effective. ",
   "workspaces": [
     "packages/frontend",
     "packages/backend",
     "packages/api"
   ],
+  "packageManager": "pnpm@10.18.3",
   "private": true,
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "env-cmd -f .env node ./scripts/build.mjs",
-    "start": "cd packages/backend/dist && env-cmd -f ../../../.env node index.js",
+    "test": "pnpm --filter ./packages/backend run test",
+    "preinstall": "npx only-allow pnpm",
+    "build": "./node_modules/.bin/env-cmd -f .config/.env node ./scripts/build.mjs",
+    "start": "./node_modules/.bin/env-cmd -f .config/.env pnpm --filter ./packages/backend run start",
     "clean": "node ./scripts/clean.mjs",
-    "dev": "env-cmd -f .env node ./scripts/dev.mjs",
-    "api": "npm run build -w packages/api",
-    "migrate:create": "cd packages/backend && env-cmd -f ../../.env npm run migrate:create",
-    "migrate:exe": "cd packages/backend && env-cmd -f ../../.env npm run migrate:exe",
-    "migrate:dev": "cd packages/backend && env-cmd -f ../../.env npm run migrate:exe",
-    "migrate:status": "cd packages/backend && env-cmd -f ../../.env npm run migrate:status",
-    "migrate:reset": "cd packages/backend && env-cmd -f ../../.env npm run migrate:reset"
+    "dev": "./node_modules/.bin/env-cmd -f .config/.env node ./scripts/dev.mjs",
+    "api": "pnpm --filter ./packages/api run build",
+    "migrate:create": "./node_modules/.bin/env-cmd -f .config/.env pnpm --filter ./packages/backend run migrate:create",
+    "migrate:exe": "./node_modules/.bin/env-cmd -f .config/.env pnpm --filter ./packages/backend run migrate:exe",
+    "migrate:dev": "./node_modules/.bin/env-cmd -f .config/.env pnpm --filter ./packages/backend run migrate:exe",
+    "migrate:status": "./node_modules/.bin/env-cmd -f .config/.env pnpm --filter ./packages/backend run migrate:status",
+    "migrate:reset": "./node_modules/.bin/env-cmd -f .config/.env pnpm --filter ./packages/backend run migrate:reset"
   },
   "repository": {
     "type": "git",
@@ -28,6 +30,13 @@
   "author": "woodnext",
   "license": "ISC",
   "dependencies": {
+    "env-cmd": "^10.1.0",
     "ps-tree": "^1.2.0"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.0.0",
+    "@types/jest": "^30.0.0",
+    "jest": "^30.0.2",
+    "ts-jest": "^29.4.0"
   }
 }

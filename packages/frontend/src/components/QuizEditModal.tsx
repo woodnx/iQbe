@@ -1,64 +1,70 @@
-import { components, paths } from 'api/schema';
+import { ContextModalProps } from "@mantine/modals";
+import { notifications } from "@mantine/notifications";
+import { components, paths } from "api/schema";
+import { $api } from "@/utils/client";
 
-import { $api } from '@/utils/client';
-import { ContextModalProps } from '@mantine/modals';
-import { notifications } from '@mantine/notifications';
+import QuizEditForm from "./QuizEditForm";
 
-import QuizEditForm from './QuizEditForm';
-
-type QuizEditSubmitValues = paths["/quizzes"]["post"]["requestBody"]["content"]["application/json"];
+type QuizEditSubmitValues =
+  paths["/quizzes"]["post"]["requestBody"]["content"]["application/json"];
 type Category = components["schemas"]["Category"];
 
 interface Props {
-  qid: string,
-  question: string,
-  answer: string,
-  wid?: string,
-  category?: Category[],
-  tags?: string[],
-  isPublic: boolean,
+  qid: string;
+  question: string;
+  answer: string;
+  wid?: string;
+  category?: Category[];
+  tags?: string[];
 }
 
-export default function({ context, id, innerProps }: ContextModalProps<Props>) {
+export default function ({
+  context,
+  id,
+  innerProps,
+}: ContextModalProps<Props>) {
   const { qid, ...formProps } = innerProps;
   const { mutate } = $api.useMutation("put", "/quizzes/{qid}");
-  const submit = async ({ question, answer, tags, category, wid, isPublic }: QuizEditSubmitValues) => {
-    mutate({ 
+  const submit = async ({
+    question,
+    answer,
+    tags,
+    category,
+    wid,
+  }: QuizEditSubmitValues) => {
+    mutate(
+      {
         body: {
           question,
           answer,
           category,
           tags,
           wid,
-          isPublic,
         },
-        params: { path: { qid } }
+        params: { path: { qid } },
       },
       {
-        onSuccess:() => {
+        onSuccess: () => {
           notifications.show({
-            title: 'クイズを編集しました',
-            message: '',
+            title: "クイズを編集しました",
+            message: "",
           });
         },
         onError: () => {
           notifications.show({
-            title: '何らかの障害が発生しました',
-            message: '何度も続く場合はサポート担当に問い合わせてください',
-            color: 'red',
+            title: "何らかの障害が発生しました",
+            message: "何度も続く場合はサポート担当に問い合わせてください",
+            color: "red",
           });
-        }
-      }
+        },
+      },
     );
     context.closeModal(id);
-  }
+  };
 
   return (
     <>
-      <QuizEditForm 
-        {...formProps}
-        onSubmit={(v) => submit(v)}
-      />
+      <QuizEditForm {...formProps} onSubmit={(v) => submit(v)} />
     </>
-  )
+  );
 }

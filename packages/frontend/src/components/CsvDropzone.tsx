@@ -1,32 +1,49 @@
-import { Group, Text, rem } from '@mantine/core';
-import { IconUpload, IconX, IconFileTypeCsv } from '@tabler/icons-react';
-import { Dropzone, DropzoneProps, MIME_TYPES } from '@mantine/dropzone';
+import { Group, Text, rem } from "@mantine/core";
+import { IconUpload, IconX, IconFileTypeCsv } from "@tabler/icons-react";
+import { Dropzone, DropzoneProps, MIME_TYPES } from "@mantine/dropzone";
 
 export default function CsvDropzone(props: Partial<DropzoneProps>) {
   return (
     <Dropzone
       loading={props.loading}
-      onDrop={(files) => !!props.onDrop ? props.onDrop(files) : null}
+      onDrop={(files) => (!!props.onDrop ? props.onDrop(files) : null)}
       maxSize={5 * 1024 ** 2}
       accept={[MIME_TYPES.csv]}
       {...props}
     >
-      <Group justify="center" gap="xl" mih={220} style={{ pointerEvents: 'none' }}>
+      <Group
+        justify="center"
+        gap="xl"
+        mih={220}
+        style={{ pointerEvents: "none" }}
+      >
         <Dropzone.Accept>
           <IconUpload
-            style={{ width: rem(52), height: rem(52), color: 'var(--mantine-color-blue-6)' }}
+            style={{
+              width: rem(52),
+              height: rem(52),
+              color: "var(--mantine-color-blue-6)",
+            }}
             stroke={1.5}
           />
         </Dropzone.Accept>
         <Dropzone.Reject>
           <IconX
-            style={{ width: rem(52), height: rem(52), color: 'var(--mantine-color-red-6)' }}
+            style={{
+              width: rem(52),
+              height: rem(52),
+              color: "var(--mantine-color-red-6)",
+            }}
             stroke={1.5}
           />
         </Dropzone.Reject>
         <Dropzone.Idle>
           <IconFileTypeCsv
-            style={{ width: rem(52), height: rem(52), color: 'var(--mantine-color-dimmed)' }}
+            style={{
+              width: rem(52),
+              height: rem(52),
+              color: "var(--mantine-color-dimmed)",
+            }}
             stroke={1.5}
           />
         </Dropzone.Idle>

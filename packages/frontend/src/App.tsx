@@ -1,23 +1,23 @@
-import 'dayjs/locale/ja';
+import "dayjs/locale/ja";
 
-import { BrowserRouter as Router } from 'react-router-dom';
+import { RouterProvider } from "@tanstack/react-router";
 
-import { DatesProvider } from '@mantine/dates';
-import { ModalsProvider } from '@mantine/modals';
-import { Notifications } from '@mantine/notifications';
+import { DatesProvider } from "@mantine/dates";
+import { ModalsProvider } from "@mantine/modals";
+import { Notifications } from "@mantine/notifications";
 
-import CategoryCreateModal from './components/CategoryCreateModal';
-import CategoryDeleteModal from './components/CategoryDeleteModal';
-import CategoryEditModal from './components/CategoryEditModal';
-import FilteringContextModal from './components/FilteringContextModal';
-import MylistCreateModal from './components/MylistCreateModal';
-import MylistEditModal from './components/MylistEditModal';
-import QuizDeleteModal from './components/QuizDeleteModal';
-import QuizDetailesModal from './components/QuizDetailesModal';
-import QuizEditModal from './components/QuizEditModal';
-import WorkbookDeleteModal from './components/WorkbookDeleteModal';
-import WorkbookEditModal from './components/WorkbookEditModal';
-import Layout from './layouts';
+import CategoryCreateModal from "./components/CategoryCreateModal";
+import CategoryDeleteModal from "./components/CategoryDeleteModal";
+import CategoryEditModal from "./components/CategoryEditModal";
+import FilteringContextModal from "./components/FilteringContextModal";
+import MylistCreateModal from "./components/MylistCreateModal";
+import MylistEditModal from "./components/MylistEditModal";
+import QuizDeleteModal from "./components/QuizDeleteModal";
+import QuizDetailesModal from "./components/QuizDetailesModal";
+import QuizEditModal from "./components/QuizEditModal";
+import WorkbookDeleteModal from "./components/WorkbookDeleteModal";
+import WorkbookEditModal from "./components/WorkbookEditModal";
+import { router } from "./router";
 
 const modals = {
   quizFiltering: FilteringContextModal,
@@ -33,7 +33,7 @@ const modals = {
   workbookDelete: WorkbookDeleteModal,
 };
 
-declare module '@mantine/modals' {
+declare module "@mantine/modals" {
   export interface MantineModalsOverride {
     modals: typeof modals;
   }
@@ -42,11 +42,9 @@ declare module '@mantine/modals' {
 export default function App() {
   return (
     <ModalsProvider modals={modals}>
-      <DatesProvider settings={{ locale: 'ja' }}>
+      <DatesProvider settings={{ locale: "ja" }}>
         <Notifications position="top-right" />
-        <Router>
-          <Layout />
-        </Router> 
+        <RouterProvider router={router} />
       </DatesProvider>
     </ModalsProvider>
   );

@@ -1,5 +1,111 @@
 # Changelog
 
+## [4.1.2](https://github.com/woodnx/iQbe/compare/v4.1.1...v4.1.2) (2025-07-03)
+
+
+### Performance Improvements
+
+* Memoize `useInterval` system processing ([#243](https://github.com/woodnx/iQbe/issues/243)) ([6a1843a](https://github.com/woodnx/iQbe/commit/6a1843a94781dc8bc117d53a56d87c616b751796)), closes [#238](https://github.com/woodnx/iQbe/issues/238)
+
+## [4.1.1](https://github.com/woodnx/iQbe/compare/v4.1.0...v4.1.1) (2025-06-25)
+
+
+### Bug Fixes
+
+* build error ([#236](https://github.com/woodnx/iQbe/issues/236)) ([2fbb9f7](https://github.com/woodnx/iQbe/commit/2fbb9f7728394e3374e3559af97498cf631e4e54))
+
+## [4.1.0](https://github.com/woodnx/iQbe/compare/v4.0.6...v4.1.0) (2025-06-25)
+
+
+### Features
+
+* stopped creating published quiz ([#234](https://github.com/woodnx/iQbe/issues/234)) ([123d4a2](https://github.com/woodnx/iQbe/commit/123d4a2a6ec57c8d8db9b2fae511c174449f4535))
+
+## [4.0.6](https://github.com/woodnx/iQbe/compare/v4.0.5...v4.0.6) (2025-04-06)
+
+
+### Bug Fixes
+
+* favorite query error Fixes [#221](https://github.com/woodnx/iQbe/issues/221) ([#223](https://github.com/woodnx/iQbe/issues/223)) ([1dedbef](https://github.com/woodnx/iQbe/commit/1dedbef272fe65e19719adfeb434e987ea20465b))
+
+## [4.0.5](https://github.com/woodnx/iQbe/compare/v4.0.4...v4.0.5) (2025-04-05)
+
+
+### Bug Fixes
+
+* Throws CORS error when production. ([#219](https://github.com/woodnx/iQbe/issues/219)) ([61e4f39](https://github.com/woodnx/iQbe/commit/61e4f3932a4e0a8d825326f981b75c4ace7ae6d6)), closes [#218](https://github.com/woodnx/iQbe/issues/218)
+
+## [4.0.4](https://github.com/woodnx/iQbe/compare/v4.0.3...v4.0.4) (2025-04-05)
+
+
+### Bug Fixes
+
+* Not working `/welcome` page ([#216](https://github.com/woodnx/iQbe/issues/216)) ([d3d3b48](https://github.com/woodnx/iQbe/commit/d3d3b48f1530d27c9d348ded507660bc3f9d957f)), closes [#215](https://github.com/woodnx/iQbe/issues/215)
+
+## [4.0.3](https://github.com/woodnx/iQbe/compare/v4.0.2...v4.0.3) (2025-04-04)
+
+
+### Bug Fixes
+
+* Suppot docker deploy ([#213](https://github.com/woodnx/iQbe/issues/213)) ([cee524b](https://github.com/woodnx/iQbe/commit/cee524b0fa49ecc33634c2f4e314ea2070f563b8))
+
+## [4.0.2](https://github.com/woodnx/iQbe/compare/v4.0.1...v4.0.2) (2025-04-02)
+
+
+### Bug Fixes
+
+* build using docker ([#211](https://github.com/woodnx/iQbe/issues/211)) ([0056b52](https://github.com/woodnx/iQbe/commit/0056b52d0cda1b54a46e46b4ac72fe714df61b61))
+
+## [4.0.1](https://github.com/woodnx/iQbe/compare/v4.0.0...v4.0.1) (2025-04-02)
+
+
+### Bug Fixes
+
+* build with docker ([#209](https://github.com/woodnx/iQbe/issues/209)) ([cd2fb68](https://github.com/woodnx/iQbe/commit/cd2fb68378d0c7f378127f5487386310bd8305cf)), closes [#208](https://github.com/woodnx/iQbe/issues/208)
+
+## [4.0.0](https://github.com/woodnx/iQbe/compare/v3.8.0...v4.0.0) (2025-01-01)
+
+
+### ⚠ BREAKING CHANGES
+
+* APIのレスポンスを変更 ([#178](https://github.com/woodnx/iQbe/issues/178))
+
+### Features
+
+* **backend:** APIの権限による制限をしっかりする  ([#180](https://github.com/woodnx/iQbe/issues/180)) ([c65841a](https://github.com/woodnx/iQbe/commit/c65841a32caa5ddf2d50cd7b9548fcd7aa0bd258)), closes [#153](https://github.com/woodnx/iQbe/issues/153)
+* **backend:** question に全文検索を設定する  ([#194](https://github.com/woodnx/iQbe/issues/194)) ([7023dba](https://github.com/woodnx/iQbe/commit/7023dba61109c78cef7aca54779749e5efd4432e)), closes [#186](https://github.com/woodnx/iQbe/issues/186)
+* **backend:** validatorの導入 ([#187](https://github.com/woodnx/iQbe/issues/187)) ([ef68e25](https://github.com/woodnx/iQbe/commit/ef68e255bdd83903cc5b93abf3bd4109b6aed06c)), closes [#158](https://github.com/woodnx/iQbe/issues/158)
+* **backend:** 公開クイズの作成の制限 ([#189](https://github.com/woodnx/iQbe/issues/189)) ([6f5bc78](https://github.com/woodnx/iQbe/commit/6f5bc78810e3184c4fa20a1d61396f7a52fde0c0)), closes [#161](https://github.com/woodnx/iQbe/issues/161)
+* **frontend:** notificationの追加 ([#157](https://github.com/woodnx/iQbe/issues/157)) ([a372a80](https://github.com/woodnx/iQbe/commit/a372a80c19f7507d3541e28bcbdbccd14a2c3998))
+* **frontend:** クイズの詳細を表示 ([#181](https://github.com/woodnx/iQbe/issues/181)) ([b6a7aac](https://github.com/woodnx/iQbe/commit/b6a7aaca949408f015cb0e2fef3fa3d9acbc1900)), closes [#175](https://github.com/woodnx/iQbe/issues/175)
+* **frontend:** 問題集からクイズを閲覧できるように変更 ([#198](https://github.com/woodnx/iQbe/issues/198)) ([b155b44](https://github.com/woodnx/iQbe/commit/b155b443499aaeb9fb0d40db463a2802f23ef40a)), closes [#197](https://github.com/woodnx/iQbe/issues/197)
+* **frontend:** 問題集の編集機能  ([#202](https://github.com/woodnx/iQbe/issues/202)) ([1487080](https://github.com/woodnx/iQbe/commit/14870804d3e9fcb1cfd534c5bbf2312636153e2b)), closes [#199](https://github.com/woodnx/iQbe/issues/199)
+* カテゴリーのプリセットによる追加 ([#150](https://github.com/woodnx/iQbe/issues/150)) ([a641e30](https://github.com/woodnx/iQbe/commit/a641e308e55be5793b84b9496586c4e03180990b))
+* クイズの削除機能 ([#164](https://github.com/woodnx/iQbe/issues/164)) ([9e63d66](https://github.com/woodnx/iQbe/commit/9e63d66b93112a5a61c66df101fcdfec0b9ffde8)), closes [#160](https://github.com/woodnx/iQbe/issues/160)
+* ジャンル編集機能 ([#147](https://github.com/woodnx/iQbe/issues/147)) ([752ddfa](https://github.com/woodnx/iQbe/commit/752ddfa23f01b9ef3ec2801f698b0894a74f2d17)), closes [#143](https://github.com/woodnx/iQbe/issues/143)
+* タグとジャンルによる絞り込み機能 ([#174](https://github.com/woodnx/iQbe/issues/174)) ([3ace25a](https://github.com/woodnx/iQbe/commit/3ace25a04f7fb8d356ca333640058d53b850cf39)), closes [#146](https://github.com/woodnx/iQbe/issues/146)
+* トップページの刷新 ([#200](https://github.com/woodnx/iQbe/issues/200)) ([7c1c0ee](https://github.com/woodnx/iQbe/commit/7c1c0ee48912d07be3c9f264a30094ba40e05188))
+* 招待コードの作成  ([#183](https://github.com/woodnx/iQbe/issues/183)) ([2ef3481](https://github.com/woodnx/iQbe/commit/2ef34814e59062c06cb4b2e1705d657cbbbe52d2)), closes [#179](https://github.com/woodnx/iQbe/issues/179)
+
+
+### Bug Fixes
+
+* **backend:** クイズの編集ができない問題を修正 ([#162](https://github.com/woodnx/iQbe/issues/162)) ([f962b06](https://github.com/woodnx/iQbe/commit/f962b0612d49cd5dbf72a6492900c935e38ec2e0)), closes [#156](https://github.com/woodnx/iQbe/issues/156)
+* build時に画像が失われる問題を修正 ([#190](https://github.com/woodnx/iQbe/issues/190)) ([924a74b](https://github.com/woodnx/iQbe/commit/924a74b16f334b14e7e9ff86e41be251844d013e)), closes [#188](https://github.com/woodnx/iQbe/issues/188)
+* **frontend:** iOSでのinputのフォーカス時に勝手にズームインされる ([#192](https://github.com/woodnx/iQbe/issues/192)) ([3dd71b9](https://github.com/woodnx/iQbe/commit/3dd71b9f7502f7be06c6ff9c2b53b7442fdffc6a)), closes [#61](https://github.com/woodnx/iQbe/issues/61)
+* **frontend:** Practiceにおいて、FilteringのCloseボタンを押すと開始されない問題 を修正 ([#193](https://github.com/woodnx/iQbe/issues/193)) ([3e767e4](https://github.com/woodnx/iQbe/commit/3e767e4d38719c687d3bdea40d3810a01031a6dc)), closes [#182](https://github.com/woodnx/iQbe/issues/182)
+* npm run build でエラーが吐かれる問題  1 ([#152](https://github.com/woodnx/iQbe/issues/152)) ([9a46369](https://github.com/woodnx/iQbe/commit/9a4636909290e16520f9389282b0bd5f3de90067)), closes [#15](https://github.com/woodnx/iQbe/issues/15)
+* Quizのcategoryが編集できない問題を修正 ([#176](https://github.com/woodnx/iQbe/issues/176)) ([504e27d](https://github.com/woodnx/iQbe/commit/504e27d523ae94f3735ed8392359a35275e5d5cd)), closes [#167](https://github.com/woodnx/iQbe/issues/167)
+* Routerのアクセス制限をつける ([#201](https://github.com/woodnx/iQbe/issues/201)) ([7f6a63c](https://github.com/woodnx/iQbe/commit/7f6a63c0ea8bd75363fb77ad88d9d158b62dd515)), closes [#196](https://github.com/woodnx/iQbe/issues/196)
+* too large errorが出ないように，パースするjsonのファイル制限を5mbまで拡張 ([#191](https://github.com/woodnx/iQbe/issues/191)) ([3f14609](https://github.com/woodnx/iQbe/commit/3f14609e759cc608e554312880ea2a1587e878f5)), closes [#134](https://github.com/woodnx/iQbe/issues/134)
+* workbookによる絞り込みができない  ([#177](https://github.com/woodnx/iQbe/issues/177)) ([f24c319](https://github.com/woodnx/iQbe/commit/f24c319f3c7ec0e29ea90b9014ae5f0ded525312)), closes [#173](https://github.com/woodnx/iQbe/issues/173)
+* 正しく絞り込みできない問題を修正 ([#166](https://github.com/woodnx/iQbe/issues/166)) ([def9a8f](https://github.com/woodnx/iQbe/commit/def9a8f1b65266f117a19e9ebb48dd1e3d09e46e)), closes [#154](https://github.com/woodnx/iQbe/issues/154)
+
+
+### Code Refactoring
+
+* APIのレスポンスを変更 ([#178](https://github.com/woodnx/iQbe/issues/178)) ([4dec468](https://github.com/woodnx/iQbe/commit/4dec4680e6142bc582aa86aca9cd02a0b616967c)), closes [#172](https://github.com/woodnx/iQbe/issues/172)
+
 ## [3.8.0](https://github.com/woodnx/iQbe/compare/v3.7.0...v3.8.0) (2024-11-10)
 
 

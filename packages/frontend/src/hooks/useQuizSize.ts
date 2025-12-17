@@ -1,13 +1,11 @@
-import { paths } from 'api/schema';
-import { $api } from '@/utils/client';
+import { paths } from "api/schema";
+import { $api } from "@/utils/client";
 
-type QuizSizeRequestParams = paths['/quizzes/size']['get']['parameters']['query'] & {};
+type QuizSizeRequestParams =
+  paths["/quizzes/size"]["get"]["parameters"]["query"] & {};
 
-const useQuizSize = (
-  params: QuizSizeRequestParams,
-  shouldFetch = true,
-) => {
-  const { data, error, isLoading } = $api.useQuery('get', '/quizzes/size', {
+const useQuizSize = (params: QuizSizeRequestParams, shouldFetch = true) => {
+  const { data, error, isLoading } = $api.useQuery("get", "/quizzes/size", {
     params: {
       query: {
         wids: params.wids,
@@ -20,7 +18,7 @@ const useQuizSize = (
         isFavorite: params.isFavorite,
         categories: params.categories,
         tags: params.tags,
-      }
+      },
     },
     enabled: shouldFetch,
   });
@@ -30,6 +28,6 @@ const useQuizSize = (
     isLoading,
     error,
   };
-}
+};
 
 export default useQuizSize;

@@ -1,16 +1,26 @@
-import { spawn, spawnSync, exec } from 'child_process';
-import psTree from 'ps-tree';
+import { exec, spawn, spawnSync } from "child_process";
+import psTree from "ps-tree";
 
 const pids = [];
 
-// spawnSync('npm', [ 'run', 'clean' ], { stdio: 'inherit' });
+// spawnSync('pnpm', [ 'run', 'clean' ], { stdio: 'inherit' });
 
-const backProc = spawn('npm', [ 'run', 'watch', '-w', 'packages/backend' ]);
-const frontProc = spawn('npm', [ 'run', 'watch', '-w', 'packages/frontend' ]);
+const backProc = spawn("pnpm", [
+  "--filter",
+  "./packages/backend",
+  "run",
+  "watch",
+]);
+const frontProc = spawn("pnpm", [
+  "--filter",
+  "./packages/frontend",
+  "run",
+  "watch",
+]);
 
-backProc.stdout.on('data', (data) => {
+backProc.stdout.on("data", (data) => {
   process.stdout.write(data);
-  if (data.includes('Watching for file changes')) {
+  if (data.includes("Watching for file changes")) {
     psTree(backProc.pid, (err, children) => {
       //console.log(children);
       children.forEach((child) => {
@@ -20,13 +30,13 @@ backProc.stdout.on('data', (data) => {
   }
 });
 
-backProc.stderr.on('data', data => {
+backProc.stderr.on("data", (data) => {
   process.stderr.write(data);
 });
 
-frontProc.stdout.on('data', (data) => {
+frontProc.stdout.on("data", (data) => {
   process.stdout.write(data);
-  if (data.includes('Local')) {
+  if (data.includes("Local")) {
     psTree(frontProc.pid, (err, children) => {
       // console.log(children);
       children.forEach((child) => {
@@ -36,12 +46,12 @@ frontProc.stdout.on('data', (data) => {
   }
 });
 
-frontProc.stderr.on('data', data => {
+frontProc.stderr.on("data", (data) => {
   process.stderr.write(data);
 });
 
 const cleanup = () => {
-  console.log('You will kill following process (pid).')
+  console.log("You will kill following process (pid).");
   console.log(pids);
   pids.forEach((pid) => {
     try {
@@ -49,9 +59,9 @@ const cleanup = () => {
     } catch (e) {
       // nice catch
     }
-  })
-}
+  });
+};
 
-process.on('SIGINT', cleanup);
-process.on('SIGTERM', cleanup);
-process.on('SIGQUIT', cleanup);
+process.on("SIGINT", cleanup);
+process.on("SIGTERM", cleanup);
+process.on("SIGQUIT", cleanup);

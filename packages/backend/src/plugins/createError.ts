@@ -1,4 +1,4 @@
-import { components } from 'api/schema';
+import { components } from "api/schema";
 
 type Error = components["schemas"]["Error"];
 
@@ -9,8 +9,10 @@ export const createError = {
       title: "INVAILD_PARAMS",
       type: "about:blank",
       status: 400,
-      detail: detail || "This request contains invaild parameter. Please correct to the right ones.",
-    }
+      detail:
+        detail ||
+        "This request contains invaild parameter. Please correct to the right ones.",
+    };
   },
   noUser: (detail?: string): Error => {
     console.trace();
@@ -18,8 +20,8 @@ export const createError = {
       title: "NO_USER",
       type: "about:blank",
       status: 400,
-      detail: detail || "No user with such a user name and password."
-    }
+      detail: detail || "No user with such a user name and password.",
+    };
   },
   expiredToken: (detail?: string): Error => {
     console.trace();
@@ -27,8 +29,10 @@ export const createError = {
       title: "EXPIRED_TOKEN",
       type: "about:blank",
       status: 401,
-      detail: detail || "This authorization token have expired. Please refetch token.",
-    }
+      detail:
+        detail ||
+        "This authorization token have expired. Please refetch token.",
+    };
   },
   invalidToken: (detail?: string): Error => {
     console.trace();
@@ -37,7 +41,7 @@ export const createError = {
       type: "about:blank",
       status: 401,
       detail: detail || "This authorization token is invalid.",
-    }
+    };
   },
   noToken: (detail?: string): Error => {
     console.trace();
@@ -45,8 +49,10 @@ export const createError = {
       title: "NO_TOKEN",
       type: "about:blank",
       status: 401,
-      detail: detail || "Authorization token was not found. Please set authorization header.",
-    }
+      detail:
+        detail ||
+        "Authorization token was not found. Please set authorization header.",
+    };
   },
   accessDenied: (detail?: string): Error => {
     console.trace();
@@ -54,8 +60,9 @@ export const createError = {
       title: "ACCESS_DENIED",
       type: "about:blank",
       status: 403,
-      detail: detail || "Access denied. Insufficient rights to access the resource.",
-    }
+      detail:
+        detail || "Access denied. Insufficient rights to access the resource.",
+    };
   },
   internalProblems: (): Error => {
     console.trace();
@@ -64,10 +71,10 @@ export const createError = {
       type: "about:blank",
       status: 500,
       detail: "Something problems occured in server.",
-    }
+    };
   },
   create: (error: Error): Error => {
     console.trace();
-    return error
+    return error;
   },
-}
+};

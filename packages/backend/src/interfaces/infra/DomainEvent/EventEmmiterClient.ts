@@ -1,5 +1,5 @@
-import EventEmitter from 'events';
-import { singleton } from 'tsyringe';
+import EventEmitter from "events";
+import { singleton } from "tsyringe";
 
 @singleton()
 class EventEmitterClient {

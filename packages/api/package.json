@@ -8,16 +8,6 @@
       "import": "./dist/index.mjs",
       "types": "./dist/index.d.ts"
     },
-    "./types": {
-      "require": "./dist/types.js",
-      "import": "./dist/types.mjs",
-      "types": "./dist/types.d.ts"
-    },
-    "./predicates": {
-      "require": "./dist/predicates.js",
-      "import": "./dist/predicates.mjs",
-      "types": "./dist/predicates.d.ts"
-    },
     "./schema": {
       "require": "./dist/schema.js",
       "import": "./dist/schema.mjs",
@@ -25,6 +15,7 @@
     }
   },
   "devDependencies": {
+    "openapi-fetch": "^0.13.5",
     "openapi-typescript": "^7.3.0",
     "tsup": "^8.0.2",
     "tsx": "^4.7.1",
@@ -32,10 +23,10 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "npm run clean && npm run codegen && npm run build:tsup",
+    "build": "pnpm run clean && pnpm run codegen && pnpm run build:tsup",
     "build:tsup": "tsup-node --config tsup.config.ts",
     "clean": "rm -rf dist && rm -rf ./src/gen",
-    "codegen": "npm run codegen:openapi-ts",
+    "codegen": "pnpm run codegen:openapi-ts",
     "codegen:openapi-ts": "tsx ./src/transform.ts"
   },
   "author": "",

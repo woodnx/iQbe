@@ -1,95 +1,59 @@
-import { components } from 'api/schema';
-import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Group, Loader, Overlay, Text } from "@mantine/core";
+import { useDisclosure } from "@mantine/hooks";
+import { useRouter, useSearch } from "@tanstack/react-router";
+import { components } from "api/schema";
+import { useEffect, useState } from "react";
+import FilteringModal from "@/components/FilteringModal";
+import FilteringModalButton from "@/components/FilteringModalButton";
+import PracticeQuitModal from "@/components/PracticeQuitModal";
+import { PracticeQuizController } from "@/components/PracticeQuizController";
+import { PracticeQuizIntro } from "@/components/PracticeQuizIntro";
+import PracticeResultModal from "@/components/PracticeResultModal";
+import { useTimer } from "@/hooks";
+import { $api } from "@/utils/client";
 
-import FilteringModal from '@/components/FilteringModal';
-import FilteringModalButton from '@/components/FilteringModalButton';
-import PracticeQuitModal from '@/components/PracticeQuitModal';
-import { PracticeQuizController } from '@/components/PracticeQuizController';
-import { PracticeQuizInfo } from '@/components/PracticeQuizInfo';
-import { PracticeQuizIntro } from '@/components/PracticeQuizIntro';
-import PracticeResultModal from '@/components/PracticeResultModal';
-import PracticeTypewriteQuiz from '@/components/PracticeTypewriteQuiz';
-import { useTimer, useTypewriter } from '@/hooks';
-import useQuizzes from '@/hooks/useQuizzes';
-import { $api } from '@/utils/client';
-import { Card, Group, Loader, Overlay, Text } from '@mantine/core';
-import { useDisclosure } from '@mantine/hooks';
-
-type Quiz = components['schemas']['Quiz'];
+type Quiz = components["schemas"]["Quiz"];
+export type Scene = "preparation" | "ready" | "quizzing" | "result";
 
 interface Props {
-  quizzes?: Quiz[],
-  size: number,
-  shuffledList: number[],
-  isTransfer?: boolean,
-  onFilter?: () => void,
+  quizzes?: Quiz[];
+  size: number;
+  shuffledList: number[];
+  isTransfer?: boolean;
+  onFilter?: () => void;
 }
 
-export default function({
+export default function ({
   quizzes,
   size,
   shuffledList,
   isTransfer = false,
   onFilter = () => {},
 }: Props) {
-  const [ nowNumber, setNowNumber ] = useState(0);
-  const [ scene, setScene ] = useState(isTransfer ? 0 : -1);
-  const [ startTrigger, setStartTrigger ] = useState(isTransfer);
-  const [ filtering, filter ] = useDisclosure(false);
-  const [ resulted, result ] = useDisclosure(false);
-  const navigator = useNavigate();
-
-  const { params, setParams } = useQuizzes();
+  const [nowNumber, setNowNumber] = useState(0);
+  const [scene, setScene] = useState<Scene>(
+    isTransfer ? "ready" : "preparation",
+  );
+  const [startTrigger, setStartTrigger] = useState(isTransfer);
+  const [filtering, filter] = useDisclosure(false);
+  const [_, result] = useDisclosure(false);
+  const router = useRouter();
+  const search = useSearch({ from: "/practice" });
   const { mutate } = $api.useMutation("post", "/practice");
-  const [ rightList, setRightList ] = useState<string[]>([]);
-  const [ pressedWord, setPressedWord ] = useState(0);
+  const [rightList, setRightList] = useState<string[]>([]);
   const quiz = !!quizzes ? quizzes[shuffledList[nowNumber]] : null;
   const maxQuizSize = quizzes?.length || 0;
 
-  const delay = useTimer(500, 100, () => setScene(1)); 
-  const typewriter = useTypewriter(quiz?.question || "", 100, () => setScene(2));
-  const countdown = useTimer(4000, 1000, () => setScene(4)); 
-  const through = useTimer(3000, 10, () => setScene(4)); 
-
-  useEffect(() => {
-    switch(scene) {
-      case 0: 
-        delay.reset();
-        typewriter.reset();
-        countdown.reset();
-        through.reset();
-        result.close();
-        break;
-      case 1:
-        typewriter.start();
-        break;
-      case 2:
-        through.start();
-        break;
-      case 3:
-        through.pause();
-        typewriter.pause();
-        countdown.start();
-        setPressedWord(typewriter.text.length);
-        break;
-      case 4:
-        through.stop();
-        typewriter.stop()
-        break;
-      case 5:
-        result.open();
-    }
-  }, [scene]);
+  const delay = useTimer(500, 100, () => setScene("quizzing"));
 
   useEffect(() => {
     if (!isTransfer) filter.open();
-    return () => setScene(isTransfer ? 0 : -1);
-  },[]);
+    return () => setScene(isTransfer ? "ready" : "preparation");
+  }, []);
 
   const toFilter = (
-    wids?: string | string[], 
-    keyword?: string, 
+    wids?: string | string[],
+    keyword?: string,
     keywordOption?: number,
     categories?: number | number[],
     tags?: string | string[],
@@ -97,75 +61,74 @@ export default function({
     maxView?: number,
   ) => {
     const seed = Math.floor(Math.random() * 100000);
-    setParams({ 
-      ...params,
-      page: 1, 
-      maxView,
-      seed,
-      wids, 
-      keyword, 
-      keywordOption: Number(keywordOption),
-      categories,
-      tags,
-      tagMatchAll,
-      isFavorite: false,
+    router.navigate({
+      to: "/practice",
+      search: (old) => ({
+        ...old,
+        page: 1,
+        seed,
+        maxView,
+        wids,
+        keyword,
+        keywordOption,
+        categories,
+        tags,
+        tagMatchAll,
+      }),
+      replace: true,
     });
     filter.close();
     onFilter();
     setNowNumber(0);
     setStartTrigger(true);
-    setScene(0);
-  }
+    setScene("ready");
+  };
 
-  const record = async (judgement: number) => {
+  const record = async (judgement: number, pressedWord: number) => {
     if (!quiz) return;
 
-    mutate({ body: {
-      qid: quiz?.qid,
-      judgement,
-      pressedWord,
-    }});
+    mutate({
+      body: {
+        qid: quiz?.qid,
+        judgement,
+        pressedWord,
+      },
+    });
 
     if (judgement == 1) {
-      const addId = quiz.qid
-      !!addId ? setRightList([ ...rightList, addId ]) : null;
+      const addId = quiz.qid;
+      !!addId ? setRightList([...rightList, addId]) : null;
     }
-  }
+  };
 
-  const judgeQuiz = (judgement: number) => {
-    record(judgement);
-    
-    if (nowNumber >= (maxQuizSize-1)) {
-      setScene(5);
-    } else { 
-      setNowNumber(nowNumber+1);
-      setScene(0);
+  const judgeQuiz = (judgement: number, pressedWord: number) => {
+    record(judgement, pressedWord);
+
+    if (nowNumber >= maxQuizSize - 1) {
+      setScene("result");
+    } else {
+      setNowNumber(nowNumber + 1);
+      setScene("ready");
     }
-  }
+  };
 
   const stopQuiz = async (judgement: number) => {
-    await record(judgement);
-    navigator('/');
-  }
+    await record(judgement, -1);
+    router.navigate({ to: "/" });
+  };
 
   return (
     <>
-      { 
-        scene == 0 ? 
-          <Overlay fixed center>
-            { 
-              !quiz || !startTrigger ? 
-                <Loader variant="dots"/> 
-              : 
-                <PracticeQuizIntro 
-                  ta="center"
-                  onFinish={delay.start}
-                />
-            }
-          </Overlay> 
-        : null
-      }
-      <FilteringModal 
+      {scene == "ready" ? (
+        <Overlay fixed center>
+          {!quiz || !startTrigger ? (
+            <Loader variant="dots" />
+          ) : (
+            <PracticeQuizIntro ta="center" onFinish={delay.start} />
+          )}
+        </Overlay>
+      ) : null}
+      <FilteringModal
         isFilterKeyword={true}
         opened={filtering}
         onSubmit={toFilter}
@@ -175,57 +138,55 @@ export default function({
         rightTotal={rightList.length}
         quizzesTotal={maxQuizSize || 1}
         isTransfer={isTransfer}
-        canNext={(quizzes && params?.maxView && params?.page) ? Math.ceil(size / params?.maxView) >= params?.page + 1 : false}
-        opened={resulted}
+        canNext={
+          quizzes && search.maxView && search.page
+            ? Math.ceil(size / search.maxView) >= search.page + 1
+            : false
+        }
+        opened={scene == "result"}
         onClose={result.close}
-        onRetry={() => setScene(0)}
+        onRetry={() => {
+          setScene("ready");
+          setNowNumber(0);
+        }}
         onNext={() => {
-          setParams({
-            ...params,
-            page: (!!params?.page) ? params.page + 1 : 0
+          router.navigate({
+            to: "/practice",
+            search: (old) => ({
+              ...old,
+              page: !!old?.page ? old.page + 1 : 0,
+            }),
+            replace: true,
           });
-          setScene(0);
+          setScene("ready");
           setNowNumber(0);
         }}
         onTry={filter.open}
-        onQuit={() => navigator('/')}
+        onQuit={() => router.navigate({ to: "/" })}
       />
       <Group justify="space-between">
-        <FilteringModalButton
-          onSubmit={toFilter}
-        />
-        <PracticeQuitModal
-          onJudge={(j) => stopQuiz(j)}
-        />
+        <FilteringModalButton onSubmit={toFilter} />
+        <PracticeQuitModal onJudge={(j) => stopQuiz(j)} />
       </Group>
       <Text ta="center">
-        <Text span fz={38} fw={700} >{ nowNumber+1 }</Text> 
-        <Text span fz={18} fw={500}> / { maxQuizSize }</Text>
+        <Text span fz={38} fw={700}>
+          {nowNumber + 1}
+        </Text>
+        <Text span fz={18} fw={500}>
+          {" "}
+          / {maxQuizSize}
+        </Text>
       </Text>
-      <Card p="md" radius="lg" withBorder>
-        <PracticeTypewriteQuiz
-          question={typewriter.text}
-          visible={scene != 3}
-          time={through.time}
-          count={countdown.time}
-          countlimit={4000}
+      {quiz && (
+        <PracticeQuizController
+          quiz={quiz}
+          scene={scene}
+          ignoreLimit={3000}
+          countLimit={5000}
+          onJudge={(j, w) => judgeQuiz(j, w)}
+          m="sm"
         />
-        <PracticeQuizInfo 
-          qid={quiz?.qid}
-          answer={quiz?.answer}
-          workbook={quiz?.workbook || undefined}
-          isFavorite={quiz?.isFavorite}
-          registeredMylist={quiz?.registerdMylist || []}
-          visible={scene >= 4}
-        />
-      </Card>
-      <PracticeQuizController
-        canJudge={scene == 4}
-        canPress={scene == 1 || scene == 2}
-        onJudge={(j) => judgeQuiz(j)}
-        onPress={() => setScene(3)}
-        m="sm"
-      />
+      )}
     </>
-  )
+  );
 }

@@ -8,7 +8,6 @@ export default class Quiz {
     private _wid: string | null,
     private _categoryId: number | null,
     private _creatorUid: string,
-    private _visibleUids: string[],
     private _total: number,
     private _right: number,
   ) {}
@@ -19,7 +18,6 @@ export default class Quiz {
     answer: string,
     tagLabels: string[],
     creatorUid: string,
-    visibleUids: string[],
     anotherAnswer?: string,
     wid?: string,
     categoryId?: number,
@@ -33,7 +31,6 @@ export default class Quiz {
       wid || null,
       categoryId || null,
       creatorUid,
-      visibleUids,
       0,
       0,
     );
@@ -47,9 +44,8 @@ export default class Quiz {
     total: number,
     right: number,
     creatorUid: string,
-    visibleUids: string[],
     wid: string | null,
-    anotherAnswer: string | null, 
+    anotherAnswer: string | null,
     categoryId: number | null,
   ) {
     return new Quiz(
@@ -61,7 +57,6 @@ export default class Quiz {
       wid,
       categoryId,
       creatorUid,
-      visibleUids,
       total,
       right,
     );
@@ -76,7 +71,7 @@ export default class Quiz {
   }
 
   editAnotherAnswer(anotherAnswer: string | null) {
-    this._anotherAnswer = anotherAnswer
+    this._anotherAnswer = anotherAnswer;
   }
 
   editCategoryId(categoryId: number | null) {
@@ -89,14 +84,6 @@ export default class Quiz {
 
   editTags(tagLabels: string[]) {
     this._tagLabels = tagLabels;
-  }
-
-  isPublic(): boolean {
-    return !!(this.visibleUids.length == 0)
-  }
-
-  isPrivate(): boolean {
-    return this.visibleUids.includes(this._creatorUid);
   }
 
   isEditable(uid: string): boolean {
@@ -141,9 +128,5 @@ export default class Quiz {
 
   get creatorUid(): string {
     return this._creatorUid;
-  }
-
-  get visibleUids(): string[] {
-    return this._visibleUids;
   }
 }

@@ -1,49 +1,44 @@
-import { QuizRequestParams } from '../types'
-import { $api } from '@/utils/client'
-import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useFilteringParams } from "@/stores/useFilteringParams";
+import { $api } from "@/utils/client";
+import { QuizRequestParams } from "../types";
 
 const useQuizzes = (
   initialParams: QuizRequestParams = { maxView: 100 },
-  shouldFetch = true,
+  shouldFetch = true
 ) => {
-  const { data: params, } = useQuery({
-    queryKey: ['params'],
-    initialData: initialParams,
-  });
-  const queryClient = useQueryClient();
-  const setParams = (v: QuizRequestParams) => {
-    queryClient.setQueryData(['params'], v);
-  };
-  
-  const { data: quizzes, error, isLoading } = $api.useQuery('get', `/quizzes`, {
+  const { params } = useFilteringParams();
+
+  const {
+    data: quizzes,
+    error,
+    isLoading,
+  } = $api.useQuery("get", `/quizzes`, {
     params: {
       query: {
-        page: params.page,
-        maxView: params.maxView,
-        seed: params.seed,
-        wids: params.wids,
-        keyword: params.keyword,
-        keywordOption: params.keywordOption,
-        judgements: params.judgements,
-        since: params.since,
-        until: params.until,
-        mid: params.mid,
-        isFavorite: params.isFavorite,
-        categories: params.categories,
-        tags: params.tags,
-        tagMatchAll: params.tagMatchAll,
-      }
+        page: params?.page,
+        maxView: params?.maxView,
+        seed: params?.seed,
+        wids: params?.wids,
+        keyword: params?.keyword,
+        keywordOption: params?.keywordOption,
+        judgements: params?.judgements,
+        since: params?.since,
+        until: params?.until,
+        mid: params?.mid,
+        isFavorite: params?.isFavorite,
+        categories: params?.categories,
+        tags: params?.tags,
+        tagMatchAll: params?.tagMatchAll,
+      },
     },
     enabled: shouldFetch,
-  })
+  });
 
   return {
     quizzes,
     isLoading,
     error,
-    params,
-    setParams,
-  }
-}
+  };
+};
 
-export default useQuizzes
+export default useQuizzes;

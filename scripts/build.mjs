@@ -3,13 +3,16 @@ import fs from 'fs';
 
 try {
   //clean dist
-  spawnSync('npm', [ 'run', 'clean' ], { stdio: 'inherit' });
+  spawnSync('pnpm', [ 'run', 'clean' ], { stdio: 'inherit' });
 
   // build frontend
-  spawnSync('npm', [ 'run', 'build', '-w', 'packages/frontend' ], { stdio: 'inherit' });
+  spawnSync('pnpm', [ '--filter', './packages/api', 'run', 'build' ], { stdio: 'inherit' });
+
+  // build frontend
+  spawnSync('pnpm', [ '--filter', './packages/frontend', 'run', 'build' ], { stdio: 'inherit' });
 
   // build backend
-  spawnSync('npm', [ 'run', 'build', '-w', 'packages/backend' ], { stdio: 'inherit' });
+  spawnSync('pnpm', [ '--filter', './packages/backend', 'run', 'build' ], { stdio: 'inherit' });
 
   // check existing directory 
   if (!fs.existsSync('./packages/backend/dist/web')) {

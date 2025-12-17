@@ -1,6 +1,6 @@
-import { isEqual } from 'lodash';
+import { isEqual } from "lodash";
 
-export default abstract class ValueObject <T, U> {
+export default abstract class ValueObject<T, U> {
   // @ts-expect-error
   private _type: U;
   protected readonly _value: T;

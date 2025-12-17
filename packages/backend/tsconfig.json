@@ -3,20 +3,20 @@
     /* Visit https://aka.ms/tsconfig to read more about this file */
 
     /* Language and Environment */
-    "lib": ["es2020"],
+    "lib": ["es2020", "DOM"],
     "target": "ES2020",
-    
+
     /* Modules */
     "module": "Node16",
     "rootDir": "./src",
     "moduleResolution": "Node16",
+    "isolatedModules": true,
     "baseUrl": "./",
-    "paths": { 
+    "paths": {
       "@/*": ["./src/*", "./dist/*"]
     },
-    "typeRoots": [
-      "./src/types",
-    ],
+    // "typeRoots": ["./src/types"],
+    "types": ["jest", "node"],
     "resolveJsonModule": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
@@ -33,7 +33,7 @@
     "strict": true,
 
     /* Completeness */
-    "skipLibCheck": true 
+    "skipLibCheck": true
   },
-  "include": ["./src/**/*.ts"]
+  "include": ["./src/**/*.ts", "./__tests__/**/*.ts"]
 }

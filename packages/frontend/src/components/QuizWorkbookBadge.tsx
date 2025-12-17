@@ -5,8 +5,8 @@ import { components } from "api/schema";
 type Workbook = components["schemas"]["Workbook"];
 
 interface Props extends BadgeProps {
-  workbook: Workbook,
-  transformUpper?: boolean,
+  workbook: Workbook;
+  transformUpper?: boolean;
 }
 
 export function QuizWorkbookBadge({
@@ -17,11 +17,11 @@ export function QuizWorkbookBadge({
   const isMobile = useIsMobile();
 
   return (
-    <Badge 
+    <Badge
       variant="dot"
       radius="sm"
-      size={ isMobile ? "md" : "lg" }
-      style={{ textTransform: 'none', backgroundColor: '#fff' }}
+      size={isMobile ? "md" : "lg"}
+      style={{ textTransform: "none", backgroundColor: "#fff" }}
       {...other}
     >
       <div>
@@ -29,5 +29,5 @@ export function QuizWorkbookBadge({
         {/* {!!workbook?.date ? `(${workbook?.date.slice(0, 4)})` : null} */}
       </div>
     </Badge>
-  )
+  );
 }

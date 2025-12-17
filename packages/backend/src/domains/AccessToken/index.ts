@@ -1,19 +1,22 @@
-import jwt, { Secret, SignOptions } from 'jsonwebtoken';
+import jwt, { Secret, SignOptions } from "jsonwebtoken";
 
-import ValueObject from '../shared/ValueObject';
+import ValueObject from "../shared/ValueObject";
 
 interface AccessTokenValue {
-  uid: string,
-  username: string,
+  uid: string;
+  username: string;
 }
 
 const jwtSecret: Secret = process.env.JWT_SECRET_KEY || "";
 const jwtOptions: SignOptions = {
-  algorithm: 'HS256',
-  expiresIn: process.env.ACCESS_TOKEN_DURATION_MINUTE + 'm'
+  algorithm: "HS256",
+  expiresIn: process.env.ACCESS_TOKEN_DURATION_MINUTE + "m",
 };
 
-export default class AccessToken extends ValueObject<AccessTokenValue, "AccessToken"> {
+export default class AccessToken extends ValueObject<
+  AccessTokenValue,
+  "AccessToken"
+> {
   constructor(value: AccessTokenValue) {
     super(value);
   }
@@ -23,11 +26,9 @@ export default class AccessToken extends ValueObject<AccessTokenValue, "AccessTo
       uid: this._value.uid,
       username: this._value.username,
     };
-  
+
     return jwt.sign(jwtPayload, jwtSecret, jwtOptions);
   }
 
-  protected validate(value: AccessTokenValue): void {
-    
-  }
+  protected validate(value: AccessTokenValue): void {}
 }

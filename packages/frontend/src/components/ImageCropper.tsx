@@ -1,19 +1,19 @@
-import { Button, Center, Slider } from '@mantine/core';
-import { useState } from 'react';
-import Cropper, { Area } from 'react-easy-crop';
+import { Button, Center, Slider } from "@mantine/core";
+import { useState } from "react";
+import Cropper, { Area } from "react-easy-crop";
 
-import classes from './styles/ImageCropper.module.css';
+import classes from "./styles/ImageCropper.module.css";
 
 const defaultArea: Area = {
   width: 100,
   height: 100,
   x: 0,
   y: 0,
-}
+};
 
 export interface ImageCropperProps {
-  image?: string
-  onSave?: (croppedAreaPixels: Area) => void
+  image?: string;
+  onSave?: (croppedAreaPixels: Area) => void;
 }
 
 export default function ImageCropper({
@@ -28,10 +28,10 @@ export default function ImageCropper({
     setCroppedAreaPixels(croppedAreaPixels);
   };
 
-  return(
+  return (
     <>
       <div className={classes.cropContainer}>
-        <Cropper 
+        <Cropper
           image={image}
           crop={crop}
           zoom={zoom}
@@ -60,7 +60,9 @@ export default function ImageCropper({
             size="md"
             radius="xl"
             onClick={() => onSave(croppedAreaPixels || defaultArea)}
-          >保存する</Button>
+          >
+            保存する
+          </Button>
         </Center>
       </div>
     </>
