@@ -5,10 +5,11 @@ COPY . ./
 
 RUN apt-get update -y && apt-get install -y openssl
 
-RUN npm install
+RUN corepack enable pnpm
 
-RUN echo -n "JWT_SECRET_KEY=" >> ./.config/.env \
-    node -e "console.log(require('crypto').randomBytes(32).toString('hex'));" >> ./.config/.env
+RUN pnpm install --frozen-lockfile
 
-RUN npm run build
-CMD npm run start
+RUN mkdir -p .config && printf "JWT_SECRET_KEY=%s\n" "$(node -e \"console.log(require('crypto').randomBytes(32).toString('hex'));\")" >> ./.config/.env
+
+RUN pnpm run build
+CMD pnpm run start
