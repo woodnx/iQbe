@@ -1,4 +1,3 @@
-import { signupUser } from "@/plugins/auth";
 import {
   Button,
   Card,
@@ -9,9 +8,10 @@ import {
   Title,
   useMantineTheme,
 } from "@mantine/core";
-import { useForm, isNotEmpty, matchesField } from "@mantine/form";
+import { isNotEmpty, matchesField, useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "@tanstack/react-router";
+import { signupUser } from "@/plugins/auth";
 
 interface SubmitValue {
   username: string;
@@ -41,7 +41,7 @@ export default function Welcome() {
   const submit = async (values: SubmitValue) => {
     try {
       await signupUser(values.username, values.password).then(async (_user) => {
-        navigate("/");
+        navigate({ to: "/" });
       });
 
       form.reset();

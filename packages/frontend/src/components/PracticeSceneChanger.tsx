@@ -1,8 +1,8 @@
 import { Group, Loader, Overlay, Text } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
+import { useRouter, useSearch } from "@tanstack/react-router";
 import { components } from "api/schema";
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import FilteringModal from "@/components/FilteringModal";
 import FilteringModalButton from "@/components/FilteringModalButton";
 import PracticeQuitModal from "@/components/PracticeQuitModal";
@@ -10,7 +10,6 @@ import { PracticeQuizController } from "@/components/PracticeQuizController";
 import { PracticeQuizIntro } from "@/components/PracticeQuizIntro";
 import PracticeResultModal from "@/components/PracticeResultModal";
 import { useTimer } from "@/hooks";
-import useQuizzes from "@/hooks/useQuizzes";
 import { $api } from "@/utils/client";
 
 type Quiz = components["schemas"]["Quiz"];
@@ -38,9 +37,8 @@ export default function ({
   const [startTrigger, setStartTrigger] = useState(isTransfer);
   const [filtering, filter] = useDisclosure(false);
   const [_, result] = useDisclosure(false);
-  const navigator = useNavigate();
-
-  const { params, setParams } = useQuizzes();
+  const router = useRouter();
+  const search = useSearch({ from: "/practice" });
   const { mutate } = $api.useMutation("post", "/practice");
   const [rightList, setRightList] = useState<string[]>([]);
   const quiz = !!quizzes ? quizzes[shuffledList[nowNumber]] : null;
@@ -63,18 +61,21 @@ export default function ({
     maxView?: number,
   ) => {
     const seed = Math.floor(Math.random() * 100000);
-    setParams({
-      ...params,
-      page: 1,
-      maxView,
-      seed,
-      wids,
-      keyword,
-      keywordOption: Number(keywordOption),
-      categories,
-      tags,
-      tagMatchAll,
-      isFavorite: false,
+    router.navigate({
+      to: "/practice",
+      search: (old) => ({
+        ...old,
+        page: 1,
+        seed,
+        maxView,
+        wids,
+        keyword,
+        keywordOption,
+        categories,
+        tags,
+        tagMatchAll,
+      }),
+      replace: true,
     });
     filter.close();
     onFilter();
@@ -113,7 +114,7 @@ export default function ({
 
   const stopQuiz = async (judgement: number) => {
     await record(judgement, -1);
-    navigator("/");
+    router.navigate({ to: "/" });
   };
 
   return (
@@ -138,8 +139,8 @@ export default function ({
         quizzesTotal={maxQuizSize || 1}
         isTransfer={isTransfer}
         canNext={
-          quizzes && params?.maxView && params?.page
-            ? Math.ceil(size / params?.maxView) >= params?.page + 1
+          quizzes && search.maxView && search.page
+            ? Math.ceil(size / search.maxView) >= search.page + 1
             : false
         }
         opened={scene == "result"}
@@ -149,15 +150,19 @@ export default function ({
           setNowNumber(0);
         }}
         onNext={() => {
-          setParams({
-            ...params,
-            page: !!params?.page ? params.page + 1 : 0,
+          router.navigate({
+            to: "/practice",
+            search: (old) => ({
+              ...old,
+              page: !!old?.page ? old.page + 1 : 0,
+            }),
+            replace: true,
           });
           setScene("ready");
           setNowNumber(0);
         }}
         onTry={filter.open}
-        onQuit={() => navigator("/")}
+        onQuit={() => router.navigate({ to: "/" })}
       />
       <Group justify="space-between">
         <FilteringModalButton onSubmit={toFilter} />

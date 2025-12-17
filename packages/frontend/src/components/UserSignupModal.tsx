@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import {
   Button,
   Flex,
@@ -12,6 +11,7 @@ import {
 import { useForm, isNotEmpty, matchesField, isEmail } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
 import { IconAlertTriangle } from "@tabler/icons-react";
+import { useNavigate } from "@tanstack/react-router";
 import { signupUser } from "@/plugins/auth";
 import { $api } from "@/utils/client";
 import UsernameInput from "./UsernameInput";
@@ -81,7 +81,7 @@ export function UserSignupModal() {
         values.password,
         values.inviteCode,
       ).then(async (_user) => {
-        navigate("/");
+        navigate({ to: "/" });
       });
 
       form.reset();

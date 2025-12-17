@@ -1,8 +1,8 @@
 import { useReducer } from "react";
-import { useNavigate } from "react-router-dom";
 import { Button, Paper, PasswordInput, TextInput } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
+import { useNavigate } from "@tanstack/react-router";
 import { loginWithUsername } from "@/plugins/auth";
 
 export function UserLoginModal() {
@@ -29,7 +29,7 @@ export function UserLoginModal() {
             form.setFieldValue("username", "");
             return;
           }
-          navigate("/");
+          navigate({ to: "/" });
           form.reset();
         },
       );

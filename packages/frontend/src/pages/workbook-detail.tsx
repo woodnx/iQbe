@@ -1,25 +1,56 @@
-import { Center, Group, Stack } from "@mantine/core";
-import { useRouter, useSearch } from "@tanstack/react-router";
-import { useState } from "react";
+import {
+  Card,
+  Center,
+  Group,
+  getGradient,
+  Stack,
+  Text,
+  useMantineTheme,
+} from "@mantine/core";
+import { modals } from "@mantine/modals";
+import { IconTrash } from "@tabler/icons-react";
+import { useParams, useRouter, useSearch } from "@tanstack/react-router";
+import { ReactNode, useState } from "react";
 import FilteringModalButton from "@/components/FilteringModalButton";
+import MylistEditModalButton from "@/components/MylistEditModalButton";
 import QuizControllBar from "@/components/QuizControllBar";
 import QuizHiddenAnswerButton from "@/components/QuizHiddenAnswerButton";
 import QuizList from "@/components/QuizList";
 import QuizPagination from "@/components/QuizPagination";
 import QuizShuffleButton from "@/components/QuizShuffleButton";
 import QuizTransfarButton from "@/components/QuizTransfarButton";
+import { useWorkbooks } from "@/hooks/useWorkbooks";
 import { $api } from "@/utils/client";
 
-export default function Search() {
+export default function Mylist() {
+  const { wid } = useParams({
+    from: "/workbook/$wid",
+  });
   const router = useRouter();
-  const search = useSearch({ from: "/search" });
+  const search = useSearch({ from: "/workbook/$wid" });
+  const theme = useMantineTheme();
+  const { workbooks } = useWorkbooks(true);
+
+  const workbook = workbooks?.find((list) => list.wid == wid);
+  const workbookName = workbook?.name || "";
+  const workbookDate = workbook?.date;
   const [activePage, setPage] = useState(1);
   const [isHidden, setIsHidden] = useState(false);
   const { data: quizzes } = $api.useQuery("get", "/quizzes", {
-    params: { query: search },
+    params: {
+      query: {
+        ...search,
+        wids: [wid],
+      },
+    },
   });
   const { data: quizzesSize } = $api.useQuery("get", "/quizzes/size", {
-    params: { query: search },
+    params: {
+      query: {
+        ...search,
+        wids: [wid],
+      },
+    },
   });
   const size =
     !!quizzes && !!quizzes.length && !!quizzesSize ? quizzesSize.size : 0;
@@ -35,7 +66,10 @@ export default function Search() {
   ) => {
     setPage(1);
     router.navigate({
-      to: "/search",
+      to: "/workbook/$wid",
+      params: {
+        wid,
+      },
       search: (old) => ({
         ...old,
         page: 1,
@@ -55,7 +89,10 @@ export default function Search() {
   const toShuffle = (seed: number) => {
     setPage(1);
     router.navigate({
-      to: "/search",
+      to: "/workbook/$wid",
+      params: {
+        wid,
+      },
       search: (old) => ({
         ...old,
         page: 1,
@@ -68,7 +105,10 @@ export default function Search() {
   const changePage = (page: number) => {
     setPage(page);
     router.navigate({
-      to: "/search",
+      to: "/workbook/$wid",
+      params: {
+        wid,
+      },
       search: (old) => ({
         ...old,
         page,
@@ -87,11 +127,61 @@ export default function Search() {
     });
   };
 
+  const WorkbookCard = (
+    <Card
+      mb="xs"
+      w="100%"
+      withBorder
+      style={{
+        backgroundImage: getGradient(
+          { deg: 45, from: "indigo", to: "cyan" },
+          theme,
+        ),
+        color: `var(--mantine-color-white)`,
+      }}
+    >
+      <Group justify="space-between">
+        <Text fw={700} fz={25}>
+          {workbookName}
+        </Text>
+        <Group justify="md">
+          <MylistEditModalButton
+            onClick={() => {
+              modals.openContextModal({
+                modal: "workbookEdit",
+                title: "問題集の編集",
+                innerProps: {
+                  wid,
+                  name: workbookName,
+                  date: workbookDate || undefined,
+                },
+              });
+            }}
+          />
+          <MylistEditModalButton
+            icon={IconTrash}
+            label="削除"
+            onClick={() => {
+              modals.openContextModal({
+                modal: "workbookDelete",
+                title: "問題集の削除",
+                innerProps: {
+                  wid,
+                },
+              });
+            }}
+          />
+        </Group>
+      </Group>
+    </Card>
+  ) as ReactNode;
+
   return (
     <>
       <QuizControllBar
         p="sm"
         total={size}
+        header={WorkbookCard}
         buttons={
           <Group>
             <FilteringModalButton onSubmit={toFilter} />

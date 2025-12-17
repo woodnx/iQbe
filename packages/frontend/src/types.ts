@@ -5,7 +5,7 @@ import { paths } from "api/schema";
 export type QuizRequestParams =
   paths["/quizzes"]["get"]["parameters"]["query"] & {};
 
-export type KeywordOption = "1" | "2" | "3";
+export type KeywordOption = 1 | 2 | 3;
 
 export interface UserStatus {
   start: string;

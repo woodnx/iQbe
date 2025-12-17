@@ -1,6 +1,6 @@
-import { KeywordOption } from "@/types";
 import { Box, BoxProps, Group, Radio, TextInput } from "@mantine/core";
 import { ChangeEvent } from "react";
+import { KeywordOption } from "@/types";
 
 type FormInputProps = {
   value?: string;
@@ -37,8 +37,12 @@ export default function FilteringWord({
         value={wordSearchOption.value}
         defaultValue="1"
         onChange={(v) => {
-          if (v == "1" || v == "2" || v == "3") {
-            wordSearchOption.onChange && wordSearchOption.onChange(v);
+          if (wordSearchOption.onChange && v == "1") {
+            wordSearchOption.onChange(Number(v) as 1);
+          } else if (wordSearchOption.onChange && v == "2") {
+            wordSearchOption.onChange(Number(v) as 2);
+          } else if (wordSearchOption.onChange && v == "3") {
+            wordSearchOption.onChange(Number(v) as 3);
           }
         }}
       >

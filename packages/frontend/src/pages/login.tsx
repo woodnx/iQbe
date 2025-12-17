@@ -1,11 +1,11 @@
 import { useLayoutEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import { Button, Center, Modal, Stack } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { UserLoginModal } from "@/components/UserLoginModal";
 import Logo from "@/components/Logo";
 import { UserSignupModal } from "@/components/UserSignupModal";
 import { checkAuth } from "@/plugins/auth";
+import { useNavigate } from "@tanstack/react-router";
 
 export default function Login() {
   const [loginOpened, { open: loginOpen, close: loginClose }] =
@@ -17,7 +17,7 @@ export default function Login() {
   useLayoutEffect(() => {
     checkAuth().then((user) => {
       if (!!user) {
-        navigate("/");
+        navigate({ to: "/" });
         return;
       }
     });

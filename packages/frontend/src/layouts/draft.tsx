@@ -1,5 +1,5 @@
 import { AppShell, Container } from "@mantine/core";
-import { Outlet } from "react-router-dom";
+import { Outlet } from "@tanstack/react-router";
 
 export default function LoginLayout() {
   return (

@@ -1,6 +1,6 @@
 import { components } from "api/schema";
 import dayjs from "dayjs";
-import { sql } from "kysely";
+import { Expression, SqlBool, sql } from "kysely";
 
 import IQuizQueryService, {
   countOption,
@@ -16,7 +16,7 @@ type QuizDTO = components["schemas"]["Quiz"];
 export default class QuizInfra implements IQuizRepository, IQuizQueryService {
   constructor(
     private clientManager: KyselyClientManager,
-    private categoryInfra: CategoryInfra,
+    private categoryInfra: CategoryInfra
   ) {}
 
   private async addTagToQuiz(qid: string, tagLabel: string) {
@@ -66,7 +66,7 @@ export default class QuizInfra implements IQuizRepository, IQuizQueryService {
     await client
       .deleteFrom("tagging")
       .where(({ and, eb }) =>
-        and([eb("tag_id", "=", tagId), eb("quiz_id", "=", quizId)]),
+        and([eb("tag_id", "=", tagId), eb("quiz_id", "=", quizId)])
       )
       .execute();
   }
@@ -97,7 +97,7 @@ export default class QuizInfra implements IQuizRepository, IQuizQueryService {
         "quizzes.category_id as categoryId",
         "quizzes.total_crct_ans as right",
         sql<number>`total_crct_ans + total_through_ans + total_wrng_ans`.as(
-          "total",
+          "total"
         ),
         fn.countAll<number>().over().as("size"),
       ]);
@@ -108,19 +108,20 @@ export default class QuizInfra implements IQuizRepository, IQuizQueryService {
       else query = query.where("workbooks.wid", "=", option.wids);
     if (!!option.seed) query = query.orderBy(sql`RAND(${option.seed})`);
     if (!!option.keyword && !!option.keywordOption) {
-      if (option.keywordOption === 2) {
-        query = query.where(
-          sql`MATCH (ans) AGAINST (${option.keyword} IN BOOLEAN MODE)`,
-        );
-      } else if (option.keywordOption === 3) {
-        query = query.where(
-          sql`MATCH (que) AGAINST (${option.keyword} IN BOOLEAN MODE)`,
-        );
-      } else {
-        query = query.where(
-          sql`MATCH (que, ans) AGAINST (${option.keyword} IN BOOLEAN MODE)`,
-        );
-      }
+      query = query.where((eb) => {
+        const keyword = option.keyword || "";
+        const ors: Expression<SqlBool>[] = []
+
+        if (option.keywordOption !== 3) {
+          ors.push(eb("quizzes.que", "like", `%${keyword}%`))
+        }
+        
+        if (option.keywordOption !== 2) {
+          ors.push(eb("quizzes.ans", "like", `%${keyword}%`))
+        }
+
+        return eb.or(ors)
+      })
     }
     if (!!option.categories) {
       if (Array.isArray(option.categories) && option.categories.length)
@@ -138,7 +139,7 @@ export default class QuizInfra implements IQuizRepository, IQuizQueryService {
             .having(
               ({ fn }) => fn.count("tags.label"),
               "=",
-              option.tags.length,
+              option.tags.length
             );
         } else {
           query = query
@@ -160,6 +161,7 @@ export default class QuizInfra implements IQuizRepository, IQuizQueryService {
     if (option.isFavorite) {
       query = query
         .innerJoin("favorites", "favorites.quiz_id", "quizzes.id")
+        .select("favorites.registered")
         .where("favorites.user_id", "=", userId)
         .orderBy("favorites.registered desc");
     } else if (!!option.since && !!option.until) {
@@ -179,13 +181,14 @@ export default class QuizInfra implements IQuizRepository, IQuizQueryService {
                 eb("histories.judgement", "in", option.judgements),
                 between("histories.practiced", since, until),
               ])
-            : between("histories.practiced", since, until),
+            : between("histories.practiced", since, until)
         )
         .orderBy("histories.practiced desc");
     } else if (!!option.mid) {
       query = query
         .innerJoin("mylists_quizzes", "mylists_quizzes.quiz_id", "quizzes.id")
         .innerJoin("mylists", "mylists.id", "mylists_quizzes.mylist_id")
+        .select("mylists_quizzes.registered")
         .where("mylists.mid", "=", option.mid)
         .where("mylists.user_id", "=", userId)
         .orderBy("mylists_quizzes.registered desc");
@@ -212,6 +215,7 @@ export default class QuizInfra implements IQuizRepository, IQuizQueryService {
           registerdMylist,
           tags,
           visibleUser,
+          judgement,
         ] = await Promise.all([
           quiz.categoryId
             ? this.categoryInfra.findChainById(quiz.categoryId)
@@ -228,7 +232,7 @@ export default class QuizInfra implements IQuizRepository, IQuizQueryService {
             .selectFrom("favorites")
             .select("quiz_id")
             .where(({ eb, and }) =>
-              and([eb("user_id", "=", userId), eb("quiz_id", "=", quizId)]),
+              and([eb("user_id", "=", userId), eb("quiz_id", "=", quizId)])
             )
             .executeTakeFirst(),
 
@@ -244,7 +248,7 @@ export default class QuizInfra implements IQuizRepository, IQuizQueryService {
               and([
                 eb("mylists.user_id", "=", userId),
                 eb("mylists_quizzes.quiz_id", "=", quizId),
-              ]),
+              ])
             )
             .execute(),
 
@@ -265,6 +269,12 @@ export default class QuizInfra implements IQuizRepository, IQuizQueryService {
             .select(["uid"])
             .where(({ eb, and }) => and([eb("quiz_id", "=", quizId)]))
             .executeTakeFirst(),
+
+          client
+            .selectFrom("histories")
+            .select(["histories.judgement"])
+            .where(({ eb, and }) => and([eb("quiz_id", "=", quizId)]))
+            .executeTakeFirst(),
         ]);
 
         return {
@@ -280,6 +290,7 @@ export default class QuizInfra implements IQuizRepository, IQuizQueryService {
           registerdMylist,
           tags,
           workbook,
+          judgement: judgement?.judgement,
           category: category?.map((c) => ({
             id: c.id,
             name: c.name,
@@ -288,7 +299,7 @@ export default class QuizInfra implements IQuizRepository, IQuizQueryService {
             disabled: c.disabled,
           })),
         };
-      }),
+      })
     );
   }
 
@@ -310,14 +321,14 @@ export default class QuizInfra implements IQuizRepository, IQuizQueryService {
       .leftJoin(
         "quiz_visible_users",
         "quiz_visible_users.quiz_id",
-        "quizzes.id",
+        "quizzes.id"
       )
       .select(({ fn }) => [fn.countAll<number>().over().as("size")])
       .where(({ eb, or }) =>
         or([
           eb("quiz_visible_users.user_id", "is", null),
           eb("quiz_visible_users.user_id", "=", userId),
-        ]),
+        ])
       );
 
     if (!!option.wids && option.wids.length)
@@ -330,7 +341,7 @@ export default class QuizInfra implements IQuizRepository, IQuizQueryService {
           eb.or([
             eb("quizzes.que", "like", `%${option.keyword}%`),
             eb("quizzes.ans", "like", `%${option.keyword}%`),
-          ]),
+          ])
         );
       } else if (option.keywordOption === 2) {
         query = query.where("quizzes.que", "like", `%${option.keyword}%`);
@@ -381,7 +392,7 @@ export default class QuizInfra implements IQuizRepository, IQuizQueryService {
                 eb("histories.judgement", "in", option.judgements),
                 between("histories.practiced", since, until),
               ])
-            : between("histories.practiced", since, until),
+            : between("histories.practiced", since, until)
         )
         .orderBy("histories.practiced desc");
     } else if (!!option.mid) {
@@ -418,7 +429,7 @@ export default class QuizInfra implements IQuizRepository, IQuizQueryService {
         "quizzes.sub_category_id as subCategoryId",
         "quizzes.total_crct_ans as right",
         sql<number>`total_crct_ans + total_through_ans + total_wrng_ans`.as(
-          "total",
+          "total"
         ),
       ])
       .where("quizzes.qid", "=", qid)
@@ -444,7 +455,7 @@ export default class QuizInfra implements IQuizRepository, IQuizQueryService {
       quiz.creatorUid,
       quiz.anotherAnswer,
       quiz.wid,
-      quiz.categoryId,
+      quiz.categoryId
     );
   }
 
@@ -478,7 +489,7 @@ export default class QuizInfra implements IQuizRepository, IQuizQueryService {
             "quizzes.sub_category_id as subCategoryId",
             "quizzes.total_crct_ans as right",
             sql<number>`total_crct_ans + total_through_ans + total_wrng_ans`.as(
-              "total",
+              "total"
             ),
           ])
           .where("quizzes.id", "=", quizId)
@@ -504,9 +515,9 @@ export default class QuizInfra implements IQuizRepository, IQuizQueryService {
           quiz.creatorUid,
           quiz.anotherAnswer,
           quiz.wid,
-          quiz.categoryId,
+          quiz.categoryId
         );
-      }),
+      })
     );
 
     return quizzes;
@@ -560,7 +571,7 @@ export default class QuizInfra implements IQuizRepository, IQuizQueryService {
           .where("label", "=", label)
           .executeTakeFirstOrThrow()
           .then((tag) => tag.id);
-      }),
+      })
     );
 
     await Promise.all(
@@ -572,15 +583,15 @@ export default class QuizInfra implements IQuizRepository, IQuizQueryService {
             quiz_id: quizId,
             registered: new Date(),
           })
-          .execute(),
-      ),
+          .execute()
+      )
     );
   }
 
   async update(
     quiz: Quiz,
     tagsToAdd: string[],
-    tagsToRemove: string[],
+    tagsToRemove: string[]
   ): Promise<void> {
     const client = this.clientManager.getClient();
 

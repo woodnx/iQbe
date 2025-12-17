@@ -1,5 +1,4 @@
 import { useLayoutEffect, useState } from "react";
-import { Outlet, useLocation, useNavigate } from "react-router-dom";
 
 import NavbarLink from "@/components/NavbarLink";
 import UserInfoMenu from "@/components/UserInfoMenu";
@@ -29,6 +28,11 @@ import {
   IconSearch,
   IconStar,
 } from "@tabler/icons-react";
+import {
+  Outlet,
+  useNavigate,
+  useRouterState,
+} from "@tanstack/react-router";
 
 import Logo from "../components/Logo";
 import { useMylists } from "../hooks/useMylists";
@@ -52,7 +56,9 @@ export default function DefaultLayout() {
   const [loading, setLoading] = useState(true);
   const [opened, { open, close }] = useDisclosure(false);
   const navigate = useNavigate();
-  const location = useLocation();
+  const { pathname } = useRouterState({
+    select: (state) => state.location,
+  });
   const { mylists } = useMylists(!loading);
   const { workbooks } = useWorkbooks(false, !loading);
   const isMobile = useIsMobile();
@@ -110,7 +116,7 @@ export default function DefaultLayout() {
   ];
 
   const activeIdx = mockdata.findIndex(
-    (data) => checkPathname(location.pathname) === data.link,
+    (data) => checkPathname(pathname) === data.link,
   );
 
   useLayoutEffect(() => {
@@ -120,10 +126,10 @@ export default function DefaultLayout() {
       if (ignore) return;
 
       if (user == "please-move-welcome-page") {
-        navigate("/welcome");
+        navigate({ to: "/welcome" });
         return;
       } else if (!user) {
-        navigate("/login");
+        navigate({ to: "/login" });
         notifications.show({
           title: "Require Login",
           message: "Please login",
@@ -152,7 +158,7 @@ export default function DefaultLayout() {
             isActive={activeIdx == idx}
             activeLink={activeLink}
             onNavigate={(link, linksIdx) => {
-              navigate(link);
+              navigate({ to: link });
               setActiveLink(
                 linksIdx !== undefined
                   ? `${activeIdx}.${linksIdx}`
@@ -189,7 +195,7 @@ export default function DefaultLayout() {
           color="gray"
           onClick={() => {
             setActiveLink("0");
-            navigate("/");
+            navigate({ to: "/" });
           }}
         >
           <IconHome size="2rem" />
@@ -201,7 +207,7 @@ export default function DefaultLayout() {
           color="gray"
           onClick={() => {
             setActiveLink("1");
-            navigate("/search");
+            navigate({ to: "/search" });
           }}
         >
           <IconSearch size="2rem" />
@@ -213,7 +219,7 @@ export default function DefaultLayout() {
           color="gray"
           onClick={() => {
             setActiveLink("3");
-            navigate("/practice");
+            navigate({ to: "/practice", search: { path: undefined } });
           }}
         >
           <IconSchool size="2rem" />

@@ -1,8 +1,7 @@
+import { useSearch } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { useSearchParams } from "react-router-dom";
 import PracticeSceneChanger from "@/components/PracticeSceneChanger";
-import useQuizSize from "@/hooks/useQuizSize";
-import useQuizzes from "@/hooks/useQuizzes";
+import { $api } from "@/utils/client";
 
 function shuffleSequense(n: number) {
   const a = [...Array(n).keys()];
@@ -18,25 +17,30 @@ function shuffleSequense(n: number) {
 }
 
 export default function Practice() {
-  const [searchParams] = useSearchParams();
   const [shouldFetch, setShouldFetch] = useState(false);
-  const path = searchParams.get("path");
-  const isTransfer = !!path;
-
-  const { quizzes, params } = useQuizzes(undefined, shouldFetch || isTransfer);
-  const { quizzesSize } = useQuizSize(params);
+  const search = useSearch({ from: "/practice" });
+  const { data: quizzes } = $api.useQuery("get", "/quizzes", {
+    params: { query: search },
+    enabled: shouldFetch,
+  });
+  const { data: quizzesSize } = $api.useQuery("get", "/quizzes/size", {
+    params: { query: search },
+    enabled: shouldFetch,
+  });
   const shuffledList = useMemo(() => {
     const length = quizzes?.length || 0;
-    return isTransfer ? shuffleSequense(length) : [...Array(length).keys()];
-  }, [quizzes?.length, isTransfer]);
+    return search.isTransfer
+      ? shuffleSequense(length)
+      : [...Array(length).keys()];
+  }, [quizzes?.length, search.isTransfer]);
 
   return (
     <>
       <PracticeSceneChanger
         quizzes={quizzes}
-        size={quizzesSize || 0}
+        size={quizzesSize?.size || 0}
         shuffledList={shuffledList}
-        isTransfer={isTransfer}
+        isTransfer={search.isTransfer}
         onFilter={() => setShouldFetch(true)}
       />
     </>

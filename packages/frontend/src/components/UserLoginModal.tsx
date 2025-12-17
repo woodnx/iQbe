@@ -1,8 +1,8 @@
 import { useReducer } from "react";
-import { useNavigate } from "react-router-dom";
 import { Button, Paper, PasswordInput, TextInput } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
+import { useNavigate } from "@tanstack/react-router";
 import { loginOldUser, loginWithUsername } from "@/plugins/auth";
 
 interface SubmitValue {
@@ -39,7 +39,7 @@ export function UserLoginModal() {
             form.setFieldValue("email", email);
             return;
           }
-          navigate("/");
+          navigate({ to: "/" });
           form.reset();
         },
       );
@@ -57,7 +57,7 @@ export function UserLoginModal() {
     try {
       await loginOldUser(values.username, values.email, values.password).then(
         async (_user) => {
-          navigate("/");
+          navigate({ to: "/" });
           form.reset();
         },
       );

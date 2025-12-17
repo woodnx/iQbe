@@ -1,8 +1,3 @@
-import { components } from "api/schema";
-import dayjs from "dayjs";
-import { useNavigate } from "react-router-dom";
-
-import { useAuth } from "@/hooks/useAuth";
 import {
   ActionIcon,
   Badge,
@@ -15,6 +10,10 @@ import {
 } from "@mantine/core";
 import { IconDots, IconPencil, IconTrash } from "@tabler/icons-react";
 import { modals } from "@mantine/modals";
+import { useNavigate } from "@tanstack/react-router";
+import { components } from "api/schema";
+import dayjs from "dayjs";
+import { useAuth } from "@/hooks/useAuth";
 
 type Workbook = components["schemas"]["Workbook"];
 
@@ -35,7 +34,7 @@ export default function WorkbookCard({ workbook }: Props) {
           truncate
           onClick={(e) => {
             e.preventDefault();
-            navigate(`/workbook/${workbook.wid}`);
+            navigate({ to: "/workbook/$wid", params: { wid: `${workbook.wid}` } });
           }}
           component="a"
           href=""

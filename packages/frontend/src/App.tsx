@@ -1,6 +1,6 @@
 import "dayjs/locale/ja";
 
-import { BrowserRouter as Router } from "react-router-dom";
+import { RouterProvider } from "@tanstack/react-router";
 
 import { DatesProvider } from "@mantine/dates";
 import { ModalsProvider } from "@mantine/modals";
@@ -17,7 +17,7 @@ import QuizDetailesModal from "./components/QuizDetailesModal";
 import QuizEditModal from "./components/QuizEditModal";
 import WorkbookDeleteModal from "./components/WorkbookDeleteModal";
 import WorkbookEditModal from "./components/WorkbookEditModal";
-import Layout from "./layouts";
+import { router } from "./router";
 
 const modals = {
   quizFiltering: FilteringContextModal,
@@ -44,9 +44,7 @@ export default function App() {
     <ModalsProvider modals={modals}>
       <DatesProvider settings={{ locale: "ja" }}>
         <Notifications position="top-right" />
-        <Router>
-          <Layout />
-        </Router>
+        <RouterProvider router={router} />
       </DatesProvider>
     </ModalsProvider>
   );
