@@ -1,6 +1,6 @@
 import { components } from "api/schema";
 import dayjs from "dayjs";
-import { sql } from "kysely";
+import { Expression, SqlBool, sql } from "kysely";
 
 import IQuizQueryService, {
   countOption,
@@ -108,19 +108,20 @@ export default class QuizInfra implements IQuizRepository, IQuizQueryService {
       else query = query.where("workbooks.wid", "=", option.wids);
     if (!!option.seed) query = query.orderBy(sql`RAND(${option.seed})`);
     if (!!option.keyword && !!option.keywordOption) {
-      if (option.keywordOption === 2) {
-        query = query.where(
-          sql`MATCH (ans) AGAINST (${option.keyword} IN BOOLEAN MODE)`
-        );
-      } else if (option.keywordOption === 3) {
-        query = query.where(
-          sql`MATCH (que) AGAINST (${option.keyword} IN BOOLEAN MODE)`
-        );
-      } else {
-        query = query.where(
-          sql`MATCH (que, ans) AGAINST (${option.keyword} IN BOOLEAN MODE)`
-        );
-      }
+      query = query.where((eb) => {
+        const keyword = option.keyword || "";
+        const ors: Expression<SqlBool>[] = []
+
+        if (option.keywordOption !== 3) {
+          ors.push(eb("quizzes.que", "like", `%${keyword}%`))
+        }
+        
+        if (option.keywordOption !== 2) {
+          ors.push(eb("quizzes.ans", "like", `%${keyword}%`))
+        }
+
+        return eb.or(ors)
+      })
     }
     if (!!option.categories) {
       if (Array.isArray(option.categories) && option.categories.length)
