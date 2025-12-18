@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.1.5](https://github.com/woodnx/iQbe/compare/v4.1.4...v4.1.5) (2025-12-18)
+
+
+### Bug Fixes
+
+* lockfile bug ([#258](https://github.com/woodnx/iQbe/issues/258)) ([1e2985f](https://github.com/woodnx/iQbe/commit/1e2985ffca3135cbdd16f3a9c0920cf2f692117b))
+
 ## [4.1.4](https://github.com/woodnx/iQbe/compare/v4.1.3...v4.1.4) (2025-12-17)
 
 
