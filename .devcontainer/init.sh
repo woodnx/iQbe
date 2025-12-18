@@ -11,7 +11,7 @@ cp -f .devcontainer/allowed-server.dev.json packages/backend/src/allowed-server.
 echo -n "JWT_SECRET_KEY=" >> ./.config/.env
 node -e "console.log(require('crypto').randomBytes(32).toString('hex'));" >> ./.config/.env
 
-corepack enable pnpm
+sudo corepack enable pnpm
 pnpm install --frozen-lockfile
 pnpm run api
 pnpm run migrate:exe
