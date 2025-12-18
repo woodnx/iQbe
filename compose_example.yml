@@ -9,6 +9,8 @@ services:
       - "9000:9000"
     depends_on:
       - db
+    volumes:
+      - jwt-config:/iQbe/.config
   db:
     image: mysql:9.1
     container_name: iQbe-db
@@ -22,5 +24,6 @@ services:
       - ./db/conf.d:/etc/mysql/conf.d
 
 volumes:
+  jwt-config:
   iqbe-data:
     driver: local
