@@ -1,7 +1,7 @@
+import { ApiError } from "api";
 import IUserRepository from "@/domains/User/IUserRepository";
 import { format } from "@/plugins/day";
 import { asyncWrapper, typedAsyncWrapper } from "@/utils";
-import { ApiError } from "api";
 
 export default class IController {
   constructor(private userRepository: IUserRepository) {}

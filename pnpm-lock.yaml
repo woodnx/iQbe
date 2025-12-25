@@ -30,6 +30,9 @@ importers:
       '@types/node':
         specifier: ^20.19.27
         version: 20.19.27
+      backend:
+        specifier: link:packages/backend
+        version: link:packages/backend
       iqbe:
         specifier: 'link:'
         version: 'link:'
@@ -145,6 +148,9 @@ importers:
       '@types/express':
         specifier: ^4.17.17
         version: 4.17.25
+      '@types/express-serve-static-core':
+        specifier: ^4.19.7
+        version: 4.19.7
       '@types/jsonwebtoken':
         specifier: ^9.0.4
         version: 9.0.10
