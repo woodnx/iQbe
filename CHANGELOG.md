@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.1.7](https://github.com/woodnx/iQbe/compare/v4.1.6...v4.1.7) (2025-12-25)
+
+
+### Bug Fixes
+
+* pnpm start時にエラーが出る問題を修正 ([#262](https://github.com/woodnx/iQbe/issues/262)) ([f235a95](https://github.com/woodnx/iQbe/commit/f235a95014ec7a8feb62740f8300e3fcafecd96d))
+
 ## [4.1.6](https://github.com/woodnx/iQbe/compare/v4.1.5...v4.1.6) (2025-12-25)
 
 
