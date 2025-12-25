@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.1.6](https://github.com/woodnx/iQbe/compare/v4.1.5...v4.1.6) (2025-12-25)
+
+
+### Bug Fixes
+
+* ビルドが通らない問題を修正 ([#260](https://github.com/woodnx/iQbe/issues/260)) ([b93f394](https://github.com/woodnx/iQbe/commit/b93f39450c1f04939d793290dca0fe58dcc9887e))
+
 ## [4.1.5](https://github.com/woodnx/iQbe/compare/v4.1.4...v4.1.5) (2025-12-18)
 
 
