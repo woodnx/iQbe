@@ -1,4 +1,4 @@
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 
 export default class AuthService {
   generateHashedPassword(passwd: string) {
