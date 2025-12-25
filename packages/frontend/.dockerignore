@@ -1,0 +1,17 @@
+node_modules
+**/node_modules
+
+.pnpm-store
+**/.pnpm-store
+
+.pnpm
+**/.pnpm
+
+dist
+**/dist
+
+.git
+.gitignore
+
+Dockerfile
+docker-compose.yml

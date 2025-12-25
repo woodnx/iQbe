@@ -1,6 +1,6 @@
-import { DB } from "./db/types";
-import { createPool } from "mysql2";
 import { Kysely, MysqlDialect } from "kysely";
+import { createPool } from "mysql2/promise";
+import { DB } from "./db/types";
 
 const dialect = new MysqlDialect({
   pool: createPool({

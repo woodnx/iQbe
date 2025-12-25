@@ -7,20 +7,16 @@ FROM node:22-slim AS deps
 
 WORKDIR /iQbe
 
-# 必要最低限のツール
 RUN apt-get update -y && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
-
-# pnpm を固定
 RUN corepack enable && corepack prepare pnpm@10.18.3 --activate
 
-# 依存解決に必要なファイルだけ先にコピー（キャッシュの要）
+# 依存解決に必要なファイルだけ先にコピー
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY packages/*/package.json packages/*/
 
-# pnpm store を BuildKit cache に
 RUN --mount=type=cache,id=pnpm-store,target=/pnpm/store \
     PNPM_STORE_DIR=/pnpm/store \
-    pnpm install --frozen-lockfile
+    pnpm -r install --frozen-lockfile
 
 
 ############################
@@ -31,13 +27,16 @@ FROM node:22-slim AS build
 WORKDIR /iQbe
 
 RUN corepack enable && corepack prepare pnpm@10.18.3 --activate
-
-# node_modules を含めてコピー
 COPY --from=deps /iQbe /iQbe
 COPY . .
 
-RUN pnpm run build
+RUN --mount=type=cache,id=pnpm-store,target=/pnpm/store \
+    PNPM_STORE_DIR=/pnpm/store \
+    pnpm -r install --frozen-lockfile
 
+# build 用にダミーの.env ファイルを作成
+RUN mkdir -p .config && echo "JWT_SECRET_KEY=dummy" > .config/.env
+RUN pnpm run build
 
 ############################
 # runtime stage (Prod)
@@ -49,16 +48,13 @@ ENV NODE_ENV=production
 
 RUN apt-get update -y && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
 
-# pnpm（prune 用）
 RUN corepack enable && corepack prepare pnpm@10.18.3 --activate
 
-# ビルド成果物をコピー
 COPY --from=build /iQbe /iQbe
 
 # devDependencies を削除
-RUN pnpm prune --prod
+RUN CI=true pnpm prune --prod
 
-# entrypoint
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 

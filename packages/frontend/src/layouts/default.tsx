@@ -1,10 +1,3 @@
-import { useLayoutEffect, useState } from "react";
-
-import NavbarLink from "@/components/NavbarLink";
-import UserInfoMenu from "@/components/UserInfoMenu";
-import { useIsMobile } from "@/contexts/isMobile";
-import useHeaderHeight from "@/hooks/useHeaderHeight";
-import { useWorkbooks } from "@/hooks/useWorkbooks";
 import {
   ActionIcon,
   AppShell,
@@ -28,11 +21,13 @@ import {
   IconSearch,
   IconStar,
 } from "@tabler/icons-react";
-import {
-  Outlet,
-  useNavigate,
-  useRouterState,
-} from "@tanstack/react-router";
+import { Outlet, useNavigate, useRouterState } from "@tanstack/react-router";
+import { useLayoutEffect, useState } from "react";
+import NavbarLink from "@/components/NavbarLink";
+import UserInfoMenu from "@/components/UserInfoMenu";
+import { useIsMobile } from "@/contexts/isMobile";
+import useHeaderHeight from "@/hooks/useHeaderHeight";
+import { useWorkbooks } from "@/hooks/useWorkbooks";
 
 import Logo from "../components/Logo";
 import { useMylists } from "../hooks/useMylists";
@@ -219,7 +214,7 @@ export default function DefaultLayout() {
           color="gray"
           onClick={() => {
             setActiveLink("3");
-            navigate({ to: "/practice", search: { path: undefined } });
+            navigate({ to: "/practice", search: { isTransfer: false } });
           }}
         >
           <IconSchool size="2rem" />

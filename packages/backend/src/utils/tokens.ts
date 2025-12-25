@@ -8,7 +8,7 @@ type User = components["schemas"]["User"];
 const jwtSecret: Secret = process.env.JWT_SECRET_KEY || "";
 const jwtOptions: SignOptions = {
   algorithm: "HS256",
-  expiresIn: process.env.ACCESS_TOKEN_DURATION_MINUTE + "m",
+  expiresIn: `${Number(process.env.ACCESS_TOKEN_DURATION_MINUTE)}M`,
 };
 
 interface VerifyedToken {

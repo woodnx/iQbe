@@ -1,13 +1,17 @@
-import { parse } from "csv/sync";
-import ICsvImportRepository from "@/domains/CsvImport/ICsvImportRepository";
 import { ApiError } from "api";
+import { parse } from "csv/sync";
 import CsvImport from "@/domains/CsvImport";
+import ICsvImportRepository from "@/domains/CsvImport/ICsvImportRepository";
 
 export default class CsvImportInfra implements ICsvImportRepository {
   async parseCsv(file: Express.Multer.File) {
     const fileContent = file.buffer.toString("utf-8");
 
-    const parsed = parse(fileContent, {
+    const parsed = parse<{
+      question: string,
+      answer: string,
+      anotherAnswer: string | null,
+    }>(fileContent, {
       columns: true,
       skip_empty_lines: true,
     });
