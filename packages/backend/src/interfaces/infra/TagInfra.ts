@@ -1,7 +1,6 @@
+import Tag from "@/domains/Tag";
 import ITagRepository from "@/domains/Tag/ITagRepository";
 import KyselyClientManager from "./kysely/KyselyClientManager";
-import Tag from "@/domains/Tag";
-import { sql } from "kysely";
 
 export default class TagInfra implements ITagRepository {
   constructor(private clientManager: KyselyClientManager) {}
@@ -33,9 +32,7 @@ export default class TagInfra implements ITagRepository {
     let query = client.selectFrom("tags").select(["id", "label", "created"]);
 
     if (!all) {
-      query = query.where(
-        sql`MATCH (label) AGAINST (${q} IN NATURAL LANGUAGE MODE)`,
-      );
+      query = query.where("label", "like", `%${q}%`);
     }
 
     const tags = await query.execute();

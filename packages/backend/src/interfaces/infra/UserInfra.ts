@@ -1,7 +1,6 @@
 import User from "@/domains/User";
 import IUsersRepository from "@/domains/User/IUserRepository";
 import KyselyClientManager from "./kysely/KyselyClientManager";
-import e from "cors";
 
 export default class UserInfra implements IUsersRepository {
   constructor(private clientManager: KyselyClientManager) {}
@@ -27,6 +26,7 @@ export default class UserInfra implements IUsersRepository {
       .where("uid", "=", uid)
       .executeTakeFirst();
 
+    console.log(data)
     if (!data) {
       return null;
     }
