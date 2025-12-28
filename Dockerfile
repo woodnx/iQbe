@@ -12,7 +12,9 @@ RUN corepack enable && corepack prepare pnpm@10.18.3 --activate
 
 # 依存解決に必要なファイルだけ先にコピー
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
-COPY packages/*/package.json packages/*/
+COPY packages/api/package.json packages/api/package.json
+COPY packages/backend/package.json packages/backend/package.json
+COPY packages/frontend/package.json packages/frontend/package.json
 
 RUN --mount=type=cache,id=pnpm-store,target=/pnpm/store \
     PNPM_STORE_DIR=/pnpm/store \
