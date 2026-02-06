@@ -2,14 +2,13 @@ import { ApiError } from "api";
 
 import Workbook from "@/domains/Workbook";
 import IWorkbookRepository from "@/domains/Workbook/IWorkbookRepository";
-
-import KyselyClientManager from "./kysely/KyselyClientManager";
 import { format } from "@/plugins/day";
+import KyselyClientManager from "./kysely/KyselyClientManager";
 
 export default class WorkbookInfra implements IWorkbookRepository {
   constructor(private clientManager: KyselyClientManager) {}
 
-  async findByWid(wid: string): Promise<Workbook | null> {
+  async findByWid(wid: string, uid: string): Promise<Workbook | null> {
     const client = this.clientManager.getClient();
 
     const workbook = await client
@@ -25,6 +24,7 @@ export default class WorkbookInfra implements IWorkbookRepository {
         "level_id as levelId",
       ])
       .where("workbooks.wid", "=", wid)
+      .where("uid", "=", uid)
       .executeTakeFirst();
 
     if (!workbook) return null;
@@ -55,29 +55,6 @@ export default class WorkbookInfra implements IWorkbookRepository {
         "level_id as levelId",
       ])
       .where("uid", "=", uid)
-      .execute();
-
-    return workbooks.map(
-      (w) =>
-        new Workbook(w.wid, w.name, w.date, w.creatorUId, w.levelId, w.color),
-    );
-  }
-
-  async findAll(): Promise<Workbook[]> {
-    const client = this.clientManager.getClient();
-
-    const workbooks = await client
-      .selectFrom("workbooks")
-      .leftJoin("levels", "workbooks.level_id", "levels.id")
-      .innerJoin("users", "creator_id", "users.id")
-      .select([
-        "workbooks.name as name",
-        "wid",
-        "workbooks.date",
-        "users.uid as creatorUId",
-        "levels.color as color",
-        "level_id as levelId",
-      ])
       .execute();
 
     return workbooks.map(

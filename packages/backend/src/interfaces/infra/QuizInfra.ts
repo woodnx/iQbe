@@ -100,7 +100,8 @@ export default class QuizInfra implements IQuizRepository, IQuizQueryService {
           "total"
         ),
         fn.countAll<number>().over().as("size"),
-      ]);
+      ])
+      .where("quizzes.creator_id", "=", userId);
 
     if (!!option.wids && option.wids.length)
       if (Array.isArray(option.wids))
