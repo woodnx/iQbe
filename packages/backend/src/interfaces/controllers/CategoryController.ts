@@ -1,70 +1,45 @@
 import { ApiError } from "api";
 
-import ICategoryQueryService from "@/applications/queryservices/ICategoryQueryService";
-import CategoryUseCase from "@/applications/usecases/CategoryUseCase";
-import abc23 from "@/db/categories/abc23.json";
-import minhaya from "@/db/categories/minhaya.json";
-import preset from "@/db/categories/preset.json";
+import { AddCategoryPresetUseCase } from "@/applications/usecases/AddCategoryPresetUseCase";
+import { CreateCategoryUseCase } from "@/applications/usecases/CreateCategoryUseCase";
+import { DeleteCategoryUseCase } from "@/applications/usecases/DeleteCategoryUseCase";
+import { GetCategoriesUseCase } from "@/applications/usecases/GetCategoriesUseCase";
+import { GetCategoryChainUseCase } from "@/applications/usecases/GetCategoryChainUseCase";
+import { GetCategoryPresetListUseCase } from "@/applications/usecases/GetCategoryPresetListUseCase";
+import { UpdateCategoryUseCase } from "@/applications/usecases/UpdateCategoryUseCase";
 import { typedAsyncWrapper } from "@/utils";
 
 export default class CategoryController {
   constructor(
-    private categoryQueryService: ICategoryQueryService,
-    private categoryUseCase: CategoryUseCase,
+    private getCategoriesUseCase: GetCategoriesUseCase,
+    private getCategoryChainUseCase: GetCategoryChainUseCase,
+    private createCategoryUseCase: CreateCategoryUseCase,
+    private updateCategoryUseCase: UpdateCategoryUseCase,
+    private deleteCategoryUseCase: DeleteCategoryUseCase,
+    private getCategoryPresetListUseCase: GetCategoryPresetListUseCase,
+    private addCategoryPresetUseCase: AddCategoryPresetUseCase,
   ) {}
-
-  private selectPreset(preset: string) {
-    switch (preset) {
-      case "abc23":
-        return abc23;
-      case "minhaya":
-        return minhaya;
-      default:
-        return null;
-    }
-  }
 
   get() {
     return typedAsyncWrapper<"/categories", "get">(async (req, res) => {
-      const categories = await this.categoryQueryService.all();
+      const categories = await this.getCategoriesUseCase.execute();
 
-      if (!categories) {
-        throw new Error("");
-      }
-
-      const data = categories.map((category) => ({
-        id: category.id,
-        name: category.name,
-        description: category.description,
-        disabled: category.disabled,
-        parentId: category.parentId,
-        sub: category.sub?.map((s) => ({
-          id: s.id,
-          name: s.name,
-          description: s.description,
-          parentId: s.parentId,
-          disabled: s.disabled,
-        })),
-      }));
-
-      res.status(200).send(data);
+      res.status(200).send(categories);
     });
   }
 
   getFromId() {
     return typedAsyncWrapper<"/categories/{id}", "get">(async (req, res) => {
       const { id } = req.params;
-      const categories = await this.categoryUseCase.findById(id);
+      const parsedId = Number(id);
 
-      res.status(200).send(
-        categories.map((category) => ({
-          id: category.id,
-          name: category.name,
-          description: category.description,
-          disabled: category.disabled,
-          parentId: category.parentId,
-        })),
-      );
+      if (!Number.isFinite(parsedId)) throw new ApiError().invalidParams();
+
+      const categories = await this.getCategoryChainUseCase.execute({
+        id: parsedId,
+      });
+
+      res.status(200).send(categories);
     });
   }
 
@@ -78,12 +53,12 @@ export default class CategoryController {
         throw new ApiError().invalidParams();
       }
 
-      await this.categoryUseCase.addCategory(
+      await this.createCategoryUseCase.execute({
         name,
-        description || null,
-        parentId || null,
+        description: description || null,
+        parentId: parentId || null,
         disabled,
-      );
+      });
 
       res.status(201).send();
     });
@@ -100,11 +75,15 @@ export default class CategoryController {
         throw new ApiError().invalidParams();
       }
 
-      await this.categoryUseCase.editCategory(
-        Number(id),
-        description || null,
+      const parsedId = Number(id);
+
+      if (!Number.isFinite(parsedId)) throw new ApiError().invalidParams();
+
+      await this.updateCategoryUseCase.execute({
+        id: parsedId,
+        description: description || null,
         disabled,
-      );
+      });
     });
   }
 
@@ -116,13 +95,17 @@ export default class CategoryController {
 
       if (!id) throw new ApiError().invalidParams();
 
-      await this.categoryUseCase.deleteCategory(id);
+      const parsedId = Number(id);
+
+      if (!Number.isFinite(parsedId)) throw new ApiError().invalidParams();
+
+      await this.deleteCategoryUseCase.execute({ id: parsedId });
     });
   }
 
   getPreset() {
     return typedAsyncWrapper<"/categories/preset", "get">(async (req, res) => {
-      res.send(preset);
+      res.send(this.getCategoryPresetListUseCase.execute());
     });
   }
 
@@ -136,13 +119,7 @@ export default class CategoryController {
         throw new ApiError().invalidParams();
       }
 
-      const categories = this.selectPreset(preset);
-
-      if (!categories) {
-        throw new ApiError().invalidParams();
-      }
-
-      await this.categoryUseCase.addPresetCategory(categories);
+      await this.addCategoryPresetUseCase.execute({ preset });
 
       res.send();
     });
