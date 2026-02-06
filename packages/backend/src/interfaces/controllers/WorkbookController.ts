@@ -1,31 +1,27 @@
-import { ApiError } from "api";
-
-import Workbook from "@/domains/Workbook";
-import IWorkbookRepository from "@/domains/Workbook/IWorkbookRepository";
-import WorkbookService from "@/domains/Workbook/WorkbookService";
+import { CreateWorkbookUseCase } from "@/applications/usecases/CreateWorkbookUseCase";
+import { DeleteWorkbookUseCase } from "@/applications/usecases/DeleteWorkbookUseCase";
+import { GetAllWorkbooksUseCase } from "@/applications/usecases/GetAllWorkbooksUseCase";
+import { GetWorkbooksUseCase } from "@/applications/usecases/GetWorkbooksUseCase";
+import { GetWorkbookUseCase } from "@/applications/usecases/GetWorkbookUseCase";
+import { UpdateWorkbookUseCase } from "@/applications/usecases/UpdateWorkbookUseCase";
 import { typedAsyncWrapper } from "@/utils";
 
 export default class WorkbookController {
   constructor(
-    private workbookRepository: IWorkbookRepository,
-    private workbookService: WorkbookService,
+    private getWorkbooksUseCase: GetWorkbooksUseCase,
+    private getWorkbookUseCase: GetWorkbookUseCase,
+    private getAllWorkbooksUseCase: GetAllWorkbooksUseCase,
+    private createWorkbookUseCase: CreateWorkbookUseCase,
+    private updateWorkbookUseCase: UpdateWorkbookUseCase,
+    private deleteWorkbookUseCase: DeleteWorkbookUseCase,
   ) {}
 
   get() {
     return typedAsyncWrapper<"/workbooks", "get">(async (req, res) => {
       const uid = req.user.uid;
-      const workbooks = await this.workbookRepository.findManyByUid(uid);
+      const workbooks = await this.getWorkbooksUseCase.execute({ uid });
 
-      res.status(200).send(
-        workbooks.map((w) => ({
-          wid: w.wid,
-          name: w.name,
-          date: w.date || undefined,
-          creatorId: w.creatorUid,
-          levelId: w.levelId,
-          color: w.color,
-        })),
-      );
+      res.status(200).send(workbooks);
     });
   }
 
@@ -34,36 +30,18 @@ export default class WorkbookController {
       const uid = req.user.uid;
       const wid = req.params.wid;
 
-      const workbook = await this.workbookRepository.findByWid(wid);
+      const workbook = await this.getWorkbookUseCase.execute({ uid, wid });
 
-      if (!workbook) throw new ApiError().invalidParams("workbook not found");
-
-      res.status(200).send({
-        wid: workbook.wid,
-        name: workbook.name,
-        date: workbook.date || undefined,
-        creatorId: workbook.creatorUid,
-        levelId: workbook.levelId,
-        color: workbook.color,
-      });
+      res.status(200).send(workbook);
     });
   }
 
   getAll() {
     return typedAsyncWrapper<"/workbooks/all", "get">(async (req, res) => {
       const uid = req.user.uid;
-      const workbooks = await this.workbookRepository.findManyByUid(uid);
+      const workbooks = await this.getAllWorkbooksUseCase.execute({ uid });
 
-      res.status(200).send(
-        workbooks.map((w) => ({
-          wid: w.wid,
-          name: w.name,
-          date: w.date || undefined,
-          creatorId: w.creatorUid,
-          levelId: w.levelId,
-          color: w.color,
-        })),
-      );
+      res.status(200).send(workbooks);
     });
   }
 
@@ -73,19 +51,13 @@ export default class WorkbookController {
       const name = req.body.name;
       const date = req.body.published || null;
 
-      const wid = this.workbookService.generateWid();
-      const workbook = new Workbook(wid, name, date, uid, null, null);
-
-      await this.workbookRepository.save(workbook);
-
-      res.status(200).send({
-        wid,
+      const workbook = await this.createWorkbookUseCase.execute({
+        uid,
         name,
-        date: date || null,
-        creatorId: uid,
-        levelId: null,
-        color: null,
+        date,
       });
+
+      res.status(200).send(workbook);
     });
   }
 
@@ -96,22 +68,14 @@ export default class WorkbookController {
       const name = req.body.name;
       const date = req.body.published || null;
 
-      const workbook = await this.workbookRepository.findByWid(wid);
-      if (!workbook) throw new ApiError().invalidParams();
-
-      workbook.rename(name);
-      workbook.setDate(date);
-
-      await this.workbookRepository.update(workbook);
-
-      res.status(200).send({
+      const workbook = await this.updateWorkbookUseCase.execute({
+        uid,
         wid,
         name,
-        date: null,
-        creatorId: uid,
-        levelId: null,
-        color: null,
+        date,
       });
+
+      res.status(200).send(workbook);
     });
   }
 
@@ -120,19 +84,9 @@ export default class WorkbookController {
       const uid = req.user.uid;
       const wid = req.params.wid;
 
-      await this.workbookRepository.delete(wid);
-      const workbooks = await this.workbookRepository.findManyByUid(uid);
+      const workbooks = await this.deleteWorkbookUseCase.execute({ uid, wid });
 
-      res.status(200).send(
-        workbooks.map((w) => ({
-          wid: w.wid,
-          name: w.name,
-          date: w.date || undefined,
-          creatorId: w.creatorUid,
-          levelId: w.levelId,
-          color: w.color,
-        })),
-      );
+      res.status(200).send(workbooks);
     });
   }
 }
