@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import {
   Button,
   Flex,
@@ -8,10 +7,11 @@ import {
   Text,
   TextInput,
 } from "@mantine/core";
-import { useForm, isNotEmpty, matchesField, isEmail } from "@mantine/form";
+import { isEmail, isNotEmpty, matchesField, useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
 import { IconAlertTriangle } from "@tabler/icons-react";
 import { useNavigate } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 import { signupUser } from "@/plugins/auth";
 import { $api } from "@/utils/client";
 import UsernameInput from "./UsernameInput";
@@ -26,8 +26,15 @@ const requiredInviteCode =
   import.meta.env.VITE_REQUIRED_INVITE_CODE !== "false" ? true : false;
 
 export function UserSignupModal() {
-  const { mutate } = $api.useMutation("post", "/auth/available");
   const [available, setAvailable] = useState(false);
+  const { mutate } = $api.useMutation("post", "/auth/available", {
+    onMutate() {
+      setAvailable(true);
+    },
+    onError() {
+      setAvailable(false);
+    },
+  });
   const navigate = useNavigate();
   const form = useForm({
     initialValues: {
