@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.1.9](https://github.com/woodnx/iQbe/compare/v4.1.8...v4.1.9) (2026-02-06)
+
+
+### Bug Fixes
+
+* visibility issue for non-public settings and refactor category use cases ([#267](https://github.com/woodnx/iQbe/issues/267)) ([2b585ea](https://github.com/woodnx/iQbe/commit/2b585ea4d81f2f7609bdc11d5ab09108d58e5722))
+
 ## [4.1.8](https://github.com/woodnx/iQbe/compare/v4.1.7...v4.1.8) (2025-12-30)
 
 
