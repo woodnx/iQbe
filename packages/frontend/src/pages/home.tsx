@@ -1,7 +1,7 @@
-import ActivityStatus from "@/components/ActivityStatus";
-import ActivityUserRanking from "@/components/ActivityUserRanking";
-import QuizSearchInput from "@/components/QuizSearchInput";
-import ResetPasswordModal from "@/components/ResetPasswordModal";
+import ActivityStatus from "@/features/activity/components/ActivityStatus";
+import ActivityUserRanking from "@/features/activity/components/ActivityUserRanking";
+import QuizSearchInput from "@/features/quiz/components/QuizSearchInput";
+import ResetPasswordModal from "@/features/user/components/ResetPasswordModal";
 import {
   useRequestResetPassword,
   useSetRequestResetPassword,

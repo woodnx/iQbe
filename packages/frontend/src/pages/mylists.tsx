@@ -16,15 +16,15 @@ import {
   useSearch,
 } from "@tanstack/react-router";
 import { ReactNode, useState } from "react";
-import FilteringModalButton from "@/components/FilteringModalButton";
-import MylistDeleteModal from "@/components/MylistDeleteModal";
-import MylistEditModalButton from "@/components/MylistEditModalButton";
-import QuizControllBar from "@/components/QuizControllBar";
-import QuizHiddenAnswerButton from "@/components/QuizHiddenAnswerButton";
-import QuizList from "@/components/QuizList";
-import QuizPagination from "@/components/QuizPagination";
-import QuizShuffleButton from "@/components/QuizShuffleButton";
-import QuizTransfarButton from "@/components/QuizTransfarButton";
+import FilteringModalButton from "@/features/filtering/components/FilteringModalButton";
+import MylistDeleteModal from "@/features/mylist/components/MylistDeleteModal";
+import MylistEditModalButton from "@/features/mylist/components/MylistEditModalButton";
+import QuizControllBar from "@/features/quiz/components/QuizControllBar";
+import QuizHiddenAnswerButton from "@/features/quiz/components/QuizHiddenAnswerButton";
+import QuizList from "@/features/quiz/components/QuizList";
+import QuizPagination from "@/features/quiz/components/QuizPagination";
+import QuizShuffleButton from "@/features/quiz/components/QuizShuffleButton";
+import QuizTransfarButton from "@/features/quiz/components/QuizTransfarButton";
 import { useMylists } from "@/hooks/useMylists";
 import { $api } from "@/utils/client";
 

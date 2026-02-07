@@ -1,6 +1,6 @@
-import SettingAccount from "@/components/SettingAccount";
-import SettingProfile from "@/components/SettingProfile";
-import SettingServer from "@/components/SettingServer";
+import SettingAccount from "@/features/settings/components/SettingAccount";
+import SettingProfile from "@/features/settings/components/SettingProfile";
+import SettingServer from "@/features/settings/components/SettingServer";
 import { useIsSuperUser } from "@/hooks/useLoginedUser";
 import { Container, Tabs, Title } from "@mantine/core";
 

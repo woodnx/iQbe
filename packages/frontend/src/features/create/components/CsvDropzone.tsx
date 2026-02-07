@@ -1,6 +1,6 @@
-import { Group, Text, rem } from "@mantine/core";
-import { IconUpload, IconX, IconFileTypeCsv } from "@tabler/icons-react";
+import { Group, rem, Text } from "@mantine/core";
 import { Dropzone, DropzoneProps, MIME_TYPES } from "@mantine/dropzone";
+import { IconFileTypeCsv, IconUpload, IconX } from "@tabler/icons-react";
 
 export default function CsvDropzone(props: Partial<DropzoneProps>) {
   return (

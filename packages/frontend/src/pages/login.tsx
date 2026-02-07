@@ -1,9 +1,9 @@
 import { useLayoutEffect } from "react";
 import { Button, Center, Modal, Stack } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { UserLoginModal } from "@/components/UserLoginModal";
-import Logo from "@/components/Logo";
-import { UserSignupModal } from "@/components/UserSignupModal";
+import { UserLoginModal } from "@/features/user/components/UserLoginModal";
+import Logo from "@/shared/components/Logo";
+import { UserSignupModal } from "@/features/user/components/UserSignupModal";
 import { checkAuth } from "@/plugins/auth";
 import { useNavigate } from "@tanstack/react-router";
 

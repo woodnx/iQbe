@@ -1,4 +1,3 @@
-import { useState } from "react";
 import {
   BoxProps,
   CheckIcon,
@@ -9,7 +8,8 @@ import {
   ScrollArea,
   useCombobox,
 } from "@mantine/core";
-import { QuizWorkbookBadge } from "./QuizWorkbookBadge";
+import { useState } from "react";
+import { QuizWorkbookBadge } from "@/features/quiz/components/QuizWorkbookBadge";
 import { useWorkbooks } from "@/hooks/useWorkbooks";
 
 interface FilteringWorkbookProps extends BoxProps {
