@@ -1,6 +1,6 @@
 import { useSearch } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import PracticeSceneChanger from "@/components/PracticeSceneChanger";
+import PracticeSceneChanger from "@/features/practice/components/PracticeSceneChanger";
 import { $api } from "@/utils/client";
 
 function shuffleSequense(n: number) {

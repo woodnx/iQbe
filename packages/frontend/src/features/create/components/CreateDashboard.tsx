@@ -1,7 +1,7 @@
 import { Tabs } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
 import { paths } from "api/schema";
-import QuizEditForm from "@/components/QuizEditForm";
+import QuizEditForm from "@/features/quiz/components/QuizEditForm";
 import { $api } from "@/utils/client";
 import CsvFileImporter from "./CsvFileImporter";
 

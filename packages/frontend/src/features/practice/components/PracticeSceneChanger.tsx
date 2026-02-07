@@ -3,12 +3,12 @@ import { useDisclosure } from "@mantine/hooks";
 import { useRouter, useSearch } from "@tanstack/react-router";
 import { components } from "api/schema";
 import { useEffect, useState } from "react";
-import FilteringModal from "@/components/FilteringModal";
-import FilteringModalButton from "@/components/FilteringModalButton";
-import PracticeQuitModal from "@/components/PracticeQuitModal";
-import { PracticeQuizController } from "@/components/PracticeQuizController";
-import { PracticeQuizIntro } from "@/components/PracticeQuizIntro";
-import PracticeResultModal from "@/components/PracticeResultModal";
+import FilteringModal from "@/features/filtering/components/FilteringModal";
+import FilteringModalButton from "@/features/filtering/components/FilteringModalButton";
+import PracticeQuitModal from "@/features/practice/components/PracticeQuitModal";
+import { PracticeQuizController } from "@/features/practice/components/PracticeQuizController";
+import { PracticeQuizIntro } from "@/features/practice/components/PracticeQuizIntro";
+import PracticeResultModal from "@/features/practice/components/PracticeResultModal";
 import { useTimer } from "@/hooks";
 import { $api } from "@/utils/client";
 

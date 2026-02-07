@@ -1,13 +1,13 @@
 import { Center, Group, Stack } from "@mantine/core";
 import { useRouter, useSearch } from "@tanstack/react-router";
 import { useState } from "react";
-import FilteringModalButton from "@/components/FilteringModalButton";
-import QuizControllBar from "@/components/QuizControllBar";
-import QuizHiddenAnswerButton from "@/components/QuizHiddenAnswerButton";
-import QuizList from "@/components/QuizList";
-import QuizPagination from "@/components/QuizPagination";
-import QuizShuffleButton from "@/components/QuizShuffleButton";
-import QuizTransfarButton from "@/components/QuizTransfarButton";
+import FilteringModalButton from "@/features/filtering/components/FilteringModalButton";
+import QuizControllBar from "@/features/quiz/components/QuizControllBar";
+import QuizHiddenAnswerButton from "@/features/quiz/components/QuizHiddenAnswerButton";
+import QuizList from "@/features/quiz/components/QuizList";
+import QuizPagination from "@/features/quiz/components/QuizPagination";
+import QuizShuffleButton from "@/features/quiz/components/QuizShuffleButton";
+import QuizTransfarButton from "@/features/quiz/components/QuizTransfarButton";
 import { $api } from "@/utils/client";
 
 export default function Favorite() {

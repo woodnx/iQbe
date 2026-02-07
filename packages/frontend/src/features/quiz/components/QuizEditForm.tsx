@@ -2,9 +2,9 @@ import { BoxProps, Button, Card, Grid, Group, Textarea } from "@mantine/core";
 import { isNotEmpty, useForm } from "@mantine/form";
 import { components, paths } from "api/schema";
 
-import CategorySelector from "./CategorySelector";
-import TagInput from "./TagInput";
-import WorkbookCreateAndSelector from "./WorkbookCreateAndSelector";
+import CategorySelector from "@/features/category/components/CategorySelector";
+import TagInput from "@/features/tag/components/TagInput";
+import WorkbookCreateAndSelector from "@/features/workbook/components/WorkbookCreateAndSelector";
 
 type QuizEditSubmitValues =
   paths["/quizzes"]["post"]["requestBody"]["content"]["application/json"];

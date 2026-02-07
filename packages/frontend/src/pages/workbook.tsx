@@ -1,4 +1,4 @@
-import WorkbookSearch from "@/components/WorkbookSearch";
+import WorkbookSearch from "@/features/workbook/components/WorkbookSearch";
 import { $api } from "@/utils/client";
 
 export default function Workbooks() {

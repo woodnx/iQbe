@@ -1,6 +1,6 @@
 import { Modal } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import FilteringForm from "@/components/FilteringForm";
+import FilteringForm from "@/features/filtering/components/FilteringForm";
 import { useIsMobile } from "@/contexts/isMobile";
 
 interface FilteringModalProps {

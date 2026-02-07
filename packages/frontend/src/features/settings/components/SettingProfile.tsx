@@ -1,15 +1,15 @@
-import { useLoginedUser } from "@/hooks/useLoginedUser";
-import { $api } from "@/utils/client";
 import { Button, Center, Grid, Group, Modal, TextInput } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
-import ImageCropper from "./ImageCropper";
-import { useState } from "react";
-import ButtonWithFileInput from "./ButtonWithFileInput";
-import { Area } from "react-easy-crop";
-import getCroppedImg from "@/utils/getCroppedImage";
 import { notifications } from "@mantine/notifications";
-import UsernameInput from "./UsernameInput";
+import { useState } from "react";
+import { Area } from "react-easy-crop";
+import UsernameInput from "@/features/user/components/UsernameInput";
+import { useLoginedUser } from "@/hooks/useLoginedUser";
+import ImageCropper from "@/shared/components/ImageCropper";
+import { $api } from "@/utils/client";
+import getCroppedImg from "@/utils/getCroppedImage";
+import ButtonWithFileInput from "./ButtonWithFileInput";
 
 export default function SettingProfile() {
   const [opened, { open, close }] = useDisclosure(false);

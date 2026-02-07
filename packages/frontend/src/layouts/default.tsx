@@ -23,13 +23,12 @@ import {
 } from "@tabler/icons-react";
 import { Outlet, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useLayoutEffect, useState } from "react";
-import NavbarLink from "@/components/NavbarLink";
-import UserInfoMenu from "@/components/UserInfoMenu";
 import { useIsMobile } from "@/contexts/isMobile";
+import UserInfoMenu from "@/features/user/components/UserInfoMenu";
 import useHeaderHeight from "@/hooks/useHeaderHeight";
 import { useWorkbooks } from "@/hooks/useWorkbooks";
-
-import Logo from "../components/Logo";
+import Logo from "@/shared/components/Logo";
+import NavbarLink from "@/shared/components/NavbarLink";
 import { useMylists } from "../hooks/useMylists";
 import { checkAuth } from "../plugins/auth";
 
