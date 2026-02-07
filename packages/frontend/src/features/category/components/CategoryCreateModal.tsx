@@ -28,7 +28,9 @@ export default function CategoryCreateModal<T extends boolean>({
     onMutate: async ({ body }) => {
       const previous = queryClient.getQueryData(queryKey);
 
-      queryClient.setQueryData(queryKey, (old: Category[]) => {
+      queryClient.setQueryData(queryKey, (old: Category[] | undefined) => {
+        if (!old) return old;
+
         if (formProps.isSub) {
           const parent = old.find((c) => c.id === formProps.parentId);
           if (!!parent) {
@@ -45,6 +47,11 @@ export default function CategoryCreateModal<T extends boolean>({
       });
 
       return { previous };
+    },
+    onError: (_, __, context) => {
+      const rollback = context as { previous: unknown } | undefined;
+      if (!rollback) return;
+      queryClient.setQueryData(queryKey, rollback.previous);
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey });

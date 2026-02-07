@@ -1,5 +1,6 @@
 import { Group, Loader, Overlay, Text } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
+import { useQueryClient } from "@tanstack/react-query";
 import { useRouter, useSearch } from "@tanstack/react-router";
 import { components } from "api/schema";
 import { useEffect, useState } from "react";
@@ -11,6 +12,12 @@ import { PracticeQuizIntro } from "@/features/practice/components/PracticeQuizIn
 import PracticeResultModal from "@/features/practice/components/PracticeResultModal";
 import { useTimer } from "@/hooks";
 import { $api } from "@/utils/client";
+import {
+  QuerySnapshot,
+  QUIZZES_QUERY_KEY,
+  restoreQuerySnapshot,
+  takeQuerySnapshot,
+} from "@/utils/queryCache";
 
 type Quiz = components["schemas"]["Quiz"];
 export type Scene = "preparation" | "ready" | "quizzing" | "result";
@@ -39,7 +46,42 @@ export default function ({
   const [_, result] = useDisclosure(false);
   const router = useRouter();
   const search = useSearch({ from: "/practice" });
-  const { mutate } = $api.useMutation("post", "/practice");
+  const queryClient = useQueryClient();
+  const { mutate } = $api.useMutation("post", "/practice", {
+    onMutate: async ({ body }) => {
+      await queryClient.cancelQueries({ queryKey: QUIZZES_QUERY_KEY });
+      const previousQuizzes = takeQuerySnapshot<Quiz[]>(queryClient, QUIZZES_QUERY_KEY);
+
+      queryClient.setQueriesData<Quiz[] | undefined>(
+        { queryKey: QUIZZES_QUERY_KEY },
+        (data) =>
+          data?.map((quiz) =>
+            quiz.qid === body.qid
+              ? {
+                  ...quiz,
+                  total: quiz.total + 1,
+                  right: body.judgement === 1 ? quiz.right + 1 : quiz.right,
+                  judgement: body.judgement,
+                }
+              : quiz,
+          ),
+      );
+
+      return { previousQuizzes };
+    },
+    onError: (_, __, context) => {
+      const rollback = context as
+        | {
+            previousQuizzes: QuerySnapshot<Quiz[]>;
+          }
+        | undefined;
+      if (!rollback) return;
+      restoreQuerySnapshot(queryClient, rollback.previousQuizzes);
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: QUIZZES_QUERY_KEY });
+    },
+  });
   const [rightList, setRightList] = useState<string[]>([]);
   const quiz = !!quizzes ? quizzes[shuffledList[nowNumber]] : null;
   const maxQuizSize = quizzes?.length || 0;

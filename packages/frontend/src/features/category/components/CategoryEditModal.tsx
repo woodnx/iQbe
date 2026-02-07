@@ -52,6 +52,11 @@ export default function CategoryEditModal<T extends boolean>({
 
       return { previous };
     },
+    onError: (_, __, context) => {
+      const rollback = context as { previous: unknown } | undefined;
+      if (!rollback) return;
+      queryClient.setQueryData(queryKey, rollback.previous);
+    },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey });
     },

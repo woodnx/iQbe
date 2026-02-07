@@ -9,13 +9,15 @@ import {
 } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
+import { useQueryClient } from "@tanstack/react-query";
 import {
   useNavigate,
   useParams,
   useRouter,
   useSearch,
 } from "@tanstack/react-router";
-import { ReactNode, useState } from "react";
+import { components } from "api/schema";
+import { ReactNode, useRef, useState } from "react";
 import FilteringModalButton from "@/features/filtering/components/FilteringModalButton";
 import MylistDeleteModal from "@/features/mylist/components/MylistDeleteModal";
 import MylistEditModalButton from "@/features/mylist/components/MylistEditModalButton";
@@ -27,6 +29,18 @@ import QuizShuffleButton from "@/features/quiz/components/QuizShuffleButton";
 import QuizTransfarButton from "@/features/quiz/components/QuizTransfarButton";
 import { useMylists } from "@/hooks/useMylists";
 import { $api } from "@/utils/client";
+import {
+  MYLISTS_QUERY_KEY,
+  QUIZ_SIZES_QUERY_KEY,
+  QUIZZES_QUERY_KEY,
+  QuerySnapshot,
+  restoreQuerySnapshot,
+  takeQuerySnapshot,
+} from "@/utils/queryCache";
+
+type Mylist = components["schemas"]["Mylist"];
+type Quiz = components["schemas"]["Quiz"];
+type QuizSize = { size: number };
 
 export default function Mylist() {
   const { mid } = useParams({
@@ -36,8 +50,87 @@ export default function Mylist() {
   const router = useRouter();
   const search = useSearch({ from: "/mylist/$mid" });
   const theme = useMantineTheme();
+  const queryClient = useQueryClient();
+  const previousMylistsRef = useRef<QuerySnapshot<Mylist[]>>([]);
+  const previousQuizzesRef = useRef<QuerySnapshot<Quiz[]>>([]);
+  const previousQuizSizesRef = useRef<QuerySnapshot<QuizSize>>([]);
   const { mylists } = useMylists();
-  const { mutate: deleteMylist } = $api.useMutation("delete", "/mylists");
+  const { mutate: deleteMylist } = $api.useMutation("delete", "/mylists", {
+    onMutate: async ({ body }) => {
+      const targetMid = body.mid;
+
+      await queryClient.cancelQueries({ queryKey: MYLISTS_QUERY_KEY });
+      await queryClient.cancelQueries({ queryKey: QUIZZES_QUERY_KEY });
+      await queryClient.cancelQueries({ queryKey: QUIZ_SIZES_QUERY_KEY });
+
+      const previousMylists = takeQuerySnapshot<Mylist[]>(
+        queryClient,
+        MYLISTS_QUERY_KEY,
+      );
+      const previousQuizzes = takeQuerySnapshot<Quiz[]>(
+        queryClient,
+        QUIZZES_QUERY_KEY,
+      );
+      const previousQuizSizes = takeQuerySnapshot<QuizSize>(
+        queryClient,
+        QUIZ_SIZES_QUERY_KEY,
+      );
+      previousMylistsRef.current = previousMylists;
+      previousQuizzesRef.current = previousQuizzes;
+      previousQuizSizesRef.current = previousQuizSizes;
+
+      previousMylists.forEach(([key, data]) => {
+        queryClient.setQueryData<Mylist[] | undefined>(
+          key,
+          data?.filter((mylist) => mylist.mid !== targetMid),
+        );
+      });
+
+      previousQuizzes.forEach(([key, data]) => {
+        const query = (key[2] as { params?: { query?: { mid?: string } } })
+          ?.params?.query;
+
+        const nextData =
+          query?.mid === targetMid
+            ? []
+            : data?.map((quiz) => ({
+                ...quiz,
+                registerdMylist: quiz.registerdMylist?.filter(
+                  (mylist) => mylist.mid !== targetMid,
+                ),
+              }));
+
+        queryClient.setQueryData<Quiz[] | undefined>(key, nextData);
+      });
+
+      previousQuizSizes.forEach(([key, data]) => {
+        const query = (key[2] as { params?: { query?: { mid?: string } } })
+          ?.params?.query;
+
+        queryClient.setQueryData<QuizSize | undefined>(
+          key,
+          query?.mid === targetMid ? { size: 0 } : data,
+        );
+      });
+    },
+    onError: () => {
+      restoreQuerySnapshot(queryClient, previousMylistsRef.current);
+      restoreQuerySnapshot(queryClient, previousQuizzesRef.current);
+      restoreQuerySnapshot(queryClient, previousQuizSizesRef.current);
+    },
+    onSuccess: () => {
+      navigator({ to: "/" });
+      notifications.show({
+        title: "マイリストを削除しました",
+        message: "",
+      });
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: MYLISTS_QUERY_KEY });
+      queryClient.invalidateQueries({ queryKey: QUIZZES_QUERY_KEY });
+      queryClient.invalidateQueries({ queryKey: QUIZ_SIZES_QUERY_KEY });
+    },
+  });
 
   const mylistName = mylists?.find((list) => list.mid == mid)?.name;
   const [activePage, setPage] = useState(1);
@@ -138,11 +231,6 @@ export default function Mylist() {
       body: {
         mid,
       },
-    });
-    navigator({ to: "/" });
-    notifications.show({
-      title: "マイリストを削除しました",
-      message: "",
     });
   };
 

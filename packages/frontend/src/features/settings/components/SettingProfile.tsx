@@ -2,8 +2,9 @@ import { Button, Center, Grid, Group, Modal, TextInput } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Area } from "react-easy-crop";
+import store from "storejs";
 import UsernameInput from "@/features/user/components/UsernameInput";
 import { useLoginedUser } from "@/hooks/useLoginedUser";
 import ImageCropper from "@/shared/components/ImageCropper";
@@ -15,8 +16,65 @@ export default function SettingProfile() {
   const [opened, { open, close }] = useDisclosure(false);
   const [imageSrc, setImageSrc] = useState<string | null>(null);
   const { i } = useLoginedUser();
-  const { mutateAsync: editUser } = $api.useMutation("put", "/i");
-  const { mutateAsync: postImage } = $api.useMutation("post", "/i/image");
+  const [previewImage, setPreviewImage] = useState<string | undefined>(
+    i.photoURL ? `http://localhost:9000${i.photoURL}` : undefined,
+  );
+  const previousUserRef = useRef<Record<string, unknown> | undefined>(
+    undefined,
+  );
+  const previousPreviewImageRef = useRef<string | undefined>(undefined);
+  const { mutateAsync: editUser } = $api.useMutation("put", "/i", {
+    onMutate: ({ body }) => {
+      const previousUser = store.get("loginedUser") as
+        | Record<string, unknown>
+        | undefined;
+      previousUserRef.current = previousUser;
+
+      if (previousUser) {
+        store.set("loginedUser", {
+          ...previousUser,
+          username: body.username,
+          nickname: body.nickname,
+        });
+      }
+    },
+    onSuccess: (user) => {
+      const previousUser = previousUserRef.current;
+      if (!previousUser) return;
+
+      store.set("loginedUser", {
+        ...previousUser,
+        ...user,
+      });
+    },
+    onError: () => {
+      const previousUser = previousUserRef.current;
+      if (!previousUser) return;
+      store.set("loginedUser", previousUser);
+    },
+  });
+  const { mutateAsync: postImage } = $api.useMutation("post", "/i/image", {
+    onMutate: () => {
+      previousPreviewImageRef.current = previewImage;
+      if (imageSrc) {
+        setPreviewImage(imageSrc);
+      }
+    },
+    onSuccess: () => {
+      notifications.show({
+        title: "プロフィール画像を更新しました",
+        message: "",
+      });
+    },
+    onError: () => {
+      setPreviewImage(previousPreviewImageRef.current);
+      notifications.show({
+        title: "プロフィール画像の更新に失敗しました",
+        message: "しばらくしてからやり直してください",
+        color: "red",
+      });
+    },
+  });
   const form = useForm({
     initialValues: {
       username: i.username,
@@ -50,17 +108,8 @@ export default function SettingProfile() {
           // @ts-ignore
           body: formData,
         });
-
-        notifications.show({
-          title: "プロフィール画像を更新しました",
-          message: "",
-        });
       } catch {
-        notifications.show({
-          title: "プロフィール画像の更新に失敗しました",
-          message: "しばらくしてからやり直してください",
-          color: "red",
-        });
+        return;
       }
     }
     close();
@@ -94,10 +143,7 @@ export default function SettingProfile() {
         <Grid m="md">
           <Grid.Col span={{ base: 4, md: 3 }} mt="xs">
             <Center>
-              <ButtonWithFileInput
-                image={`http://localhost:9000${i.photoURL}` || undefined}
-                onLoad={loadImage}
-              />
+              <ButtonWithFileInput image={previewImage} onLoad={loadImage} />
             </Center>
           </Grid.Col>
 
