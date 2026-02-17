@@ -6,6 +6,15 @@ packages:
 ignoredBuiltDependencies:
   - esbuild
 
+onlyBuiltDependencies:
+  - '@prisma/client'
+  - '@prisma/engines'
+  - cpu-features
+  - prisma
+  - protobufjs
+  - ssh2
+  - unrs-resolver
+
 overrides:
   '@isaacs/brace-expansion@<=5.0.0': '>=5.0.1'
   ajv@<8.18.0: '>=8.18.0'
