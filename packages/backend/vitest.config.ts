@@ -3,11 +3,13 @@ import { defineConfig } from "vitest/config";
 
 export default defineConfig({
   test: {
+    globals: true,
     environment: "node",
-    include: ["src/tests/**/*.test.ts"],
-    setupFiles: ["./src/tests/setup/testcontainers.ts"],
+    include: ["src/**/*.test.ts"],
+    exclude: ["tests/**"],
     testTimeout: 120000,
     hookTimeout: 120000,
+    clearMocks: true,
   },
   resolve: {
     alias: {

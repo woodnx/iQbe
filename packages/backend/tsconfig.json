@@ -20,7 +20,8 @@
     },
     // "typeRoots": ["./src/types"],
     "types": [
-      "node"
+      "node",
+      "vitest/globals"
     ],
     "resolveJsonModule": true,
     "experimentalDecorators": true,
