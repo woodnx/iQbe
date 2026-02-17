@@ -5,7 +5,8 @@
   "scripts": {
     "start": "node ./dist/index.js",
     "build": "tsc -p tsconfig.json && tsc-alias -p tsconfig.json",
-    "test": "jest",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "watch": "tsc-watch --noClear --onSuccess \"node watch.mjs\"",
     "watch:": "tsup --config tsup.config.ts --watch --onSuccess 'node dist/index.js'",
     "migrate:create": "prisma migrate dev --create-only",
@@ -43,6 +44,8 @@
     "uid": "^2.0.2"
   },
   "devDependencies": {
+    "@testcontainers/mysql": "^10.13.1",
+    "testcontainers": "^10.13.1",
     "@types/cors": "^2.8.13",
     "@types/express": "^4.17.17",
     "@types/express-serve-static-core": "^4.19.7",
@@ -56,6 +59,7 @@
     "tsc-alias": "^1.8.16",
     "tsc-watch": "^6.2.0",
     "tsx": "^4.9.3",
+    "vitest": "^2.1.9",
     "typescript": "^5.5.4"
   }
 }
