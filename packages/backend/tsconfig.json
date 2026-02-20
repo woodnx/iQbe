@@ -21,7 +21,7 @@
     // "typeRoots": ["./src/types"],
     "types": [
       "node",
-      "vitest/globals"
+      "jest"
     ],
     "resolveJsonModule": true,
     "experimentalDecorators": true,

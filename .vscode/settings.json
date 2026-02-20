@@ -18,5 +18,6 @@
   },
   "[json]": {
     "editor.defaultFormatter": "biomejs.biome"
-  }
+  },
+  "jest.jestCommandLine": "pnpm test"
 }

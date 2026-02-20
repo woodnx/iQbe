@@ -26,7 +26,8 @@
         "github.vscode-github-actions",
         "42Crunch.vscode-openapi",
         "biomejs.biome",
-        "vitest.explorer"
+        "vitest.explorer",
+        "Orta.vscode-jest"
       ]
     }
   }
