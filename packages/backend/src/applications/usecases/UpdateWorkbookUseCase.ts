@@ -3,12 +3,10 @@ import { components } from "api/schema";
 
 import IWorkbookRepository from "@/domains/Workbook/IWorkbookRepository";
 
-import {
-  normalizeWorkbookDate,
-  WorkbookDateInput,
-} from "./WorkbookMapper";
+import { normalizeWorkbookDate, WorkbookDateInput } from "./WorkbookMapper";
 
-type WorkbookDTO = components["responses"]["WorkbookResponse"]["content"]["application/json"];
+type WorkbookDTO =
+  components["responses"]["WorkbookResponse"]["content"]["application/json"];
 
 export type UpdateWorkbookUseCaseCommand = {
   uid: string;
@@ -28,15 +26,16 @@ export class UpdateWorkbookUseCase {
 
     if (!workbook) throw new ApiError().invalidParams();
 
+    const date = normalizeWorkbookDate(command.date);
     workbook.rename(command.name);
-    workbook.setDate(normalizeWorkbookDate(command.date));
+    workbook.setDate(date);
 
     await this.workbookRepository.update(workbook);
 
     return {
       wid: command.wid,
       name: command.name,
-      date: null,
+      date,
       creatorId: command.uid,
       levelId: null,
       color: null,

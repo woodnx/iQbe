@@ -1,4 +1,3 @@
-import { privateDecrypt } from "crypto";
 import Tag from ".";
 import ITagRepository from "./ITagRepository";
 
