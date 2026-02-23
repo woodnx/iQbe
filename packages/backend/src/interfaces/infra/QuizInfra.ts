@@ -16,60 +16,8 @@ type QuizDTO = components["schemas"]["Quiz"];
 export default class QuizInfra implements IQuizRepository, IQuizQueryService {
   constructor(
     private clientManager: KyselyClientManager,
-    private categoryInfra: CategoryInfra
+    private categoryInfra: CategoryInfra,
   ) {}
-
-  private async addTagToQuiz(qid: string, tagLabel: string) {
-    const client = this.clientManager.getClient();
-
-    const tagId = await client
-      .selectFrom("tags")
-      .select(["id"])
-      .where("label", "=", tagLabel)
-      .executeTakeFirstOrThrow()
-      .then((tag) => tag.id);
-
-    const quizId = await client
-      .selectFrom("quizzes")
-      .select(["id"])
-      .where("qid", "=", qid)
-      .executeTakeFirstOrThrow()
-      .then((quiz) => quiz.id);
-
-    await client
-      .insertInto("tagging")
-      .values({
-        tag_id: tagId,
-        quiz_id: quizId,
-        registered: new Date(),
-      })
-      .execute();
-  }
-
-  private async removeTagFromQuiz(qid: string, tagLabel: string) {
-    const client = this.clientManager.getClient();
-
-    const tagId = await client
-      .selectFrom("tags")
-      .select(["id"])
-      .where("label", "=", tagLabel)
-      .executeTakeFirstOrThrow()
-      .then((tag) => tag.id);
-
-    const quizId = await client
-      .selectFrom("quizzes")
-      .select(["id"])
-      .where("qid", "=", qid)
-      .executeTakeFirstOrThrow()
-      .then((quiz) => quiz.id);
-
-    await client
-      .deleteFrom("tagging")
-      .where(({ and, eb }) =>
-        and([eb("tag_id", "=", tagId), eb("quiz_id", "=", quizId)])
-      )
-      .execute();
-  }
 
   async findMany(uid: string, option: findOption = {}): Promise<QuizDTO[]> {
     const client = this.clientManager.getClient();
@@ -97,7 +45,7 @@ export default class QuizInfra implements IQuizRepository, IQuizQueryService {
         "quizzes.category_id as categoryId",
         "quizzes.total_crct_ans as right",
         sql<number>`total_crct_ans + total_through_ans + total_wrng_ans`.as(
-          "total"
+          "total",
         ),
         fn.countAll<number>().over().as("size"),
       ])
@@ -111,18 +59,18 @@ export default class QuizInfra implements IQuizRepository, IQuizQueryService {
     if (!!option.keyword && !!option.keywordOption) {
       query = query.where((eb) => {
         const keyword = option.keyword || "";
-        const ors: Expression<SqlBool>[] = []
+        const ors: Expression<SqlBool>[] = [];
 
         if (option.keywordOption !== 3) {
-          ors.push(eb("quizzes.que", "like", `%${keyword}%`))
-        }
-        
-        if (option.keywordOption !== 2) {
-          ors.push(eb("quizzes.ans", "like", `%${keyword}%`))
+          ors.push(eb("quizzes.que", "like", `%${keyword}%`));
         }
 
-        return eb.or(ors)
-      })
+        if (option.keywordOption !== 2) {
+          ors.push(eb("quizzes.ans", "like", `%${keyword}%`));
+        }
+
+        return eb.or(ors);
+      });
     }
     if (!!option.categories) {
       if (Array.isArray(option.categories) && option.categories.length)
@@ -140,7 +88,7 @@ export default class QuizInfra implements IQuizRepository, IQuizQueryService {
             .having(
               ({ fn }) => fn.count("tags.label"),
               "=",
-              option.tags.length
+              option.tags.length,
             );
         } else {
           query = query
@@ -182,7 +130,7 @@ export default class QuizInfra implements IQuizRepository, IQuizQueryService {
                 eb("histories.judgement", "in", option.judgements),
                 between("histories.practiced", since, until),
               ])
-            : between("histories.practiced", since, until)
+            : between("histories.practiced", since, until),
         )
         .orderBy("histories.practiced desc");
     } else if (!!option.mid) {
@@ -233,7 +181,7 @@ export default class QuizInfra implements IQuizRepository, IQuizQueryService {
             .selectFrom("favorites")
             .select("quiz_id")
             .where(({ eb, and }) =>
-              and([eb("user_id", "=", userId), eb("quiz_id", "=", quizId)])
+              and([eb("user_id", "=", userId), eb("quiz_id", "=", quizId)]),
             )
             .executeTakeFirst(),
 
@@ -249,7 +197,7 @@ export default class QuizInfra implements IQuizRepository, IQuizQueryService {
               and([
                 eb("mylists.user_id", "=", userId),
                 eb("mylists_quizzes.quiz_id", "=", quizId),
-              ])
+              ]),
             )
             .execute(),
 
@@ -300,7 +248,7 @@ export default class QuizInfra implements IQuizRepository, IQuizQueryService {
             disabled: c.disabled,
           })),
         };
-      })
+      }),
     );
   }
 
@@ -322,14 +270,14 @@ export default class QuizInfra implements IQuizRepository, IQuizQueryService {
       .leftJoin(
         "quiz_visible_users",
         "quiz_visible_users.quiz_id",
-        "quizzes.id"
+        "quizzes.id",
       )
       .select(({ fn }) => [fn.countAll<number>().over().as("size")])
       .where(({ eb, or }) =>
         or([
           eb("quiz_visible_users.user_id", "is", null),
           eb("quiz_visible_users.user_id", "=", userId),
-        ])
+        ]),
       );
 
     if (!!option.wids && option.wids.length)
@@ -342,7 +290,7 @@ export default class QuizInfra implements IQuizRepository, IQuizQueryService {
           eb.or([
             eb("quizzes.que", "like", `%${option.keyword}%`),
             eb("quizzes.ans", "like", `%${option.keyword}%`),
-          ])
+          ]),
         );
       } else if (option.keywordOption === 2) {
         query = query.where("quizzes.que", "like", `%${option.keyword}%`);
@@ -393,7 +341,7 @@ export default class QuizInfra implements IQuizRepository, IQuizQueryService {
                 eb("histories.judgement", "in", option.judgements),
                 between("histories.practiced", since, until),
               ])
-            : between("histories.practiced", since, until)
+            : between("histories.practiced", since, until),
         )
         .orderBy("histories.practiced desc");
     } else if (!!option.mid) {
@@ -430,98 +378,23 @@ export default class QuizInfra implements IQuizRepository, IQuizQueryService {
         "quizzes.sub_category_id as subCategoryId",
         "quizzes.total_crct_ans as right",
         sql<number>`total_crct_ans + total_through_ans + total_wrng_ans`.as(
-          "total"
+          "total",
         ),
       ])
       .where("quizzes.qid", "=", qid)
       .executeTakeFirstOrThrow();
 
-    const [tags] = await Promise.all([
-      client
-        .selectFrom("tagging")
-        .innerJoin("tags", "tagging.tag_id", "tags.id")
-        .select("tags.label as label")
-        .where("tagging.quiz_id", "=", quiz.quizId)
-        .execute()
-        .then((tags) => tags.map((t) => t.label)),
-    ]);
-
     return Quiz.reconstruct(
       quiz.qid,
       quiz.question,
       quiz.answer,
-      tags,
       quiz.total,
       quiz.right || 0,
       quiz.creatorUid,
       quiz.anotherAnswer,
       quiz.wid,
-      quiz.categoryId
+      quiz.categoryId,
     );
-  }
-
-  async findByTagLabel(tagLabel: string): Promise<Quiz[]> {
-    const client = this.clientManager.getClient();
-
-    const quizIds = await client
-      .selectFrom("tagging")
-      .innerJoin("tags", "tags.id", "tagging.tag_id")
-      .select("tagging.quiz_id")
-      .where("tags.label", "=", tagLabel)
-      .execute()
-      .then((quidIds) => quidIds.map((q) => q.quiz_id));
-
-    const quizzes = await Promise.all(
-      quizIds.map(async (quizId) => {
-        const quiz = await client
-          .selectFrom("quizzes")
-          .leftJoin("workbooks", "quizzes.workbook_id", "workbooks.id")
-          .leftJoin("levels", "workbooks.level_id", "levels.id")
-          .innerJoin("users", "users.id", "quizzes.creator_id")
-          .select([
-            "quizzes.id as quizId",
-            "quizzes.qid as qid",
-            "quizzes.que as question",
-            "quizzes.ans as answer",
-            "quizzes.anoans as anotherAnswer",
-            "workbooks.wid as wid",
-            "users.uid as creatorUid",
-            "quizzes.category_id as categoryId",
-            "quizzes.sub_category_id as subCategoryId",
-            "quizzes.total_crct_ans as right",
-            sql<number>`total_crct_ans + total_through_ans + total_wrng_ans`.as(
-              "total"
-            ),
-          ])
-          .where("quizzes.id", "=", quizId)
-          .executeTakeFirstOrThrow();
-
-        const [tags] = await Promise.all([
-          client
-            .selectFrom("tagging")
-            .innerJoin("tags", "tagging.tag_id", "tags.id")
-            .select("tags.label as label")
-            .where("tagging.quiz_id", "=", quiz.quizId)
-            .execute()
-            .then((tags) => tags.map((t) => t.label)),
-        ]);
-
-        return Quiz.reconstruct(
-          quiz.qid,
-          quiz.question,
-          quiz.answer,
-          tags,
-          quiz.total,
-          quiz.right || 0,
-          quiz.creatorUid,
-          quiz.anotherAnswer,
-          quiz.wid,
-          quiz.categoryId
-        );
-      })
-    );
-
-    return quizzes;
   }
 
   async save(quiz: Quiz): Promise<void> {
@@ -555,45 +428,9 @@ export default class QuizInfra implements IQuizRepository, IQuizQueryService {
         category_id: quiz.categoryId,
       })
       .execute();
-
-    const quizId = await client
-      .selectFrom("quizzes")
-      .select("id")
-      .where("qid", "=", quiz.qid)
-      .executeTakeFirstOrThrow()
-      .then((quiz) => quiz.id);
-
-    // タグをクイズに付与
-    const tagIds = await Promise.all(
-      quiz.tagLabels.map(async (label) => {
-        return await client
-          .selectFrom("tags")
-          .select("id")
-          .where("label", "=", label)
-          .executeTakeFirstOrThrow()
-          .then((tag) => tag.id);
-      })
-    );
-
-    await Promise.all(
-      tagIds.map(async (id) =>
-        client
-          .insertInto("tagging")
-          .values({
-            tag_id: id,
-            quiz_id: quizId,
-            registered: new Date(),
-          })
-          .execute()
-      )
-    );
   }
 
-  async update(
-    quiz: Quiz,
-    tagsToAdd: string[],
-    tagsToRemove: string[]
-  ): Promise<void> {
+  async update(quiz: Quiz): Promise<void> {
     const client = this.clientManager.getClient();
 
     const [workbookId, userId] = await Promise.all([
@@ -624,22 +461,10 @@ export default class QuizInfra implements IQuizRepository, IQuizQueryService {
       })
       .where("qid", "=", quiz.qid)
       .executeTakeFirstOrThrow();
-
-    for (const tag of tagsToAdd) {
-      await this.addTagToQuiz(quiz.qid, tag);
-    }
-    for (const tag of tagsToRemove) {
-      await this.removeTagFromQuiz(quiz.qid, tag);
-    }
   }
 
   async delete(quiz: Quiz): Promise<void> {
     const client = this.clientManager.getClient();
-
-    for (const tag of quiz.tagLabels) {
-      await this.removeTagFromQuiz(quiz.qid, tag);
-    }
-
     await client.deleteFrom("quizzes").where("qid", "=", quiz.qid).execute();
   }
 }

@@ -4,7 +4,6 @@ export default class Quiz {
     private _question: string,
     private _answer: string,
     private _anotherAnswer: string | null,
-    private _tagLabels: string[],
     private _wid: string | null,
     private _categoryId: number | null,
     private _creatorUid: string,
@@ -16,7 +15,6 @@ export default class Quiz {
     qid: string,
     question: string,
     answer: string,
-    tagLabels: string[],
     creatorUid: string,
     anotherAnswer?: string,
     wid?: string,
@@ -27,7 +25,6 @@ export default class Quiz {
       question,
       answer,
       anotherAnswer || null,
-      tagLabels,
       wid || null,
       categoryId || null,
       creatorUid,
@@ -40,7 +37,6 @@ export default class Quiz {
     qid: string,
     question: string,
     answer: string,
-    tagLabels: string[],
     total: number,
     right: number,
     creatorUid: string,
@@ -53,7 +49,6 @@ export default class Quiz {
       question,
       answer,
       anotherAnswer,
-      tagLabels,
       wid,
       categoryId,
       creatorUid,
@@ -82,10 +77,6 @@ export default class Quiz {
     this._wid = wid;
   }
 
-  editTags(tagLabels: string[]) {
-    this._tagLabels = tagLabels;
-  }
-
   isEditable(uid: string): boolean {
     return uid == this._creatorUid;
   }
@@ -108,10 +99,6 @@ export default class Quiz {
 
   get wid(): string | null {
     return this._wid;
-  }
-
-  get tagLabels(): string[] {
-    return this._tagLabels;
   }
 
   get categoryId(): number | null {

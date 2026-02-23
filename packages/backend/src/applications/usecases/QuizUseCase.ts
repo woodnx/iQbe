@@ -154,13 +154,14 @@ export default class QuizUseCase {
     // タグ付与処理
     const currentTags = quiz.tagLabels;
     quiz.editTags(tagLabels);
-
-    const tagsToAdd = tagLabels.filter((tag) => !currentTags.includes(tag));
-    const tagsToRemove = currentTags.filter((tag) => !tagLabels.includes(tag));
+    const { tagsToAdd, tagsToRemove } = tagService.diffTags(
+      currentTags,
+      tagLabels,
+    );
 
     await this.transactionManager.begin(async () => {
       await tagService.manageTagsToAdd(tagsToAdd);
-      await this.quizRepository.update(quiz, tagsToAdd, tagsToRemove);
+      await this.quizRepository.update(quiz);
       await tagService.manageTagsToRemove(tagsToRemove);
     });
 
