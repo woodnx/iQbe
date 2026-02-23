@@ -4,7 +4,7 @@ import { QuizAttachedTags } from "@/domains/QuizAttachedTags";
 import { IQuizAttachedTagsRepository } from "@/domains/QuizAttachedTags/IQuizAttachedTagsRepository";
 import { QuizAttachedTagsService } from "@/domains/QuizAttachedTags/QuizAttachedTagsService";
 import ITagRepository from "@/domains/Tag/ITagRepository";
-import ITransactionManager from "../shared/ITransactionManager";
+import ITransactionManager from "../../shared/ITransactionManager";
 
 export type DeleteQuizUseCaseCommand = {
   qid: string;

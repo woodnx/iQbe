@@ -1,7 +1,7 @@
 import { InMemoryQuizAttachedTagsInfra } from "@/interfaces/infra/InMemory/QuizAttachedTagsInfra";
 import { InMemoryQuizInfra } from "@/interfaces/infra/InMemory/QuizInfra";
 import { InMemoryTagInfra } from "@/interfaces/infra/InMemory/TagInfra";
-import { MockTransactionManager } from "../shared/MockTransactionManager";
+import { MockTransactionManager } from "../../shared/MockTransactionManager";
 import { AddQuizUseCase, AddQuizUseCaseCommand } from "./AddQuizUseCase";
 import { DeleteQuizUseCase } from "./DeleteQuizUseCase";
 

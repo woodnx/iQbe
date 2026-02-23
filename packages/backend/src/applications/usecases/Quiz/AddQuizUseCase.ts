@@ -1,27 +1,27 @@
-import { ApiError } from "api";
 import { components } from "api/schema";
+import Quiz from "@/domains/Quiz";
 import IQuizRepository from "@/domains/Quiz/IQuizRepository";
+import QuizService from "@/domains/Quiz/QuizService";
 import { QuizAttachedTags } from "@/domains/QuizAttachedTags";
 import { IQuizAttachedTagsRepository } from "@/domains/QuizAttachedTags/IQuizAttachedTagsRepository";
 import { QuizAttachedTagsService } from "@/domains/QuizAttachedTags/QuizAttachedTagsService";
 import ITagRepository from "@/domains/Tag/ITagRepository";
-import ITransactionManager from "../shared/ITransactionManager";
+import ITransactionManager from "../../shared/ITransactionManager";
 
 type QuizDTO =
   components["responses"]["QuizResponse"]["content"]["application/json"];
 
-export interface EditQuizUseCaseCommand {
-  qid: string;
+export type AddQuizUseCaseCommand = {
   question: string;
   answer: string;
-  uid: string;
   tagLabels: string[];
+  uid: string;
   anotherAnswer?: string;
   categoryId?: number;
   wid?: string;
-}
+};
 
-export class EditQuizUseCase {
+export class AddQuizUseCase {
   constructor(
     private transactionManager: ITransactionManager,
     private quizRepository: IQuizRepository,
@@ -30,49 +30,35 @@ export class EditQuizUseCase {
   ) {}
 
   async execute({
-    qid,
     question,
     answer,
-    uid,
     tagLabels,
+    uid,
     anotherAnswer,
     categoryId,
     wid,
-  }: EditQuizUseCaseCommand): Promise<QuizDTO> {
-    const quiz = await this.quizRepository.findByQid(qid);
+  }: AddQuizUseCaseCommand): Promise<QuizDTO> {
+    const quizService = new QuizService();
     const quizAttachedTagsService = new QuizAttachedTagsService(
       this.quizAttachedTagsRepository,
       this.tagRepository,
     );
-    const editable = quiz?.isEditable(uid);
 
-    if (!quiz)
-      throw new ApiError({
-        title: "NO_QUIZ",
-        detail: "This qid is not available id",
-        status: 400,
-        type: "about:blank",
-      });
-
-    if (!editable)
-      throw new ApiError({
-        title: "NOT_EDITABLE_QUIZ",
-        detail: "This quiz is not able to edit",
-        status: 403,
-        type: "about:blank",
-      });
-
-    quiz.editQuestion(question);
-    quiz.editAnswer(answer);
-    quiz.editAnotherAnswer(anotherAnswer || null);
-    quiz.editCategoryId(categoryId || null);
-    quiz.editWid(wid || null);
+    const qid = quizService.generateQid();
+    const quiz = Quiz.create(
+      qid,
+      question,
+      answer,
+      uid,
+      anotherAnswer,
+      wid,
+      categoryId,
+    );
+    const assignedTags = QuizAttachedTags.create(qid, tagLabels);
 
     await this.transactionManager.begin(async () => {
-      await this.quizRepository.update(quiz);
-      await quizAttachedTagsService.updateAttachedTags(
-        QuizAttachedTags.create(qid, tagLabels),
-      );
+      await this.quizRepository.save(quiz);
+      await quizAttachedTagsService.updateAttachedTags(assignedTags);
     });
 
     return {
@@ -87,6 +73,7 @@ export class EditQuizUseCase {
       right: quiz.right,
       total: quiz.total,
       isFavorite: false,
+      registerdMylist: [],
     };
   }
 }
