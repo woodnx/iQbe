@@ -1,15 +1,13 @@
-import { CreateWorkbookUseCase } from "@/applications/usecases/CreateWorkbookUseCase";
-import { GetAllWorkbooksUseCase } from "@/applications/usecases/GetAllWorkbooksUseCase";
-import { GetWorkbooksUseCase } from "@/a@/applications/usecases/Workbook/GetAllWorkbooksUseCase
-
+import { CreateWorkbookUseCase } from "@/applications/usecases/Workbook/CreateWorkbookUseCase";
 import { DeleteWorkbookUseCase } from "@/applications/usecases/Workbook/DeleteWorkbookUseCase";
+import { GetAllWorkbooksUseCase } from "@/applications/usecases/Workbook/GetAllWorkbooksUseCase";
 import { GetWorkbookUseCase } from "@/applications/usecases/Workbook/GetWorkbookUseCase";
 import { UpdateWorkbookUseCase } from "@/applications/usecases/Workbook/UpdateWorkbookUseCase";
 import { typedAsyncWrapper } from "@/utils";
 
 export default class WorkbookController {
   constructor(
-    private getWorkbooksUseCase: GetWorkbooksUseCase,
+    private getWorkbooksUseCase: GetAllWorkbooksUseCase,
     private getWorkbookUseCase: GetWorkbookUseCase,
     private getAllWorkbooksUseCase: GetAllWorkbooksUseCase,
     private createWorkbookUseCase: CreateWorkbookUseCase,

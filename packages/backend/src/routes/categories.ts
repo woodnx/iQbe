@@ -1,14 +1,12 @@
 import express from "express";
 
 import { AddCategoryPresetUseCase } from "@/applications/usecases/Category/AddCategoryPresetUseCase";
-import { GetCategoryChainUseCase } from@/applications/usecases/Category/CreateCategoryUseCaseyChainUseCase";
-
-import { CreateCategoryUseCase } from "@/applications/usecases/Category/DeleteCategoryUseCase";
-import { DeleteCategoryUseCase } from @/applications/usecases/Category/GetCategoriesUseCasese";
-
+import { CreateCategoryUseCase } from "@/applications/usecases/Category/CreateCategoryUseCase";
+import { DeleteCategoryUseCase } from "@/applications/usecases/Category/DeleteCategoryUseCase";
+import { GetCategoriesUseCase } from "@/applications/usecases/Category/GetCategoriesUseCase";
+import { GetCategoryChainUseCase } from "@/applications/usecases/Category/GetCategoryChainUseCase";
 import { GetCategoryPresetListUseCase } from "@/applications/usecases/Category/GetCategoryPresetListUseCase";
 import { UpdateCategoryUseCase } from "@/applications/usecases/Category/UpdateCategoryUseCase";
-import { GetCategoriesUseCase } from "@/applications/usecases/GetCategoriesUseCase";
 import CategoryController from "@/interfaces/controllers/CategoryController";
 import CategoryInfra from "@/interfaces/infra/CategoryInfra";
 import KyselyClientManager from "@/interfaces/infra/kysely/KyselyClientManager";
