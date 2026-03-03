@@ -4,7 +4,16 @@
   "service": "app",
   "workspaceFolder": "/iQbe",
   "postCreateCommand": "sudo chmod 755 .devcontainer/init.sh && .devcontainer/init.sh",
-  "forwardPorts": [5173, 9000],
+  "forwardPorts": [
+    5173,
+    9000
+  ],
+  "features": {
+    "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {}
+  },
+  "containerEnv": {
+    "TESTCONTAINERS_RYUK_DISABLED": "true"
+  },
   "customizations": {
     "vscode": {
       "extensions": [
@@ -16,7 +25,9 @@
         "mike-co.import-sorter",
         "github.vscode-github-actions",
         "42Crunch.vscode-openapi",
-        "biomejs.biome"
+        "biomejs.biome",
+        "vitest.explorer",
+        "Orta.vscode-jest"
       ]
     }
   }

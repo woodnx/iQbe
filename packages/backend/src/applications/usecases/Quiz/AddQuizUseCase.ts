@@ -2,9 +2,11 @@ import { components } from "api/schema";
 import Quiz from "@/domains/Quiz";
 import IQuizRepository from "@/domains/Quiz/IQuizRepository";
 import QuizService from "@/domains/Quiz/QuizService";
+import { QuizAttachedTags } from "@/domains/QuizAttachedTags";
+import { IQuizAttachedTagsRepository } from "@/domains/QuizAttachedTags/IQuizAttachedTagsRepository";
+import { QuizAttachedTagsService } from "@/domains/QuizAttachedTags/QuizAttachedTagsService";
 import ITagRepository from "@/domains/Tag/ITagRepository";
-import TagService from "@/domains/Tag/TagService";
-import ITransactionManager from "../shared/ITransactionManager";
+import ITransactionManager from "../../shared/ITransactionManager";
 
 type QuizDTO =
   components["responses"]["QuizResponse"]["content"]["application/json"];
@@ -24,6 +26,7 @@ export class AddQuizUseCase {
     private transactionManager: ITransactionManager,
     private quizRepository: IQuizRepository,
     private tagRepository: ITagRepository,
+    private quizAttachedTagsRepository: IQuizAttachedTagsRepository,
   ) {}
 
   async execute({
@@ -36,23 +39,26 @@ export class AddQuizUseCase {
     wid,
   }: AddQuizUseCaseCommand): Promise<QuizDTO> {
     const quizService = new QuizService();
-    const tagService = new TagService(this.tagRepository);
+    const quizAttachedTagsService = new QuizAttachedTagsService(
+      this.quizAttachedTagsRepository,
+      this.tagRepository,
+    );
 
     const qid = quizService.generateQid();
     const quiz = Quiz.create(
       qid,
       question,
       answer,
-      tagLabels,
       uid,
       anotherAnswer,
       wid,
       categoryId,
     );
+    const assignedTags = QuizAttachedTags.create(qid, tagLabels);
 
     await this.transactionManager.begin(async () => {
-      await tagService.manageTagsToAdd(tagLabels);
       await this.quizRepository.save(quiz);
+      await quizAttachedTagsService.updateAttachedTags(assignedTags);
     });
 
     return {
@@ -61,7 +67,7 @@ export class AddQuizUseCase {
       answer: quiz.answer,
       anotherAnswer: quiz.anotherAnswer,
       wid: quiz.wid,
-      tagLabels: quiz.tagLabels,
+      tagLabels: tagLabels,
       categoryId: quiz.categoryId,
       creatorId: quiz.creatorUid,
       right: quiz.right,

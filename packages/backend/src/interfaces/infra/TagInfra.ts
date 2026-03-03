@@ -5,6 +5,17 @@ import KyselyClientManager from "./kysely/KyselyClientManager";
 export default class TagInfra implements ITagRepository {
   constructor(private clientManager: KyselyClientManager) {}
 
+  private async countTagUsage(tagId: number): Promise<number> {
+    const client = this.clientManager.getClient();
+
+    return client
+      .selectFrom("tagging")
+      .select(({ fn }) => [fn.count("tag_id").as("count")])
+      .where("tag_id", "=", tagId)
+      .executeTakeFirst()
+      .then((result) => (!!result ? Number(result.count) : 0));
+  }
+
   async findByLabel(label: string): Promise<Tag | null> {
     const client = this.clientManager.getClient();
 
@@ -16,12 +27,7 @@ export default class TagInfra implements ITagRepository {
 
     if (!tag) return null;
 
-    const usageCount = await client
-      .selectFrom("tagging")
-      .select(({ fn }) => [fn.count("tag_id").as("count")])
-      .where("tag_id", "=", tag.id)
-      .executeTakeFirst()
-      .then((result) => (!!result ? Number(result.count) : 0));
+    const usageCount = await this.countTagUsage(tag.id);
 
     return Tag.reconstruct(tag.id, tag.label, tag.created, usageCount);
   }
@@ -39,12 +45,7 @@ export default class TagInfra implements ITagRepository {
 
     return Promise.all(
       tags.map(async (tag) => {
-        const usageCount = await client
-          .selectFrom("tagging")
-          .select(({ fn }) => [fn.count("tag_id").as("count")])
-          .where("tag_id", "=", tag.id)
-          .executeTakeFirst()
-          .then((result) => (!!result ? Number(result.count) : 0));
+        const usageCount = await this.countTagUsage(tag.id);
 
         return Tag.reconstruct(tag.id, tag.label, tag.created, usageCount);
       }),

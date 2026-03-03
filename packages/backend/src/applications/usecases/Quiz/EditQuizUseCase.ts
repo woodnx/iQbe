@@ -1,9 +1,11 @@
 import { ApiError } from "api";
 import { components } from "api/schema";
 import IQuizRepository from "@/domains/Quiz/IQuizRepository";
+import { QuizAttachedTags } from "@/domains/QuizAttachedTags";
+import { IQuizAttachedTagsRepository } from "@/domains/QuizAttachedTags/IQuizAttachedTagsRepository";
+import { QuizAttachedTagsService } from "@/domains/QuizAttachedTags/QuizAttachedTagsService";
 import ITagRepository from "@/domains/Tag/ITagRepository";
-import TagService from "@/domains/Tag/TagService";
-import ITransactionManager from "../shared/ITransactionManager";
+import ITransactionManager from "../../shared/ITransactionManager";
 
 type QuizDTO =
   components["responses"]["QuizResponse"]["content"]["application/json"];
@@ -24,6 +26,7 @@ export class EditQuizUseCase {
     private transactionManager: ITransactionManager,
     private quizRepository: IQuizRepository,
     private tagRepository: ITagRepository,
+    private quizAttachedTagsRepository: IQuizAttachedTagsRepository,
   ) {}
 
   async execute({
@@ -37,7 +40,10 @@ export class EditQuizUseCase {
     wid,
   }: EditQuizUseCaseCommand): Promise<QuizDTO> {
     const quiz = await this.quizRepository.findByQid(qid);
-    const tagService = new TagService(this.tagRepository);
+    const quizAttachedTagsService = new QuizAttachedTagsService(
+      this.quizAttachedTagsRepository,
+      this.tagRepository,
+    );
     const editable = quiz?.isEditable(uid);
 
     if (!quiz)
@@ -62,17 +68,11 @@ export class EditQuizUseCase {
     quiz.editCategoryId(categoryId || null);
     quiz.editWid(wid || null);
 
-    // タグ付与処理
-    const currentTags = quiz.tagLabels;
-    quiz.editTags(tagLabels);
-
-    const tagsToAdd = tagLabels.filter((tag) => !currentTags.includes(tag));
-    const tagsToRemove = currentTags.filter((tag) => !tagLabels.includes(tag));
-
     await this.transactionManager.begin(async () => {
-      await tagService.manageTagsToAdd(tagsToAdd);
-      await this.quizRepository.update(quiz, tagsToAdd, tagsToRemove);
-      await tagService.manageTagsToRemove(tagsToRemove);
+      await this.quizRepository.update(quiz);
+      await quizAttachedTagsService.updateAttachedTags(
+        QuizAttachedTags.create(qid, tagLabels),
+      );
     });
 
     return {
@@ -81,7 +81,7 @@ export class EditQuizUseCase {
       answer: quiz.answer,
       anotherAnswer: quiz.anotherAnswer,
       wid: quiz.wid,
-      tagLabels: quiz.tagLabels,
+      tagLabels: tagLabels,
       categoryId: quiz.categoryId,
       creatorId: quiz.creatorUid,
       right: quiz.right,

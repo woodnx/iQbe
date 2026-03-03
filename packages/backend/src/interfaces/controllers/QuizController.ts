@@ -2,13 +2,17 @@ import { ApiError } from "api";
 import { isArray } from "lodash";
 
 import IQuizQueryService from "@/applications/queryservices/IQuizQueryService";
-import QuizUseCase from "@/applications/usecases/QuizUseCase";
+import { AddQuizUseCase } from "@/applications/usecases/Quiz/AddQuizUseCase";
+import { DeleteQuizUseCase } from "@/applications/usecases/Quiz/DeleteQuizUseCase";
+import { EditQuizUseCase } from "@/applications/usecases/Quiz/EditQuizUseCase";
 import { typedAsyncWrapper } from "@/utils";
 
 export default class QuizController {
   constructor(
     private quizQueryService: IQuizQueryService,
-    private quizUseCase: QuizUseCase
+    private addQuizUseCase: AddQuizUseCase,
+    private editQuizUseCase: EditQuizUseCase,
+    private deleteQuizUseCase: DeleteQuizUseCase,
   ) {}
 
   get() {
@@ -117,15 +121,15 @@ export default class QuizController {
         throw new ApiError().invalidParams();
       }
 
-      await this.quizUseCase.addQuiz(
+      await this.addQuizUseCase.execute({
         question,
         answer,
-        tags,
+        tagLabels: tags,
         uid,
         anotherAnswer,
-        category,
-        wid
-      );
+        categoryId: category,
+        wid,
+      });
 
       res.status(201).send();
     });
@@ -140,17 +144,18 @@ export default class QuizController {
         throw new ApiError().invalidParams();
       }
 
-      await this.quizUseCase.addQuizzes(
-        records.map((r) => ({
-          question: r.question,
-          answer: r.answer,
-          anotherAnswer: r.anotherAnswer || undefined,
-          tagLabels: r.tags || [],
-          wid: r.wid || undefined,
-          categoryId: r.category || undefined,
-          subCategoryId: r.subCategory || undefined,
-          uid,
-        }))
+      await Promise.all(
+        records.map((r) =>
+          this.addQuizUseCase.execute({
+            question: r.question,
+            answer: r.answer,
+            anotherAnswer: r.anotherAnswer || undefined,
+            tagLabels: r.tags || [],
+            wid: r.wid || undefined,
+            categoryId: r.category || undefined,
+            uid,
+          }),
+        ),
       );
 
       res.status(201).send();
@@ -172,16 +177,16 @@ export default class QuizController {
         throw new ApiError().invalidParams();
       }
 
-      await this.quizUseCase.editQuiz(
+      await this.editQuizUseCase.execute({
         qid,
         question,
         answer,
         uid,
-        tags,
+        tagLabels: tags,
         anotherAnswer,
-        category,
-        wid
-      );
+        categoryId: category,
+        wid,
+      });
 
       res.status(201).send();
     });
@@ -193,7 +198,7 @@ export default class QuizController {
 
       if (!qid) throw new ApiError().internalProblems();
 
-      await this.quizUseCase.deleteQuiz(qid);
+      await this.deleteQuizUseCase.execute({ qid });
 
       res.status(204).send();
     });

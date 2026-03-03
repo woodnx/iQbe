@@ -39,3 +39,12 @@ Clean Architecter をベースとした軽量DDD．
 
 ### src/utils
 - DB処理に依らない再利用可能な処理を記述
+
+## Testing
+Vitest + Testcontainers (MySQL) を使って単体/結合テストを実行します。
+
+```
+pnpm --filter backend test
+```
+
+devcontainer で実行する場合は Docker ソケットが利用可能であることを確認してください。

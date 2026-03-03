@@ -1,12 +1,12 @@
 import { ApiError } from "api";
 
-import { AddCategoryPresetUseCase } from "@/applications/usecases/AddCategoryPresetUseCase";
-import { CreateCategoryUseCase } from "@/applications/usecases/CreateCategoryUseCase";
-import { DeleteCategoryUseCase } from "@/applications/usecases/DeleteCategoryUseCase";
-import { GetCategoriesUseCase } from "@/applications/usecases/GetCategoriesUseCase";
-import { GetCategoryChainUseCase } from "@/applications/usecases/GetCategoryChainUseCase";
-import { GetCategoryPresetListUseCase } from "@/applications/usecases/GetCategoryPresetListUseCase";
-import { UpdateCategoryUseCase } from "@/applications/usecases/UpdateCategoryUseCase";
+import { AddCategoryPresetUseCase } from "@/applications/usecases/Category/AddCategoryPresetUseCase";
+import { CreateCategoryUseCase } from "@/applications/usecases/Category/CreateCategoryUseCase";
+import { DeleteCategoryUseCase } from "@/applications/usecases/Category/DeleteCategoryUseCase";
+import { GetCategoriesUseCase } from "@/applications/usecases/Category/GetCategoriesUseCase";
+import { GetCategoryChainUseCase } from "@/applications/usecases/Category/GetCategoryChainUseCase";
+import { GetCategoryPresetListUseCase } from "@/applications/usecases/Category/GetCategoryPresetListUseCase";
+import { UpdateCategoryUseCase } from "@/applications/usecases/Category/UpdateCategoryUseCase";
 import { typedAsyncWrapper } from "@/utils";
 
 export default class CategoryController {

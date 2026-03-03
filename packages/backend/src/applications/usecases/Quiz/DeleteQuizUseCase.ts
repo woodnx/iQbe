@@ -1,8 +1,10 @@
 import { ApiError } from "api";
 import IQuizRepository from "@/domains/Quiz/IQuizRepository";
+import { QuizAttachedTags } from "@/domains/QuizAttachedTags";
+import { IQuizAttachedTagsRepository } from "@/domains/QuizAttachedTags/IQuizAttachedTagsRepository";
+import { QuizAttachedTagsService } from "@/domains/QuizAttachedTags/QuizAttachedTagsService";
 import ITagRepository from "@/domains/Tag/ITagRepository";
-import TagService from "@/domains/Tag/TagService";
-import ITransactionManager from "../shared/ITransactionManager";
+import ITransactionManager from "../../shared/ITransactionManager";
 
 export type DeleteQuizUseCaseCommand = {
   qid: string;
@@ -13,10 +15,14 @@ export class DeleteQuizUseCase {
     private transactionManager: ITransactionManager,
     private quizRepository: IQuizRepository,
     private tagRepository: ITagRepository,
+    private quizAttachedTagsRepository: IQuizAttachedTagsRepository,
   ) {}
 
   async execute(command: DeleteQuizUseCaseCommand): Promise<void> {
-    const tagService = new TagService(this.tagRepository);
+    const quizAttachedTagsService = new QuizAttachedTagsService(
+      this.quizAttachedTagsRepository,
+      this.tagRepository,
+    );
     const quiz = await this.quizRepository.findByQid(command.qid);
 
     if (!quiz)
@@ -27,9 +33,11 @@ export class DeleteQuizUseCase {
         type: "about:blank",
       });
 
-    this.transactionManager.begin(async () => {
+    const assignedTags = QuizAttachedTags.create(quiz.qid, []);
+
+    await this.transactionManager.begin(async () => {
       await this.quizRepository.delete(quiz);
-      await tagService.manageTagsToRemove(quiz.tagLabels);
+      await quizAttachedTagsService.updateAttachedTags(assignedTags);
     });
   }
 }

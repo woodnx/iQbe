@@ -15,8 +15,8 @@ export const normalizeWorkbookDate = (date: WorkbookDateInput): Date | null => {
     return Number.isNaN(date.getTime()) ? null : date;
   }
 
+  // string のとき
   const parsed = new Date(date);
-
   return Number.isNaN(parsed.getTime()) ? null : parsed;
 };
 

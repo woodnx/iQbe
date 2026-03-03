@@ -7,24 +7,18 @@ export class InMemoryQuizInfra implements IQuizRepository {
   } = {};
 
   async findByQid(qid: string): Promise<Quiz | null> {
-    const book = Object.entries(this.DB).find(([id]) => {
+    const quiz = Object.entries(this.DB).find(([id]) => {
       return qid === id;
     });
 
-    return book ? book[1] : null;
-  }
-
-  async findByTagLabel(tagLabel: string): Promise<Quiz[]> {
-    return Object.values(this.DB).filter((quiz) =>
-      quiz.tagLabels.includes(tagLabel),
-    );
+    return quiz ? quiz[1] : null;
   }
 
   async save(quiz: Quiz) {
     this.DB[quiz.qid] = quiz;
   }
 
-  async update(quiz: Quiz, tagsToAdd: string[], tagsToRemove: string[]) {
+  async update(quiz: Quiz) {
     this.DB[quiz.qid] = quiz;
   }
 

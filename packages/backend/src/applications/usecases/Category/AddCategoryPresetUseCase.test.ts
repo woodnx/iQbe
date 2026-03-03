@@ -1,5 +1,5 @@
 import { InMemoryCategoryInfra } from "@/interfaces/infra/InMemory/CategoryInfra";
-import { MockTransactionManager } from "../shared/MockTransactionManager";
+import { MockTransactionManager } from "../../shared/MockTransactionManager";
 import { AddCategoryPresetUseCase } from "./AddCategoryPresetUseCase";
 
 describe("AddCategoryPresetUseCase", () => {
