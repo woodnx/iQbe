@@ -1,10 +1,8 @@
 import express from "express";
 
-import { CreateWorkbookUseCase } from "@/applications/usecases/CreateWorkbookUseCase";
-import { GetAllWorkbooksUseCase } from "@/applications/usecases/GetAllWorkbooksUseCase";
-import { GetWorkbooksUseCase } from "@/a@/applications/usecases/Workbook/GetAllWorkbooksUseCase
-
+import { CreateWorkbookUseCase } from "@/applications/usecases/Workbook/CreateWorkbookUseCase";
 import { DeleteWorkbookUseCase } from "@/applications/usecases/Workbook/DeleteWorkbookUseCase";
+import { GetAllWorkbooksUseCase } from "@/applications/usecases/Workbook/GetAllWorkbooksUseCase";
 import { GetWorkbookUseCase } from "@/applications/usecases/Workbook/GetWorkbookUseCase";
 import { UpdateWorkbookUseCase } from "@/applications/usecases/Workbook/UpdateWorkbookUseCase";
 import WorkbookService from "@/domains/Workbook/WorkbookService";
@@ -15,7 +13,7 @@ import WorkbookInfra from "@/interfaces/infra/WorkbookInfra";
 const clientManager = new KyselyClientManager();
 const workbookInfra = new WorkbookInfra(clientManager);
 const workbookService = new WorkbookService();
-const getWorkbooksUseCase = new GetWorkbooksUseCase(workbookInfra);
+const getWorkbooksUseCase = new GetAllWorkbooksUseCase(workbookInfra);
 const getWorkbookUseCase = new GetWorkbookUseCase(workbookInfra);
 const getAllWorkbooksUseCase = new GetAllWorkbooksUseCase(workbookInfra);
 const createWorkbookUseCase = new CreateWorkbookUseCase(

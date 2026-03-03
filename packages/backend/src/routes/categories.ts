@@ -7,8 +7,8 @@ import { CreateCategoryUseCase } from "@/applications/usecases/Category/DeleteCa
 import { DeleteCategoryUseCase } from @/applications/usecases/Category/GetCategoriesUseCasese";
 
 import { GetCategoryPresetListUseCase } from "@/applications/usecases/Category/GetCategoryPresetListUseCase";
+import { UpdateCategoryUseCase } from "@/applications/usecases/Category/UpdateCategoryUseCase";
 import { GetCategoriesUseCase } from "@/applications/usecases/GetCategoriesUseCase";
-import { UpdateCategoryUseCase } from "@/applications/usecases/Workbook/UpdateCategoryUseCase";
 import CategoryController from "@/interfaces/controllers/CategoryController";
 import CategoryInfra from "@/interfaces/infra/CategoryInfra";
 import KyselyClientManager from "@/interfaces/infra/kysely/KyselyClientManager";
