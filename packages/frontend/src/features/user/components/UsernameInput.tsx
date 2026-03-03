@@ -1,4 +1,3 @@
-import { client } from "@/utils/client";
 import {
   Flex,
   Loader,
@@ -10,6 +9,7 @@ import {
 import { useDebouncedCallback } from "@mantine/hooks";
 import { IconAlertCircle, IconCheck } from "@tabler/icons-react";
 import { useState } from "react";
+import { client } from "@/utils/client";
 
 function checkUsernameAvailable(username: string): Promise<boolean> {
   return client
@@ -34,7 +34,7 @@ export default function UsernameInput({
     setLoading(true);
     setAvailable(await checkUsernameAvailable(username));
     setLoading(false);
-  }, 500);
+  }, 1000);
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     onChange(event);
