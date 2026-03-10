@@ -12,14 +12,12 @@ import { notifications } from "@mantine/notifications";
 import {
   IconActivity,
   IconBook,
-  IconBooks,
   IconHistory,
   IconHome,
   IconMenu2,
   IconPencil,
   IconSchool,
   IconSearch,
-  IconStar,
 } from "@tabler/icons-react";
 import { Outlet, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useLayoutEffect, useState } from "react";
@@ -28,13 +26,12 @@ import UserInfoMenu from "@/features/user/components/UserInfoMenu";
 import useHeaderHeight from "@/hooks/useHeaderHeight";
 import Logo from "@/shared/components/Logo";
 import NavbarLink from "@/shared/components/NavbarLink";
-import { useMylists } from "../hooks/useMylists";
 import { checkAuth } from "../plugins/auth";
 
 const checkPathname = (pathname: string) => {
   if (pathname === "/") return "/";
   else if (pathname === "/collection") return "/collection";
-  else if (pathname === "/practice") return "/practice";
+  else if (pathname === "/training") return "/training";
   else if (pathname === "/favorite") return "/favorite";
   else if (pathname === "/history") return "/history";
   else if (pathname === "/setting") return "/setting";
@@ -52,14 +49,8 @@ export default function DefaultLayout() {
   const { pathname } = useRouterState({
     select: (state) => state.location,
   });
-  const { mylists } = useMylists(!loading);
   const isMobile = useIsMobile();
   const { headerHeight } = useHeaderHeight();
-
-  const mockMylists = mylists?.map((m) => ({
-    label: m.name,
-    link: `${m.mid}`,
-  }));
 
   const mockdata = [
     {
@@ -75,7 +66,7 @@ export default function DefaultLayout() {
     {
       label: "演習",
       icon: IconSchool,
-      link: "/practice",
+      link: "/training",
     },
     {
       label: "作問",
@@ -83,21 +74,9 @@ export default function DefaultLayout() {
       link: "/create",
     },
     {
-      label: "お気に入り",
-      icon: IconStar,
-      link: "/favorite",
-    },
-    {
       label: "履歴",
       icon: IconHistory,
       link: "/history",
-    },
-    {
-      label: "マイリスト",
-      icon: IconBooks,
-      link: "/mylist",
-      isTab: true,
-      links: [...(mockMylists || [])],
     },
   ];
 
@@ -255,8 +234,8 @@ export default function DefaultLayout() {
 
           <Footer />
 
-          <AppShell.Main bg="#F8FAFC">
-            <Container size="lg" px={0}>
+          <AppShell.Main bg="#F2F3F4">
+            <Container size="md" px={0}>
               <Outlet />
             </Container>
           </AppShell.Main>
