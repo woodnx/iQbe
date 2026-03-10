@@ -255,7 +255,7 @@ export default function DefaultLayout() {
 
           <Footer />
 
-          <AppShell.Main>
+          <AppShell.Main bg="#F8FAFC">
             <Container size="lg" px={0}>
               <Outlet />
             </Container>
