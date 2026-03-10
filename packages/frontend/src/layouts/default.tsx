@@ -26,7 +26,6 @@ import { useLayoutEffect, useState } from "react";
 import { useIsMobile } from "@/contexts/isMobile";
 import UserInfoMenu from "@/features/user/components/UserInfoMenu";
 import useHeaderHeight from "@/hooks/useHeaderHeight";
-import { useWorkbooks } from "@/hooks/useWorkbooks";
 import Logo from "@/shared/components/Logo";
 import NavbarLink from "@/shared/components/NavbarLink";
 import { useMylists } from "../hooks/useMylists";
@@ -34,7 +33,7 @@ import { checkAuth } from "../plugins/auth";
 
 const checkPathname = (pathname: string) => {
   if (pathname === "/") return "/";
-  else if (pathname === "/search") return "/search";
+  else if (pathname === "/collection") return "/collection";
   else if (pathname === "/practice") return "/practice";
   else if (pathname === "/favorite") return "/favorite";
   else if (pathname === "/history") return "/history";
@@ -54,18 +53,12 @@ export default function DefaultLayout() {
     select: (state) => state.location,
   });
   const { mylists } = useMylists(!loading);
-  const { workbooks } = useWorkbooks(false, !loading);
   const isMobile = useIsMobile();
   const { headerHeight } = useHeaderHeight();
 
   const mockMylists = mylists?.map((m) => ({
     label: m.name,
     link: `${m.mid}`,
-  }));
-
-  const mockWorkbooks = workbooks?.map((w) => ({
-    label: w.name,
-    link: `${w.wid}`,
   }));
 
   const mockdata = [
@@ -75,10 +68,9 @@ export default function DefaultLayout() {
       link: "/",
     },
     {
-      label: "問題集",
+      label: "クイズセット",
       icon: IconBook,
-      link: "/workbook",
-      links: mockWorkbooks,
+      link: "/collection",
     },
     {
       label: "演習",

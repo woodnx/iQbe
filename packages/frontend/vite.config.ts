@@ -1,8 +1,7 @@
-import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react';
-import { TanStackRouterVite } from '@tanstack/router-vite-plugin';
-import { VitePWA } from 'vite-plugin-pwa';
-import myManifest from './manifest.json';
+import react from "@vitejs/plugin-react";
+import { defineConfig } from "vite";
+import { VitePWA } from "vite-plugin-pwa";
+import myManifest from "./manifest.json";
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -13,23 +12,22 @@ export default defineConfig({
   },
   server: {
     host: true,
-		proxy: {
-      '/api': {
-        target: 'http://localhost:9000/api',
+    proxy: {
+      "/api": {
+        target: "http://localhost:9000/api",
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, ''),
+        rewrite: (path) => path.replace(/^\/api/, ""),
       },
-    }
-	},
+    },
+  },
   plugins: [
-    TanStackRouterVite(),
     react(),
     VitePWA({
       includeAssets: [
-        'offline.html',
-        'favicon.ico',
-        'iqbe-icon.png',
-        'iqbe.png',
+        "offline.html",
+        "favicon.ico",
+        "iqbe-icon.png",
+        "iqbe.png",
       ],
       devOptions: {
         enabled: true,
@@ -37,4 +35,4 @@ export default defineConfig({
       manifest: myManifest,
     }),
   ],
-})
+});

@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as WelcomeRouteImport } from './routes/welcome'
+import { Route as TrainingRouteImport } from './routes/training'
 import { Route as SettingRouteImport } from './routes/setting'
 import { Route as SearchRouteImport } from './routes/search'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
@@ -19,6 +20,7 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as HistoryRouteImport } from './routes/history'
 import { Route as FavoriteRouteImport } from './routes/favorite'
 import { Route as CreateRouteImport } from './routes/create'
+import { Route as CollectionRouteImport } from './routes/collection'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as WorkbookIndexRouteImport } from './routes/workbook/index'
 import { Route as WorkbookWidRouteImport } from './routes/workbook/$wid'
@@ -27,6 +29,11 @@ import { Route as MylistMidRouteImport } from './routes/mylist.$mid'
 const WelcomeRoute = WelcomeRouteImport.update({
   id: '/welcome',
   path: '/welcome',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TrainingRoute = TrainingRouteImport.update({
+  id: '/training',
+  path: '/training',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SettingRoute = SettingRouteImport.update({
@@ -74,6 +81,11 @@ const CreateRoute = CreateRouteImport.update({
   path: '/create',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CollectionRoute = CollectionRouteImport.update({
+  id: '/collection',
+  path: '/collection',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -97,6 +109,7 @@ const MylistMidRoute = MylistMidRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/collection': typeof CollectionRoute
   '/create': typeof CreateRoute
   '/favorite': typeof FavoriteRoute
   '/history': typeof HistoryRoute
@@ -106,6 +119,7 @@ export interface FileRoutesByFullPath {
   '/reset-password': typeof ResetPasswordRoute
   '/search': typeof SearchRoute
   '/setting': typeof SettingRoute
+  '/training': typeof TrainingRoute
   '/welcome': typeof WelcomeRoute
   '/mylist/$mid': typeof MylistMidRoute
   '/workbook/$wid': typeof WorkbookWidRoute
@@ -113,6 +127,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/collection': typeof CollectionRoute
   '/create': typeof CreateRoute
   '/favorite': typeof FavoriteRoute
   '/history': typeof HistoryRoute
@@ -122,6 +137,7 @@ export interface FileRoutesByTo {
   '/reset-password': typeof ResetPasswordRoute
   '/search': typeof SearchRoute
   '/setting': typeof SettingRoute
+  '/training': typeof TrainingRoute
   '/welcome': typeof WelcomeRoute
   '/mylist/$mid': typeof MylistMidRoute
   '/workbook/$wid': typeof WorkbookWidRoute
@@ -130,6 +146,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/collection': typeof CollectionRoute
   '/create': typeof CreateRoute
   '/favorite': typeof FavoriteRoute
   '/history': typeof HistoryRoute
@@ -139,6 +156,7 @@ export interface FileRoutesById {
   '/reset-password': typeof ResetPasswordRoute
   '/search': typeof SearchRoute
   '/setting': typeof SettingRoute
+  '/training': typeof TrainingRoute
   '/welcome': typeof WelcomeRoute
   '/mylist/$mid': typeof MylistMidRoute
   '/workbook/$wid': typeof WorkbookWidRoute
@@ -148,6 +166,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/collection'
     | '/create'
     | '/favorite'
     | '/history'
@@ -157,6 +176,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/search'
     | '/setting'
+    | '/training'
     | '/welcome'
     | '/mylist/$mid'
     | '/workbook/$wid'
@@ -164,6 +184,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/collection'
     | '/create'
     | '/favorite'
     | '/history'
@@ -173,6 +194,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/search'
     | '/setting'
+    | '/training'
     | '/welcome'
     | '/mylist/$mid'
     | '/workbook/$wid'
@@ -180,6 +202,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/collection'
     | '/create'
     | '/favorite'
     | '/history'
@@ -189,6 +212,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/search'
     | '/setting'
+    | '/training'
     | '/welcome'
     | '/mylist/$mid'
     | '/workbook/$wid'
@@ -197,6 +221,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  CollectionRoute: typeof CollectionRoute
   CreateRoute: typeof CreateRoute
   FavoriteRoute: typeof FavoriteRoute
   HistoryRoute: typeof HistoryRoute
@@ -206,6 +231,7 @@ export interface RootRouteChildren {
   ResetPasswordRoute: typeof ResetPasswordRoute
   SearchRoute: typeof SearchRoute
   SettingRoute: typeof SettingRoute
+  TrainingRoute: typeof TrainingRoute
   WelcomeRoute: typeof WelcomeRoute
   MylistMidRoute: typeof MylistMidRoute
   WorkbookWidRoute: typeof WorkbookWidRoute
@@ -219,6 +245,13 @@ declare module '@tanstack/react-router' {
       path: '/welcome'
       fullPath: '/welcome'
       preLoaderRoute: typeof WelcomeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/training': {
+      id: '/training'
+      path: '/training'
+      fullPath: '/training'
+      preLoaderRoute: typeof TrainingRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/setting': {
@@ -284,6 +317,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CreateRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/collection': {
+      id: '/collection'
+      path: '/collection'
+      fullPath: '/collection'
+      preLoaderRoute: typeof CollectionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -317,6 +357,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  CollectionRoute: CollectionRoute,
   CreateRoute: CreateRoute,
   FavoriteRoute: FavoriteRoute,
   HistoryRoute: HistoryRoute,
@@ -326,6 +367,7 @@ const rootRouteChildren: RootRouteChildren = {
   ResetPasswordRoute: ResetPasswordRoute,
   SearchRoute: SearchRoute,
   SettingRoute: SettingRoute,
+  TrainingRoute: TrainingRoute,
   WelcomeRoute: WelcomeRoute,
   MylistMidRoute: MylistMidRoute,
   WorkbookWidRoute: WorkbookWidRoute,
