@@ -14,16 +14,23 @@ import { useHistories } from "@/hooks/useHistories";
 import dayjs from "@/plugins/dayjs";
 import { Judgement } from "@/types";
 import { $api } from "@/utils/client";
+import { convertJudgements } from "@/utils/convertJudgement";
 
 export default function History() {
   const router = useRouter();
   const search = useSearch({ from: "/history" });
   const [activePage, setPage] = useState(1);
   const [isHidden, setIsHidden] = useState(false);
-  const [judgements, setJudgements] = useState<Judgement[]>([]);
+  const [judgements, setJudgements] = useState<Judgement[]>(
+    convertJudgements(search.judgements || []),
+  );
   const [dates, setDates] = useState<number[]>([
-    dayjs().startOf("day").valueOf(),
-    dayjs().endOf("day").valueOf(),
+    dayjs(search.since || undefined)
+      .startOf("day")
+      .valueOf(),
+    dayjs(search.until || undefined)
+      .endOf("day")
+      .valueOf(),
   ]);
   const { histories } = useHistories(dates[0], dates[1]);
   const right = !!histories ? Number(histories.right) : 0;

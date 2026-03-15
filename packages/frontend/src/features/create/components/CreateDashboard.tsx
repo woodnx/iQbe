@@ -90,7 +90,13 @@ export default function CreateDashboard() {
         </Tabs.List>
 
         <Tabs.Panel value="single" pt="xs">
-          <QuizEditForm question="" answer="" mb={16} onSubmit={submit} />
+          <QuizEditForm
+            question=""
+            answer=""
+            mb={16}
+            p="md"
+            onSubmit={submit}
+          />
         </Tabs.Panel>
         <Tabs.Panel value="file" pt="xs">
           <CsvFileImporter />

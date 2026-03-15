@@ -1,12 +1,12 @@
-import ActivityStatus from "@/features/activity/components/ActivityStatus";
-import ActivityUserRanking from "@/features/activity/components/ActivityUserRanking";
-import QuizSearchInput from "@/features/quiz/components/QuizSearchInput";
-import ResetPasswordModal from "@/features/user/components/ResetPasswordModal";
+import { Card, Grid, Modal, Tabs } from "@mantine/core";
 import {
   useRequestResetPassword,
   useSetRequestResetPassword,
 } from "@/contexts/requestResetPassword";
-import { Card, Grid, Modal, Tabs } from "@mantine/core";
+import ActivityStatus from "@/features/activity/components/ActivityStatus";
+import ActivityUserRanking from "@/features/activity/components/ActivityUserRanking";
+import QuizSearchInput from "@/features/quiz/components/QuizSearchInput";
+import ResetPasswordModal from "@/features/user/components/ResetPasswordModal";
 
 export default function Home() {
   const requesting = useRequestResetPassword();
@@ -18,17 +18,11 @@ export default function Home() {
         <ResetPasswordModal onSubmit={() => setRequesting(false)} />
       </Modal>
       <Grid align="center">
-        <Grid.Col span={10}>
+        <Grid.Col>
           <QuizSearchInput />
         </Grid.Col>
         <Grid.Col span={{ base: 12, md: 6 }}>
-          <Card
-            style={{
-              borderRadius: "20px 20px 0 0",
-            }}
-            withBorder
-            p={0}
-          >
+          <Card radius="lg" p={0}>
             <Tabs defaultValue="status">
               <Tabs.List grow>
                 <Tabs.Tab value="status">演習状況</Tabs.Tab>

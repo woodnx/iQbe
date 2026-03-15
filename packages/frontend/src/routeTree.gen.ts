@@ -17,10 +17,10 @@ import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as PracticeRouteImport } from './routes/practice'
 import { Route as NotFoundRouteImport } from './routes/not-found'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as LibraryRouteImport } from './routes/library'
 import { Route as HistoryRouteImport } from './routes/history'
 import { Route as FavoriteRouteImport } from './routes/favorite'
 import { Route as CreateRouteImport } from './routes/create'
-import { Route as CollectionRouteImport } from './routes/collection'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as WorkbookIndexRouteImport } from './routes/workbook/index'
 import { Route as WorkbookWidRouteImport } from './routes/workbook/$wid'
@@ -66,6 +66,11 @@ const LoginRoute = LoginRouteImport.update({
   path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LibraryRoute = LibraryRouteImport.update({
+  id: '/library',
+  path: '/library',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const HistoryRoute = HistoryRouteImport.update({
   id: '/history',
   path: '/history',
@@ -79,11 +84,6 @@ const FavoriteRoute = FavoriteRouteImport.update({
 const CreateRoute = CreateRouteImport.update({
   id: '/create',
   path: '/create',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CollectionRoute = CollectionRouteImport.update({
-  id: '/collection',
-  path: '/collection',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -109,10 +109,10 @@ const MylistMidRoute = MylistMidRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/collection': typeof CollectionRoute
   '/create': typeof CreateRoute
   '/favorite': typeof FavoriteRoute
   '/history': typeof HistoryRoute
+  '/library': typeof LibraryRoute
   '/login': typeof LoginRoute
   '/not-found': typeof NotFoundRoute
   '/practice': typeof PracticeRoute
@@ -127,10 +127,10 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/collection': typeof CollectionRoute
   '/create': typeof CreateRoute
   '/favorite': typeof FavoriteRoute
   '/history': typeof HistoryRoute
+  '/library': typeof LibraryRoute
   '/login': typeof LoginRoute
   '/not-found': typeof NotFoundRoute
   '/practice': typeof PracticeRoute
@@ -146,10 +146,10 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/collection': typeof CollectionRoute
   '/create': typeof CreateRoute
   '/favorite': typeof FavoriteRoute
   '/history': typeof HistoryRoute
+  '/library': typeof LibraryRoute
   '/login': typeof LoginRoute
   '/not-found': typeof NotFoundRoute
   '/practice': typeof PracticeRoute
@@ -166,10 +166,10 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/collection'
     | '/create'
     | '/favorite'
     | '/history'
+    | '/library'
     | '/login'
     | '/not-found'
     | '/practice'
@@ -184,10 +184,10 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/collection'
     | '/create'
     | '/favorite'
     | '/history'
+    | '/library'
     | '/login'
     | '/not-found'
     | '/practice'
@@ -202,10 +202,10 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
-    | '/collection'
     | '/create'
     | '/favorite'
     | '/history'
+    | '/library'
     | '/login'
     | '/not-found'
     | '/practice'
@@ -221,10 +221,10 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  CollectionRoute: typeof CollectionRoute
   CreateRoute: typeof CreateRoute
   FavoriteRoute: typeof FavoriteRoute
   HistoryRoute: typeof HistoryRoute
+  LibraryRoute: typeof LibraryRoute
   LoginRoute: typeof LoginRoute
   NotFoundRoute: typeof NotFoundRoute
   PracticeRoute: typeof PracticeRoute
@@ -296,6 +296,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/library': {
+      id: '/library'
+      path: '/library'
+      fullPath: '/library'
+      preLoaderRoute: typeof LibraryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/history': {
       id: '/history'
       path: '/history'
@@ -315,13 +322,6 @@ declare module '@tanstack/react-router' {
       path: '/create'
       fullPath: '/create'
       preLoaderRoute: typeof CreateRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/collection': {
-      id: '/collection'
-      path: '/collection'
-      fullPath: '/collection'
-      preLoaderRoute: typeof CollectionRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -357,10 +357,10 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  CollectionRoute: CollectionRoute,
   CreateRoute: CreateRoute,
   FavoriteRoute: FavoriteRoute,
   HistoryRoute: HistoryRoute,
+  LibraryRoute: LibraryRoute,
   LoginRoute: LoginRoute,
   NotFoundRoute: NotFoundRoute,
   PracticeRoute: PracticeRoute,

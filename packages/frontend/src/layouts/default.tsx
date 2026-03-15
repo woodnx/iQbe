@@ -10,9 +10,8 @@ import {
 import { useDisclosure } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
 import {
-  IconActivity,
-  IconBook,
-  IconHistory,
+  IconBooks,
+  IconDashboard,
   IconHome,
   IconMenu2,
   IconPencil,
@@ -30,7 +29,7 @@ import { checkAuth } from "../plugins/auth";
 
 const checkPathname = (pathname: string) => {
   if (pathname === "/") return "/";
-  else if (pathname === "/collection") return "/collection";
+  else if (pathname === "/library") return "/library";
   else if (pathname === "/training") return "/training";
   else if (pathname === "/favorite") return "/favorite";
   else if (pathname === "/history") return "/history";
@@ -54,15 +53,11 @@ export default function DefaultLayout() {
 
   const mockdata = [
     {
-      label: "アクティビティ",
-      icon: IconActivity,
+      label: "ダッシュボード",
+      icon: IconDashboard,
       link: "/",
     },
-    {
-      label: "クイズセット",
-      icon: IconBook,
-      link: "/collection",
-    },
+
     {
       label: "演習",
       icon: IconSchool,
@@ -74,9 +69,9 @@ export default function DefaultLayout() {
       link: "/create",
     },
     {
-      label: "履歴",
-      icon: IconHistory,
-      link: "/history",
+      label: "ライブラリ",
+      icon: IconBooks,
+      link: "/library",
     },
   ];
 

@@ -1,7 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
-
-import Create from "@/pages/create";
+import CreateDashboard from "@/features/create/components/CreateDashboard";
 
 export const Route = createFileRoute("/create")({
-  component: Create,
+  component: RouteComponent,
 });
+
+function RouteComponent() {
+  return <CreateDashboard />;
+}
