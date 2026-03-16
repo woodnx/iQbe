@@ -36,8 +36,8 @@ export class DeleteQuizUseCase {
     const assignedTags = QuizAttachedTags.create(quiz.qid, []);
 
     await this.transactionManager.begin(async () => {
-      await this.quizRepository.delete(quiz);
       await quizAttachedTagsService.updateAttachedTags(assignedTags);
+      await this.quizRepository.delete(quiz);
     });
   }
 }
