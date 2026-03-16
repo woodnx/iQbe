@@ -21,9 +21,11 @@ export default function ButtonWithFileInput({
       component="button"
       onClick={onClick}
       style={{ border: "none", cursor: "pointer" }}
+      bg="transparent"
+      radius="lg"
     >
       <Stack align="center" justify="center" gap="xs">
-        <Avatar size={100} src={image} />
+        <Avatar size={150} src={image} />
         <Text c="gray" fz="sm">
           変更する
         </Text>
