@@ -1,4 +1,4 @@
-import { BoxProps, Button, Center, Group } from "@mantine/core";
+import { BoxProps, Button, Card, Center, Group } from "@mantine/core";
 import {
   IconChevronsRight,
   IconPlaystationCircle,
@@ -63,7 +63,7 @@ export function PracticeQuizController({
   };
 
   return (
-    <>
+    <Card radius="lg">
       <PracticeTypewriteQuiz
         question={quiz.question}
         quizScene={quizScene}
@@ -87,6 +87,7 @@ export function PracticeQuizController({
         <Button
           fullWidth
           size="xl"
+          radius="md"
           color="red"
           onClick={() => judge(1)}
           disabled={quizScene !== "judging" || pressedWord == -1}
@@ -96,6 +97,7 @@ export function PracticeQuizController({
         <Button
           fullWidth
           size="xl"
+          radius="md"
           color="gray"
           onClick={() => judge(2)}
           disabled={quizScene !== "judging" || pressedWord >= 0}
@@ -105,6 +107,7 @@ export function PracticeQuizController({
         <Button
           fullWidth
           size="xl"
+          radius="md"
           color="blue"
           onClick={() => judge(0)}
           disabled={quizScene !== "judging" || pressedWord == -1}
@@ -119,6 +122,6 @@ export function PracticeQuizController({
           disabled={quizScene !== "typewriting" && quizScene !== "ignored"}
         />
       </Center>
-    </>
+    </Card>
   );
 }

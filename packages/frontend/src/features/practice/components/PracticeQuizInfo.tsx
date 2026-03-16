@@ -29,7 +29,7 @@ export function PracticeQuizInfo({
   const isMobile = useIsMobile();
 
   return (
-    <Card p="sm" radius="sm" {...other}>
+    <Card {...other} px={8} py="md">
       <Group justify="space-between">
         <Text fz={isMobile ? "lg" : "xl"} fw="bold">
           {answer}
@@ -44,7 +44,9 @@ export function PracticeQuizInfo({
         />
         {!!workbook ? <QuizWorkbookBadge workbook={workbook} /> : null}
       </Group>
-      {!visible ? <Overlay blur={50} color="#fff" zIndex={100} /> : null}
+      {!visible ? (
+        <Overlay backgroundOpacity={1} color="#fff" zIndex={100} />
+      ) : null}
     </Card>
   );
 }

@@ -13,8 +13,8 @@ import PracticeResultModal from "@/features/practice/components/PracticeResultMo
 import { useTimer } from "@/hooks";
 import { $api } from "@/utils/client";
 import {
-  QuerySnapshot,
   QUIZZES_QUERY_KEY,
+  QuerySnapshot,
   restoreQuerySnapshot,
   takeQuerySnapshot,
 } from "@/utils/queryCache";
@@ -50,7 +50,10 @@ export default function ({
   const { mutate } = $api.useMutation("post", "/practice", {
     onMutate: async ({ body }) => {
       await queryClient.cancelQueries({ queryKey: QUIZZES_QUERY_KEY });
-      const previousQuizzes = takeQuerySnapshot<Quiz[]>(queryClient, QUIZZES_QUERY_KEY);
+      const previousQuizzes = takeQuerySnapshot<Quiz[]>(
+        queryClient,
+        QUIZZES_QUERY_KEY,
+      );
 
       queryClient.setQueriesData<Quiz[] | undefined>(
         { queryKey: QUIZZES_QUERY_KEY },
@@ -226,7 +229,6 @@ export default function ({
           ignoreLimit={3000}
           countLimit={5000}
           onJudge={(j, w) => judgeQuiz(j, w)}
-          m="sm"
         />
       )}
     </>
