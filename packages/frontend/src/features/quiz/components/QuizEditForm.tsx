@@ -1,4 +1,4 @@
-import { BoxProps, Button, Card, Grid, Group, Textarea } from "@mantine/core";
+import { Button, Card, CardProps, Grid, Group, Textarea } from "@mantine/core";
 import { isNotEmpty, useForm } from "@mantine/form";
 import { components, paths } from "api/schema";
 
@@ -10,7 +10,7 @@ type QuizEditSubmitValues =
   paths["/quizzes"]["post"]["requestBody"]["content"]["application/json"];
 type Category = components["schemas"]["Category"];
 
-interface QuizEditFormProps extends BoxProps {
+interface QuizEditFormProps extends CardProps {
   question: string;
   answer: string;
   wid?: string;

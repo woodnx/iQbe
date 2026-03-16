@@ -1,7 +1,9 @@
+import { Code, Text, Title } from "@mantine/core";
 import { FileWithPath } from "@mantine/dropzone";
 import { notifications } from "@mantine/notifications";
 import { useQueryClient } from "@tanstack/react-query";
 import { useRef, useState } from "react";
+import { Element } from "@/routes/create";
 import { $api, client } from "@/utils/client";
 import {
   QUIZ_SIZES_QUERY_KEY,
@@ -10,7 +12,6 @@ import {
   restoreQuerySnapshot,
   takeQuerySnapshot,
 } from "@/utils/queryCache";
-import { Element } from "./CreateDashboard";
 import CsvDropzone from "./CsvDropzone";
 import CsvEditor from "./CsvEditor";
 
@@ -101,7 +102,16 @@ export default function CsvFileImporter() {
           onSave={saveQuizzes}
         />
       ) : (
-        <CsvDropzone onDrop={parseCsv} loading={isLoading} />
+        <>
+          <CsvDropzone onDrop={parseCsv} loading={isLoading} />
+          <Title size="h4" my="md">
+            CSVファイルをインポートする手順
+          </Title>
+          <Text>
+            CSVファイルの一番上の行（カラム欄）の問題文の箇所を
+            <Code>question</Code>、答えの箇所を<Code>answer</Code>としてください
+          </Text>
+        </>
       )}
     </>
   );
