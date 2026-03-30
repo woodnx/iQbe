@@ -229,7 +229,7 @@ export default function DefaultLayout() {
 
           <Footer />
 
-          <AppShell.Main bg="#F2F3F4">
+          <AppShell.Main>
             <Container size="md" px={0}>
               <Outlet />
             </Container>
