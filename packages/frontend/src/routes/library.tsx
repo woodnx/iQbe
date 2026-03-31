@@ -3,6 +3,8 @@ import {
   Button,
   Card,
   Group,
+  Stack,
+  Text,
   TextInput,
   Title,
 } from "@mantine/core";
@@ -31,17 +33,16 @@ function RouteComponent() {
 
   return (
     <>
-      <TextInput
-        mb="lg"
-        radius="md"
-        bd="unset"
-        placeholder="問題集・マイリストの名前を検索"
-        value={search}
-        onChange={(event) => setSearch(event.currentTarget.value)}
-      />
-
-      {displayedWorkbooks?.length > 0 && (
+      {displayedWorkbooks?.length > 0 ? (
         <>
+          <TextInput
+            mb="lg"
+            radius="md"
+            bd="unset"
+            placeholder="問題集・マイリストの名前を検索"
+            value={search}
+            onChange={(event) => setSearch(event.currentTarget.value)}
+          />
           <Group mb="xs" ml="sm">
             <IconBook2 />
             <Title size="h3">問題集</Title>
@@ -110,6 +111,13 @@ function RouteComponent() {
             </Accordion>
           </Card>
         </>
+      ) : (
+        <Stack mt="md" mb="3rem">
+          <Text ta="center">問題集がありませんか？</Text>
+          <Button onClick={() => navigate({ to: "/create" })}>
+            問題を追加する
+          </Button>
+        </Stack>
       )}
 
       {displayedMylists?.length > 0 && (

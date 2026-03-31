@@ -28,6 +28,8 @@ function RouteComponent() {
   const [dates, setDates] = useState<[Date | null, Date | null]>([null, null]);
   const navigate = useNavigate();
   const maxWorkbook = 5;
+  const isWorkbooksExist = workbooks && workbooks.length > 0;
+  const brokenTraining = null;
 
   return (
     <Grid>
@@ -39,7 +41,7 @@ function RouteComponent() {
                 前回の続き
               </Text>
               <Text c="dimmed" size="sm" mt="xs">
-                前回の学習内容から再開できます
+                {brokenTraining || "中断した演習はありません"}
               </Text>
               <Button
                 color="green"
@@ -47,8 +49,9 @@ function RouteComponent() {
                 mt="md"
                 radius="md"
                 variant="filled"
+                disabled={!brokenTraining}
               >
-                演習を開始
+                演習を再開
               </Button>
             </div>
           </Card>
@@ -65,75 +68,91 @@ function RouteComponent() {
             最近演習した順
           </Text>
         </Group>
-        <Card radius="lg" style={{ flex: 1 }}>
-          <Stack>
-            {workbooks?.slice(0, maxWorkbook).map((workbook) => (
-              <Group
-                key={workbook.wid}
-                style={{
-                  cursor: "pointer",
-                }}
-                component="a"
-                gap="xs"
-                wrap="nowrap"
-                onClick={() =>
-                  modals.openContextModal({
-                    modal: "practiceSetting",
-                    title: "演習の設定",
-                    innerProps: {
-                      onTrain: (judgements) => {
-                        const seed = Math.floor(Math.random() * 100000);
-                        navigate({
-                          to: "/practice",
-                          search: () => ({
-                            page: 1,
-                            seed,
-                            maxView: 100,
-                            wids: workbook.wid,
-                            judgements: judgements,
-                            isTransfer: true,
-                          }),
-                          replace: true,
-                        });
-                      },
-                    },
-                  })
-                }
-              >
-                <div
+        <Card
+          radius="lg"
+          style={{
+            flex: 1,
+            justifyContent: isWorkbooksExist ? "start" : "center",
+          }}
+        >
+          {isWorkbooksExist ? (
+            <Stack>
+              {workbooks.slice(0, maxWorkbook).map((workbook) => (
+                <Group
+                  key={workbook.wid}
                   style={{
-                    width: "4px",
-                    backgroundColor: "#a5d8ff",
-                    alignSelf: "stretch",
-                    borderRadius: "12px",
-                    flexShrink: 0,
+                    cursor: "pointer",
                   }}
-                ></div>
-                <div>
-                  <Text fw={700} size="lg" lineClamp={1}>
-                    {workbook.name}
-                  </Text>
-                  <Text c="dimmed" size="sm">
-                    {dayjs(workbook.date).format("YYYY/MM/DD")}
-                  </Text>
-                </div>
-              </Group>
-            ))}
-            {!!workbooks && workbooks.length > maxWorkbook && (
-              <Button
-                justify="end"
-                size="sm"
-                variant="transparent"
-                onClick={() =>
-                  navigate({
-                    to: "/library",
-                  })
-                }
-              >
-                → ほかの問題集も見る
+                  component="a"
+                  gap="xs"
+                  wrap="nowrap"
+                  onClick={() =>
+                    modals.openContextModal({
+                      modal: "practiceSetting",
+                      title: "演習の設定",
+                      innerProps: {
+                        onTrain: (judgements) => {
+                          const seed = Math.floor(Math.random() * 100000);
+                          navigate({
+                            to: "/practice",
+                            search: () => ({
+                              page: 1,
+                              seed,
+                              maxView: 100,
+                              wids: workbook.wid,
+                              judgements: judgements,
+                              isTransfer: true,
+                            }),
+                            replace: true,
+                          });
+                        },
+                      },
+                    })
+                  }
+                >
+                  <div
+                    style={{
+                      width: "4px",
+                      backgroundColor: "#a5d8ff",
+                      alignSelf: "stretch",
+                      borderRadius: "12px",
+                      flexShrink: 0,
+                    }}
+                  ></div>
+                  <div>
+                    <Text fw={700} size="lg" lineClamp={1}>
+                      {workbook.name}
+                    </Text>
+                    <Text c="dimmed" size="sm">
+                      {dayjs(workbook.date).format("YYYY/MM/DD")}
+                    </Text>
+                  </div>
+                </Group>
+              ))}
+
+              {workbooks.length > maxWorkbook && (
+                <Button
+                  justify="end"
+                  size="sm"
+                  variant="transparent"
+                  onClick={() =>
+                    navigate({
+                      to: "/library",
+                    })
+                  }
+                >
+                  → ほかの問題集も見る
+                </Button>
+              )}
+            </Stack>
+          ) : (
+            <Stack justify="center">
+              <Text ta="center">演習した問題集がありません...</Text>
+              <Button onClick={() => navigate({ to: "/library" })}>
+                問題集から演習する
               </Button>
-            )}
-          </Stack>
+            </Stack>
+          )}
         </Card>
       </Grid.Col>
 
