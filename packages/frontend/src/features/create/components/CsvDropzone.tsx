@@ -9,6 +9,7 @@ export default function CsvDropzone(props: Partial<DropzoneProps>) {
       onDrop={(files) => (!!props.onDrop ? props.onDrop(files) : null)}
       maxSize={5 * 1024 ** 2}
       accept={[MIME_TYPES.csv]}
+      radius="lg"
       {...props}
     >
       <Group
@@ -52,9 +53,7 @@ export default function CsvDropzone(props: Partial<DropzoneProps>) {
           <Text size="xl" inline>
             CSVファイルをドラッグするか、クリックしてファイルを選択してください
           </Text>
-          <Text size="sm" c="dimmed" inline mt={7}>
-            ファイルサイズは5MBまで
-          </Text>
+          <Text size="sm" c="dimmed" inline mt={7}></Text>
         </div>
       </Group>
     </Dropzone>

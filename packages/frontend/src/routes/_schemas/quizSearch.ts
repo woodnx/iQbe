@@ -22,7 +22,7 @@ export const quizSearchSchema = z.object({
   since: z.number().nullable().optional(),
   until: z.number().nullable().optional(),
   judgements: z
-    .union([z.number(), z.array(z.number())])
+    .union([z.array(z.number())])
     .nullable()
     .optional(),
   mid: z.string().nullable().optional(),

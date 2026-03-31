@@ -10,12 +10,14 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as WelcomeRouteImport } from './routes/welcome'
+import { Route as TrainingRouteImport } from './routes/training'
 import { Route as SettingRouteImport } from './routes/setting'
 import { Route as SearchRouteImport } from './routes/search'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as PracticeRouteImport } from './routes/practice'
 import { Route as NotFoundRouteImport } from './routes/not-found'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as LibraryRouteImport } from './routes/library'
 import { Route as HistoryRouteImport } from './routes/history'
 import { Route as FavoriteRouteImport } from './routes/favorite'
 import { Route as CreateRouteImport } from './routes/create'
@@ -27,6 +29,11 @@ import { Route as MylistMidRouteImport } from './routes/mylist.$mid'
 const WelcomeRoute = WelcomeRouteImport.update({
   id: '/welcome',
   path: '/welcome',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TrainingRoute = TrainingRouteImport.update({
+  id: '/training',
+  path: '/training',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SettingRoute = SettingRouteImport.update({
@@ -57,6 +64,11 @@ const NotFoundRoute = NotFoundRouteImport.update({
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LibraryRoute = LibraryRouteImport.update({
+  id: '/library',
+  path: '/library',
   getParentRoute: () => rootRouteImport,
 } as any)
 const HistoryRoute = HistoryRouteImport.update({
@@ -100,12 +112,14 @@ export interface FileRoutesByFullPath {
   '/create': typeof CreateRoute
   '/favorite': typeof FavoriteRoute
   '/history': typeof HistoryRoute
+  '/library': typeof LibraryRoute
   '/login': typeof LoginRoute
   '/not-found': typeof NotFoundRoute
   '/practice': typeof PracticeRoute
   '/reset-password': typeof ResetPasswordRoute
   '/search': typeof SearchRoute
   '/setting': typeof SettingRoute
+  '/training': typeof TrainingRoute
   '/welcome': typeof WelcomeRoute
   '/mylist/$mid': typeof MylistMidRoute
   '/workbook/$wid': typeof WorkbookWidRoute
@@ -116,12 +130,14 @@ export interface FileRoutesByTo {
   '/create': typeof CreateRoute
   '/favorite': typeof FavoriteRoute
   '/history': typeof HistoryRoute
+  '/library': typeof LibraryRoute
   '/login': typeof LoginRoute
   '/not-found': typeof NotFoundRoute
   '/practice': typeof PracticeRoute
   '/reset-password': typeof ResetPasswordRoute
   '/search': typeof SearchRoute
   '/setting': typeof SettingRoute
+  '/training': typeof TrainingRoute
   '/welcome': typeof WelcomeRoute
   '/mylist/$mid': typeof MylistMidRoute
   '/workbook/$wid': typeof WorkbookWidRoute
@@ -133,12 +149,14 @@ export interface FileRoutesById {
   '/create': typeof CreateRoute
   '/favorite': typeof FavoriteRoute
   '/history': typeof HistoryRoute
+  '/library': typeof LibraryRoute
   '/login': typeof LoginRoute
   '/not-found': typeof NotFoundRoute
   '/practice': typeof PracticeRoute
   '/reset-password': typeof ResetPasswordRoute
   '/search': typeof SearchRoute
   '/setting': typeof SettingRoute
+  '/training': typeof TrainingRoute
   '/welcome': typeof WelcomeRoute
   '/mylist/$mid': typeof MylistMidRoute
   '/workbook/$wid': typeof WorkbookWidRoute
@@ -151,12 +169,14 @@ export interface FileRouteTypes {
     | '/create'
     | '/favorite'
     | '/history'
+    | '/library'
     | '/login'
     | '/not-found'
     | '/practice'
     | '/reset-password'
     | '/search'
     | '/setting'
+    | '/training'
     | '/welcome'
     | '/mylist/$mid'
     | '/workbook/$wid'
@@ -167,12 +187,14 @@ export interface FileRouteTypes {
     | '/create'
     | '/favorite'
     | '/history'
+    | '/library'
     | '/login'
     | '/not-found'
     | '/practice'
     | '/reset-password'
     | '/search'
     | '/setting'
+    | '/training'
     | '/welcome'
     | '/mylist/$mid'
     | '/workbook/$wid'
@@ -183,12 +205,14 @@ export interface FileRouteTypes {
     | '/create'
     | '/favorite'
     | '/history'
+    | '/library'
     | '/login'
     | '/not-found'
     | '/practice'
     | '/reset-password'
     | '/search'
     | '/setting'
+    | '/training'
     | '/welcome'
     | '/mylist/$mid'
     | '/workbook/$wid'
@@ -200,12 +224,14 @@ export interface RootRouteChildren {
   CreateRoute: typeof CreateRoute
   FavoriteRoute: typeof FavoriteRoute
   HistoryRoute: typeof HistoryRoute
+  LibraryRoute: typeof LibraryRoute
   LoginRoute: typeof LoginRoute
   NotFoundRoute: typeof NotFoundRoute
   PracticeRoute: typeof PracticeRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   SearchRoute: typeof SearchRoute
   SettingRoute: typeof SettingRoute
+  TrainingRoute: typeof TrainingRoute
   WelcomeRoute: typeof WelcomeRoute
   MylistMidRoute: typeof MylistMidRoute
   WorkbookWidRoute: typeof WorkbookWidRoute
@@ -219,6 +245,13 @@ declare module '@tanstack/react-router' {
       path: '/welcome'
       fullPath: '/welcome'
       preLoaderRoute: typeof WelcomeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/training': {
+      id: '/training'
+      path: '/training'
+      fullPath: '/training'
+      preLoaderRoute: typeof TrainingRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/setting': {
@@ -261,6 +294,13 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/library': {
+      id: '/library'
+      path: '/library'
+      fullPath: '/library'
+      preLoaderRoute: typeof LibraryRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/history': {
@@ -320,12 +360,14 @@ const rootRouteChildren: RootRouteChildren = {
   CreateRoute: CreateRoute,
   FavoriteRoute: FavoriteRoute,
   HistoryRoute: HistoryRoute,
+  LibraryRoute: LibraryRoute,
   LoginRoute: LoginRoute,
   NotFoundRoute: NotFoundRoute,
   PracticeRoute: PracticeRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   SearchRoute: SearchRoute,
   SettingRoute: SettingRoute,
+  TrainingRoute: TrainingRoute,
   WelcomeRoute: WelcomeRoute,
   MylistMidRoute: MylistMidRoute,
   WorkbookWidRoute: WorkbookWidRoute,

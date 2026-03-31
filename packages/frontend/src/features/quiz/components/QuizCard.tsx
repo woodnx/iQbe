@@ -16,9 +16,9 @@ interface Props extends BoxProps {
 }
 
 const defineColor = (judgement: number) => {
-  if (judgement == 0) return "blue.1";
-  else if (judgement == 1) return "red.1";
-  else return "gray.1";
+  if (judgement == 0) return "4px solid blue.2";
+  else if (judgement == 1) return "4px solid red.2";
+  else return "4px solid gray.5";
 };
 
 export default function QuizCard({
@@ -45,7 +45,7 @@ export default function QuizCard({
   );
 
   return (
-    <Card withBorder bg={color} {...others}>
+    <Card radius="lg" bd={color} {...others}>
       <Group justify="space-between">
         <Text>No.{index}</Text>
         <QuizFavoriteButton

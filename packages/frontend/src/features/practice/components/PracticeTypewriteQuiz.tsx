@@ -71,8 +71,19 @@ export function PracticeTypewriteQuiz({
 
   return (
     <>
-      <Progress value={throughval} radius="xs" size="lg" bg="blue.1" striped />
-      <Card p="sm" radius="sm" bg="gray.1" mih="7em">
+      <Progress
+        value={throughval}
+        size="lg"
+        bg="blue.1"
+        striped
+        style={{ borderRadius: "10px 10px 0 0" }}
+      />
+      <Card
+        p="sm"
+        bg="gray.1"
+        mih="10em"
+        style={{ borderRadius: "0 0 15px 15px" }}
+      >
         <Text fz={isMobile ? 15 : 16}>{typewriter.text}</Text>
         {!visible && (
           <Overlay bg="gray.4" opacity={1} center>

@@ -10,32 +10,27 @@ import {
 import { useDisclosure } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
 import {
-  IconActivity,
-  IconBook,
   IconBooks,
-  IconHistory,
+  IconDashboard,
   IconHome,
   IconMenu2,
   IconPencil,
   IconSchool,
   IconSearch,
-  IconStar,
 } from "@tabler/icons-react";
 import { Outlet, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useLayoutEffect, useState } from "react";
 import { useIsMobile } from "@/contexts/isMobile";
 import UserInfoMenu from "@/features/user/components/UserInfoMenu";
 import useHeaderHeight from "@/hooks/useHeaderHeight";
-import { useWorkbooks } from "@/hooks/useWorkbooks";
 import Logo from "@/shared/components/Logo";
 import NavbarLink from "@/shared/components/NavbarLink";
-import { useMylists } from "../hooks/useMylists";
 import { checkAuth } from "../plugins/auth";
 
 const checkPathname = (pathname: string) => {
   if (pathname === "/") return "/";
-  else if (pathname === "/search") return "/search";
-  else if (pathname === "/practice") return "/practice";
+  else if (pathname === "/library") return "/library";
+  else if (pathname === "/training") return "/training";
   else if (pathname === "/favorite") return "/favorite";
   else if (pathname === "/history") return "/history";
   else if (pathname === "/setting") return "/setting";
@@ -53,37 +48,20 @@ export default function DefaultLayout() {
   const { pathname } = useRouterState({
     select: (state) => state.location,
   });
-  const { mylists } = useMylists(!loading);
-  const { workbooks } = useWorkbooks(false, !loading);
   const isMobile = useIsMobile();
   const { headerHeight } = useHeaderHeight();
 
-  const mockMylists = mylists?.map((m) => ({
-    label: m.name,
-    link: `${m.mid}`,
-  }));
-
-  const mockWorkbooks = workbooks?.map((w) => ({
-    label: w.name,
-    link: `${w.wid}`,
-  }));
-
   const mockdata = [
     {
-      label: "アクティビティ",
-      icon: IconActivity,
+      label: "ダッシュボード",
+      icon: IconDashboard,
       link: "/",
     },
-    {
-      label: "問題集",
-      icon: IconBook,
-      link: "/workbook",
-      links: mockWorkbooks,
-    },
+
     {
       label: "演習",
       icon: IconSchool,
-      link: "/practice",
+      link: "/training",
     },
     {
       label: "作問",
@@ -91,21 +69,9 @@ export default function DefaultLayout() {
       link: "/create",
     },
     {
-      label: "お気に入り",
-      icon: IconStar,
-      link: "/favorite",
-    },
-    {
-      label: "履歴",
-      icon: IconHistory,
-      link: "/history",
-    },
-    {
-      label: "マイリスト",
+      label: "ライブラリ",
       icon: IconBooks,
-      link: "/mylist",
-      isTab: true,
-      links: [...(mockMylists || [])],
+      link: "/library",
     },
   ];
 
@@ -264,7 +230,7 @@ export default function DefaultLayout() {
           <Footer />
 
           <AppShell.Main>
-            <Container size="lg" px={0}>
+            <Container size="md" px={0}>
               <Outlet />
             </Container>
           </AppShell.Main>

@@ -22,9 +22,10 @@ export class QuizAttachedTagsService {
     const tagsToDetach = Array.from(currentTags).filter(
       (tag) => !updateTags.has(tag),
     );
-
-    this.attachTags(QuizAttachedTags.create(qid, tagsToAttach));
-    this.detachTags(QuizAttachedTags.create(qid, tagsToDetach));
+    if (tagsToAttach.length > 0)
+      this.attachTags(QuizAttachedTags.create(qid, tagsToAttach));
+    if (tagsToDetach.length > 0)
+      this.detachTags(QuizAttachedTags.create(qid, tagsToDetach));
   }
 
   private async incrementUsage(label: string): Promise<void> {
