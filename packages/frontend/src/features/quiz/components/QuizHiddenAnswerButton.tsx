@@ -1,4 +1,4 @@
-import { ActionIcon, Button, BoxProps } from "@mantine/core";
+import { ActionIcon, BoxProps, Button } from "@mantine/core";
 import { IconEye, IconEyeOff } from "@tabler/icons-react";
 import { useIsMobile } from "@/contexts/isMobile";
 
@@ -25,7 +25,8 @@ export default function QuizHiddenAnswerButton({
     <Button
       onClick={() => innerOnToggle()}
       leftSection={icon}
-      variant="outline"
+      radius="md"
+      variant="light"
       color={color}
       {...others}
     >
@@ -38,7 +39,7 @@ export default function QuizHiddenAnswerButton({
       onClick={() => innerOnToggle()}
       size="lg"
       radius="xl"
-      variant="outline"
+      variant="light"
       color={color}
     >
       {icon}

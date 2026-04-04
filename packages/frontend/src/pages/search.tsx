@@ -1,11 +1,10 @@
-import { Center, Group, Stack } from "@mantine/core";
+import { Group } from "@mantine/core";
 import { useRouter, useSearch } from "@tanstack/react-router";
 import { useState } from "react";
 import FilteringModalButton from "@/features/filtering/components/FilteringModalButton";
 import QuizControllBar from "@/features/quiz/components/QuizControllBar";
 import QuizHiddenAnswerButton from "@/features/quiz/components/QuizHiddenAnswerButton";
 import QuizList from "@/features/quiz/components/QuizList";
-import QuizPagination from "@/features/quiz/components/QuizPagination";
 import QuizShuffleButton from "@/features/quiz/components/QuizShuffleButton";
 import QuizTransfarButton from "@/features/quiz/components/QuizTransfarButton";
 import { $api } from "@/utils/client";
@@ -90,7 +89,8 @@ export default function Search() {
   return (
     <>
       <QuizControllBar
-        p="sm"
+        variant="onlyPagenation"
+        pb="sm"
         total={size}
         buttons={
           <Group>
@@ -106,17 +106,9 @@ export default function Search() {
             />
           </Group>
         }
-        pagination={
-          <Stack gap={2}>
-            <Center mt="sm">
-              <QuizPagination
-                page={activePage}
-                total={!!search?.maxView ? Math.ceil(size / search.maxView) : 0}
-                setPage={changePage}
-              />
-            </Center>
-          </Stack>
-        }
+        activePage={activePage}
+        maxView={search.maxView || 100}
+        setPage={changePage}
       />
       <QuizList
         quizzes={quizzes}

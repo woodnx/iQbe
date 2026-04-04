@@ -1,8 +1,8 @@
-import { useIsMobile } from "@/contexts/isMobile";
-import { QuizRequestParams } from "@/types";
 import { ActionIcon, Button, ButtonProps } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { IconFilter } from "@tabler/icons-react";
+import { useIsMobile } from "@/contexts/isMobile";
+import { QuizRequestParams } from "@/types";
 
 export interface FilteringModalButton extends ButtonProps {
   onSubmit?: (
@@ -50,8 +50,9 @@ export default function FilteringModalButton({
   const DefaultButton = () => (
     <Button
       leftSection={<IconFilter />}
-      variant="outline"
       color="orange"
+      radius="md"
+      variant="light"
       onClick={click}
       {...others}
     >
@@ -64,7 +65,7 @@ export default function FilteringModalButton({
       color="orange"
       size="lg"
       radius="xl"
-      variant="outline"
+      variant="light"
       onClick={click}
     >
       <IconFilter />

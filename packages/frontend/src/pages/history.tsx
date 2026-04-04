@@ -1,13 +1,10 @@
-import { Center, Group, Stack } from "@mantine/core";
+import { Group } from "@mantine/core";
 import { useRouter, useSearch } from "@tanstack/react-router";
 import { useState } from "react";
 import FilteringModalButton from "@/features/filtering/components/FilteringModalButton";
-import HistoryDateRange from "@/features/history/components/HistoryDateRange";
-import HistorySelectJudgement from "@/features/history/components/HistorySelectJudgement";
 import QuizControllBar from "@/features/quiz/components/QuizControllBar";
 import QuizHiddenAnswerButton from "@/features/quiz/components/QuizHiddenAnswerButton";
 import QuizList from "@/features/quiz/components/QuizList";
-import QuizPagination from "@/features/quiz/components/QuizPagination";
 import QuizShuffleButton from "@/features/quiz/components/QuizShuffleButton";
 import QuizTransfarButton from "@/features/quiz/components/QuizTransfarButton";
 import { useHistories } from "@/hooks/useHistories";
@@ -35,7 +32,7 @@ export default function History() {
   const { histories } = useHistories(dates[0], dates[1]);
   const right = !!histories ? Number(histories.right) : 0;
   const wrong = !!histories ? Number(histories.wrong) : 0;
-  const through = !!histories ? Number(histories.through) : 0;
+  const throgh = !!histories ? Number(histories.through) : 0;
 
   const { data: quizzes } = $api.useQuery("get", "/quizzes", {
     params: {
@@ -165,7 +162,8 @@ export default function History() {
   return (
     <>
       <QuizControllBar
-        p="sm"
+        variant="history"
+        pb="sm"
         total={size}
         buttons={
           <Group>
@@ -181,29 +179,16 @@ export default function History() {
             />
           </Group>
         }
-        pagination={
-          <Stack gap={2}>
-            <Center mt={0}>
-              <HistorySelectJudgement
-                judgements={judgements}
-                right={right}
-                wrong={wrong}
-                throgh={through}
-                onSelect={changeJudgement}
-              />
-            </Center>
-            <Center mt={0}>
-              <HistoryDateRange dates={dates} onChangeDates={changeDates} />
-            </Center>
-            <Center mt="sm">
-              <QuizPagination
-                page={activePage}
-                total={!!search?.maxView ? Math.ceil(size / search.maxView) : 0}
-                setPage={changePage}
-              />
-            </Center>
-          </Stack>
-        }
+        activePage={activePage}
+        maxView={search.maxView || 100}
+        setPage={changePage}
+        judgements={judgements}
+        right={right}
+        wrong={wrong}
+        throgh={throgh}
+        onSelectJudgement={changeJudgement}
+        dates={dates}
+        onChangeDates={changeDates}
       />
       <QuizList
         quizzes={quizzes}
