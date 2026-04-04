@@ -1,12 +1,4 @@
-import {
-  Card,
-  Center,
-  Group,
-  getGradient,
-  Stack,
-  Text,
-  useMantineTheme,
-} from "@mantine/core";
+import { Card, Group, getGradient, Text, useMantineTheme } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { IconTrash } from "@tabler/icons-react";
 import { useParams, useRouter, useSearch } from "@tanstack/react-router";
@@ -16,7 +8,6 @@ import MylistEditModalButton from "@/features/mylist/components/MylistEditModalB
 import QuizControllBar from "@/features/quiz/components/QuizControllBar";
 import QuizHiddenAnswerButton from "@/features/quiz/components/QuizHiddenAnswerButton";
 import QuizList from "@/features/quiz/components/QuizList";
-import QuizPagination from "@/features/quiz/components/QuizPagination";
 import QuizShuffleButton from "@/features/quiz/components/QuizShuffleButton";
 import QuizTransfarButton from "@/features/quiz/components/QuizTransfarButton";
 import { useWorkbooks } from "@/hooks/useWorkbooks";
@@ -179,7 +170,8 @@ export default function Mylist() {
   return (
     <>
       <QuizControllBar
-        p="sm"
+        variant="onlyPagenation"
+        pb="sm"
         total={size}
         header={WorkbookCard}
         buttons={
@@ -196,17 +188,9 @@ export default function Mylist() {
             />
           </Group>
         }
-        pagination={
-          <Stack gap={2}>
-            <Center mt="sm">
-              <QuizPagination
-                page={activePage}
-                total={!!search?.maxView ? Math.ceil(size / search.maxView) : 0}
-                setPage={changePage}
-              />
-            </Center>
-          </Stack>
-        }
+        activePage={activePage}
+        maxView={search.maxView || 100}
+        setPage={changePage}
       />
       <QuizList
         quizzes={quizzes}

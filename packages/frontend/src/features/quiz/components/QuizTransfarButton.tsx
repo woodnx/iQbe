@@ -1,6 +1,6 @@
-import { useIsMobile } from "@/contexts/isMobile";
-import { ActionIcon, Button, BoxProps } from "@mantine/core";
+import { ActionIcon, BoxProps, Button } from "@mantine/core";
 import { IconArrowAutofitContent } from "@tabler/icons-react";
+import { useIsMobile } from "@/contexts/isMobile";
 
 interface Props extends BoxProps {
   apply: () => void;
@@ -16,7 +16,8 @@ export default function ({ apply, disabled, ...others }: Props) {
     <Button
       onClick={() => apply()}
       leftSection={<Icon />}
-      variant="outline"
+      radius="md"
+      variant="light"
       color={color}
       disabled={disabled}
       {...others}
@@ -30,7 +31,7 @@ export default function ({ apply, disabled, ...others }: Props) {
       onClick={() => apply()}
       size="lg"
       radius="xl"
-      variant="outline"
+      variant="light"
       color={color}
       disabled={disabled}
     >

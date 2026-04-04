@@ -1,44 +1,86 @@
-import { ComponentProps, ReactNode, useEffect } from "react";
-import { AppShell, Group, Stack, Text } from "@mantine/core";
-import { useResizeObserver } from "@mantine/hooks";
-import useHeaderHeight from "@/hooks/useHeaderHeight";
+import { Center, Group, Stack, Text } from "@mantine/core";
+import { ComponentProps, ReactNode } from "react";
+import HistoryDateRange from "@/features/history/components/HistoryDateRange";
+import HistorySelectJudgement from "@/features/history/components/HistorySelectJudgement";
+import { Judgement } from "@/types";
+import QuizPagination from "./QuizPagination";
 
-interface Props extends ComponentProps<typeof Stack> {
-  total: number;
-  buttons: ReactNode;
-  pagination: ReactNode;
-  header?: ReactNode;
-}
+type Props = ComponentProps<typeof Stack> &
+  (
+    | {
+        variant: "onlyPagenation";
+        total: number;
+        buttons: ReactNode;
+        activePage: number;
+        maxView: number;
+        header?: ReactNode;
+        setPage: (value: number) => void;
+      }
+    | {
+        variant: "history";
+        total: number;
+        buttons: ReactNode;
+        activePage: number;
+        maxView: number;
+        header?: ReactNode;
+        setPage: (value: number) => void;
+        judgements: Judgement[];
+        right: number;
+        wrong: number;
+        throgh: number;
+        onSelectJudgement: (judgements: Judgement[]) => void;
+        dates: number[];
+        onChangeDates: (dates: number[]) => void;
+      }
+  );
 
-export default function QuizControllBar({
-  total,
-  buttons,
-  pagination,
-  header = <></>,
-  ...others
-}: Props) {
-  const [ref, rect] = useResizeObserver();
-  const { setHeaderHeight } = useHeaderHeight();
-  const height = rect.height + rect.y * 2;
-
-  useEffect(() => {
-    setHeaderHeight(height);
-
-    return () => {
-      setHeaderHeight(0);
-    };
-  }, [rect]);
+export default function QuizControllBar(props: Props) {
+  const {
+    variant,
+    total,
+    buttons,
+    activePage,
+    maxView,
+    header,
+    setPage,
+    ...others
+  } = props;
 
   return (
-    <AppShell.Header h={height}>
-      <Stack {...others} ref={ref} gap={0}>
-        {header}
-        <Group justify="space-between">
-          <div>{buttons}</div>
-          <Text ta="right">総問題数: {total}</Text>
-        </Group>
-        {pagination}
+    <Stack {...others}>
+      {header}
+      <Group justify="space-between">
+        <div>{buttons}</div>
+        <Text ta="right">総問題数: {total}</Text>
+      </Group>
+      <Stack gap={1}>
+        {variant == "history" && (
+          <>
+            <Center>
+              <HistorySelectJudgement
+                judgements={props.judgements}
+                right={props.right}
+                wrong={props.wrong}
+                throgh={props.throgh}
+                onSelect={props.onSelectJudgement}
+              />
+            </Center>
+            <Center mb="xs">
+              <HistoryDateRange
+                dates={props.dates}
+                onChangeDates={props.onChangeDates}
+              />
+            </Center>
+          </>
+        )}
+        <Center>
+          <QuizPagination
+            page={activePage}
+            total={Math.ceil(total / maxView)}
+            setPage={setPage}
+          />
+        </Center>
       </Stack>
-    </AppShell.Header>
+    </Stack>
   );
 }
