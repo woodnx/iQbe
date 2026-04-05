@@ -13,7 +13,22 @@ properties:
     type: string
   creatorId:
     type: string
+  total: 
+    type: number
+  corrects: 
+    type: number
+  wrongs: 
+    type: number
+  ignored:
+    type: number
+  lastPracticedAt:
+    type: string
+    format: date-time
 required:
   - wid
   - name
   - creatorId
+  - total
+  - corrects
+  - wrongs
+  - ignored

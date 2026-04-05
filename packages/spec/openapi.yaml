@@ -11,6 +11,7 @@ tags:
   - name: analysis
   - name: auth
   - name: categories
+  - name: favorites
   - name: file
   - name: histories
   - name: levels
@@ -48,6 +49,8 @@ paths:
     $ref: "./openapi/paths/categories.preset.yaml"
   "/csv/parse":
     $ref: "./openapi/paths/csv.parse.yaml"
+  "/favorites":
+    $ref: "./openapi/paths/favorites.yaml"
   "/histories/{since}/{until}":
     $ref: "./openapi/paths/histories.by-since-and-until.yaml"
   "/i":
@@ -150,6 +153,8 @@ components:
       $ref: "./openapi/components/responses/CategoriesResponse.yaml"
     CategoryResponse:
       $ref: "./openapi/components/responses/CategoryResponse.yaml"
+    FavoritesResponse:
+      $ref: "./openapi/components/responses/FavoritesResponse.yaml"
     LevelResponse:
       $ref: "./openapi/components/responses/LevelResponse.yaml"
     LevelsResponse:
@@ -179,6 +184,8 @@ components:
       $ref: "./openapi/components/schemas/Category.yaml"
     Error:
       $ref: "./openapi/components/schemas/Error.yaml"
+    Favorites:
+      $ref: "./openapi/components/schemas/Favorites.yaml"
     Level:
       $ref: "./openapi/components/schemas/Level.yaml"
     Mylist:

@@ -1,13 +1,7 @@
 type: object
 properties:
-  mid: 
+  uid: 
     type: string
-  name: 
-    type: string
-  created:
-    type: string
-    format: date-time
-    readOnly: true
   total: 
     type: number
   corrects: 
@@ -20,9 +14,7 @@ properties:
     type: string
     format: date-time
 required:
-  - mid
-  - name
-  - created
+  - uid
   - total
   - corrects
   - wrongs
