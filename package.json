@@ -5,7 +5,7 @@
   "workspaces": [
     "packages/frontend",
     "packages/backend",
-    "packages/api"
+    "packages/spec"
   ],
   "packageManager": "pnpm@10.18.3",
   "private": true,
@@ -16,7 +16,7 @@
     "start": "./node_modules/.bin/env-cmd -f .config/.env pnpm --filter ./packages/backend run start",
     "clean": "node ./scripts/clean.mjs",
     "dev": "./node_modules/.bin/env-cmd -f .config/.env node ./scripts/dev.mjs",
-    "api": "pnpm --filter ./packages/api run build",
+    "spec": "pnpm --filter ./packages/spec run build",
     "migrate:create": "./node_modules/.bin/env-cmd -f .config/.env pnpm --filter ./packages/backend run migrate:create",
     "migrate:exe": "./node_modules/.bin/env-cmd -f .config/.env pnpm --filter ./packages/backend run migrate:exe",
     "migrate:dev": "./node_modules/.bin/env-cmd -f .config/.env pnpm --filter ./packages/backend run migrate:exe",

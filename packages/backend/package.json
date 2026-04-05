@@ -19,7 +19,7 @@
   "dependencies": {
     "@hapi/boom": "^10.0.1",
     "@prisma/client": "^5.18.0",
-    "api": "file:../api",
+    "api": "file:../spec",
     "bcryptjs": "^3.0.3",
     "cors": "^2.8.5",
     "csv": "^6.3.10",

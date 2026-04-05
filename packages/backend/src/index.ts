@@ -34,7 +34,7 @@ app.use(express.static(path.join(__dirname, "web")));
 
 app.use(
   OpenApiValidator.middleware({
-    apiSpec: path.join(__dirname, "../../api/openapi.yaml"),
+    apiSpec: path.join(__dirname, "../../spec/openapi.yaml"),
     validateRequests: true, // (default)
     validateResponses: false, // false by default
   }),
