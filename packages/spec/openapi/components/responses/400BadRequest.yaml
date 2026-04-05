@@ -1,0 +1,12 @@
+description: パラメータの不備
+content:
+  application/problem+json:
+    schema: 
+      $ref: "../../../openapi.yaml#/components/schemas/Error"
+    examples:
+      Invaild parameter: 
+        value:
+          title: INVAILD_PARAMS
+          type: "about:blank"
+          status: 400
+          detail: "This request contains invaild parameter. Please correct to the right ones."

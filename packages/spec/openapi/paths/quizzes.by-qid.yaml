@@ -1,0 +1,74 @@
+put: 
+  tags: 
+    - quizzes
+  summary: クイズの編集
+  parameters:
+    - name: qid
+      in: path
+      required: true
+      description: クイズID
+      schema:
+        type: string
+      example: DG8ED3bx7y0McbistuLx
+  requestBody:
+     required: true
+     content:
+        application/json:
+          schema: 
+            type: object
+            properties:
+              question: 
+                type: string
+              anotherAnswer:
+                type: string
+              answer: 
+                type: string
+              tags: 
+                type: array
+                items:
+                  type: string
+              wid:
+                type: string
+              category:
+                type: number
+            required:
+              - question
+              - answer
+            example:
+              id: DG8ED3bx7y0McbistuLx
+              question: すい臓にある組織・ランゲルハンス島の発見者であるランゲルハンスは、現在でいうどこの国の病理学者でしょう？
+              answer: ドイツ
+              wid: sX8G8W
+              category: 10
+              subCategory: 14
+              isPublic: false
+  responses:
+    "201":
+      $ref: "../../openapi.yaml#/components/responses/QuizResponse"
+    "400":
+      $ref: "../../openapi.yaml#/components/responses/400BadRequest"
+    "401": 
+      $ref: "../../openapi.yaml#/components/responses/401Unauthorized"
+    "403":
+      $ref: "../../openapi.yaml#/components/responses/403Forbidden"
+delete: 
+  tags:
+    - quizzes
+  summary: クイズを削除
+  parameters:
+    - name: qid
+      in: path
+      required: true
+      description: クイズID
+      schema:
+        type: string
+      example: DG8ED3bx7y0McbistuLx
+  responses:
+    "204": 
+      description: クイズの削除を完了
+    "400":
+      $ref: "../../openapi.yaml#/components/responses/400BadRequest"
+    "401": 
+      $ref: "../../openapi.yaml#/components/responses/401Unauthorized"
+    "403":
+      $ref: "../../openapi.yaml#/components/responses/403Forbidden"

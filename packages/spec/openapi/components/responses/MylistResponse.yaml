@@ -1,0 +1,9 @@
+description: マイリスト情報
+content:
+  application/json:
+    schema:
+      $ref: "../../../openapi.yaml#/components/schemas/Mylist"
+    example: 
+      mid: WI0Nul
+      name: 医学系問題
+      created: 2023-12-24

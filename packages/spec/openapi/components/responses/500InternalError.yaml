@@ -1,0 +1,12 @@
+description: サーバ内部での問題
+content:
+  application/problem+json:
+    schema: 
+      $ref: "../../../openapi.yaml#/components/schemas/Error"
+    examples:
+      Internal error:
+        value: 
+          title: INTERNAL_ERROR
+          type: "about:blank"
+          status: 500
+          detail: "Internal error occurred."

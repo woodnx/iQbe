@@ -1,0 +1,83 @@
+get: 
+  tags:
+    - categories
+  summary:  カテゴリーの取得
+  parameters:
+    - name: id
+      in: path
+      required: true
+      description: カテゴリーのID
+      schema: 
+        type: number
+      example: 1
+  responses:
+    "200":
+      $ref: "../../openapi.yaml#/components/responses/CategoriesResponse"
+    "400":
+      $ref: "../../openapi.yaml#/components/responses/400BadRequest"
+    "401": 
+      $ref: "../../openapi.yaml#/components/responses/401Unauthorized"
+    "403":
+      $ref: "../../openapi.yaml#/components/responses/403Forbidden"
+put: 
+  tags: 
+    - categories
+  summary: カテゴリーの編集
+  parameters:
+    - name: id
+      in: path
+      required: true
+      description: カテゴリーのID
+      schema:
+        type: number
+      example: 1
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema: 
+          type: object
+          properties:
+            name: 
+              type: string
+            description:
+              type: string
+            disabled: 
+              type: boolean
+          required:
+            - name
+            - disabled
+        example: 
+          id: 1
+          name: "文学"
+          description: 小説や童話など文学に関するクイズ
+  responses:
+    "200": 
+      $ref: "../../openapi.yaml#/components/responses/CategoryResponse"
+    "400":
+      $ref: "../../openapi.yaml#/components/responses/400BadRequest"
+    "401": 
+      $ref: "../../openapi.yaml#/components/responses/401Unauthorized"
+    "403":
+      $ref: "../../openapi.yaml#/components/responses/403Forbidden"
+delete:
+  tags: 
+    - categories
+  summary: カテゴリーの削除
+  parameters:
+    - name: id
+      in: path
+      required: true
+      description: カテゴリーのID
+      schema:
+        type: number
+      example: 1
+  responses:
+    "204": 
+      description: delete category
+    "400":
+      $ref: "../../openapi.yaml#/components/responses/400BadRequest"
+    "401": 
+      $ref: "../../openapi.yaml#/components/responses/401Unauthorized"
+    "403":
+      $ref: "../../openapi.yaml#/components/responses/403Forbidden"

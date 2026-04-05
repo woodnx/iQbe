@@ -1,0 +1,13 @@
+name: wids
+in: query
+required: false
+description: 検索したいwidのリスト
+schema: 
+  oneOf:
+    - type: array
+      items: 
+        type: string
+    - type: string
+example: 
+  - WI0Nul
+  - qS3dmK

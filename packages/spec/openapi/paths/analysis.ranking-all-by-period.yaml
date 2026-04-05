@@ -1,0 +1,49 @@
+get: 
+  tags: 
+    - analysis
+  summary: ユーザの演習問題数のランキング
+  description: 演習問題によるランク済みのユーザリストを取得する
+  parameters:
+    - name: period
+      in: path
+      required: true
+      description: 日 / 週 / 月
+      schema:
+        type: string
+      example: day 
+  responses:
+    "200": 
+      description: 指定範囲のユーザ情報とランク
+      content:
+        application/json:
+          schema: 
+            type: array
+            items: 
+              $ref: "../../openapi.yaml#/components/schemas/Rank"
+          example:
+            - rank: 1
+              uid: WI0Nulr6F1dhLUi7A3zYRKs5bu9txaGgT0PqBc 
+              name: foo
+              count: 323
+              compare: 0
+            - rank: 2
+              uid: 2kYfkh59sP8Qbm1drC7uZXOnBIGRSAoz5hTMN3
+              name: piyo
+              count: 234
+              compare: 1
+            - rank: 3
+              uid: Kb5F7yQHOhpNb9tnLBx6GJj1IeiucMk0mDw27z
+              name: bar
+              count: 103
+              compare: -1
+            - rank: 4
+              uid: BapXVEOuLlYb3jHCBpeSzx7cPRrgf1dNTZqE4
+              name: hoge
+              count: 234
+              compare: 1
+    "400":
+      $ref: "../../openapi.yaml#/components/responses/400BadRequest"
+    "401": 
+      $ref: "../../openapi.yaml#/components/responses/401Unauthorized"
+    "403":
+      $ref: "../../openapi.yaml#/components/responses/403Forbidden"

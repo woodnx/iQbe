@@ -1,0 +1,7 @@
+name: seed
+in: query
+required: false
+description: シャッフル時のシード値
+schema: 
+  type: number
+example: 520004

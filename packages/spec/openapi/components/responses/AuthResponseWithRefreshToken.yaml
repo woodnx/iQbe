@@ -1,0 +1,29 @@
+description: ユーザ情報と認証トークン
+content:
+  application/json:
+    schema: 
+      type: object
+      properties:
+        accessToken:
+          type: string
+        refreshToken:
+          type: string
+          
+        user: 
+          type: object
+          $ref: "../../../openapi.yaml#/components/schemas/User"
+      required:
+        - accessToken
+        - refreshToken
+        - user
+    example:
+      accessToken: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJCYXBYVkVPdUxsWWIzakhDQnBlU3p4N2NQUnJnZjFkTlRacUU0IiwibmFtZSI6ImhvZ2UiLCJpYXQiOjE1MTYyMzkwMjJ9.vpt-SA6QoVJmG9cy32Lq-twd1anEuYKCzlLUMavMqyQ
+      refreshToken: DDAFC07B-E55A-9B7A-740B-9F6125E11113
+      user:
+        uid: BapXVEOuLlYb3jHCBpeSzx7cPRrgf1dNTZqE4
+        username: hoge
+        nickname: huga
+        email: hoge@example.com
+        modified: 2023-12-22
+        created: 2023-12-01
+        photoURL: /photo/hoge

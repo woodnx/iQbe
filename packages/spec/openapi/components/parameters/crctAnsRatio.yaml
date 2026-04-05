@@ -1,0 +1,11 @@
+name: crctAnsRatio
+in: query
+required: false
+description: クイズの正答率の絞り込み
+schema:
+  type: array
+  items:
+    type: number
+example:
+  - 1
+  - 100

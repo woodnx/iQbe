@@ -1,0 +1,7 @@
+name: page
+in: query
+required: false
+description: ページネーションでの現在のページ
+schema:
+  type: number
+example: 1

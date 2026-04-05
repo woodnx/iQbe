@@ -1,0 +1,9 @@
+description: 問題集のリスト
+content:
+  application/json:
+    schema: 
+      $ref: "../../../openapi.yaml#/components/schemas/Workbook"
+    example: 
+      wid: sX8G8W
+      name: abc the 12th
+      creatorId: 1

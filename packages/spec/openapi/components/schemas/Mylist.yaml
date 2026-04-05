@@ -1,0 +1,14 @@
+type: object
+properties:
+  mid: 
+    type: string
+  name: 
+    type: string
+  created:
+    type: string
+    format: date-time
+    readOnly: true
+required:
+  - mid
+  - name
+  - created

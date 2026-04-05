@@ -1,0 +1,48 @@
+get: 
+  tags: 
+    - histories
+  summary: 正答/誤答/スルー問題数を取得
+  description: 指定する日時範囲の正答/誤答/スルー問題数を取得
+  parameters:
+    - name: since
+      in: path
+      required: true
+      description: Unix時間
+      schema:
+        type: number
+      example: 1703948400
+    - name: until
+      in: path
+      required: true
+      description: Unix時間
+      schema:
+        type: number
+      example: 1704034799
+  responses:
+    "200": 
+      description: 正答/誤答/スルーの問題数
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              right: 
+                type: number
+              wrong: 
+                type: number
+              through: 
+                type: number
+            required:
+              - right
+              - wrong
+              - through
+          example:
+            right: 2
+            wrong: 10
+            through: 40
+    "400":
+      $ref: "../../openapi.yaml#/components/responses/400BadRequest"
+    "401": 
+      $ref: "../../openapi.yaml#/components/responses/401Unauthorized"
+    "403":
+      $ref: "../../openapi.yaml#/components/responses/403Forbidden"

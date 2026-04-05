@@ -1,0 +1,4 @@
+type: http
+description: Credentials or access token for API
+scheme: bearer
+bearerFormat: JWT

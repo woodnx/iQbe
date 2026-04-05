@@ -1,0 +1,12 @@
+get:
+  tags:
+    - workbooks
+  summary: 取得できるすべての問題集のリストを取得
+  description: 公開された問題集，閲覧権限のある問題集，そして自分が作った問題集のリストを取得します．
+  responses:
+    "200":
+      $ref: "../../openapi.yaml#/components/responses/WorkbooksResponse"
+    "401": 
+      $ref: "../../openapi.yaml#/components/responses/401Unauthorized"
+    "403":
+      $ref: "../../openapi.yaml#/components/responses/403Forbidden"

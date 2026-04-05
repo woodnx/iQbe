@@ -1,0 +1,14 @@
+type: object
+properties:
+  label: 
+    type: string
+  created: 
+    type: string
+    format: date-time
+  modified:
+    type: string
+    format: date-time
+required:
+  - label
+  - created
+  - modified

@@ -1,0 +1,45 @@
+get: 
+  tags: 
+    - users
+  summary: ユーザ情報を取得
+  description: 自分のユーザ情報を取得する
+  responses:
+    "200":
+      $ref: "../../openapi.yaml#/components/responses/UserResponse"
+    "400":
+      $ref: "../../openapi.yaml#/components/responses/400BadRequest"
+    "401": 
+      $ref: "../../openapi.yaml#/components/responses/401Unauthorized"
+    "403":
+      $ref: "../../openapi.yaml#/components/responses/403Forbidden"
+put:
+  tags: 
+    - users
+  summary: ユーザ情報の編集
+  description: ユーザ情報の編集を行う．
+  security: []
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema: 
+          type: object
+          properties: 
+            username: 
+              type: string
+            nickname:
+              type: string
+          required:
+            - username
+        example: 
+          username: hoge
+          nickname: huga
+  responses:
+    "201":
+      $ref: "../../openapi.yaml#/components/responses/UserResponse"
+    "400":
+      $ref: "../../openapi.yaml#/components/responses/400BadRequest"
+    "401": 
+      $ref: "../../openapi.yaml#/components/responses/401Unauthorized"
+    "403":
+      $ref: "../../openapi.yaml#/components/responses/403Forbidden"

@@ -1,0 +1,27 @@
+get: 
+  tags:
+    - tags
+  parameters:
+    - name: q
+      in: query
+      required: false
+      description: 検索キーワード
+      schema:
+        type: string
+      example: ジャンル
+    - name: all
+      in: query
+      required: false
+      description: すべてのタグを得るか
+      schema: 
+        type: boolean
+  summary: ユーザ自身の作成したタグのリストを取得
+  responses:
+    "200":
+      $ref: "../../openapi.yaml#/components/responses/TagsResponse"
+    "400":
+      $ref: "../../openapi.yaml#/components/responses/400BadRequest"
+    "401": 
+      $ref: "../../openapi.yaml#/components/responses/401Unauthorized"
+    "403":
+      $ref: "../../openapi.yaml#/components/responses/403Forbidden"

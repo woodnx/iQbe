@@ -1,0 +1,18 @@
+description: カテゴリー情報
+content:
+  application/json: 
+    schema:
+      $ref: "../../../openapi.yaml#/components/schemas/Category"
+    example:
+      id: 1
+      name: "文学"
+      description: "小説や童話など文学に関するクイズ"
+      sub: 
+        - id: 1,
+          name: "日本文学"
+          description: "明治以降の日本の文学・作家"
+          parentId: 1
+        - id: 2,
+          name: "古典文学"
+          description: "江戸以前の日本の文学・作家"
+          parentId: 1

@@ -1,0 +1,19 @@
+type: object
+properties:
+  wid: 
+    type: string
+  name: 
+    type: string
+  date: 
+    type: string
+    format: date-time
+  levelId: 
+    type: number
+  color: 
+    type: string
+  creatorId:
+    type: string
+required:
+  - wid
+  - name
+  - creatorId

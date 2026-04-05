@@ -1,0 +1,31 @@
+post: 
+  tags: 
+    - auth
+  summary: 認証トークンの取得
+  description: リフレッシュトークンをもとに認証トークンを発行する
+  deprecated: false
+  security: []
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            refreshToken:
+              type: string
+            uid:
+              type: string
+          required:
+            - refreshToken
+            - uid
+        example: 
+          refreshToken: DDAFC07B-E55A-9B7A-740B-9F6125E11113
+          uid: BapXVEOuLlYb3jHCBpeSzx7cPRrgf1dNTZqE4
+  responses:
+    "201":
+      $ref: "../../openapi.yaml#/components/responses/AuthResponse"
+    "400":
+      $ref: "../../openapi.yaml#/components/responses/400BadRequest"
+    "403":
+      $ref: "../../openapi.yaml#/components/responses/403Forbidden"

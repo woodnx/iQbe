@@ -1,0 +1,19 @@
+type: object
+properties:
+  id: 
+    type: number
+  name: 
+    type: string
+  description: 
+    type: string
+  parentId:
+    type: number
+  disabled:
+    type: boolean
+  from: 
+    type: string
+required:
+  - id
+  - name
+  - parentId
+  - disabled

@@ -1,0 +1,12 @@
+description: アクセス権限がない
+content:
+  application/problem+json:
+    schema: 
+      $ref: "../../../openapi.yaml#/components/schemas/Error"
+    examples:
+      Access denied:
+        value: 
+          title: ACCESS_DENIED
+          type: "about:blank"
+          status: 403
+          detail: "Access denied. Insufficient rights to access the resource."

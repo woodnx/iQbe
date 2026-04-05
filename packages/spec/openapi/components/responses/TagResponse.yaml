@@ -1,0 +1,12 @@
+description: タグ情報
+content:
+  application/json:
+    schema: 
+      $ref: "../../../openapi.yaml#/components/schemas/Tag"
+    example:
+      tid: UaHxXrGKQM
+      label: hoge
+      color: orange
+      creatorUid: BapXVEOuLlYb3jHCBpeSzx7cPRrgf1dNTZqE4
+      modified: 2023-12-22
+      created: 2023-12-01

@@ -1,0 +1,25 @@
+description: サブカテゴリーのリスト
+content:
+  application/json: 
+    schema:
+      type: array
+      items:
+        type: object
+        $ref: "../../../openapi.yaml#/components/schemas/SubCategory"
+    example:
+      - id: 1,
+        name: "日本文学"
+        description: "明治以降の日本の文学・作家"
+        parentId: 1
+      - id: 2,
+        name: "古典文学"
+        description: "江戸以前の日本の文学・作家"
+        parentId: 1
+      - id: 3,
+        name: "物理"
+        description: "物理学用語・物理学者など"
+        parentId: 2
+      - id: 4,
+        name: "化学"
+        description: "科学用語・化学者など"
+        parentId: 2

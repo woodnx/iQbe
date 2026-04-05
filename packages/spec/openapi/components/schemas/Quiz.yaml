@@ -1,0 +1,62 @@
+type: object
+properties:
+  qid: 
+    type: string
+  question:
+    type: string
+  answer: 
+    type: string
+  anotherAnswer:
+    type: string
+  wid: 
+    type: string
+    writeOnly: true
+  workbook:
+    $ref: "../../../openapi.yaml#/components/schemas/Workbook"
+    readOnly: true
+  categoryId:
+    type: number
+    writeOnly: true
+  category:
+    type: array
+    items:
+      $ref: "../../../openapi.yaml#/components/schemas/Category"
+    readOnly: true
+  total: 
+    type: number
+    readOnly: true
+  right: 
+    type: number
+    readOnly: true
+  tagLabels:
+    type: array
+    items: 
+      type: string
+    writeOnly: true
+  tags:
+    type: array
+    items:
+      $ref: "../../../openapi.yaml#/components/schemas/Tag"
+    readOnly: true
+  creatorId:
+    type: string
+  isFavorite:
+    type: boolean
+    readOnly: true
+  registerdMylist:
+    type: array 
+    items: 
+      $ref: "../../../openapi.yaml#/components/schemas/Mylist"
+    readOnly: true
+  judgement:
+    type: number
+    readOnly: true
+required:
+  - qid
+  - question
+  - answer
+  - total
+  - right
+  - creatorId
+  - isPublic
+  - isFavorite

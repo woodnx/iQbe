@@ -1,0 +1,23 @@
+type: object
+properties:
+  uid: 
+    type: string
+  username: 
+    type: string
+  nickname: 
+    type: string
+  email:
+    type: string
+  modified:
+    type: string
+  created:
+    type: string
+  photoURL:
+    type: string
+  permission: 
+    type: string
+required:
+  - uid
+  - username
+  - modified
+  - created

@@ -1,0 +1,14 @@
+required: true
+content:
+  application/json:
+    schema: 
+      $ref: "../../../openapi.yaml#/components/schemas/Quiz"
+    example:
+      id: 3
+      question: 能楽の『唐船(とうせん)』が出典である、何かしようと思ったらすぐに着手するべきであるという意味のことわざは何でしょう？
+      answer: 思い立ったが吉日
+      wid: Kb5F7y
+      category: 3
+      subCategory: 5
+      creatorId: 1
+      isPublic: false

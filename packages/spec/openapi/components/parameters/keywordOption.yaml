@@ -1,0 +1,7 @@
+name: keywordOption
+in: query
+required: false
+description: "キーワード検索の範囲を設定（1: 問題文と解答，2: 問題文のみ，3: 解答のみ）"
+schema:
+  type: number
+  example: 1

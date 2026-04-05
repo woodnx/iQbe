@@ -1,0 +1,13 @@
+description: ユーザ情報
+content:
+  application/json:
+    schema: 
+      $ref: "../../../openapi.yaml#/components/schemas/User"
+    example:
+      uid: BapXVEOuLlYb3jHCBpeSzx7cPRrgf1dNTZqE4
+      username: hoge
+      nickname: huga
+      email: hoge@example.com
+      modified: 2023-12-22
+      created: 2023-12-01
+      photoURL: /photo/hoge

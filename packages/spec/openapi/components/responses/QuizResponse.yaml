@@ -1,0 +1,20 @@
+description: クイズ情報
+content:
+  application/json:
+    schema: 
+      $ref: "../../../openapi.yaml#/components/schemas/Quiz"
+    example:
+      id: 1
+      question: すい臓にある組織・ランゲルハンス島の発見者であるランゲルハンスは、現在でいうどこの国の病理学者でしょう？
+      answer: ドイツ
+      workbook: abc the 12th
+      wid: sX8G8W
+      level: 1
+      category: 10
+      subCategory: 14
+      total: 10
+      right: 4
+      isFavorite: false
+      registerdMylist: []
+      creatorId: 1
+      isPublic: false

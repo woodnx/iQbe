@@ -1,0 +1,34 @@
+post: 
+  tags:
+    - auth
+  summary: ユーザの再登録
+  description: emailだけで登録していたユーザを再登録する．usernameとパスワードを求める．
+  security: []
+  requestBody: 
+    required: true
+    content:
+      application/json:
+        schema: 
+          type: object
+          properties: 
+            username: 
+              type: string
+            password: 
+              type: string
+            email: 
+              type: string
+          required:
+            - username
+            - password
+            - email
+        example: 
+          username: hoge
+          password: p@ssw0rd
+          email: hoge@example.com
+  responses:
+    "201":
+      $ref: "../../openapi.yaml#/components/responses/AuthResponseWithRefreshToken"
+    "400":
+      $ref: "../../openapi.yaml#/components/responses/400BadRequest"
+    "403":
+      $ref: "../../openapi.yaml#/components/responses/403Forbidden"
