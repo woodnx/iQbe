@@ -135,7 +135,6 @@ export default class QuizInfra implements IQuizRepository, IQuizQueryService {
           "histories.judgement as judgement",
           "histories.practiced as practiced",
         ])
-        .where("histories.user_id", "=", userId)
         .where(({ eb, and, between }) =>
           !!option.judgements
             ? and([
@@ -144,7 +143,16 @@ export default class QuizInfra implements IQuizRepository, IQuizQueryService {
               ])
             : between("histories.practiced", since, until),
         )
+        .where("histories.user_id", "=", userId)
         .orderBy("histories.practiced", "desc");
+    } else if (!!option.judgements) {
+      query = query
+        .innerJoin("histories", "histories.quiz_id", "quizzes.id")
+        .select([
+          "histories.judgement as judgement",
+          "histories.practiced as practiced",
+        ])
+        .where("histories.judgement", "in", option.judgements);
     }
     if (!!option.mid) {
       query = query
