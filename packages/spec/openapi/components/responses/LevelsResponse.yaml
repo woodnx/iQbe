@@ -1,0 +1,16 @@
+description: レベルのリスト
+content:
+  application/json:
+    schema:
+      type: array
+      items:
+        $ref: "../../../openapi.yaml#/components/schemas/Level"
+    example:
+      - id: 1
+        name: 簡単
+        value: easy
+        color: orange
+      - id: 2
+        name: 難しい
+        value: difficult
+        color: red

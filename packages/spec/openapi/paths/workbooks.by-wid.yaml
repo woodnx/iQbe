@@ -1,0 +1,82 @@
+get: 
+  tags:
+    - workbooks
+  summary: 問題集の詳細を取得
+  description: リクエストパラメータに指定した問題集の詳細を取得します．
+  parameters:
+    - name: wid
+      in: path
+      required: true
+      description: 問題集のID
+      schema:
+        type: string
+      example: 1i7qaa
+  responses:
+    "200":
+      $ref: "../../openapi.yaml#/components/responses/WorkbookResponse"
+    "400":
+      $ref: "../../openapi.yaml#/components/responses/400BadRequest"
+    "401": 
+      $ref: "../../openapi.yaml#/components/responses/401Unauthorized"
+    "403":
+      $ref: "../../openapi.yaml#/components/responses/403Forbidden"
+put:  
+  tags:
+    - workbooks
+  summary: 問題集の編集
+  description: リクエストボディに指定した問題集を編集します．
+  parameters:
+    - name: wid
+      in: path
+      required: true
+      description: 問題集のID
+      schema:
+        type: string
+      example: 1i7qaa
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:  
+          type: object
+          properties:
+            name:
+              type: string
+            published: 
+              type: string
+              format: date-time
+          required:
+            - name
+        example: 
+          name: abc the 12th
+  responses:
+    "200":
+      $ref: "../../openapi.yaml#/components/responses/WorkbookResponse"
+    "400":
+      $ref: "../../openapi.yaml#/components/responses/400BadRequest"
+    "401": 
+      $ref: "../../openapi.yaml#/components/responses/401Unauthorized"
+    "403":
+      $ref: "../../openapi.yaml#/components/responses/403Forbidden"
+delete:
+  tags: 
+    - workbooks
+  summary: 問題集を削除
+  description: リクエストボディに指定した問題集を削除します．削除する問題集に登録されたクイズは削除されません．
+  parameters:
+    - name: wid
+      in: path
+      required: true
+      description: 問題集のID
+      schema:
+        type: string
+      example: 1i7qaa
+  responses:
+    "200":
+      $ref: "../../openapi.yaml#/components/responses/WorkbooksResponse"
+    "400":
+      $ref: "../../openapi.yaml#/components/responses/400BadRequest"
+    "401": 
+      $ref: "../../openapi.yaml#/components/responses/401Unauthorized"
+    "403":
+      $ref: "../../openapi.yaml#/components/responses/403Forbidden"

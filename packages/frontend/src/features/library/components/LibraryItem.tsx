@@ -5,7 +5,7 @@ export type LibraryItemProps = {
   total: number;
   corrects: number;
   wrongs: number;
-  skips: number;
+  ignored: number;
 };
 
 export function LibraryItem({
@@ -13,12 +13,12 @@ export function LibraryItem({
   total,
   corrects,
   wrongs,
-  skips,
+  ignored,
 }: LibraryItemProps) {
-  const answered = corrects + wrongs + skips;
-  const correctsRate = (corrects / total) * 100;
-  const wrongsRate = (wrongs / total) * 100;
-  const skipsRate = (skips / total) * 100;
+  const answered = corrects + wrongs + ignored;
+  const correctsRate = total > 0 ? (corrects / total) * 100 : 0;
+  const wrongsRate = total > 0 ? (wrongs / total) * 100 : 0;
+  const ignoredRate = total > 0 ? (ignored / total) * 100 : 0;
 
   return (
     <Group justify="space-between" wrap="nowrap">
@@ -41,15 +41,14 @@ export function LibraryItem({
           </Text>
         </div>
       </Group>
-      <Tooltip label={`正答: ${corrects}, 誤答: ${wrongs}, スルー: ${skips}`}>
+      <Tooltip label={`正答: ${corrects}, 誤答: ${wrongs}, スルー: ${ignored}`}>
         <RingProgress
           size={50}
           thickness={6}
-          roundCaps
           sections={[
             { value: correctsRate, color: "red.6" },
             { value: wrongsRate, color: "blue.6" },
-            { value: skipsRate, color: "gray.8" },
+            { value: ignoredRate, color: "gray.8" },
           ]}
           mr="sm"
         />

@@ -1,0 +1,7 @@
+name: tagMatchAll
+in: query
+required: false 
+description: "タグ検索のオプション（true: AND検索, false: OR検索）"
+schema: 
+  type: boolean
+example: false

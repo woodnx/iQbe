@@ -8,8 +8,9 @@ export default class RegisterController {
     return typedAsyncWrapper<"/register", "post">(async (req, res) => {
       const qid = req.body.qid;
       const mid = req.body.mid;
+      const uid = req.user.uid;
 
-      await this.registerUseCase.registerQuizToMylist(qid, mid);
+      await this.registerUseCase.registerQuizToMylist(qid, mid, uid);
 
       res.status(201).send();
     });
@@ -19,8 +20,9 @@ export default class RegisterController {
     return typedAsyncWrapper<"/unregister", "post">(async (req, res) => {
       const qid = req.body.qid;
       const mid = req.body.mid;
+      const uid = req.user.uid;
 
-      await this.registerUseCase.unregisterQuizFromMylist(qid, mid);
+      await this.registerUseCase.unregisterQuizFromMylist(qid, mid, uid);
 
       res.status(201).send();
     });

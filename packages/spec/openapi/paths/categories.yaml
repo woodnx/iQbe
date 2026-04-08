@@ -1,0 +1,47 @@
+get: 
+  tags:
+    - categories
+  summary: クイズのカテゴリーのリストを取得
+  responses:
+    "200": 
+      $ref: "../../openapi.yaml#/components/responses/CategoriesResponse"
+    "400":
+      $ref: "../../openapi.yaml#/components/responses/400BadRequest"
+    "401": 
+      $ref: "../../openapi.yaml#/components/responses/401Unauthorized"
+    "403":
+      $ref: "../../openapi.yaml#/components/responses/403Forbidden"
+post: 
+  tags: 
+    - categories
+  summary: カテゴリーの新規作成
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema: 
+          type: object
+          properties:
+            name: 
+              type: string
+            description:
+              type: string
+            parentId:
+              type: number
+            disabled:
+              type: boolean
+          required:
+            - name
+            - disabled
+        example: 
+          name: "文学"
+          description: 小説や童話など文学に関するクイズ
+  responses:
+    "200": 
+      $ref: "../../openapi.yaml#/components/responses/CategoryResponse"
+    "400":
+      $ref: "../../openapi.yaml#/components/responses/400BadRequest"
+    "401": 
+      $ref: "../../openapi.yaml#/components/responses/401Unauthorized"
+    "403":
+      $ref: "../../openapi.yaml#/components/responses/403Forbidden"

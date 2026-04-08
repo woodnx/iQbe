@@ -1,0 +1,23 @@
+type: object
+properties:
+  id: 
+    type: number
+  name: 
+    type: string
+  description:
+    type: string
+  disabled:
+    type: boolean
+  from: 
+    type: string
+  parentId:
+    type: number
+  sub: 
+    type: array
+    items:
+      $ref: "../../../openapi.yaml#/components/schemas/SubCategory"
+required:
+  - id
+  - name
+  - disabled
+  - parentId

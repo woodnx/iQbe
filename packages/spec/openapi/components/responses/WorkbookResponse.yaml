@@ -1,0 +1,14 @@
+description: 問題集のリスト
+content:
+  application/json:
+    schema: 
+      $ref: "../../../openapi.yaml#/components/schemas/Workbook"
+    example: 
+      wid: sX8G8W
+      name: abc the 12th
+      creatorId: 1
+      total: 100
+      corrects: 50
+      wrongs: 20
+      ignored: 10
+      lastPracticedAt: 2025-10-27

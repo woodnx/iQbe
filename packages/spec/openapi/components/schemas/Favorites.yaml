@@ -1,0 +1,21 @@
+type: object
+properties:
+  uid: 
+    type: string
+  total: 
+    type: number
+  corrects: 
+    type: number
+  wrongs: 
+    type: number
+  ignored:
+    type: number
+  lastPracticedAt:
+    type: string
+    format: date-time
+required:
+  - uid
+  - total
+  - corrects
+  - wrongs
+  - ignored

@@ -5,8 +5,8 @@ try {
   //clean dist
   spawnSync("pnpm", ["run", "clean"], { stdio: "inherit" });
 
-  // build frontend
-  spawnSync("pnpm", ["--filter", "./packages/api", "run", "build"], {
+  // build api schema package
+  spawnSync("pnpm", ["--filter", "./packages/spec", "run", "build"], {
     stdio: "inherit",
   });
 

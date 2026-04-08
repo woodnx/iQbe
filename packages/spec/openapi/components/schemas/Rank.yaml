@@ -1,0 +1,20 @@
+type: object
+properties:
+  rank:
+    type: number
+  uid: 
+    type: string
+  username:
+    type: string
+  nickname:
+    type: string
+  count: 
+    type: number
+  compare: 
+    type: number
+required:
+  - rank
+  - uid
+  - username
+  - count 
+  - compare 

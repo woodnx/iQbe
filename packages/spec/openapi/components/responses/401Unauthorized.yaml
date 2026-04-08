@@ -1,0 +1,24 @@
+description: JWTトークンの不備（期限切れ，無効，存在しない）
+content:
+  application/problem+json:
+    schema: 
+      $ref: "../../../openapi.yaml#/components/schemas/Error"
+    examples: 
+      Expired token:
+        value:
+          title: EXPIRED_TOKEN
+          type: "about:blank"
+          status: 401
+          detail: "This authorization token have expired. Please refetch token."
+      Invalid token:
+        value:
+          code: INVAILD_TOKEN
+          type: "about:blank"
+          status: 401
+          detail: "This authorization token is invalid."
+      No token:
+        value:
+          code: NoToken
+          type: "about:blank"
+          status: 401
+          message: "Authorization token was not found. Please set authorization header."

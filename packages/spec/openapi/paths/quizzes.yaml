@@ -1,0 +1,74 @@
+get:
+  tags:
+    - quizzes
+  summary: クイズリストを取得
+  description: クエリパラメータをもとに，クイズリストを取得する
+  parameters:
+    - $ref: "../../openapi.yaml#/components/parameters/page"
+    - $ref: "../../openapi.yaml#/components/parameters/maxView"
+    - $ref: "../../openapi.yaml#/components/parameters/seed"
+    - $ref: "../../openapi.yaml#/components/parameters/wids"
+    - $ref: "../../openapi.yaml#/components/parameters/keyword"
+    - $ref: "../../openapi.yaml#/components/parameters/keywordOption"
+    - $ref: "../../openapi.yaml#/components/parameters/crctAnsRatio"
+    - $ref: "../../openapi.yaml#/components/parameters/since"
+    - $ref: "../../openapi.yaml#/components/parameters/until"
+    - $ref: "../../openapi.yaml#/components/parameters/judgements"
+    - $ref: "../../openapi.yaml#/components/parameters/mid"
+    - $ref: "../../openapi.yaml#/components/parameters/isFavorite"
+    - $ref: "../../openapi.yaml#/components/parameters/tags"
+    - $ref: "../../openapi.yaml#/components/parameters/tagMatchAll"
+    - $ref: "../../openapi.yaml#/components/parameters/categories"
+  responses:
+    "200":
+      $ref: "../../openapi.yaml#/components/responses/QuizzesResponse"
+    "400":
+      $ref: "../../openapi.yaml#/components/responses/400BadRequest"
+    "401": 
+      $ref: "../../openapi.yaml#/components/responses/401Unauthorized"
+    "403":
+      $ref: "../../openapi.yaml#/components/responses/403Forbidden"
+post: 
+  tags: 
+    - quizzes
+  summary: クイズの新規作成
+  requestBody:
+     required: true
+     content:
+        application/json:
+          schema: 
+            type: object
+            properties:
+              question: 
+                type: string
+              answer: 
+                type: string
+              anotherAnswer:
+                type: string
+              tags:
+                type: array
+                items:
+                  type: string
+              wid:
+                type: string
+              category:
+                type: number
+            required:
+              - question
+              - answer
+            example:
+              question: すい臓にある組織・ランゲルハンス島の発見者であるランゲルハンスは、現在でいうどこの国の病理学者でしょう？
+              answer: ドイツ
+              wid: sX8G8W
+              category: 10
+              subCategory: 14
+              isPublic: false
+  responses:
+    "201":
+      $ref: "../../openapi.yaml#/components/responses/QuizResponse"
+    "400":
+      $ref: "../../openapi.yaml#/components/responses/400BadRequest"
+    "401": 
+      $ref: "../../openapi.yaml#/components/responses/401Unauthorized"
+    "403":
+      $ref: "../../openapi.yaml#/components/responses/403Forbidden"

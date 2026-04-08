@@ -1,0 +1,19 @@
+type: object
+properties: 
+  title:
+    type: string
+    description: エラーを簡潔に表現したコード
+  type: 
+    type: string
+    description: エラーの詳細ドキュメントを指すURL
+  status:
+    type: number
+    description: HTTPステータスコード
+  detail: 
+    type: string
+    description: 開発者向けの詳細文
+required:
+  - title
+  - type
+  - status
+  - detail

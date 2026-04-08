@@ -1,0 +1,83 @@
+get: 
+  tags: 
+    - analysis
+  summary: 正答/誤答/スルー問題数を取得
+  description: 指定する日時範囲の正答/誤答/スルー問題数を取得
+  parameters:
+    - name: date
+      in: path
+      required: true
+      description: 起算する日にち
+      schema:
+        type: string
+      example: 2023-12-31 
+    - name: period
+      in: path
+      required: true
+      description: 日 / 週 / 月
+      schema:
+        type: string
+      example: day 
+  responses:
+    "200": 
+      description: 正答/誤答/スルーの問題数
+      content:
+        application/json:
+          schema:
+            type: array
+            items: 
+              type: object
+              properties:
+                start: 
+                  type: string
+                end: 
+                  type: string
+                right: 
+                  type: number
+                wrong: 
+                  type: number
+                through: 
+                  type: number
+              required:
+                - start
+                - end
+                - right
+                - wrong
+                - through
+          example:
+            - start: 2023-12-31 00:00:00
+              end: 2023-12-31 23:59:59
+              right: 2
+              wrong: 1
+              through: 4
+            - start: 2023-12-30 00:00:00
+              end: 2023-12-30 23:59:59
+              right: 10
+              wrong: 10
+              through: 40
+            - start: 2023-12-29 00:00:00
+              end: 2023-12-29 23:59:59
+              right: 1
+              wrong: 3
+              through: 47
+            - start: 2023-12-28 00:00:00
+              end: 2023-12-28 23:59:59
+              right: 17
+              wrong: 12
+              through: 37
+            - start: 2023-12-27 00:00:00
+              end: 2023-12-27 23:59:59
+              right: 18
+              wrong: 14
+              through: 34
+            - start: 2023-12-26 00:00:00
+              end: 2023-12-26 23:59:59
+              right: 13
+              wrong: 4
+              through: 12
+    "400":
+      $ref: "../../openapi.yaml#/components/responses/400BadRequest"
+    "401": 
+      $ref: "../../openapi.yaml#/components/responses/401Unauthorized"
+    "403":
+      $ref: "../../openapi.yaml#/components/responses/403Forbidden"

@@ -1,0 +1,207 @@
+openapi: "3.1.0"
+
+info:
+  title: "iQbe API"
+  version: 2.1.0
+
+servers:
+  - url: "http://localhost:9000/api/v2"
+
+tags:
+  - name: analysis
+  - name: auth
+  - name: categories
+  - name: favorites
+  - name: file
+  - name: histories
+  - name: levels
+  - name: mylists
+  - name: quizzes
+  - name: tags
+  - name: users
+  - name: workbooks
+
+security:
+  - jwt: []
+
+paths:
+  "/analysis/ranking/all/{period}":
+    $ref: "./openapi/paths/analysis.ranking-all-by-period.yaml"
+  "/analysis/ranking/personal/{period}":
+    $ref: "./openapi/paths/analysis.ranking-personal-by-period.yaml"
+  "/analysis/status/{date}/{period}":
+    $ref: "./openapi/paths/analysis.status-by-date-and-period.yaml"
+  "/auth/login":
+    $ref: "./openapi/paths/auth.login.yaml"
+  "/auth/signup":
+    $ref: "./openapi/paths/auth.signup.yaml"
+  "/auth/token":
+    $ref: "./openapi/paths/auth.token.yaml"
+  "/auth/register":
+    $ref: "./openapi/paths/auth.register.yaml"
+  "/auth/available":
+    $ref: "./openapi/paths/auth.available.yaml"
+  "/categories":
+    $ref: "./openapi/paths/categories.yaml"
+  "/categories/{id}":
+    $ref: "./openapi/paths/categories.by-id.yaml"
+  "/categories/preset":
+    $ref: "./openapi/paths/categories.preset.yaml"
+  "/csv/parse":
+    $ref: "./openapi/paths/csv.parse.yaml"
+  "/favorites":
+    $ref: "./openapi/paths/favorites.yaml"
+  "/histories/{since}/{until}":
+    $ref: "./openapi/paths/histories.by-since-and-until.yaml"
+  "/i":
+    $ref: "./openapi/paths/users.me.yaml"
+  "/i/image":
+    $ref: "./openapi/paths/users.me-image.yaml"
+  "/invite-code":
+    $ref: "./openapi/paths/invite-code.yaml"
+  "/levels":
+    $ref: "./openapi/paths/levels.yaml"
+  "/like":
+    $ref: "./openapi/paths/like.yaml"
+  "/unlike":
+    $ref: "./openapi/paths/unlike.yaml"
+  "/mylists":
+    $ref: "./openapi/paths/mylists.yaml"
+  "/practice":
+    $ref: "./openapi/paths/practice.yaml"
+  "/quizzes":
+    $ref: "./openapi/paths/quizzes.yaml"
+  "/quizzes/{qid}":
+    $ref: "./openapi/paths/quizzes.by-qid.yaml"
+  "/quizzes/size":
+    $ref: "./openapi/paths/quizzes.size.yaml"
+  "/quizzes/multiple":
+    $ref: "./openapi/paths/quizzes.bulk-create.yaml"
+  "/request-reset-password":
+    $ref: "./openapi/paths/auth.request-reset-password.yaml"
+  "/reset-password":
+    $ref: "./openapi/paths/auth.reset-password.yaml"
+  "/register":
+    $ref: "./openapi/paths/quizzes.register-to-mylist.yaml"
+  "/unregister":
+    $ref: "./openapi/paths/quizzes.unregister-from-mylist.yaml"
+  "/tags":
+    $ref: "./openapi/paths/tags.yaml"
+  "/tagging":
+    $ref: "./openapi/paths/quizzes.tagging.yaml"
+  "/untagging":
+    $ref: "./openapi/paths/quizzes.untagging.yaml"
+  "/users":
+    $ref: "./openapi/paths/users.yaml"
+  "/users/ranking":
+    $ref: "./openapi/paths/users.ranking.yaml"
+  "/workbooks":
+    $ref: "./openapi/paths/workbooks.yaml"
+  "/workbooks/{wid}":
+    $ref: "./openapi/paths/workbooks.by-wid.yaml"
+  "/workbooks/all":
+    $ref: "./openapi/paths/workbooks.all.yaml"
+components:
+  parameters:
+    categories:
+      $ref: "./openapi/components/parameters/categories.yaml"
+    crctAnsRatio:
+      $ref: "./openapi/components/parameters/crctAnsRatio.yaml"
+    isFavorite:
+      $ref: "./openapi/components/parameters/isFavorite.yaml"
+    judgements:
+      $ref: "./openapi/components/parameters/judgements.yaml"
+    keyword:
+      $ref: "./openapi/components/parameters/keyword.yaml"
+    keywordOption:
+      $ref: "./openapi/components/parameters/keywordOption.yaml"
+    maxView:
+      $ref: "./openapi/components/parameters/maxView.yaml"
+    mid:
+      $ref: "./openapi/components/parameters/mid.yaml"
+    page:
+      $ref: "./openapi/components/parameters/page.yaml"
+    seed:
+      $ref: "./openapi/components/parameters/seed.yaml"
+    since:
+      $ref: "./openapi/components/parameters/since.yaml"
+    tags:
+      $ref: "./openapi/components/parameters/tags.yaml"
+    tagMatchAll:
+      $ref: "./openapi/components/parameters/tagMatchAll.yaml"
+    until:
+      $ref: "./openapi/components/parameters/until.yaml"
+    wids:
+      $ref: "./openapi/components/parameters/wids.yaml"
+  requestBodies:
+    QuizRequestBody:
+      $ref: "./openapi/components/requestBodies/QuizRequestBody.yaml"
+  responses:
+    400BadRequest:
+      $ref: "./openapi/components/responses/400BadRequest.yaml"
+    401Unauthorized:
+      $ref: "./openapi/components/responses/401Unauthorized.yaml"
+    403Forbidden:
+      $ref: "./openapi/components/responses/403Forbidden.yaml"
+    500InternalError:
+      $ref: "./openapi/components/responses/500InternalError.yaml"
+    AuthResponse:
+      $ref: "./openapi/components/responses/AuthResponse.yaml"
+    AuthResponseWithRefreshToken:
+      $ref: "./openapi/components/responses/AuthResponseWithRefreshToken.yaml"
+    CategoriesResponse:
+      $ref: "./openapi/components/responses/CategoriesResponse.yaml"
+    CategoryResponse:
+      $ref: "./openapi/components/responses/CategoryResponse.yaml"
+    FavoritesResponse:
+      $ref: "./openapi/components/responses/FavoritesResponse.yaml"
+    LevelResponse:
+      $ref: "./openapi/components/responses/LevelResponse.yaml"
+    LevelsResponse:
+      $ref: "./openapi/components/responses/LevelsResponse.yaml"
+    MylistResponse:
+      $ref: "./openapi/components/responses/MylistResponse.yaml"
+    MylistsResponse:
+      $ref: "./openapi/components/responses/MylistsResponse.yaml"
+    QuizResponse:
+      $ref: "./openapi/components/responses/QuizResponse.yaml"
+    QuizzesResponse:
+      $ref: "./openapi/components/responses/QuizzesResponse.yaml"
+    SubCategoriesResponse:
+      $ref: "./openapi/components/responses/SubCategoriesResponse.yaml"
+    TagResponse:
+      $ref: "./openapi/components/responses/TagResponse.yaml"
+    TagsResponse:
+      $ref: "./openapi/components/responses/TagsResponse.yaml"
+    UserResponse:
+      $ref: "./openapi/components/responses/UserResponse.yaml"
+    WorkbookResponse:
+      $ref: "./openapi/components/responses/WorkbookResponse.yaml"
+    WorkbooksResponse:
+      $ref: "./openapi/components/responses/WorkbooksResponse.yaml"
+  schemas:
+    Category:
+      $ref: "./openapi/components/schemas/Category.yaml"
+    Error:
+      $ref: "./openapi/components/schemas/Error.yaml"
+    Favorites:
+      $ref: "./openapi/components/schemas/Favorites.yaml"
+    Level:
+      $ref: "./openapi/components/schemas/Level.yaml"
+    Mylist:
+      $ref: "./openapi/components/schemas/Mylist.yaml"
+    Quiz:
+      $ref: "./openapi/components/schemas/Quiz.yaml"
+    Rank:
+      $ref: "./openapi/components/schemas/Rank.yaml"
+    SubCategory:
+      $ref: "./openapi/components/schemas/SubCategory.yaml"
+    Tag:
+      $ref: "./openapi/components/schemas/Tag.yaml"
+    User:
+      $ref: "./openapi/components/schemas/User.yaml"
+    Workbook:
+      $ref: "./openapi/components/schemas/Workbook.yaml"
+  securitySchemes:
+    jwt:
+      $ref: "./openapi/components/securitySchemes/jwt.yaml"

@@ -6,6 +6,11 @@ export default class Workbook {
     private _creatorUid: string,
     private _levelId: number | null,
     private _color: string | null,
+    private _total: number,
+    private _corrects: number,
+    private _wrongs: number,
+    private _ignored: number,
+    private _lastPracticedAt: Date | null,
   ) {}
 
   rename(name: string) {
@@ -38,5 +43,25 @@ export default class Workbook {
 
   get color(): string | null {
     return this._color;
+  }
+
+  get total(): number {
+    return this._total;
+  }
+
+  get corrects(): number {
+    return this._corrects;
+  }
+
+  get wrongs(): number {
+    return this._wrongs;
+  }
+
+  get ignored(): number {
+    return this._ignored;
+  }
+
+  get lastPracticedAt(): Date | null {
+    return this._lastPracticedAt;
   }
 }

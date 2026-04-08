@@ -13,5 +13,5 @@ node -e "console.log(require('crypto').randomBytes(32).toString('hex'));" >> ./.
 
 sudo corepack enable pnpm
 pnpm install --frozen-lockfile
-pnpm run api
+pnpm run spec
 pnpm run migrate:exe

@@ -1,0 +1,95 @@
+get:
+  tags:
+    - mylists
+  summary: ユーザの全マイリストを取得
+  description: ユーザが作成した全てのマイリストを取得する
+  responses:
+    "200":
+      $ref: "../../openapi.yaml#/components/responses/MylistsResponse"
+    "400":
+      $ref: "../../openapi.yaml#/components/responses/400BadRequest"
+    "401": 
+      $ref: "../../openapi.yaml#/components/responses/401Unauthorized"
+    "403":
+      $ref: "../../openapi.yaml#/components/responses/403Forbidden"
+post:
+  tags:
+    - mylists
+  summary: マイリストの新規作成
+  description: 任意のタイトルのマイリストを新規作成する
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:  
+          type: object
+          properties:
+            listName:
+              type: string
+          required:
+            - listName
+  responses:
+    "200":
+      $ref: "../../openapi.yaml#/components/responses/MylistResponse"
+    "400":
+      $ref: "../../openapi.yaml#/components/responses/400BadRequest"
+    "401": 
+      $ref: "../../openapi.yaml#/components/responses/401Unauthorized"
+    "403":
+      $ref: "../../openapi.yaml#/components/responses/403Forbidden"
+put: 
+  tags:
+    - mylists
+  summary: マイリストの編集
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:  
+          type: object
+          properties:
+            mid: 
+              type: string
+            listName:
+              type: string
+          required:
+            - mid
+            - listName
+        example: 
+          mid: WI0Nul
+          listName: 生活習慣病
+  responses:
+    "200":
+      $ref: "../../openapi.yaml#/components/responses/MylistResponse"
+    "400":
+      $ref: "../../openapi.yaml#/components/responses/400BadRequest"
+    "401": 
+      $ref: "../../openapi.yaml#/components/responses/401Unauthorized"
+    "403":
+      $ref: "../../openapi.yaml#/components/responses/403Forbidden"
+delete:
+  tags: 
+    - mylists
+  summary: マイリストの削除
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            mid: 
+              type: string
+          required:
+            - mid
+        example: 
+          mid: WI0Nul
+  responses:
+    "200":
+      $ref: "../../openapi.yaml#/components/responses/MylistsResponse"
+    "400":
+      $ref: "../../openapi.yaml#/components/responses/400BadRequest"
+    "401": 
+      $ref: "../../openapi.yaml#/components/responses/401Unauthorized"
+    "403":
+      $ref: "../../openapi.yaml#/components/responses/403Forbidden"

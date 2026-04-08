@@ -1,0 +1,10 @@
+description: レベル情報
+content:
+  application/json:
+    schema:
+      $ref: "../../../openapi.yaml#/components/schemas/Level"
+    example:
+      id: 1
+      name: 簡単
+      value: easy
+      color: orange

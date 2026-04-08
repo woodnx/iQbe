@@ -4,10 +4,7 @@ import Workbook from "@/domains/Workbook";
 import IWorkbookRepository from "@/domains/Workbook/IWorkbookRepository";
 import WorkbookService from "@/domains/Workbook/WorkbookService";
 
-import {
-  normalizeWorkbookDate,
-  WorkbookDateInput,
-} from "./WorkbookMapper";
+import { normalizeWorkbookDate, WorkbookDateInput } from "./WorkbookMapper";
 
 type WorkbookDTO =
   components["responses"]["WorkbookResponse"]["content"]["application/json"];
@@ -34,6 +31,11 @@ export class CreateWorkbookUseCase {
       command.uid,
       null,
       null,
+      0,
+      0,
+      0,
+      0,
+      null,
     );
 
     await this.workbookRepository.save(workbook);
@@ -45,6 +47,11 @@ export class CreateWorkbookUseCase {
       creatorId: command.uid,
       levelId: null,
       color: null,
+      total: workbook.total,
+      corrects: workbook.corrects,
+      wrongs: workbook.wrongs,
+      ignored: workbook.ignored,
+      lastPracticedAt: workbook.lastPracticedAt,
     };
   }
 }

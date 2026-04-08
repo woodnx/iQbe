@@ -1,0 +1,29 @@
+post: 
+  tags: 
+    - quizzes
+  summary: クイズにタグを登録
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            qid: 
+              type: string
+            tid: 
+              type: string
+          required:
+            - qid
+            - tid
+        example:
+          qid: DG8ED3bx7y0McbistuLx
+  responses:
+    "201":
+      $ref: "../../openapi.yaml#/components/responses/QuizResponse"
+    "400":
+      $ref: "../../openapi.yaml#/components/responses/400BadRequest"
+    "401": 
+      $ref: "../../openapi.yaml#/components/responses/401Unauthorized"
+    "403":
+      $ref: "../../openapi.yaml#/components/responses/403Forbidden"

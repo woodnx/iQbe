@@ -1,0 +1,9 @@
+name: tags
+in: query
+required: false
+schema: 
+  oneOf:
+    - type: array
+      items: 
+        type: string
+    - type: string

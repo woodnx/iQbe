@@ -10,23 +10,23 @@ export default class RegisterUseCase {
     private registeredQuizRepository: IRegisteredQuizRepository,
   ) {}
 
-  async registerQuizToMylist(qid: string, mid: string) {
+  async registerQuizToMylist(qid: string, mid: string, uid: string) {
     const registeredQuizService = new RegisteredQuizService(
       this.mylistRepository,
       this.quizRepository,
       this.registeredQuizRepository,
     );
 
-    return registeredQuizService.add(mid, qid);
+    return registeredQuizService.add(mid, qid, uid);
   }
 
-  async unregisterQuizFromMylist(qid: string, mid: string) {
+  async unregisterQuizFromMylist(qid: string, mid: string, uid: string) {
     const registeredQuizService = new RegisteredQuizService(
       this.mylistRepository,
       this.quizRepository,
       this.registeredQuizRepository,
     );
 
-    return registeredQuizService.delete(mid, qid);
+    return registeredQuizService.delete(mid, qid, uid);
   }
 }

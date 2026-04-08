@@ -1,0 +1,30 @@
+post: 
+  tags: 
+    - quizzes
+  summary: クイズを履歴に追加
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            qid: 
+              type: string
+            judgement: 
+              type: number
+            pressedWord:
+              type: number
+          required:
+            - qid
+            - judgement
+            - pressedWord
+  responses:
+    "201":
+      $ref: "../../openapi.yaml#/components/responses/QuizResponse"
+    "400":
+      $ref: "../../openapi.yaml#/components/responses/400BadRequest"
+    "401": 
+      $ref: "../../openapi.yaml#/components/responses/401Unauthorized"
+    "403":
+      $ref: "../../openapi.yaml#/components/responses/403Forbidden"

@@ -1,0 +1,14 @@
+get:
+  tags:
+    - favorites
+  summary: ユーザのお気に入りの情報を取得
+  description: お気に入りクイズの総数，演習履歴等を取得
+  responses:
+    "200":
+      $ref: "../../openapi.yaml#/components/responses/FavoritesResponse"
+    "400":
+      $ref: "../../openapi.yaml#/components/responses/400BadRequest"
+    "401": 
+      $ref: "../../openapi.yaml#/components/responses/401Unauthorized"
+    "403":
+      $ref: "../../openapi.yaml#/components/responses/403Forbidden"

@@ -1,0 +1,32 @@
+get: 
+  tags: 
+    - analysis
+  summary: 個人の演習問題数のランク
+  description: 演習問題によるランクを取得する
+  parameters:
+    - name: period
+      in: path
+      required: true
+      description: 日 / 週 / 月
+      schema:
+        type: string
+      example: day 
+  responses:
+    "200": 
+      description: 指定範囲のランク
+      content:
+        application/json:
+          schema: 
+            $ref: "../../openapi.yaml#/components/schemas/Rank"
+          example:
+            rank: 1
+            uid: WI0Nulr6F1dhLUi7A3zYRKs5bu9txaGgT0PqBc 
+            name: foo
+            count: 323
+            compare: 0
+    "400":
+      $ref: "../../openapi.yaml#/components/responses/400BadRequest"
+    "401": 
+      $ref: "../../openapi.yaml#/components/responses/401Unauthorized"
+    "403":
+      $ref: "../../openapi.yaml#/components/responses/403Forbidden"

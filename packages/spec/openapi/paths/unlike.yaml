@@ -1,0 +1,26 @@
+post: 
+  tags:
+    - quizzes
+  summary: お気に入りからクイズを削除
+  requestBody: 
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            qid: 
+              type: string
+          required:
+            - qid
+        example: 
+          qid: DG8ED3bx7y0McbistuLx
+  responses:
+    "204": 
+      description: deleted quiz from favorite
+    "400":
+      $ref: "../../openapi.yaml#/components/responses/400BadRequest"
+    "401": 
+      $ref: "../../openapi.yaml#/components/responses/401Unauthorized"
+    "403":
+      $ref: "../../openapi.yaml#/components/responses/403Forbidden"

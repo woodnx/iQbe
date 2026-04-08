@@ -8,7 +8,19 @@ describe("UpdateWorkbookUseCase", () => {
     const useCase = new UpdateWorkbookUseCase(workbookRepository);
 
     await workbookRepository.save(
-      new Workbook("w1", "Before", null, "user-a", null, null),
+      new Workbook(
+        "w1",
+        "Before",
+        null,
+        "user-a",
+        null,
+        null,
+        0,
+        0,
+        0,
+        0,
+        null,
+      ),
     );
 
     const result = await useCase.execute({

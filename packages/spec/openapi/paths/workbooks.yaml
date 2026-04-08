@@ -1,0 +1,36 @@
+get: 
+  tags:
+    - workbooks
+  summary: 自分が作った問題集のリストを取得
+  responses:
+    "200":
+      $ref: "../../openapi.yaml#/components/responses/WorkbooksResponse"
+post:
+  tags:
+    - workbooks
+  summary: 問題集を新規作成
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:  
+          type: object
+          properties:
+            name:
+              type: string
+            published: 
+              type: string
+              format: date-time
+          required:
+            - name
+        example: 
+          name: abc the 12th
+  responses:
+    "200":
+      $ref: "../../openapi.yaml#/components/responses/WorkbookResponse"
+    "400":
+      $ref: "../../openapi.yaml#/components/responses/400BadRequest"
+    "401": 
+      $ref: "../../openapi.yaml#/components/responses/401Unauthorized"
+    "403":
+      $ref: "../../openapi.yaml#/components/responses/403Forbidden"

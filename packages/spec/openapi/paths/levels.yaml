@@ -1,0 +1,14 @@
+get: 
+  tags: 
+    - levels
+  summary: レベルリストを取得
+  description: 全てのレベルのリストを取得する
+  responses:
+    "200":
+      $ref: "../../openapi.yaml#/components/responses/LevelsResponse"
+    "400":
+      $ref: "../../openapi.yaml#/components/responses/400BadRequest"
+    "401": 
+      $ref: "../../openapi.yaml#/components/responses/401Unauthorized"
+    "403":
+      $ref: "../../openapi.yaml#/components/responses/403Forbidden"

@@ -1,0 +1,34 @@
+type: object
+properties:
+  wid: 
+    type: string
+  name: 
+    type: string
+  date: 
+    type: string
+    format: date-time
+  levelId: 
+    type: number
+  color: 
+    type: string
+  creatorId:
+    type: string
+  total: 
+    type: number
+  corrects: 
+    type: number
+  wrongs: 
+    type: number
+  ignored:
+    type: number
+  lastPracticedAt:
+    type: string
+    format: date-time
+required:
+  - wid
+  - name
+  - creatorId
+  - total
+  - corrects
+  - wrongs
+  - ignored

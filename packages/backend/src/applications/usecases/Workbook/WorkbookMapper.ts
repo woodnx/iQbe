@@ -27,6 +27,11 @@ export const toWorkbookDTO = (workbook: Workbook): WorkbookDTO => ({
   creatorId: workbook.creatorUid,
   levelId: workbook.levelId,
   color: workbook.color,
+  total: workbook.total,
+  corrects: workbook.corrects,
+  wrongs: workbook.wrongs,
+  ignored: workbook.ignored,
+  lastPracticedAt: workbook.lastPracticedAt,
 });
 
 export const toWorkbooksDTO = (workbooks: Workbook[]): WorkbooksDTO =>

@@ -1,0 +1,37 @@
+get: 
+  tags: 
+    - quizzes
+  summary: クイズの総数を取得
+  parameters:
+    - $ref: "../../openapi.yaml#/components/parameters/wids"
+    - $ref: "../../openapi.yaml#/components/parameters/keyword"
+    - $ref: "../../openapi.yaml#/components/parameters/keywordOption"
+    - $ref: "../../openapi.yaml#/components/parameters/crctAnsRatio"
+    - $ref: "../../openapi.yaml#/components/parameters/since"
+    - $ref: "../../openapi.yaml#/components/parameters/until"
+    - $ref: "../../openapi.yaml#/components/parameters/judgements"
+    - $ref: "../../openapi.yaml#/components/parameters/mid"
+    - $ref: "../../openapi.yaml#/components/parameters/isFavorite"
+    - $ref: "../../openapi.yaml#/components/parameters/tags"
+    - $ref: "../../openapi.yaml#/components/parameters/tagMatchAll"
+    - $ref: "../../openapi.yaml#/components/parameters/categories"
+  responses:
+    "200":
+      description: クイズの総数
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              size: 
+                type: number
+            required:
+              - size
+          example:
+            size: 100
+    "400":
+      $ref: "../../openapi.yaml#/components/responses/400BadRequest"
+    "401": 
+      $ref: "../../openapi.yaml#/components/responses/401Unauthorized"
+    "403":
+      $ref: "../../openapi.yaml#/components/responses/403Forbidden"

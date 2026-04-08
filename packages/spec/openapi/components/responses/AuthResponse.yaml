@@ -1,0 +1,15 @@
+description: ユーザ情報と認証トークン
+content:
+  application/json:
+    schema: 
+      type: object
+      properties:
+        accessToken:
+          type: string
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJCYXBYVkVPdUxsWWIzakhDQnBlU3p4N2NQUnJnZjFkTlRacUU0IiwibmFtZSI6ImhvZ2UiLCJpYXQiOjE1MTYyMzkwMjJ9.vpt-SA6QoVJmG9cy32Lq-twd1anEuYKCzlLUMavMqyQ
+        user: 
+          type: object
+          $ref: "../../../openapi.yaml#/components/schemas/User"
+      required:
+        - accessToken
+        - user

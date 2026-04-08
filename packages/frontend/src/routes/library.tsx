@@ -54,10 +54,10 @@ function RouteComponent() {
                   <Accordion.Control display="flex">
                     <LibraryItem
                       name={workbook.name}
-                      total={100}
-                      corrects={45}
-                      wrongs={15}
-                      skips={15}
+                      total={workbook.total}
+                      corrects={workbook.corrects}
+                      wrongs={workbook.wrongs}
+                      ignored={workbook.ignored}
                     />
                   </Accordion.Control>
                   <Accordion.Panel>
@@ -133,10 +133,10 @@ function RouteComponent() {
                   <Accordion.Control display="flex">
                     <LibraryItem
                       name={mylist.name}
-                      total={100}
-                      corrects={45}
-                      wrongs={15}
-                      skips={15}
+                      total={mylist.total}
+                      corrects={mylist.corrects}
+                      wrongs={mylist.wrongs}
+                      ignored={mylist.ignored}
                     />
                   </Accordion.Control>
                   <Accordion.Panel>

@@ -1,0 +1,58 @@
+post: 
+  tags: 
+    - quizzes
+  summary: クイズの新規作成
+  requestBody:
+     required: true
+     content:
+        application/json:
+          schema: 
+            type: object
+            properties:
+              records: 
+                type: array
+                items:
+                  type: object
+                  properties:
+                    question: 
+                      type: string
+                    answer: 
+                      type: string
+                    anotherAnswer:
+                      type: string
+                    tags: 
+                      type: array
+                      items:
+                        type: string
+                    wid:
+                      type: string
+                    category:
+                      type: number
+                    subCategory:
+                      type: number
+                  required:
+                    - question
+                    - answer
+            example:
+              type: object
+              properties:
+                records:
+                  type: array
+                  items:
+                    - type: object
+                      properties:
+                        question: すい臓にある組織・ランゲルハンス島の発見者であるランゲルハンスは、現在でいうどこの国の病理学者でしょう？
+                        answer: ドイツ
+                        wid: sX8G8W
+                        category: 10
+                        subCategory: 14
+                        isPublic: false
+  responses:
+    "201":
+      $ref: "../../openapi.yaml#/components/responses/QuizzesResponse"
+    "400":
+      $ref: "../../openapi.yaml#/components/responses/400BadRequest"
+    "401": 
+      $ref: "../../openapi.yaml#/components/responses/401Unauthorized"
+    "403":
+      $ref: "../../openapi.yaml#/components/responses/403Forbidden"

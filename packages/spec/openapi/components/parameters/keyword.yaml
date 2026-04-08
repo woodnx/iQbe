@@ -1,0 +1,8 @@
+name: keyword
+in: query
+required: false
+description: 検索したいキーワード（部分一致）
+schema: 
+  type: string
+example: 
+  テスト

@@ -1,0 +1,31 @@
+post: 
+  tags: 
+    - auth
+  summary: ユーザのログイン
+  description: ユーザのログインを行う
+  security: []
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema: 
+          type: object
+          properties: 
+            username: 
+              type: string
+            password: 
+              type: string
+          required:
+            - username
+            - password
+        example: 
+          uid: BapXVEOuLlYb3jHCBpeSzx7cPRrgf1dNTZqE4
+          username: hoge
+          nickname: huga
+  responses:
+    "201":
+      $ref: "../../openapi.yaml#/components/responses/AuthResponseWithRefreshToken"
+    "400":
+      $ref: "../../openapi.yaml#/components/responses/400BadRequest"
+    "403":
+      $ref: "../../openapi.yaml#/components/responses/403Forbidden"                  

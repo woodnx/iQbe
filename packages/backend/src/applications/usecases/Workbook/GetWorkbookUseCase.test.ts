@@ -10,7 +10,19 @@ describe("GetWorkbookUseCase", () => {
     const createdDate = new Date("2024-02-02T00:00:00.000Z");
 
     await workbookRepository.save(
-      new Workbook("w1", "First", createdDate, "user-a", 1, "red"),
+      new Workbook(
+        "w1",
+        "First",
+        createdDate,
+        "user-a",
+        1,
+        "red",
+        0,
+        0,
+        0,
+        0,
+        null,
+      ),
     );
 
     const result = await useCase.execute({ uid: "user-a", wid: "w1" });
@@ -22,6 +34,11 @@ describe("GetWorkbookUseCase", () => {
       creatorId: "user-a",
       levelId: 1,
       color: "red",
+      total: 0,
+      corrects: 0,
+      wrongs: 0,
+      ignored: 0,
+      lastPracticedAt: null,
     });
   });
 });

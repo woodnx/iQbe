@@ -1,0 +1,15 @@
+description: タグ群の情報
+content:
+  application/json:
+    schema: 
+      type: array
+      items:
+        type: object
+        $ref: "../../../openapi.yaml#/components/schemas/Tag"
+      example:
+        - tid: UaHxXrGKQM
+          label: 時事
+          color: gray
+          creatorUid: BapXVEOuLlYb3jHCBpeSzx7cPRrgf1dNTZqE4
+          modified: 2023-12-22
+          created: 2023-12-01

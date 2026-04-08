@@ -1,0 +1,29 @@
+type: object
+properties:
+  mid: 
+    type: string
+  name: 
+    type: string
+  created:
+    type: string
+    format: date-time
+    readOnly: true
+  total: 
+    type: number
+  corrects: 
+    type: number
+  wrongs: 
+    type: number
+  ignored:
+    type: number
+  lastPracticedAt:
+    type: string
+    format: date-time
+required:
+  - mid
+  - name
+  - created
+  - total
+  - corrects
+  - wrongs
+  - ignored

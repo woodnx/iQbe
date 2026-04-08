@@ -1,0 +1,29 @@
+post: 
+  tags:
+    - quizzes
+  summary: マイリストからクイズを削除
+  requestBody: 
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            qid: 
+              type: string
+            mid: 
+              type: string
+          required:
+            - qid
+            - mid
+        example: 
+          qid: DG8ED3bx7y0McbistuLx
+  responses:
+    "204": 
+      description: "deleted quiz from mylist"
+    "400":
+      $ref: "../../openapi.yaml#/components/responses/400BadRequest"
+    "401": 
+      $ref: "../../openapi.yaml#/components/responses/401Unauthorized"
+    "403":
+      $ref: "../../openapi.yaml#/components/responses/403Forbidden"

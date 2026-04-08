@@ -1,0 +1,9 @@
+name: maxView
+in: query
+required: false
+description: ページネーションでの1ページあたりのクイズ数
+schema:
+  type: number
+  maximum: 100
+  minimum: 0
+example: 100

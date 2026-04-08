@@ -1,0 +1,13 @@
+name: categories
+in: query
+required: false
+description: ジャンルの絞り込み
+schema:
+  oneOf:
+    - type: array
+      items: 
+        type: number
+    - type: number
+example: 
+  - 1
+  - 2

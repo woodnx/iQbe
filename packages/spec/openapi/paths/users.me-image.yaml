@@ -1,0 +1,31 @@
+post: 
+  tags:
+    - user
+  description: プロフィール画像の編集
+  security: []
+  requestBody:
+    required: true
+    content:
+      image/png:
+        schema:
+          type: object
+          properties:
+            file:
+              type: string
+              format: binary
+      image/jpeg:
+        schema:
+          type: object
+          properties:
+            file:
+              type: string
+              format: binary
+  responses:
+    "201":
+      $ref: "../../openapi.yaml#/components/responses/UserResponse"
+    "400":
+      $ref: "../../openapi.yaml#/components/responses/400BadRequest"
+    "401": 
+      $ref: "../../openapi.yaml#/components/responses/401Unauthorized"
+    "403":
+      $ref: "../../openapi.yaml#/components/responses/403Forbidden"

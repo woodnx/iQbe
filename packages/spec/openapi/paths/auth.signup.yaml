@@ -1,0 +1,36 @@
+post: 
+  tags: 
+    - auth
+  summary: ユーザの新規登録
+  description: ユーザの新規登録を行う．クローズドなインスタンスであれば招待コードが必要．
+  security: []
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema: 
+          type: object
+          properties: 
+            username: 
+              type: string
+            password: 
+              type: string
+            email: 
+              type: string
+            inviteCode: 
+              type: string
+          required:
+            - username
+            - password
+        example: 
+          username: hoge
+          password: p@ssw0rd
+          email: hoge@example.com
+          inviteCode: 9197DD99-5504-10D0-E529-4EC60EEA978A
+  responses:
+    "201":
+      $ref: "../../openapi.yaml#/components/responses/AuthResponseWithRefreshToken"
+    "400":
+      $ref: "../../openapi.yaml#/components/responses/400BadRequest"
+    "403":
+      $ref: "../../openapi.yaml#/components/responses/403Forbidden"
