@@ -26,6 +26,11 @@ describe("CreateWorkbookUseCase", () => {
       creatorId: "user-a",
       levelId: null,
       color: null,
+      total: 0,
+      corrects: 0,
+      wrongs: 0,
+      ignored: 0,
+      lastPracticedAt: null,
     });
   });
 });

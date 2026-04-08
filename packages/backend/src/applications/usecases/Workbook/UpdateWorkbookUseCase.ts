@@ -39,6 +39,11 @@ export class UpdateWorkbookUseCase {
       creatorId: command.uid,
       levelId: null,
       color: null,
+      total: workbook.total,
+      corrects: workbook.corrects,
+      wrongs: workbook.wrongs,
+      ignored: workbook.ignored,
+      lastPracticedAt: workbook.lastPracticedAt,
     };
   }
 }

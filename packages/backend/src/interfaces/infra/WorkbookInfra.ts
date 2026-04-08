@@ -1,8 +1,7 @@
 import { ApiError } from "api";
-
 import Workbook from "@/domains/Workbook";
 import IWorkbookRepository from "@/domains/Workbook/IWorkbookRepository";
-import { format } from "@/plugins/day";
+import dayjs, { format } from "@/plugins/day";
 import KyselyClientManager from "./kysely/KyselyClientManager";
 
 export default class WorkbookInfra implements IWorkbookRepository {
@@ -16,18 +15,51 @@ export default class WorkbookInfra implements IWorkbookRepository {
       .leftJoin("levels", "workbooks.level_id", "levels.id")
       .innerJoin("users", "creator_id", "users.id")
       .select([
+        "workbooks.id as id",
         "workbooks.name as name",
         "wid",
         "workbooks.date",
+        "users.id as userId",
         "users.uid as creatorUId",
         "levels.color as color",
         "level_id as levelId",
       ])
       .where("workbooks.wid", "=", wid)
-      .where("uid", "=", uid)
+      .where("users.uid", "=", uid)
       .executeTakeFirst();
 
     if (!workbook) return null;
+    const userId = workbook.userId;
+
+    const quizzes = await client
+      .selectFrom("quizzes")
+      .select(["id"])
+      .where("workbook_id", "=", workbook.id)
+      .execute();
+    const quizIds = [...new Set(quizzes.map((q) => q.id))];
+
+    const histories =
+      quizIds.length > 0
+        ? await client
+            .selectFrom("histories")
+            .select(["quiz_id", "judgement", "practiced"])
+            .where("user_id", "=", userId)
+            .where("quiz_id", "in", quizIds)
+            .execute()
+        : [];
+
+    const total = histories.length;
+    const corrects = histories.filter((h) => h.judgement == 1).length;
+    const wrongs = histories.filter((h) => h.judgement == 0).length;
+    const ignored = histories.filter((h) => h.judgement == 2).length;
+    const lastPracticed =
+      histories.length === 0
+        ? null
+        : histories.reduce((last, history) => {
+            const practiced = dayjs(history.practiced);
+            if (last.isBefore(practiced)) last = practiced;
+            return last;
+          }, dayjs("1000-01-01"));
 
     return new Workbook(
       workbook.wid,
@@ -36,6 +68,11 @@ export default class WorkbookInfra implements IWorkbookRepository {
       workbook.creatorUId,
       workbook.levelId,
       workbook.color,
+      total,
+      corrects,
+      wrongs,
+      ignored,
+      lastPracticed ? lastPracticed.toDate() : null,
     );
   }
 
@@ -47,9 +84,11 @@ export default class WorkbookInfra implements IWorkbookRepository {
       .leftJoin("levels", "workbooks.level_id", "levels.id")
       .innerJoin("users", "creator_id", "users.id")
       .select([
+        "workbooks.id as id",
         "workbooks.name as name",
         "wid",
         "workbooks.date",
+        "users.id as userId",
         "users.uid as creatorUId",
         "levels.color as color",
         "level_id as levelId",
@@ -57,10 +96,65 @@ export default class WorkbookInfra implements IWorkbookRepository {
       .where("uid", "=", uid)
       .execute();
 
-    return workbooks.map(
-      (w) =>
-        new Workbook(w.wid, w.name, w.date, w.creatorUId, w.levelId, w.color),
-    );
+    if (workbooks.length === 0) return [];
+
+    const userId = workbooks[0].userId;
+    const workbooksIds = workbooks.map((m) => m.id);
+
+    const quizzes = await client
+      .selectFrom("quizzes")
+      .select(["id", "workbook_id"])
+      .where("workbook_id", "in", workbooksIds)
+      .execute();
+    const quizIds = [...new Set(quizzes.map((q) => q.id))];
+
+    const histories =
+      quizIds.length > 0
+        ? await client
+            .selectFrom("histories")
+            .select(["quiz_id", "judgement", "practiced"])
+            .where("user_id", "=", userId)
+            .where("quiz_id", "in", quizIds)
+            .execute()
+        : [];
+
+    return workbooks.map((workbook) => {
+      const targetQuizIds = quizzes
+        .filter((quiz) => quiz.workbook_id === workbook.id)
+        .map((quiz) => quiz.id);
+
+      // このマイリストに属するクイズの履歴リスト
+      const targetHistories = histories.filter((h) =>
+        targetQuizIds.includes(h.quiz_id),
+      );
+
+      const total = targetQuizIds.length;
+      const corrects = targetHistories.filter((h) => h.judgement == 1).length;
+      const wrongs = targetHistories.filter((h) => h.judgement == 0).length;
+      const ignored = targetHistories.filter((h) => h.judgement == 2).length;
+      const lastPracticed =
+        histories.length === 0
+          ? null
+          : histories.reduce((last, history) => {
+              const practiced = dayjs(history.practiced);
+              if (last.isBefore(practiced)) last = practiced;
+              return last;
+            }, dayjs("1000-01-01"));
+
+      return new Workbook(
+        workbook.wid,
+        workbook.name,
+        workbook.date,
+        workbook.creatorUId,
+        workbook.levelId,
+        workbook.color,
+        total,
+        corrects,
+        wrongs,
+        ignored,
+        lastPracticed ? lastPracticed.toDate() : null,
+      );
+    });
   }
 
   async save(workbook: Workbook): Promise<void> {

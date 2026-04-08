@@ -8,7 +8,7 @@ describe("GetAllWorkbooksUseCase", () => {
     const useCase = new GetAllWorkbooksUseCase(workbookRepository);
 
     await workbookRepository.save(
-      new Workbook("w1", "First", null, "user-a", null, null),
+      new Workbook("w1", "First", null, "user-a", null, null, 0, 0, 0, 0, null),
     );
 
     const result = await useCase.execute({ uid: "user-a" });
@@ -21,6 +21,11 @@ describe("GetAllWorkbooksUseCase", () => {
         creatorId: "user-a",
         levelId: null,
         color: null,
+        total: 0,
+        corrects: 0,
+        wrongs: 0,
+        ignored: 0,
+        lastPracticedAt: null,
       },
     ]);
   });

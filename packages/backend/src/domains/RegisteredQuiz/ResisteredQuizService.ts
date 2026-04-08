@@ -1,6 +1,6 @@
-import RegisteredQuiz from ".";
 import IMylistRepository from "../Mylist/IMylistRepository";
 import IQuizRepository from "../Quiz/IQuizRepository";
+import RegisteredQuiz from ".";
 import IRegisteredQuizRepository from "./IResiteredQuizRepository";
 
 export default class RegisteredQuizService {
@@ -10,9 +10,9 @@ export default class RegisteredQuizService {
     private registeredQuizRepository: IRegisteredQuizRepository,
   ) {}
 
-  async add(mid: string, qid: string) {
+  async add(mid: string, qid: string, uid: string) {
     const [mylist, quiz] = await Promise.all([
-      this.mylistRepository.findByMid(mid),
+      this.mylistRepository.findByMid(mid, uid),
       this.quizRepository.findByQid(qid),
     ]);
 
@@ -24,9 +24,9 @@ export default class RegisteredQuizService {
     return this.registeredQuizRepository.insert(registeredQuiz);
   }
 
-  async delete(mid: string, qid: string) {
+  async delete(mid: string, qid: string, uid: string) {
     const [mylist, quiz] = await Promise.all([
-      this.mylistRepository.findByMid(mid),
+      this.mylistRepository.findByMid(mid, uid),
       this.quizRepository.findByQid(qid),
     ]);
 
