@@ -144,19 +144,17 @@ export default class QuizController {
         throw new ApiError().invalidParams();
       }
 
-      await Promise.all(
-        records.map((r) =>
-          this.addQuizUseCase.execute({
-            question: r.question,
-            answer: r.answer,
-            anotherAnswer: r.anotherAnswer || undefined,
-            tagLabels: r.tags || [],
-            wid: r.wid || undefined,
-            categoryId: r.category || undefined,
-            uid,
-          }),
-        ),
-      );
+      for (const r of records) {
+        await this.addQuizUseCase.execute({
+          question: r.question,
+          answer: r.answer,
+          anotherAnswer: r.anotherAnswer || undefined,
+          tagLabels: r.tags || [],
+          wid: r.wid || undefined,
+          categoryId: r.category || undefined,
+          uid,
+        });
+      }
 
       res.status(201).send();
     });

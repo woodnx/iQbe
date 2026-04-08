@@ -23,9 +23,9 @@ export class QuizAttachedTagsService {
       (tag) => !updateTags.has(tag),
     );
     if (tagsToAttach.length > 0)
-      this.attachTags(QuizAttachedTags.create(qid, tagsToAttach));
+      await this.attachTags(QuizAttachedTags.create(qid, tagsToAttach));
     if (tagsToDetach.length > 0)
-      this.detachTags(QuizAttachedTags.create(qid, tagsToDetach));
+      await this.detachTags(QuizAttachedTags.create(qid, tagsToDetach));
   }
 
   private async incrementUsage(label: string): Promise<void> {
@@ -52,11 +52,11 @@ export class QuizAttachedTagsService {
       await this.incrementUsage(label);
     }
 
-    this.quizAttachedTagsRepository.save(tags);
+    await this.quizAttachedTagsRepository.save(tags);
   }
 
   private async detachTags(tags: QuizAttachedTags): Promise<void> {
-    this.quizAttachedTagsRepository.delete(tags);
+    await this.quizAttachedTagsRepository.delete(tags);
 
     for (const label of tags.tagLabels) {
       await this.decrementUsage(label);
