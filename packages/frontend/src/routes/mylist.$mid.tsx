@@ -238,7 +238,6 @@ function RouteComponent() {
 
   const MylistCard = (
     <Card
-      mb="xs"
       w="100%"
       withBorder
       style={{
@@ -279,7 +278,7 @@ function RouteComponent() {
     <>
       <QuizControllBar
         variant="onlyPagenation"
-        p="sm"
+        pb="sm"
         total={size}
         header={MylistCard}
         buttons={

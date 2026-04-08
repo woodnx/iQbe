@@ -135,7 +135,6 @@ function RouteComponent() {
 
   const WorkbookCard = (
     <Card
-      mb="xs"
       w="100%"
       withBorder
       style={{
