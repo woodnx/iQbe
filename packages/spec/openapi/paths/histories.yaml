@@ -1,0 +1,24 @@
+get: 
+  tags: 
+    - histories
+  summary: 全ての履歴がある日を取得
+  responses:
+    "200": 
+      description: 正答/誤答/スルーの問題数
+      content:
+        application/json:
+          schema:
+            type: array
+            items: 
+              type: string
+              format: date-time
+          example:
+            - "2025-10-24"
+            - "2025-10-23"
+            - "2025-10-21"
+    "400":
+      $ref: "../../openapi.yaml#/components/responses/400BadRequest"
+    "401": 
+      $ref: "../../openapi.yaml#/components/responses/401Unauthorized"
+    "403":
+      $ref: "../../openapi.yaml#/components/responses/403Forbidden"

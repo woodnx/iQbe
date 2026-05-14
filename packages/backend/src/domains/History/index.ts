@@ -7,6 +7,7 @@ export default class History {
     private _user: User,
     private _pressedWordPosiston: number | null,
     private _judgement: number,
+    private _practicedAt: Date,
   ) {}
 
   get quiz(): Quiz {
@@ -23,5 +24,9 @@ export default class History {
 
   get judgement(): number {
     return this._judgement;
+  }
+
+  get practicedAt(): Date {
+    return this._practicedAt;
   }
 }
