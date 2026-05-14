@@ -25,6 +25,10 @@ export const Route = createFileRoute("/training")({
 function RouteComponent() {
   const { data: workbooks } = $api.useQuery("get", "/workbooks");
   // const { data: histories } = $api.useQuery("get", "/histories/{since}/{until}");
+  const histories =
+    $api
+      .useQuery("get", "/histories")
+      .data?.map((d) => dayjs(d).format("YYYY-MM-DD")) || [];
   const [dates, setDates] = useState<[Date | null, Date | null]>([null, null]);
   const navigate = useNavigate();
   const maxWorkbook = 5;
@@ -172,8 +176,16 @@ function RouteComponent() {
               monthLabelFormat="YYYY年 M月"
               renderDay={(d) => {
                 const date = dayjs(d);
+                const disabled = histories.some(
+                  (h) => h == date.format("YYYY-MM-DD"),
+                );
                 return (
-                  <Indicator size={6} color="red" offset={-2} disabled={true}>
+                  <Indicator
+                    size={6}
+                    color="red"
+                    offset={-2}
+                    disabled={!disabled}
+                  >
                     <div>{date.date()}</div>
                   </Indicator>
                 );

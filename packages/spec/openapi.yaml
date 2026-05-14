@@ -53,6 +53,8 @@ paths:
     $ref: "./openapi/paths/favorites.yaml"
   "/histories/{since}/{until}":
     $ref: "./openapi/paths/histories.by-since-and-until.yaml"
+  "/histories":
+    $ref: "./openapi/paths/histories.yaml"
   "/i":
     $ref: "./openapi/paths/users.me.yaml"
   "/i/image":

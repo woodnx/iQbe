@@ -5,9 +5,24 @@ import KyselyClientManager from "./kysely/KyselyClientManager";
 export default class HistoryInfra implements IHistoryRepository {
   constructor(private clientManager: KyselyClientManager) {}
 
+  async getAllDates(uid: string): Promise<Date[]> {
+    const client = this.clientManager.getClient();
+
+    const histories = await client
+      .selectFrom("histories")
+      .innerJoin("users", "histories.user_id", "users.id")
+      .select(["histories.practiced"])
+      .groupBy("histories.practiced")
+      .orderBy("histories.practiced", "desc")
+      .where("users.uid", "=", uid)
+      .execute()
+      .then((result) => result.map((r) => r.practiced));
+
+    return histories;
+  }
+
   async add(history: History): Promise<void> {
     const client = this.clientManager.getClient();
-    const now = new Date();
 
     const [userId, quizId] = await Promise.all([
       client
@@ -30,7 +45,7 @@ export default class HistoryInfra implements IHistoryRepository {
       .values({
         user_id: userId,
         quiz_id: quizId,
-        practiced: now,
+        practiced: history.practicedAt,
         judgement: history.judgement,
         pressed_word: history.pressedWordPosition,
       })
