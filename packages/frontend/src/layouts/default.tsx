@@ -3,6 +3,7 @@ import {
   AppShell,
   Center,
   Container,
+  Divider,
   Drawer,
   Group,
   Loader,
@@ -12,11 +13,13 @@ import { notifications } from "@mantine/notifications";
 import {
   IconBooks,
   IconDashboard,
+  IconHistory,
   IconHome,
   IconMenu2,
   IconPencil,
   IconSchool,
   IconSearch,
+  IconStar,
 } from "@tabler/icons-react";
 import { Outlet, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useLayoutEffect, useState } from "react";
@@ -25,6 +28,7 @@ import UserInfoMenu from "@/features/user/components/UserInfoMenu";
 import useHeaderHeight from "@/hooks/useHeaderHeight";
 import Logo from "@/shared/components/Logo";
 import NavbarLink from "@/shared/components/NavbarLink";
+import { $api } from "@/utils/client";
 import { checkAuth } from "../plugins/auth";
 
 const checkPathname = (pathname: string) => {
@@ -51,13 +55,15 @@ export default function DefaultLayout() {
   const isMobile = useIsMobile();
   const { headerHeight } = useHeaderHeight();
 
+  const { data: workbooks } = $api.useQuery("get", "/workbooks");
+  const { data: mylists } = $api.useQuery("get", "/mylists");
+
   const mockdata = [
     {
       label: "ダッシュボード",
       icon: IconDashboard,
       link: "/",
     },
-
     {
       label: "演習",
       icon: IconSchool,
@@ -69,9 +75,39 @@ export default function DefaultLayout() {
       link: "/create",
     },
     {
-      label: "ライブラリ",
+      setDivider: true,
+      label: "問題集",
       icon: IconBooks,
-      link: "/library",
+      isTab: true,
+      link: "/workbook",
+      links: [
+        ...(workbooks?.map((w) => ({
+          label: w.name,
+          link: `${w.wid}`,
+        })) || []),
+      ],
+    },
+    {
+      label: "マイリスト",
+      icon: IconBooks,
+      isTab: true,
+      link: "/mylist",
+      links: [
+        ...(mylists?.map((m) => ({
+          label: m.name,
+          link: `${m.mid}`,
+        })) || []),
+      ],
+    },
+    {
+      label: "お気に入り",
+      icon: IconStar,
+      link: "/favorite",
+    },
+    {
+      label: "履歴",
+      icon: IconHistory,
+      link: "/history",
     },
   ];
 
@@ -112,22 +148,25 @@ export default function DefaultLayout() {
           <Logo horizonal width={100} mb="xs" />
         </Group>
         {mockdata.map((i, idx) => (
-          <NavbarLink
-            {...i}
-            key={idx}
-            isActive={activeIdx == idx}
-            activeLink={activeLink}
-            onNavigate={(link, linksIdx) => {
-              navigate({ to: link });
-              setActiveLink(
-                linksIdx !== undefined
-                  ? `${activeIdx}.${linksIdx}`
-                  : `${activeIdx}`,
-              );
-              close();
-            }}
-            my={5}
-          />
+          <>
+            {i.setDivider && <Divider />}
+            <NavbarLink
+              {...i}
+              key={idx}
+              isActive={activeIdx == idx}
+              activeLink={activeLink}
+              onNavigate={(link, linksIdx) => {
+                navigate({ to: link });
+                setActiveLink(
+                  linksIdx !== undefined
+                    ? `${activeIdx}.${linksIdx}`
+                    : `${activeIdx}`,
+                );
+                close();
+              }}
+              my={5}
+            />
+          </>
         ))}
       </AppShell.Section>
       <AppShell.Section p="md">
