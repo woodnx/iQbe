@@ -1,14 +1,14 @@
 import express from "express";
 
-import { CreateWorkbookUseCase } from "@/applications/usecases/Workbook/CreateWorkbookUseCase";
-import { DeleteWorkbookUseCase } from "@/applications/usecases/Workbook/DeleteWorkbookUseCase";
-import { GetAllWorkbooksUseCase } from "@/applications/usecases/Workbook/GetAllWorkbooksUseCase";
-import { GetWorkbookUseCase } from "@/applications/usecases/Workbook/GetWorkbookUseCase";
-import { UpdateWorkbookUseCase } from "@/applications/usecases/Workbook/UpdateWorkbookUseCase";
-import WorkbookService from "@/domains/Workbook/WorkbookService";
-import WorkbookController from "@/interfaces/controllers/WorkbookController";
-import KyselyClientManager from "@/interfaces/infra/kysely/KyselyClientManager";
-import WorkbookInfra from "@/interfaces/infra/WorkbookInfra";
+import { CreateWorkbookUseCase } from "@/applications/usecases/Workbook/CreateWorkbookUseCase.js";
+import { DeleteWorkbookUseCase } from "@/applications/usecases/Workbook/DeleteWorkbookUseCase.js";
+import { GetAllWorkbooksUseCase } from "@/applications/usecases/Workbook/GetAllWorkbooksUseCase.js";
+import { GetWorkbookUseCase } from "@/applications/usecases/Workbook/GetWorkbookUseCase.js";
+import { UpdateWorkbookUseCase } from "@/applications/usecases/Workbook/UpdateWorkbookUseCase.js";
+import WorkbookService from "@/domains/Workbook/WorkbookService.js";
+import WorkbookController from "@/interfaces/controllers/WorkbookController.js";
+import KyselyClientManager from "@/interfaces/infra/kysely/KyselyClientManager.js";
+import WorkbookInfra from "@/interfaces/infra/WorkbookInfra.js";
 
 const clientManager = new KyselyClientManager();
 const workbookInfra = new WorkbookInfra(clientManager);
@@ -40,4 +40,4 @@ router.post("/", workbookController.post());
 router.put("/:wid", workbookController.put());
 router.delete("/:wid", workbookController.delete());
 
-module.exports = router;
+export default router;

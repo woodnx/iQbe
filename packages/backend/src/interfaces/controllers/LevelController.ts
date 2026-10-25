@@ -1,5 +1,5 @@
-import ILevelRepository from "@/domains/Level/ILevelRepository";
-import { typedAsyncWrapper } from "@/utils";
+import ILevelRepository from "@/domains/Level/ILevelRepository.js";
+import { typedAsyncWrapper } from "@/utils/index.js";
 
 export default class LevelController {
   constructor(private levelRepository: ILevelRepository) {}

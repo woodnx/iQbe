@@ -1,11 +1,11 @@
 import express from "express";
 
-import { db } from "@/database";
-import MylistService from "@/domains/Mylist/MylistService";
-import MylistController from "@/interfaces/controllers/MylistController";
-import KyselyClientManager from "@/interfaces/infra/kysely/KyselyClientManager";
-import MylistInfra from "@/interfaces/infra/MylistInfra";
-import dayjs from "@/plugins/day";
+import { db } from "@/database.js";
+import MylistService from "@/domains/Mylist/MylistService.js";
+import MylistController from "@/interfaces/controllers/MylistController.js";
+import KyselyClientManager from "@/interfaces/infra/kysely/KyselyClientManager.js";
+import MylistInfra from "@/interfaces/infra/MylistInfra.js";
+import dayjs from "@/plugins/day.js";
 
 const clientManager = new KyselyClientManager();
 const mylistInfra = new MylistInfra(clientManager);
@@ -85,4 +85,4 @@ router.delete("/quiz", async (req, res) => {
   }
 });
 
-module.exports = router;
+export default router;

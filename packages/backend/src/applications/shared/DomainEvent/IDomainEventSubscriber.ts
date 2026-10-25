@@ -1,4 +1,4 @@
-import { DomainEvent } from "@/domains/shared/DomainEvent";
+import { DomainEvent } from "@/domains/shared/DomainEvent/index.js";
 
 export interface IDomainEventSubscriber {
   subscribe<T extends Record<string, unknown>>(

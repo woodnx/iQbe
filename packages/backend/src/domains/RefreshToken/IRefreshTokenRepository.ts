@@ -1,4 +1,4 @@
-import RefreshToken from ".";
+import RefreshToken from "./index.js";
 
 export default interface IRefreshTokensRepository {
   findByUid(uid: string): Promise<RefreshToken | null>;

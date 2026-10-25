@@ -1,5 +1,5 @@
-import Workbook from "@/domains/Workbook";
-import IWorkbookRepository from "@/domains/Workbook/IWorkbookRepository";
+import Workbook from "@/domains/Workbook/index.js";
+import IWorkbookRepository from "@/domains/Workbook/IWorkbookRepository.js";
 
 export class InMemoryWorkbookInfra implements IWorkbookRepository {
   public DB: {

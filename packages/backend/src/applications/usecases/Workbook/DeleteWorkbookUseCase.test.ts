@@ -1,6 +1,6 @@
-import Workbook from "@/domains/Workbook";
-import { InMemoryWorkbookInfra } from "@/interfaces/infra/InMemory/WorkbookInfra";
-import { DeleteWorkbookUseCase } from "./DeleteWorkbookUseCase";
+import Workbook from "@/domains/Workbook/index.js";
+import { InMemoryWorkbookInfra } from "@/interfaces/infra/InMemory/WorkbookInfra.js";
+import { DeleteWorkbookUseCase } from "./DeleteWorkbookUseCase.js";
 
 describe("DeleteWorkbookUseCase", () => {
   it("問題集を削除して一覧を返せる", async () => {

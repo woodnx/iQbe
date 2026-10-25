@@ -1,7 +1,7 @@
 import dayjs, { extend } from "dayjs";
-import duration from "dayjs/plugin/duration";
-import timezone from "dayjs/plugin/timezone";
-import utc from "dayjs/plugin/utc";
+import duration from "dayjs/plugin/duration.js";
+import timezone from "dayjs/plugin/timezone.js";
+import utc from "dayjs/plugin/utc.js";
 import type { ManipulateType } from "dayjs";
 
 extend(duration);

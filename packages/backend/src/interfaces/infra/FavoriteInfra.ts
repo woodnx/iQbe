@@ -1,6 +1,6 @@
-import Favorite from "@/domains/Favorite";
-import IFavoriteRepository from "@/domains/Favorite/IFavoriteRepository";
-import KyselyClientManager from "./kysely/KyselyClientManager";
+import Favorite from "@/domains/Favorite/index.js";
+import IFavoriteRepository from "@/domains/Favorite/IFavoriteRepository.js";
+import KyselyClientManager from "./kysely/KyselyClientManager.js";
 
 export default class FavoriteInfra implements IFavoriteRepository {
   constructor(private clientManager: KyselyClientManager) {}

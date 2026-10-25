@@ -1,11 +1,11 @@
 import { ApiError } from "api";
 import { isArray } from "lodash";
 
-import IQuizQueryService from "@/applications/queryservices/IQuizQueryService";
-import { AddQuizUseCase } from "@/applications/usecases/Quiz/AddQuizUseCase";
-import { DeleteQuizUseCase } from "@/applications/usecases/Quiz/DeleteQuizUseCase";
-import { EditQuizUseCase } from "@/applications/usecases/Quiz/EditQuizUseCase";
-import { typedAsyncWrapper } from "@/utils";
+import IQuizQueryService from "@/applications/queryservices/IQuizQueryService.js";
+import { AddQuizUseCase } from "@/applications/usecases/Quiz/AddQuizUseCase.js";
+import { DeleteQuizUseCase } from "@/applications/usecases/Quiz/DeleteQuizUseCase.js";
+import { EditQuizUseCase } from "@/applications/usecases/Quiz/EditQuizUseCase.js";
+import { typedAsyncWrapper } from "@/utils/index.js";
 
 export default class QuizController {
   constructor(

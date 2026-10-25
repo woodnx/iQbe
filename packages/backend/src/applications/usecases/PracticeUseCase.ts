@@ -1,7 +1,7 @@
-import HistoryService from "@/domains/History/HistoryServise";
-import IHistoryRepository from "@/domains/History/IHistoryRepository";
-import IQuizRepository from "@/domains/Quiz/IQuizRepository";
-import IUserRepository from "@/domains/User/IUserRepository";
+import HistoryService from "@/domains/History/HistoryServise.js";
+import IHistoryRepository from "@/domains/History/IHistoryRepository.js";
+import IQuizRepository from "@/domains/Quiz/IQuizRepository.js";
+import IUserRepository from "@/domains/User/IUserRepository.js";
 
 export default class PracticeUseCase {
   constructor(

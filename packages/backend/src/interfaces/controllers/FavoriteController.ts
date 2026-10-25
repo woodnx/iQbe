@@ -1,5 +1,5 @@
-import FavoriteUseCase from "@/applications/usecases/FavoriteUseCase";
-import { typedAsyncWrapper } from "@/utils";
+import FavoriteUseCase from "@/applications/usecases/FavoriteUseCase.js";
+import { typedAsyncWrapper } from "@/utils/index.js";
 import { ApiError } from "api";
 
 export default class FavoriteController {

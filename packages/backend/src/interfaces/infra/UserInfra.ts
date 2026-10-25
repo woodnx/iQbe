@@ -1,6 +1,6 @@
-import User from "@/domains/User";
-import IUsersRepository from "@/domains/User/IUserRepository";
-import KyselyClientManager from "./kysely/KyselyClientManager";
+import User from "@/domains/User/index.js";
+import IUsersRepository from "@/domains/User/IUserRepository.js";
+import KyselyClientManager from "./kysely/KyselyClientManager.js";
 
 export default class UserInfra implements IUsersRepository {
   constructor(private clientManager: KyselyClientManager) {}

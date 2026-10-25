@@ -1,6 +1,6 @@
-import Quiz from "@/domains/Quiz";
-import { QuizAttachedTags } from "@/domains/QuizAttachedTags";
-import { DomainEvent } from ".";
+import Quiz from "@/domains/Quiz/index.js";
+import { QuizAttachedTags } from "@/domains/QuizAttachedTags/index.js";
+import { DomainEvent } from "./index.js";
 
 export type QuizDomainEventBody = {
   qid: string;

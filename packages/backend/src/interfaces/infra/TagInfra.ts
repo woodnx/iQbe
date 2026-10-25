@@ -1,6 +1,6 @@
-import Tag from "@/domains/Tag";
-import ITagRepository from "@/domains/Tag/ITagRepository";
-import KyselyClientManager from "./kysely/KyselyClientManager";
+import Tag from "@/domains/Tag/index.js";
+import ITagRepository from "@/domains/Tag/ITagRepository.js";
+import KyselyClientManager from "./kysely/KyselyClientManager.js";
 
 export default class TagInfra implements ITagRepository {
   constructor(private clientManager: KyselyClientManager) {}

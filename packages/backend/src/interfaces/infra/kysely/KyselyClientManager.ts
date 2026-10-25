@@ -1,8 +1,8 @@
 import { Kysely, Transaction } from "kysely";
 
-import { db } from "@/database";
-import { DB } from "@/db/types";
-import IDataAccessClientManager from "@/interfaces/infra/shared/IDataAccessClientManager";
+import { db } from "@/database.js";
+import { DB } from "@/db/types.js";
+import IDataAccessClientManager from "@/interfaces/infra/shared/IDataAccessClientManager.js";
 
 type Client = Kysely<DB> | Transaction<DB>;
 

@@ -1,12 +1,12 @@
 import { components } from "api/schema";
-import Quiz from "@/domains/Quiz";
-import IQuizRepository from "@/domains/Quiz/IQuizRepository";
-import QuizService from "@/domains/Quiz/QuizService";
-import { QuizAttachedTags } from "@/domains/QuizAttachedTags";
-import { IQuizAttachedTagsRepository } from "@/domains/QuizAttachedTags/IQuizAttachedTagsRepository";
-import { QuizAttachedTagsService } from "@/domains/QuizAttachedTags/QuizAttachedTagsService";
-import ITagRepository from "@/domains/Tag/ITagRepository";
-import ITransactionManager from "../../shared/ITransactionManager";
+import Quiz from "@/domains/Quiz/index.js";
+import IQuizRepository from "@/domains/Quiz/IQuizRepository.js";
+import QuizService from "@/domains/Quiz/QuizService.js";
+import { QuizAttachedTags } from "@/domains/QuizAttachedTags/index.js";
+import { IQuizAttachedTagsRepository } from "@/domains/QuizAttachedTags/IQuizAttachedTagsRepository.js";
+import { QuizAttachedTagsService } from "@/domains/QuizAttachedTags/QuizAttachedTagsService.js";
+import ITagRepository from "@/domains/Tag/ITagRepository.js";
+import ITransactionManager from "../../shared/ITransactionManager.js";
 
 type QuizDTO =
   components["responses"]["QuizResponse"]["content"]["application/json"];

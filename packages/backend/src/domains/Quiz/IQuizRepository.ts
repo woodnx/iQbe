@@ -1,4 +1,4 @@
-import Quiz from ".";
+import Quiz from "./index.js";
 
 export default interface IQuizRepository {
   findByQid(qid: string): Promise<Quiz | null>;

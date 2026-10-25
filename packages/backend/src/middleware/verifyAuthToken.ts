@@ -1,10 +1,10 @@
-import type { Request, Response, NextFunction } from "express";
 import { ApiError } from "api";
-import { JsonWebTokenError, TokenExpiredError } from "jsonwebtoken";
+import type { NextFunction, Request, Response } from "express";
+import jwt from "jsonwebtoken";
 
-import { db } from "@/database";
-import { createError } from "@/plugins/createError";
-import { verifyAccessToken } from "@/plugins/jsonwebtoken";
+import { db } from "@/database.js";
+import { createError } from "@/plugins/createError.js";
+import { verifyAccessToken } from "@/plugins/jsonwebtoken.js";
 
 // ユーザ認証ミドルウェア
 export default async function (
@@ -38,9 +38,9 @@ export default async function (
 
     next();
   } catch (e) {
-    if (e instanceof TokenExpiredError) {
+    if (e instanceof jwt.TokenExpiredError) {
       next(new ApiError().expiredToken());
-    } else if (e instanceof JsonWebTokenError) {
+    } else if (e instanceof jwt.JsonWebTokenError) {
       next(new ApiError().invalidToken());
     }
   }

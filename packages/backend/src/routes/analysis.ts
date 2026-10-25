@@ -1,9 +1,9 @@
 import express from "express";
 import { sql } from "kysely";
-import { db } from "@/database";
-import type { Period } from "@/plugins/day";
-import dayjs, { generateRange } from "@/plugins/day";
-import { typedWrapper } from "@/utils/wrappers";
+import { db } from "@/database.js";
+import type { Period } from "@/plugins/day.js";
+import dayjs, { generateRange } from "@/plugins/day.js";
+import { typedWrapper } from "@/utils/wrappers.js";
 
 const router = express.Router();
 
@@ -220,4 +220,4 @@ router.get("/ranking/personal/:period", async (req, res) => {
   }
 });
 
-module.exports = router;
+export default router;

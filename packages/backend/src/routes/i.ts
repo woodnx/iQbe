@@ -3,9 +3,9 @@ import fs from "fs";
 import multer from "multer";
 import path from "path";
 
-import IController from "@/interfaces/controllers/IController";
-import KyselyClientManager from "@/interfaces/infra/kysely/KyselyClientManager";
-import UserInfra from "@/interfaces/infra/UserInfra";
+import IController from "@/interfaces/controllers/IController.js";
+import KyselyClientManager from "@/interfaces/infra/kysely/KyselyClientManager.js";
+import UserInfra from "@/interfaces/infra/UserInfra.js";
 
 const router: Router = express.Router();
 
@@ -40,4 +40,4 @@ router.post(
   iController.registerProfileImage(),
 );
 
-module.exports = router;
+export default router;

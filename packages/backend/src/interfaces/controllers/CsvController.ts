@@ -1,5 +1,5 @@
-import ICsvImportRepository from "@/domains/CsvImport/ICsvImportRepository";
-import { asyncWrapper } from "@/utils";
+import ICsvImportRepository from "@/domains/CsvImport/ICsvImportRepository.js";
+import { asyncWrapper } from "@/utils/index.js";
 import { ApiError } from "api";
 
 export default class CsvController {

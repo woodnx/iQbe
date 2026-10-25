@@ -1,5 +1,5 @@
-import Tag from ".";
-import ITagRepository from "./ITagRepository";
+import Tag from "./index.js";
+import ITagRepository from "./ITagRepository.js";
 
 export type TagDiff = {
   tagsToAdd: string[];

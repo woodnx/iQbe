@@ -1,16 +1,16 @@
 import express from "express";
 
-import { AddCategoryPresetUseCase } from "@/applications/usecases/Category/AddCategoryPresetUseCase";
-import { CreateCategoryUseCase } from "@/applications/usecases/Category/CreateCategoryUseCase";
-import { DeleteCategoryUseCase } from "@/applications/usecases/Category/DeleteCategoryUseCase";
-import { GetCategoriesUseCase } from "@/applications/usecases/Category/GetCategoriesUseCase";
-import { GetCategoryChainUseCase } from "@/applications/usecases/Category/GetCategoryChainUseCase";
-import { GetCategoryPresetListUseCase } from "@/applications/usecases/Category/GetCategoryPresetListUseCase";
-import { UpdateCategoryUseCase } from "@/applications/usecases/Category/UpdateCategoryUseCase";
-import CategoryController from "@/interfaces/controllers/CategoryController";
-import CategoryInfra from "@/interfaces/infra/CategoryInfra";
-import KyselyClientManager from "@/interfaces/infra/kysely/KyselyClientManager";
-import KyselyTransactionManager from "@/interfaces/infra/kysely/KyselyTransactionManager";
+import { AddCategoryPresetUseCase } from "@/applications/usecases/Category/AddCategoryPresetUseCase.js";
+import { CreateCategoryUseCase } from "@/applications/usecases/Category/CreateCategoryUseCase.js";
+import { DeleteCategoryUseCase } from "@/applications/usecases/Category/DeleteCategoryUseCase.js";
+import { GetCategoriesUseCase } from "@/applications/usecases/Category/GetCategoriesUseCase.js";
+import { GetCategoryChainUseCase } from "@/applications/usecases/Category/GetCategoryChainUseCase.js";
+import { GetCategoryPresetListUseCase } from "@/applications/usecases/Category/GetCategoryPresetListUseCase.js";
+import { UpdateCategoryUseCase } from "@/applications/usecases/Category/UpdateCategoryUseCase.js";
+import CategoryController from "@/interfaces/controllers/CategoryController.js";
+import CategoryInfra from "@/interfaces/infra/CategoryInfra.js";
+import KyselyClientManager from "@/interfaces/infra/kysely/KyselyClientManager.js";
+import KyselyTransactionManager from "@/interfaces/infra/kysely/KyselyTransactionManager.js";
 
 const clientManager = new KyselyClientManager();
 const categoryInfra = new CategoryInfra(clientManager);
@@ -37,4 +37,4 @@ router.delete("/:id", categoryController.delete());
 router.get("/preset", categoryController.getPreset());
 router.post("/preset", categoryController.addFromPreset());
 
-module.exports = router;
+export default router;

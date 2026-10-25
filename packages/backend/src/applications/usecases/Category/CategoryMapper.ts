@@ -1,6 +1,6 @@
 import { components } from "api/schema";
 
-import Category from "@/domains/Category";
+import Category from "@/domains/Category/index.js";
 
 type CategoryDTO = components["schemas"]["Category"];
 

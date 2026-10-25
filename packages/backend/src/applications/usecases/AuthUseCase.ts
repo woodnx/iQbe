@@ -1,20 +1,20 @@
 import { ApiError } from "api";
 import { components } from "api/schema";
 
-import AccessToken from "@/domains/AccessToken";
-import AuthService from "@/domains/Auth/AuthService";
-import InviteCode from "@/domains/InviteCode";
-import IInviteCodeRepository from "@/domains/InviteCode/IInviteCodeRepository";
-import InviteCodeService from "@/domains/InviteCode/InviteCodeService";
-import RefreshToken from "@/domains/RefreshToken";
-import IRefreshTokenRepository from "@/domains/RefreshToken/IRefreshTokenRepository";
-import RefreshTokenService from "@/domains/RefreshToken/RefreshTokenService";
-import User from "@/domains/User";
-import IUserRepository from "@/domains/User/IUserRepository";
-import UserService from "@/domains/User/UserService";
-import dayjs, { format } from "@/plugins/day";
+import AccessToken from "@/domains/AccessToken/index.js";
+import AuthService from "@/domains/Auth/AuthService.js";
+import IInviteCodeRepository from "@/domains/InviteCode/IInviteCodeRepository.js";
+import InviteCodeService from "@/domains/InviteCode/InviteCodeService.js";
+import InviteCode from "@/domains/InviteCode/index.js";
+import IRefreshTokenRepository from "@/domains/RefreshToken/IRefreshTokenRepository.js";
+import RefreshToken from "@/domains/RefreshToken/index.js";
+import RefreshTokenService from "@/domains/RefreshToken/RefreshTokenService.js";
+import IUserRepository from "@/domains/User/IUserRepository.js";
+import User from "@/domains/User/index.js";
+import UserService from "@/domains/User/UserService.js";
+import dayjs, { format } from "@/plugins/day.js";
 
-import ITransactionManager from "../shared/ITransactionManager";
+import ITransactionManager from "../shared/ITransactionManager.js";
 
 type TokenDTO =
   components["responses"]["AuthResponse"]["content"]["application/json"];

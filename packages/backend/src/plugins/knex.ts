@@ -1,9 +1,8 @@
-import type { Knex } from "knex";
-import _knex from "knex";
-import knexfile from "./knexfile";
+import { knex as createKnex, type Knex } from "knex";
+import knexfile from "./knexfile.js";
 
 const environment: string = "development";
 const config: Knex.Config = knexfile[environment];
-const knex = _knex(config);
+const knex = createKnex(config);
 
 export default knex;

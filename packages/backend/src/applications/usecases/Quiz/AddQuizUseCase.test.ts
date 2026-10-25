@@ -1,8 +1,8 @@
-import { InMemoryQuizAttachedTagsInfra } from "@/interfaces/infra/InMemory/QuizAttachedTagsInfra";
-import { InMemoryQuizInfra } from "@/interfaces/infra/InMemory/QuizInfra";
-import { InMemoryTagInfra } from "@/interfaces/infra/InMemory/TagInfra";
-import { MockTransactionManager } from "../../shared/MockTransactionManager";
-import { AddQuizUseCase, AddQuizUseCaseCommand } from "./AddQuizUseCase";
+import { InMemoryQuizAttachedTagsInfra } from "@/interfaces/infra/InMemory/QuizAttachedTagsInfra.js";
+import { InMemoryQuizInfra } from "@/interfaces/infra/InMemory/QuizInfra.js";
+import { InMemoryTagInfra } from "@/interfaces/infra/InMemory/TagInfra.js";
+import { MockTransactionManager } from "../../shared/MockTransactionManager.js";
+import { AddQuizUseCase, AddQuizUseCaseCommand } from "./AddQuizUseCase.js";
 
 describe("AddQuizUseCase", () => {
   it("idが重複しないときクイズが正常に作成できる", async () => {

@@ -1,8 +1,8 @@
 import { ApiError } from "api";
 import { nanoid } from "nanoid";
 
-import IInviteCodeRepository from "@/domains/InviteCode/IInviteCodeRepository";
-import { typedAsyncWrapper } from "@/utils";
+import IInviteCodeRepository from "@/domains/InviteCode/IInviteCodeRepository.js";
+import { typedAsyncWrapper } from "@/utils/index.js";
 
 export default class InviteCodeController {
   constructor(private inviteCodeRepository: IInviteCodeRepository) {}

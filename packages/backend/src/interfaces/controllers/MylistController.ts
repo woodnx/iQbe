@@ -1,9 +1,9 @@
 import { ApiError } from "api";
 
-import Mylist from "@/domains/Mylist";
-import IMylistRepository from "@/domains/Mylist/IMylistRepository";
-import MylistService from "@/domains/Mylist/MylistService";
-import { typedAsyncWrapper } from "@/utils";
+import Mylist from "@/domains/Mylist/index.js";
+import IMylistRepository from "@/domains/Mylist/IMylistRepository.js";
+import MylistService from "@/domains/Mylist/MylistService.js";
+import { typedAsyncWrapper } from "@/utils/index.js";
 
 export default class MylistController {
   constructor(

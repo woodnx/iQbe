@@ -1,6 +1,6 @@
-import Category from "@/domains/Category";
-import CategoryRepository from "@/domains/Category/ICategoryRepository";
-import ITransactionManager from "../shared/ITransactionManager";
+import Category from "@/domains/Category/index.js";
+import CategoryRepository from "@/domains/Category/ICategoryRepository.js";
+import ITransactionManager from "../shared/ITransactionManager.js";
 
 type CategoryDAO = {
   name: string;

@@ -1,6 +1,6 @@
 import { components } from "api/schema";
 
-import ICategoryQueryService from "@/applications/queryservices/ICategoryQueryService";
+import ICategoryQueryService from "@/applications/queryservices/ICategoryQueryService.js";
 
 type CategoryDTO = components["schemas"]["Category"];
 

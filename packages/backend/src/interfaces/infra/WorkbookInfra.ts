@@ -1,8 +1,8 @@
 import { ApiError } from "api";
-import Workbook from "@/domains/Workbook";
-import IWorkbookRepository from "@/domains/Workbook/IWorkbookRepository";
-import dayjs, { format } from "@/plugins/day";
-import KyselyClientManager from "./kysely/KyselyClientManager";
+import Workbook from "@/domains/Workbook/index.js";
+import IWorkbookRepository from "@/domains/Workbook/IWorkbookRepository.js";
+import dayjs, { format } from "@/plugins/day.js";
+import KyselyClientManager from "./kysely/KyselyClientManager.js";
 
 export default class WorkbookInfra implements IWorkbookRepository {
   constructor(private clientManager: KyselyClientManager) {}

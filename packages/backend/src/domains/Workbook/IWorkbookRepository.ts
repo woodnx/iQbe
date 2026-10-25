@@ -1,4 +1,4 @@
-import Workbook from ".";
+import Workbook from "./index.js";
 
 export default interface IWorkbookRepository {
   findByWid(wid: string, uid: string): Promise<Workbook | null>;

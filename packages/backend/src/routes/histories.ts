@@ -1,9 +1,9 @@
 import express from "express";
-import HistoryController from "@/interfaces/controllers/HistoryController";
-import JudgementController from "@/interfaces/controllers/JudgementController";
-import HistoryInfra from "@/interfaces/infra/HistoryInfra";
-import JudgementInfra from "@/interfaces/infra/JudgementInfra";
-import KyselyClientManager from "@/interfaces/infra/kysely/KyselyClientManager";
+import HistoryController from "@/interfaces/controllers/HistoryController.js";
+import JudgementController from "@/interfaces/controllers/JudgementController.js";
+import HistoryInfra from "@/interfaces/infra/HistoryInfra.js";
+import JudgementInfra from "@/interfaces/infra/JudgementInfra.js";
+import KyselyClientManager from "@/interfaces/infra/kysely/KyselyClientManager.js";
 
 const kyselyClientManager = new KyselyClientManager();
 const historyController = new HistoryController(
@@ -18,4 +18,4 @@ const router = express.Router();
 router.get("/", historyController.get());
 router.get("/:since/:until", judgementController.get());
 
-module.exports = router;
+export default router;

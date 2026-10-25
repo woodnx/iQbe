@@ -1,10 +1,10 @@
 import { ApiError } from "api";
-import IQuizRepository from "@/domains/Quiz/IQuizRepository";
-import { QuizAttachedTags } from "@/domains/QuizAttachedTags";
-import { IQuizAttachedTagsRepository } from "@/domains/QuizAttachedTags/IQuizAttachedTagsRepository";
-import { QuizAttachedTagsService } from "@/domains/QuizAttachedTags/QuizAttachedTagsService";
-import ITagRepository from "@/domains/Tag/ITagRepository";
-import ITransactionManager from "../../shared/ITransactionManager";
+import IQuizRepository from "@/domains/Quiz/IQuizRepository.js";
+import { QuizAttachedTags } from "@/domains/QuizAttachedTags/index.js";
+import { IQuizAttachedTagsRepository } from "@/domains/QuizAttachedTags/IQuizAttachedTagsRepository.js";
+import { QuizAttachedTagsService } from "@/domains/QuizAttachedTags/QuizAttachedTagsService.js";
+import ITagRepository from "@/domains/Tag/ITagRepository.js";
+import ITransactionManager from "../../shared/ITransactionManager.js";
 
 export type DeleteQuizUseCaseCommand = {
   qid: string;

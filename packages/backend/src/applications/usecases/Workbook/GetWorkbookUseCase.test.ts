@@ -1,6 +1,6 @@
-import Workbook from "@/domains/Workbook";
-import { InMemoryWorkbookInfra } from "@/interfaces/infra/InMemory/WorkbookInfra";
-import { GetWorkbookUseCase } from "./GetWorkbookUseCase";
+import Workbook from "@/domains/Workbook/index.js";
+import { InMemoryWorkbookInfra } from "@/interfaces/infra/InMemory/WorkbookInfra.js";
+import { GetWorkbookUseCase } from "./GetWorkbookUseCase.js";
 
 describe("GetWorkbookUseCase", () => {
   it("widに対応した問題集を取得できる", async () => {

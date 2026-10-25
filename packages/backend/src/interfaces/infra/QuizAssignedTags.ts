@@ -1,6 +1,6 @@
-import { QuizAttachedTags } from "@/domains/QuizAttachedTags";
-import { IQuizAttachedTagsRepository } from "@/domains/QuizAttachedTags/IQuizAttachedTagsRepository";
-import KyselyClientManager from "./kysely/KyselyClientManager";
+import { QuizAttachedTags } from "@/domains/QuizAttachedTags/index.js";
+import { IQuizAttachedTagsRepository } from "@/domains/QuizAttachedTags/IQuizAttachedTagsRepository.js";
+import KyselyClientManager from "./kysely/KyselyClientManager.js";
 
 export class QuizAssignedTagsInfra implements IQuizAttachedTagsRepository {
   constructor(private clientManager: KyselyClientManager) {}

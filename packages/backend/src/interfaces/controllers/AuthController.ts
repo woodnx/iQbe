@@ -1,7 +1,7 @@
 import { ApiError } from "api";
 
-import AuthUseCase from "@/applications/usecases/AuthUseCase";
-import { typedAsyncWrapper } from "@/utils";
+import AuthUseCase from "@/applications/usecases/AuthUseCase.js";
+import { typedAsyncWrapper } from "@/utils/index.js";
 
 export default class AuthController {
   constructor(private authUseCase: AuthUseCase) {}

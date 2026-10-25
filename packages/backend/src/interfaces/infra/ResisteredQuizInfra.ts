@@ -1,6 +1,6 @@
-import RegisteredQuiz from "@/domains/RegisteredQuiz";
-import IRegisteredQuizRepository from "@/domains/RegisteredQuiz/IResiteredQuizRepository";
-import KyselyClientManager from "./kysely/KyselyClientManager";
+import RegisteredQuiz from "@/domains/RegisteredQuiz/index.js";
+import IRegisteredQuizRepository from "@/domains/RegisteredQuiz/IResiteredQuizRepository.js";
+import KyselyClientManager from "./kysely/KyselyClientManager.js";
 
 export default class RegisteredQuizInfra implements IRegisteredQuizRepository {
   constructor(private clientManager: KyselyClientManager) {}

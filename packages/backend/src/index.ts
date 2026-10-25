@@ -5,11 +5,15 @@ import boolParser from "express-query-boolean";
 import intParser from "express-query-int";
 import fs from "fs";
 import path from "path";
+import { fileURLToPath } from "url";
 
-import { errorHandler } from "@/middleware/error";
-import verifyAuthToken from "@/middleware/verifyAuthToken";
+import { errorHandler } from "@/middleware/error.js";
+import verifyAuthToken from "@/middleware/verifyAuthToken.js";
 
-import server from "./allowed-server.json";
+import server from "./allowed-server.json" with { type: "json" };
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 if (!fs.existsSync(path.join(__dirname, "public", "images"))) {
   fs.mkdirSync(path.join(__dirname, "public", "images"), { recursive: true });
@@ -43,17 +47,17 @@ app.use(
 // router import
 const filenames = fs
   .readdirSync(path.join(__dirname, "routes"))
-  .filter((n) => !n.includes(".map"));
+  .filter((n) => n.endsWith(".js"));
 const nonVerifyRoutes = ["auth"];
 
-filenames.forEach((filename) => {
+for (const filename of filenames) {
   const name = filename.replace(".js", "");
-  const route_path = `${__dirname}/routes/${name}.js`;
-  const route = require(route_path);
+  const routePath = new URL(`./routes/${filename}`, import.meta.url);
+  const { default: route } = await import(routePath.href);
 
   if (nonVerifyRoutes.includes(name)) app.use(`/api/${name}`, route);
   else app.use(`/api/${name}`, verifyAuthToken, route);
-});
+}
 
 // index
 app.get("/api/*", (req, res) => {

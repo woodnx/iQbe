@@ -1,7 +1,7 @@
-import Auth from "@/domains/Auth";
-import AuthRepository from "@/domains/Auth/AuthRepository";
-import KyselyClientManager from "./kysely/KyselyClientManager";
-import dayjs, { format } from "@/plugins/day";
+import Auth from "@/domains/Auth/index.js";
+import AuthRepository from "@/domains/Auth/AuthRepository.js";
+import KyselyClientManager from "./kysely/KyselyClientManager.js";
+import dayjs, { format } from "@/plugins/day.js";
 import { sql } from "kysely";
 
 export default class AuthInfra implements AuthRepository {

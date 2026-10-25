@@ -1,7 +1,7 @@
-import IMylistRepository from "../Mylist/IMylistRepository";
-import IQuizRepository from "../Quiz/IQuizRepository";
-import RegisteredQuiz from ".";
-import IRegisteredQuizRepository from "./IResiteredQuizRepository";
+import IMylistRepository from "../Mylist/IMylistRepository.js";
+import IQuizRepository from "../Quiz/IQuizRepository.js";
+import RegisteredQuiz from "./index.js";
+import IRegisteredQuizRepository from "./IResiteredQuizRepository.js";
 
 export default class RegisteredQuizService {
   constructor(

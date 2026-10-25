@@ -1,5 +1,5 @@
-import RegisterUseCase from "@/applications/usecases/RegisterUseCase";
-import { typedAsyncWrapper } from "@/utils";
+import RegisterUseCase from "@/applications/usecases/RegisterUseCase.js";
+import { typedAsyncWrapper } from "@/utils/index.js";
 
 export default class RegisterController {
   constructor(private registerUseCase: RegisterUseCase) {}

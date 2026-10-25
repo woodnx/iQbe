@@ -1,13 +1,13 @@
 import { ApiError } from "api";
 import { randomUUID } from "crypto";
 
-import ITransactionManager from "@/applications/shared/ITransactionManager";
-import AuthService from "@/domains/Auth/AuthService";
-import ResetPassword from "@/domains/ResetPassword";
-import IResetPasswordRepository from "@/domains/ResetPassword/ResetPasswordRepository";
-import ResetPasswordService from "@/domains/ResetPassword/ResetPasswordService";
-import IUserRepository from "@/domains/User/IUserRepository";
-import dayjs from "@/plugins/day";
+import ITransactionManager from "@/applications/shared/ITransactionManager.js";
+import AuthService from "@/domains/Auth/AuthService.js";
+import ResetPassword from "@/domains/ResetPassword/index.js";
+import IResetPasswordRepository from "@/domains/ResetPassword/ResetPasswordRepository.js";
+import ResetPasswordService from "@/domains/ResetPassword/ResetPasswordService.js";
+import IUserRepository from "@/domains/User/IUserRepository.js";
+import dayjs from "@/plugins/day.js";
 
 export default class ResetPasswordUseCase {
   constructor(

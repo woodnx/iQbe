@@ -1,6 +1,6 @@
 import { components } from "api/schema";
 
-import Workbook from "@/domains/Workbook";
+import Workbook from "@/domains/Workbook/index.js";
 
 type WorkbookDTO = components["schemas"]["Workbook"];
 export type WorkbooksDTO =

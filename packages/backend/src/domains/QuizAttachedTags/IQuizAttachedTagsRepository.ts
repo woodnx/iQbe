@@ -1,4 +1,4 @@
-import { QuizAttachedTags } from ".";
+import { QuizAttachedTags } from "./index.js";
 
 export interface IQuizAttachedTagsRepository {
   findByQid(qid: string): Promise<QuizAttachedTags>;

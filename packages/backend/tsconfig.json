@@ -2,17 +2,11 @@
   "compilerOptions": {
     /* Visit https://aka.ms/tsconfig to read more about this file */
     /* Language and Environment */
-    "lib": [
-      "es2020",
-      "DOM"
-    ],
-    "target": "ES2020",
-    /* Modules */
-    "module": "Node16",
+    "target": "ES2022",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
     "rootDir": "./src",
-    "moduleResolution": "Node16",
     "isolatedModules": true,
-    "baseUrl": "./",
     "paths": {
       "@/*": [
         "./src/*"
@@ -40,5 +34,9 @@
   "include": [
     "src",
     "src/types"
-  ]
+  ],
+  "tsc-alias": {
+    "resolveFullPaths": true,
+    "resolveFullExtension": ".js"
+  }
 }

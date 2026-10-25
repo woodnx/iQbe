@@ -1,10 +1,10 @@
 import ICategoryQueryService, {
   CategoryDTO,
-} from "@/applications/queryservices/ICategoryQueryService";
-import Category from "@/domains/Category";
-import ICategoryRepository from "@/domains/Category/ICategoryRepository";
+} from "@/applications/queryservices/ICategoryQueryService.js";
+import Category from "@/domains/Category/index.js";
+import ICategoryRepository from "@/domains/Category/ICategoryRepository.js";
 
-import KyselyClientManager from "./kysely/KyselyClientManager";
+import KyselyClientManager from "./kysely/KyselyClientManager.js";
 
 export default class CategoryInfra
   implements ICategoryRepository, ICategoryQueryService

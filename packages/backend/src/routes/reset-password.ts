@@ -1,12 +1,12 @@
 import express from "express";
-import ResetPasswordController from "@/interfaces/controllers/ResetPasswordController";
-import ResetPasswordUseCase from "@/applications/usecases/ResetPasswordUseCase";
-import KyselyClientManager from "@/interfaces/infra/kysely/KyselyClientManager";
-import KyselyTransactionManager from "@/interfaces/infra/kysely/KyselyTransactionManager";
-import AuthService from "@/domains/Auth/AuthService";
-import ResetPasswordService from "@/domains/ResetPassword/ResetPasswordService";
-import ResetPasswordInfra from "@/interfaces/infra/ResetPasswordInfra";
-import UserInfra from "@/interfaces/infra/UserInfra";
+import ResetPasswordController from "@/interfaces/controllers/ResetPasswordController.js";
+import ResetPasswordUseCase from "@/applications/usecases/ResetPasswordUseCase.js";
+import KyselyClientManager from "@/interfaces/infra/kysely/KyselyClientManager.js";
+import KyselyTransactionManager from "@/interfaces/infra/kysely/KyselyTransactionManager.js";
+import AuthService from "@/domains/Auth/AuthService.js";
+import ResetPasswordService from "@/domains/ResetPassword/ResetPasswordService.js";
+import ResetPasswordInfra from "@/interfaces/infra/ResetPasswordInfra.js";
+import UserInfra from "@/interfaces/infra/UserInfra.js";
 
 const kyselyClientManager = new KyselyClientManager();
 const resetPasswordController = new ResetPasswordController(
@@ -23,4 +23,4 @@ const router = express.Router();
 
 router.post("/", resetPasswordController.reset());
 
-module.exports = router;
+export default router;

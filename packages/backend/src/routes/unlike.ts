@@ -1,12 +1,12 @@
 import express from "express";
 
-import FavoriteUseCase from "@/applications/usecases/FavoriteUseCase";
-import FavoriteController from "@/interfaces/controllers/FavoriteController";
-import FavoriteInfra from "@/interfaces/infra/FavoriteInfra";
-import KyselyClientManager from "@/interfaces/infra/kysely/KyselyClientManager";
-import QuizInfra from "@/interfaces/infra/QuizInfra";
-import UserInfra from "@/interfaces/infra/UserInfra";
-import CategoryInfra from "@/interfaces/infra/CategoryInfra";
+import FavoriteUseCase from "@/applications/usecases/FavoriteUseCase.js";
+import FavoriteController from "@/interfaces/controllers/FavoriteController.js";
+import FavoriteInfra from "@/interfaces/infra/FavoriteInfra.js";
+import KyselyClientManager from "@/interfaces/infra/kysely/KyselyClientManager.js";
+import QuizInfra from "@/interfaces/infra/QuizInfra.js";
+import UserInfra from "@/interfaces/infra/UserInfra.js";
+import CategoryInfra from "@/interfaces/infra/CategoryInfra.js";
 
 const router = express.Router();
 
@@ -21,4 +21,4 @@ const favoriteController = new FavoriteController(
 
 router.post("/", favoriteController.unlike());
 
-module.exports = router;
+export default router;

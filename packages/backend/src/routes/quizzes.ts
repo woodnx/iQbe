@@ -1,15 +1,15 @@
 import express from "express";
 
-import { AddQuizUseCase } from "@/applications/usecases/Quiz/AddQuizUseCase";
-import { DeleteQuizUseCase } from "@/applications/usecases/Quiz/DeleteQuizUseCase";
-import { EditQuizUseCase } from "@/applications/usecases/Quiz/EditQuizUseCase";
-import QuizController from "@/interfaces/controllers/QuizController";
-import CategoryInfra from "@/interfaces/infra/CategoryInfra";
-import KyselyClientManager from "@/interfaces/infra/kysely/KyselyClientManager";
-import KyselyTransactionManager from "@/interfaces/infra/kysely/KyselyTransactionManager";
-import { QuizAssignedTagsInfra } from "@/interfaces/infra/QuizAssignedTags";
-import QuizInfra from "@/interfaces/infra/QuizInfra";
-import TagInfra from "@/interfaces/infra/TagInfra";
+import { AddQuizUseCase } from "@/applications/usecases/Quiz/AddQuizUseCase.js";
+import { DeleteQuizUseCase } from "@/applications/usecases/Quiz/DeleteQuizUseCase.js";
+import { EditQuizUseCase } from "@/applications/usecases/Quiz/EditQuizUseCase.js";
+import QuizController from "@/interfaces/controllers/QuizController.js";
+import CategoryInfra from "@/interfaces/infra/CategoryInfra.js";
+import KyselyClientManager from "@/interfaces/infra/kysely/KyselyClientManager.js";
+import KyselyTransactionManager from "@/interfaces/infra/kysely/KyselyTransactionManager.js";
+import { QuizAssignedTagsInfra } from "@/interfaces/infra/QuizAssignedTags.js";
+import QuizInfra from "@/interfaces/infra/QuizInfra.js";
+import TagInfra from "@/interfaces/infra/TagInfra.js";
 
 const router = express.Router();
 
@@ -58,4 +58,4 @@ router.put("/:qid", quizController.put());
 
 router.delete("/:qid", quizController.delete());
 
-module.exports = router;
+export default router;

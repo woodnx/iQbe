@@ -1,5 +1,5 @@
 import express from "express";
-import { Response } from "@/types/global";
+import { Response } from "@/types/global.js";
 import {
   ApiBody,
   ApiPath,
@@ -7,7 +7,7 @@ import {
   ApiQueryParam,
   ApiResponse,
   HttpMethod,
-} from "@/utils/schema";
+} from "@/utils/schema.js";
 
 type Handler<T = express.Request, U = express.Response> = (
   req: T,

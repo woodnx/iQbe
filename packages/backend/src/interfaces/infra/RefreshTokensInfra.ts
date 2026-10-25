@@ -1,8 +1,8 @@
 import { sql } from "kysely";
-import RefreshToken from "@/domains/RefreshToken";
-import IRefreshTokensRepository from "@/domains/RefreshToken/IRefreshTokenRepository";
-import dayjs from "@/plugins/day";
-import KyselyClientManager from "./kysely/KyselyClientManager";
+import RefreshToken from "@/domains/RefreshToken/index.js";
+import IRefreshTokensRepository from "@/domains/RefreshToken/IRefreshTokenRepository.js";
+import dayjs from "@/plugins/day.js";
+import KyselyClientManager from "./kysely/KyselyClientManager.js";
 
 export default class RefreshTokensInfra implements IRefreshTokensRepository {
   constructor(private clientManager: KyselyClientManager) {}

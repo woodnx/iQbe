@@ -1,8 +1,8 @@
 import { ApiError } from "api";
 
-import dayjs from "@/plugins/day";
+import dayjs from "@/plugins/day.js";
 
-import ResetPassword from "./";
+import ResetPassword from "./index.js";
 
 export default class ResetPasswordService {
   constructor() {}

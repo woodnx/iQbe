@@ -1,7 +1,7 @@
 import { ApiError } from "api";
 import { parse } from "csv/sync";
-import CsvImport from "@/domains/CsvImport";
-import ICsvImportRepository from "@/domains/CsvImport/ICsvImportRepository";
+import CsvImport from "@/domains/CsvImport/index.js";
+import ICsvImportRepository from "@/domains/CsvImport/ICsvImportRepository.js";
 
 export default class CsvImportInfra implements ICsvImportRepository {
   async parseCsv(file: Express.Multer.File) {

@@ -1,5 +1,5 @@
-import ITagRepository from "@/domains/Tag/ITagRepository";
-import { typedAsyncWrapper } from "@/utils";
+import ITagRepository from "@/domains/Tag/ITagRepository.js";
+import { typedAsyncWrapper } from "@/utils/index.js";
 
 export default class TagController {
   constructor(private tagRepository: ITagRepository) {}

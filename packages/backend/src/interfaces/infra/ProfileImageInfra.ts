@@ -1,4 +1,4 @@
-import IProfileImageRepository from "@/domains/ProfileImage/IProfileImageRepository";
+import IProfileImageRepository from "@/domains/ProfileImage/IProfileImageRepository.js";
 
 export default class ProfileImageInfra implements IProfileImageRepository {
   async save(image: Express.Multer.File, filePath: string): Promise<void> {

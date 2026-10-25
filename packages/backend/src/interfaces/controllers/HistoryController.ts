@@ -1,5 +1,5 @@
-import IHistoryRepository from "@/domains/History/IHistoryRepository";
-import { typedAsyncWrapper } from "@/utils";
+import IHistoryRepository from "@/domains/History/IHistoryRepository.js";
+import { typedAsyncWrapper } from "@/utils/index.js";
 
 export default class HistoriesController {
   constructor(private historyRepository: IHistoryRepository) {}

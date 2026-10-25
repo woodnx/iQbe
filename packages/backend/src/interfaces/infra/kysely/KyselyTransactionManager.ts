@@ -1,6 +1,6 @@
-import ITransactionManager from "@/applications/shared/ITransactionManager";
-import KyselyClientManager from "./KyselyClientManager";
-import { db } from "@/database";
+import ITransactionManager from "@/applications/shared/ITransactionManager.js";
+import KyselyClientManager from "./KyselyClientManager.js";
+import { db } from "@/database.js";
 
 export default class KyselyTransactionManager implements ITransactionManager {
   constructor(private clientManager: KyselyClientManager) {}

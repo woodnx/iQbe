@@ -1,13 +1,13 @@
 import { ApiError } from "api";
 
-import { AddCategoryPresetUseCase } from "@/applications/usecases/Category/AddCategoryPresetUseCase";
-import { CreateCategoryUseCase } from "@/applications/usecases/Category/CreateCategoryUseCase";
-import { DeleteCategoryUseCase } from "@/applications/usecases/Category/DeleteCategoryUseCase";
-import { GetCategoriesUseCase } from "@/applications/usecases/Category/GetCategoriesUseCase";
-import { GetCategoryChainUseCase } from "@/applications/usecases/Category/GetCategoryChainUseCase";
-import { GetCategoryPresetListUseCase } from "@/applications/usecases/Category/GetCategoryPresetListUseCase";
-import { UpdateCategoryUseCase } from "@/applications/usecases/Category/UpdateCategoryUseCase";
-import { typedAsyncWrapper } from "@/utils";
+import { AddCategoryPresetUseCase } from "@/applications/usecases/Category/AddCategoryPresetUseCase.js";
+import { CreateCategoryUseCase } from "@/applications/usecases/Category/CreateCategoryUseCase.js";
+import { DeleteCategoryUseCase } from "@/applications/usecases/Category/DeleteCategoryUseCase.js";
+import { GetCategoriesUseCase } from "@/applications/usecases/Category/GetCategoriesUseCase.js";
+import { GetCategoryChainUseCase } from "@/applications/usecases/Category/GetCategoryChainUseCase.js";
+import { GetCategoryPresetListUseCase } from "@/applications/usecases/Category/GetCategoryPresetListUseCase.js";
+import { UpdateCategoryUseCase } from "@/applications/usecases/Category/UpdateCategoryUseCase.js";
+import { typedAsyncWrapper } from "@/utils/index.js";
 
 export default class CategoryController {
   constructor(

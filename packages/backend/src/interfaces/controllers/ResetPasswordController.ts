@@ -1,7 +1,7 @@
 import { ApiError } from "api";
 
-import ResetPasswordUseCase from "@/applications/usecases/ResetPasswordUseCase";
-import { typedAsyncWrapper } from "@/utils";
+import ResetPasswordUseCase from "@/applications/usecases/ResetPasswordUseCase.js";
+import { typedAsyncWrapper } from "@/utils/index.js";
 
 export default class ResetPasswordController {
   constructor(private resetPasswordUseCase: ResetPasswordUseCase) {}

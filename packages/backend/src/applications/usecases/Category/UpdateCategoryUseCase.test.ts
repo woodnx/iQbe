@@ -1,6 +1,6 @@
-import Category from "@/domains/Category";
-import { InMemoryCategoryInfra } from "@/interfaces/infra/InMemory/CategoryInfra";
-import { UpdateCategoryUseCase } from "./UpdateCategoryUseCase";
+import Category from "@/domains/Category/index.js";
+import { InMemoryCategoryInfra } from "@/interfaces/infra/InMemory/CategoryInfra.js";
+import { UpdateCategoryUseCase } from "./UpdateCategoryUseCase.js";
 
 describe("UpdateCategoryUseCase", () => {
   it("カテゴリを更新できる", async () => {

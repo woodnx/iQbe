@@ -1,9 +1,9 @@
 import { ApiError } from "api";
 import { components } from "api/schema";
 
-import IWorkbookRepository from "@/domains/Workbook/IWorkbookRepository";
+import IWorkbookRepository from "@/domains/Workbook/IWorkbookRepository.js";
 
-import { toWorkbookDTO } from "./WorkbookMapper";
+import { toWorkbookDTO } from "./WorkbookMapper.js";
 
 type WorkbookDTO = components["responses"]["WorkbookResponse"]["content"]["application/json"];
 

@@ -1,8 +1,8 @@
 import { components } from "api/schema";
 
-import ICategoryRepository from "@/domains/Category/ICategoryRepository";
+import ICategoryRepository from "@/domains/Category/ICategoryRepository.js";
 
-import { toCategoryDTO } from "./CategoryMapper";
+import { toCategoryDTO } from "./CategoryMapper.js";
 
 type CategoryDTO = components["schemas"]["Category"];
 

@@ -1,5 +1,5 @@
-import PracticeUseCase from "@/applications/usecases/PracticeUseCase";
-import { typedAsyncWrapper } from "@/utils";
+import PracticeUseCase from "@/applications/usecases/PracticeUseCase.js";
+import { typedAsyncWrapper } from "@/utils/index.js";
 
 export default class PracticeController {
   constructor(private practiceUseCase: PracticeUseCase) {}

@@ -1,6 +1,6 @@
-import InviteCode from "@/domains/InviteCode";
-import IInviteCodeRepository from "@/domains/InviteCode/IInviteCodeRepository";
-import KyselyClientManager from "./kysely/KyselyClientManager";
+import InviteCode from "@/domains/InviteCode/index.js";
+import IInviteCodeRepository from "@/domains/InviteCode/IInviteCodeRepository.js";
+import KyselyClientManager from "./kysely/KyselyClientManager.js";
 
 export default class InviteCodeInfra implements IInviteCodeRepository {
   constructor(private clientManager: KyselyClientManager) {}

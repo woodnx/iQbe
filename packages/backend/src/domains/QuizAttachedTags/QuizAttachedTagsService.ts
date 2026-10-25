@@ -1,7 +1,7 @@
-import Tag from "../Tag";
-import ITagRepository from "../Tag/ITagRepository";
-import { QuizAttachedTags } from ".";
-import { IQuizAttachedTagsRepository } from "./IQuizAttachedTagsRepository";
+import Tag from "../Tag/index.js";
+import ITagRepository from "../Tag/ITagRepository.js";
+import { QuizAttachedTags } from "./index.js";
+import { IQuizAttachedTagsRepository } from "./IQuizAttachedTagsRepository.js";
 
 export class QuizAttachedTagsService {
   constructor(

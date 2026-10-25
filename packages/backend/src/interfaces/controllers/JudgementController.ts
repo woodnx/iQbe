@@ -1,6 +1,6 @@
-import IJudgementRepository from "@/domains/Judgement/IJudgementRepository";
-import { typedAsyncWrapper } from "@/utils";
-import dayjs from "@/plugins/day";
+import IJudgementRepository from "@/domains/Judgement/IJudgementRepository.js";
+import { typedAsyncWrapper } from "@/utils/index.js";
+import dayjs from "@/plugins/day.js";
 
 export default class JudgementController {
   constructor(private judgementRepository: IJudgementRepository) {}

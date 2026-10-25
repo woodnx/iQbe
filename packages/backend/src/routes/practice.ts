@@ -1,12 +1,12 @@
 import express from "express";
 
-import PracticeUseCase from "@/applications/usecases/PracticeUseCase";
-import QuizInfra from "@/interfaces/infra/QuizInfra";
-import UserInfra from "@/interfaces/infra/UserInfra";
-import KyselyClientManager from "@/interfaces/infra/kysely/KyselyClientManager";
-import HistoryInfra from "@/interfaces/infra/HistoryInfra";
-import PracticeController from "@/interfaces/controllers/PracticeController";
-import CategoryInfra from "@/interfaces/infra/CategoryInfra";
+import PracticeUseCase from "@/applications/usecases/PracticeUseCase.js";
+import QuizInfra from "@/interfaces/infra/QuizInfra.js";
+import UserInfra from "@/interfaces/infra/UserInfra.js";
+import KyselyClientManager from "@/interfaces/infra/kysely/KyselyClientManager.js";
+import HistoryInfra from "@/interfaces/infra/HistoryInfra.js";
+import PracticeController from "@/interfaces/controllers/PracticeController.js";
+import CategoryInfra from "@/interfaces/infra/CategoryInfra.js";
 
 const router = express.Router();
 const kyselyClientManager = new KyselyClientManager();
@@ -19,4 +19,4 @@ const practiceController = new PracticeController(practiceUseCase);
 
 router.post("/", practiceController.practice());
 
-module.exports = router;
+export default router;

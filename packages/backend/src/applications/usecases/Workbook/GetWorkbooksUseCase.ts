@@ -1,6 +1,6 @@
-import IWorkbookRepository from "@/domains/Workbook/IWorkbookRepository";
+import IWorkbookRepository from "@/domains/Workbook/IWorkbookRepository.js";
 
-import { toWorkbooksDTO, WorkbooksDTO } from "./WorkbookMapper";
+import { toWorkbooksDTO, WorkbooksDTO } from "./WorkbookMapper.js";
 
 export type GetWorkbooksUseCaseCommand = {
   uid: string;

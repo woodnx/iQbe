@@ -4,11 +4,11 @@ import { Expression, SqlBool, sql } from "kysely";
 import IQuizQueryService, {
   countOption,
   findOption,
-} from "@/applications/queryservices/IQuizQueryService";
-import Quiz from "@/domains/Quiz";
-import IQuizRepository from "@/domains/Quiz/IQuizRepository";
-import CategoryInfra from "./CategoryInfra";
-import KyselyClientManager from "./kysely/KyselyClientManager";
+} from "@/applications/queryservices/IQuizQueryService.js";
+import Quiz from "@/domains/Quiz/index.js";
+import IQuizRepository from "@/domains/Quiz/IQuizRepository.js";
+import CategoryInfra from "./CategoryInfra.js";
+import KyselyClientManager from "./kysely/KyselyClientManager.js";
 
 type QuizDTO = components["schemas"]["Quiz"];
 

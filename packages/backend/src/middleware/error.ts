@@ -1,5 +1,5 @@
 import express from "express";
-import { createError } from "@/plugins/createError";
+import { createError } from "@/plugins/createError.js";
 import { ApiError } from "api";
 
 export const errorHandler = (

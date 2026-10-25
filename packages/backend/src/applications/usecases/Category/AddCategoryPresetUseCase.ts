@@ -1,9 +1,9 @@
 import { ApiError } from "api";
-import ITransactionManager from "@/applications/shared/ITransactionManager";
-import abc23 from "@/db/categories/abc23.json";
-import minhaya from "@/db/categories/minhaya.json";
-import Category from "@/domains/Category";
-import ICategoryRepository from "@/domains/Category/ICategoryRepository";
+import ITransactionManager from "@/applications/shared/ITransactionManager.js";
+import abc23 from "@/db/categories/abc23.json" with { type: "json" };
+import minhaya from "@/db/categories/minhaya.json" with { type: "json" };
+import Category from "@/domains/Category/index.js";
+import ICategoryRepository from "@/domains/Category/ICategoryRepository.js";
 
 type CategoryDAO = {
   name: string;

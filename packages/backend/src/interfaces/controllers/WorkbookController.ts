@@ -1,9 +1,9 @@
-import { CreateWorkbookUseCase } from "@/applications/usecases/Workbook/CreateWorkbookUseCase";
-import { DeleteWorkbookUseCase } from "@/applications/usecases/Workbook/DeleteWorkbookUseCase";
-import { GetAllWorkbooksUseCase } from "@/applications/usecases/Workbook/GetAllWorkbooksUseCase";
-import { GetWorkbookUseCase } from "@/applications/usecases/Workbook/GetWorkbookUseCase";
-import { UpdateWorkbookUseCase } from "@/applications/usecases/Workbook/UpdateWorkbookUseCase";
-import { typedAsyncWrapper } from "@/utils";
+import { CreateWorkbookUseCase } from "@/applications/usecases/Workbook/CreateWorkbookUseCase.js";
+import { DeleteWorkbookUseCase } from "@/applications/usecases/Workbook/DeleteWorkbookUseCase.js";
+import { GetAllWorkbooksUseCase } from "@/applications/usecases/Workbook/GetAllWorkbooksUseCase.js";
+import { GetWorkbookUseCase } from "@/applications/usecases/Workbook/GetWorkbookUseCase.js";
+import { UpdateWorkbookUseCase } from "@/applications/usecases/Workbook/UpdateWorkbookUseCase.js";
+import { typedAsyncWrapper } from "@/utils/index.js";
 
 export default class WorkbookController {
   constructor(

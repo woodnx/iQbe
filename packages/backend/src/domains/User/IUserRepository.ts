@@ -1,4 +1,4 @@
-import User from ".";
+import User from "./index.js";
 
 export default interface IUserRepository {
   findByUid(uid: string): Promise<User | null>;

@@ -1,7 +1,7 @@
-import IMylistRepository from "@/domains/Mylist/IMylistRepository";
-import IQuizRepository from "@/domains/Quiz/IQuizRepository";
-import IRegisteredQuizRepository from "@/domains/RegisteredQuiz/IResiteredQuizRepository";
-import RegisteredQuizService from "@/domains/RegisteredQuiz/ResisteredQuizService";
+import IMylistRepository from "@/domains/Mylist/IMylistRepository.js";
+import IQuizRepository from "@/domains/Quiz/IQuizRepository.js";
+import IRegisteredQuizRepository from "@/domains/RegisteredQuiz/IResiteredQuizRepository.js";
+import RegisteredQuizService from "@/domains/RegisteredQuiz/ResisteredQuizService.js";
 
 export default class RegisterUseCase {
   constructor(

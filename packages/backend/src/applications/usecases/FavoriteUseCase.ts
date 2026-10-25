@@ -1,7 +1,7 @@
-import FavoriteService from "@/domains/Favorite/FavoriteService";
-import IFavoriteRepository from "@/domains/Favorite/IFavoriteRepository";
-import IQuizRepository from "@/domains/Quiz/IQuizRepository";
-import IUserRepository from "@/domains/User/IUserRepository";
+import FavoriteService from "@/domains/Favorite/FavoriteService.js";
+import IFavoriteRepository from "@/domains/Favorite/IFavoriteRepository.js";
+import IQuizRepository from "@/domains/Quiz/IQuizRepository.js";
+import IUserRepository from "@/domains/User/IUserRepository.js";
 
 export default class FavoriteUseCase {
   constructor(
