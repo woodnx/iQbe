@@ -1,3 +1,6 @@
+import type { Mylist as ApiMylist, Quiz as ApiQuiz } from "@/utils/api-types";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { api } from "@/utils/api";
 import { Card, Group, getGradient, Text, useMantineTheme } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
@@ -9,7 +12,6 @@ import {
   useRouter,
   useSearch,
 } from "@tanstack/react-router";
-import { components } from "api/schema";
 import { ReactNode, useRef, useState } from "react";
 import { z } from "zod";
 import FilteringModalButton from "@/features/filtering/components/FilteringModalButton";
@@ -21,7 +23,6 @@ import QuizList from "@/features/quiz/components/QuizList";
 import QuizShuffleButton from "@/features/quiz/components/QuizShuffleButton";
 import QuizTransfarButton from "@/features/quiz/components/QuizTransfarButton";
 import { useMylists } from "@/hooks/useMylists";
-import { $api } from "@/utils/client";
 import {
   MYLISTS_QUERY_KEY,
   QUIZ_SIZES_QUERY_KEY,
@@ -32,8 +33,8 @@ import {
 } from "@/utils/queryCache";
 import { quizSearchSchema } from "./_schemas/quizSearch";
 
-type Mylist = components["schemas"]["Mylist"];
-type Quiz = components["schemas"]["Quiz"];
+type Mylist = ApiMylist;
+type Quiz = ApiQuiz;
 type QuizSize = { size: number };
 
 export const Route = createFileRoute("/mylist/$mid")({
@@ -57,7 +58,9 @@ function RouteComponent() {
   const previousQuizzesRef = useRef<QuerySnapshot<Quiz[]>>([]);
   const previousQuizSizesRef = useRef<QuerySnapshot<QuizSize>>([]);
   const { mylists } = useMylists();
-  const { mutate: deleteMylist } = $api.useMutation("delete", "/mylists", {
+  const { mutate: deleteMylist } = useMutation({
+    mutationKey: ["delete", "/mylists"],
+    mutationFn: api.deleteMylists,
     onMutate: async ({ body }) => {
       const targetMid = body.mid;
 
@@ -137,21 +140,57 @@ function RouteComponent() {
   const mylistName = mylists?.find((list) => list.mid == mid)?.name;
   const [activePage, setPage] = useState(1);
   const [isHidden, setIsHidden] = useState(false);
-  const { data: quizzes } = $api.useQuery("get", "/quizzes", {
-    params: {
-      query: {
-        ...search,
-        mid,
+  const { data: quizzes } = useQuery({
+    queryKey: [
+      "get",
+      "/quizzes",
+      {
+        params: {
+          query: {
+            ...search,
+            mid,
+          },
+        },
       },
-    },
+    ],
+    queryFn: ({ signal }) =>
+      api.getQuizzes(
+        {
+          params: {
+            query: {
+              ...search,
+              mid,
+            },
+          },
+        },
+        signal,
+      ),
   });
-  const { data: quizzesSize } = $api.useQuery("get", "/quizzes/size", {
-    params: {
-      query: {
-        ...search,
-        mid,
+  const { data: quizzesSize } = useQuery({
+    queryKey: [
+      "get",
+      "/quizzes/size",
+      {
+        params: {
+          query: {
+            ...search,
+            mid,
+          },
+        },
       },
-    },
+    ],
+    queryFn: ({ signal }) =>
+      api.getQuizzesSize(
+        {
+          params: {
+            query: {
+              ...search,
+              mid,
+            },
+          },
+        },
+        signal,
+      ),
   });
   const size =
     !!quizzes && !!quizzes.length && !!quizzesSize ? quizzesSize.size : 0;

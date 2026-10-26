@@ -1,3 +1,4 @@
+import type { Workbook as ApiWorkbook } from "@/utils/api-types";
 import {
   ActionIcon,
   Badge,
@@ -11,11 +12,10 @@ import {
 import { IconDots, IconPencil, IconTrash } from "@tabler/icons-react";
 import { modals } from "@mantine/modals";
 import { useNavigate } from "@tanstack/react-router";
-import { components } from "api/schema";
 import dayjs from "dayjs";
 import { useAuth } from "@/hooks/useAuth";
 
-type Workbook = components["schemas"]["Workbook"];
+type Workbook = ApiWorkbook;
 
 interface Props extends BoxProps {
   workbook: Workbook;
@@ -34,7 +34,10 @@ export default function WorkbookCard({ workbook }: Props) {
           truncate
           onClick={(e) => {
             e.preventDefault();
-            navigate({ to: "/workbook/$wid", params: { wid: `${workbook.wid}` } });
+            navigate({
+              to: "/workbook/$wid",
+              params: { wid: `${workbook.wid}` },
+            });
           }}
           component="a"
           href=""

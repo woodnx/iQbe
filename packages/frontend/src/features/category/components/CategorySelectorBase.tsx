@@ -1,3 +1,4 @@
+import type { Category as ApiCategory } from "@/utils/api-types";
 import {
   CloseButton,
   Combobox,
@@ -7,9 +8,8 @@ import {
   Text,
   useCombobox,
 } from "@mantine/core";
-import type { components } from "api/schema";
 
-type Category = components["schemas"]["Category"];
+type Category = ApiCategory;
 
 interface CategorySelectorBaseProps {
   data: Category[] | undefined;

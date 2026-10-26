@@ -1,3 +1,5 @@
+import { useQuery } from "@tanstack/react-query";
+import { api } from "@/utils/api";
 import {
   Accordion,
   Button,
@@ -13,15 +15,20 @@ import { IconBook2, IconList, IconStar } from "@tabler/icons-react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { LibraryItem } from "@/features/library/components/LibraryItem";
-import { $api } from "@/utils/client";
 
 export const Route = createFileRoute("/library")({
   component: RouteComponent,
 });
 
 function RouteComponent() {
-  const { data: workbooks } = $api.useQuery("get", "/workbooks");
-  const { data: mylists } = $api.useQuery("get", "/mylists");
+  const { data: workbooks } = useQuery({
+    queryKey: ["get", "/workbooks"],
+    queryFn: ({ signal }) => api.getWorkbooks({}, signal),
+  });
+  const { data: mylists } = useQuery({
+    queryKey: ["get", "/mylists"],
+    queryFn: ({ signal }) => api.getMylists({}, signal),
+  });
   const [search, setSearch] = useState("");
   const displayedWorkbooks = (workbooks || []).filter((w) =>
     w.name.toLowerCase().includes(search.toLowerCase().trim()),

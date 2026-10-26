@@ -1,6 +1,7 @@
-import { components } from "api/schema";
+import type { Category as ApiCategory } from "@/utils/api-types";
+import { useMutation } from "@tanstack/react-query";
+import { api } from "@/utils/api";
 
-import { $api } from "@/utils/client";
 import { ContextModalProps } from "@mantine/modals";
 
 import CategoryEditForm from "./CategoryEditForm";
@@ -15,7 +16,7 @@ export interface CategoryEditModalInnerProps<T extends boolean> {
   id: number;
 }
 
-type Category = components["schemas"]["Category"];
+type Category = ApiCategory;
 
 export default function CategoryEditModal<T extends boolean>({
   context,
@@ -24,9 +25,11 @@ export default function CategoryEditModal<T extends boolean>({
 }: ContextModalProps<CategoryEditModalInnerProps<T>>) {
   const { id, ...formProps } = innerProps;
   const queryClient = useQueryClient();
-  const queryKey = ["get", "/categories", undefined];
+  const queryKey = ["get", "/categories"];
 
-  const { mutate: edit } = $api.useMutation("put", "/categories/{id}", {
+  const { mutate: edit } = useMutation({
+    mutationKey: ["put", "/categories/{id}"],
+    mutationFn: api.putCategoriesId,
     onMutate: async ({ body }) => {
       const previous = queryClient.getQueryData(queryKey);
 

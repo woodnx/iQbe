@@ -1,5 +1,5 @@
-import { ApiError } from "api";
-import { components } from "api/schema";
+import type { QuizResponseDTO as ApiQuizResponseDTO } from "@/types/dto.js";
+import { ApiError } from "@/http/ApiError.js";
 import IQuizRepository from "@/domains/Quiz/IQuizRepository.js";
 import { QuizAttachedTags } from "@/domains/QuizAttachedTags/index.js";
 import { IQuizAttachedTagsRepository } from "@/domains/QuizAttachedTags/IQuizAttachedTagsRepository.js";
@@ -7,8 +7,7 @@ import { QuizAttachedTagsService } from "@/domains/QuizAttachedTags/QuizAttached
 import ITagRepository from "@/domains/Tag/ITagRepository.js";
 import ITransactionManager from "../../shared/ITransactionManager.js";
 
-type QuizDTO =
-  components["responses"]["QuizResponse"]["content"]["application/json"];
+type QuizDTO = ApiQuizResponseDTO;
 
 export interface EditQuizUseCaseCommand {
   qid: string;

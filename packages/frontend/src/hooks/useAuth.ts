@@ -1,7 +1,7 @@
-import { components } from "api/schema";
+import type { User as ApiUser } from "@/utils/api-types";
 import store from "storejs";
 
-type User = components["schemas"]["User"];
+type User = ApiUser;
 
 export const useAuth = () => {
   const setUser = (user: User, accessToken: string, refreshToken: string) => {

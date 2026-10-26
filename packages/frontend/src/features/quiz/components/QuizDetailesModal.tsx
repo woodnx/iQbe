@@ -1,4 +1,4 @@
-import { components } from "api/schema";
+import type { Quiz as ApiQuiz } from "@/utils/api-types";
 
 import { ContextModalProps } from "@mantine/modals";
 import {
@@ -11,7 +11,7 @@ import {
 } from "@mantine/core";
 import { IconCheck, IconCopy } from "@tabler/icons-react";
 
-type Quiz = components["schemas"]["Quiz"];
+type Quiz = ApiQuiz;
 
 export interface QuizDetailesModalInnerProps {
   quiz: Quiz;

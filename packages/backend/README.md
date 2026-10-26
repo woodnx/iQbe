@@ -22,7 +22,7 @@ Clean Architecter をベースとした軽量DDD．
 - [prisma-kysely](https://github.com/valtyr/prisma-kysely)によって，prismaスキーマ定義ファイル`prisma/schema.prisma`から自動生成される
 
 ### src/middleware
-- `src/index.ts`においてアプリ起動前に`app.use()`するミドルウェアを定義
+- `src/app.ts` で登録する Hono ミドルウェアを定義
 
 ### src/models
 - データベースと通信して，データを取得する
@@ -41,10 +41,10 @@ Clean Architecter をベースとした軽量DDD．
 - DB処理に依らない再利用可能な処理を記述
 
 ## Testing
-Vitest + Testcontainers (MySQL) を使って単体/結合テストを実行します。
+Jest を使ってユースケースと Hono HTTP API の回帰テストを実行します。HTTP テストは依存先を差し替え、実際の DB 接続を必要としません。
 
 ```
 pnpm --filter backend test
 ```
 
-devcontainer で実行する場合は Docker ソケットが利用可能であることを確認してください。
+サーバー起動は `src/index.ts`、アプリ構築と RPC 型の公開は `src/app.ts` で行います。

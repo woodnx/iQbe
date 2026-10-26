@@ -1,4 +1,7 @@
-import express from "express";
+import { Hono } from "hono";
+import type { AppEnv } from "@/http/context.js";
+import { postUnlike } from "@/http/schemas.js";
+import { validate } from "@/http/validate.js";
 
 import FavoriteUseCase from "@/applications/usecases/FavoriteUseCase.js";
 import FavoriteController from "@/interfaces/controllers/FavoriteController.js";
@@ -7,8 +10,6 @@ import KyselyClientManager from "@/interfaces/infra/kysely/KyselyClientManager.j
 import QuizInfra from "@/interfaces/infra/QuizInfra.js";
 import UserInfra from "@/interfaces/infra/UserInfra.js";
 import CategoryInfra from "@/interfaces/infra/CategoryInfra.js";
-
-const router = express.Router();
 
 const kyselyClientManager = new KyselyClientManager();
 const favoriteController = new FavoriteController(
@@ -19,6 +20,9 @@ const favoriteController = new FavoriteController(
   ),
 );
 
-router.post("/", favoriteController.unlike());
-
+const router = new Hono<AppEnv>().post(
+  "/",
+  validate("json", postUnlike.json),
+  favoriteController.unlike(),
+);
 export default router;

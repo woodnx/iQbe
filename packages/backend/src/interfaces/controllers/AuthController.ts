@@ -1,15 +1,23 @@
-import { ApiError } from "api";
+import type { ApiContext } from "@/http/context.js";
+import {
+  postAuthLogin,
+  postAuthSignup,
+  postAuthToken,
+  postAuthRegister,
+  postAuthAvailable,
+} from "@/http/schemas.js";
+import { ApiError } from "@/http/ApiError.js";
 
 import AuthUseCase from "@/applications/usecases/AuthUseCase.js";
-import { typedAsyncWrapper } from "@/utils/index.js";
 
 export default class AuthController {
   constructor(private authUseCase: AuthUseCase) {}
 
   login() {
-    return typedAsyncWrapper<"/auth/login", "post">(async (req, res) => {
-      const username = req.body.username;
-      const password = req.body.password;
+    return async (c: ApiContext<typeof postAuthLogin>) => {
+      const body = c.req.valid("json");
+      const username = body.username;
+      const password = body.password;
 
       if (!username || !password) {
         throw new ApiError().invalidParams();
@@ -17,16 +25,17 @@ export default class AuthController {
 
       const data = await this.authUseCase.loginUser(username, password);
 
-      res.status(200).send(data);
-    });
+      return c.json(data, 200);
+    };
   }
 
   signup() {
-    return typedAsyncWrapper<"/auth/signup", "post">(async (req, res, next) => {
-      const username = req.body.username;
-      const email = req.body.email || undefined;
-      const password = req.body.password;
-      const inviteCode = req.body.inviteCode || undefined;
+    return async (c: ApiContext<typeof postAuthSignup>) => {
+      const body = c.req.valid("json");
+      const username = body.username;
+      const email = body.email || undefined;
+      const password = body.password;
+      const inviteCode = body.inviteCode || undefined;
 
       if (!username || !password) {
         throw new ApiError().invalidParams();
@@ -39,14 +48,15 @@ export default class AuthController {
         inviteCode,
       );
 
-      res.status(200).send(data);
-    });
+      return c.json(data, 200);
+    };
   }
 
   token() {
-    return typedAsyncWrapper<"/auth/token", "post">(async (req, res) => {
-      const refreshToken = req.body.refreshToken;
-      const uid = req.body.uid;
+    return async (c: ApiContext<typeof postAuthToken>) => {
+      const body = c.req.valid("json");
+      const refreshToken = body.refreshToken;
+      const uid = body.uid;
 
       if (!refreshToken || !uid) {
         throw new ApiError().invalidParams();
@@ -57,15 +67,16 @@ export default class AuthController {
         refreshToken,
       );
 
-      res.status(200).send({ accessToken, user });
-    });
+      return c.json({ accessToken, user }, 200);
+    };
   }
 
   register() {
-    return typedAsyncWrapper<"/auth/register", "post">(async (req, res) => {
-      const email = req.body.email;
-      const password = req.body.password;
-      const username = req.body.username;
+    return async (c: ApiContext<typeof postAuthRegister>) => {
+      const body = c.req.valid("json");
+      const email = body.email;
+      const password = body.password;
+      const username = body.username;
 
       if (!email || !password || !username) {
         throw new ApiError().invalidParams();
@@ -77,15 +88,19 @@ export default class AuthController {
         password,
       );
 
-      res.status(200).send({
-        ...data,
-      });
-    });
+      return c.json(
+        {
+          ...data,
+        },
+        200,
+      );
+    };
   }
 
   available() {
-    return typedAsyncWrapper<"/auth/available", "post">(async (req, res) => {
-      const username = req.body.username || undefined;
+    return async (c: ApiContext<typeof postAuthAvailable>) => {
+      const body = c.req.valid("json");
+      const username = body.username || undefined;
 
       if (!username) {
         throw new ApiError().invalidParams();
@@ -93,9 +108,12 @@ export default class AuthController {
 
       const available = await this.authUseCase.available(username);
 
-      res.status(200).send({
-        available,
-      });
-    });
+      return c.json(
+        {
+          available,
+        },
+        200,
+      );
+    };
   }
 }

@@ -1,10 +1,11 @@
+import { useMutation } from "@tanstack/react-query";
+import { api } from "@/utils/api";
 import { Code, Text, Title } from "@mantine/core";
 import { FileWithPath } from "@mantine/dropzone";
 import { notifications } from "@mantine/notifications";
 import { useQueryClient } from "@tanstack/react-query";
 import { useRef, useState } from "react";
 import { Element } from "@/routes/create";
-import { $api, client } from "@/utils/client";
 import {
   QUIZ_SIZES_QUERY_KEY,
   QUIZZES_QUERY_KEY,
@@ -20,56 +21,55 @@ export default function CsvFileImporter() {
   const [isLoading, setIsLoading] = useState(false);
   const queryClient = useQueryClient();
   const previousQuizSizesRef = useRef<QuerySnapshot<{ size: number }>>([]);
-  const { mutateAsync: addQuizzes } = $api.useMutation(
-    "post",
-    "/quizzes/multiple",
-    {
-      onMutate: async ({ body }) => {
-        const addCount = body.records?.length || 0;
+  const { mutateAsync: addQuizzes } = useMutation({
+    mutationKey: ["post", "/quizzes/multiple"],
+    mutationFn: api.postQuizzesMultiple,
+    onMutate: async ({ body }) => {
+      const addCount = body.records?.length || 0;
 
-        if (addCount <= 0) {
-          return;
-        }
+      if (addCount <= 0) {
+        return;
+      }
 
-        await queryClient.cancelQueries({ queryKey: QUIZ_SIZES_QUERY_KEY });
+      await queryClient.cancelQueries({ queryKey: QUIZ_SIZES_QUERY_KEY });
 
-        const previousQuizSizes = takeQuerySnapshot<{ size: number }>(
-          queryClient,
-          QUIZ_SIZES_QUERY_KEY,
+      const previousQuizSizes = takeQuerySnapshot<{ size: number }>(
+        queryClient,
+        QUIZ_SIZES_QUERY_KEY,
+      );
+      previousQuizSizesRef.current = previousQuizSizes;
+
+      previousQuizSizes.forEach(([key, data]) => {
+        queryClient.setQueryData<{ size: number } | undefined>(key, () =>
+          data ? { ...data, size: data.size + addCount } : data,
         );
-        previousQuizSizesRef.current = previousQuizSizes;
-
-        previousQuizSizes.forEach(([key, data]) => {
-          queryClient.setQueryData<{ size: number } | undefined>(
-            key,
-            data ? { ...data, size: data.size + addCount } : data,
-          );
-        });
-      },
-      onError: () => {
-        restoreQuerySnapshot(queryClient, previousQuizSizesRef.current);
-      },
-      onSettled: () => {
-        queryClient.invalidateQueries({ queryKey: QUIZZES_QUERY_KEY });
-        queryClient.invalidateQueries({ queryKey: QUIZ_SIZES_QUERY_KEY });
-      },
+      });
     },
-  );
+    onError: () => {
+      restoreQuerySnapshot(queryClient, previousQuizSizesRef.current);
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: QUIZZES_QUERY_KEY });
+      queryClient.invalidateQueries({ queryKey: QUIZ_SIZES_QUERY_KEY });
+    },
+  });
 
   const parseCsv = async (files: FileWithPath[]) => {
     setIsLoading(true);
     const file = files[0];
 
-    const formData = new FormData();
-    formData.append("file", file);
-
-    const { data } = await client.POST("/csv/parse", {
-      // @ts-ignore
-      body: formData,
-    });
-
-    setPasedCsv(data || []);
-    setIsLoading(false);
+    try {
+      const data = await api.postCsvParse({ body: { file } });
+      setPasedCsv(data);
+    } catch {
+      notifications.show({
+        title: "CSV の読み込みに失敗しました",
+        message: "ファイルの形式を確認してください",
+        color: "red",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const saveQuizzes = async (quizzes: Element[], wid: string | null) => {

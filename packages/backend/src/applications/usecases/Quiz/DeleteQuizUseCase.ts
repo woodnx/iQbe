@@ -1,4 +1,4 @@
-import { ApiError } from "api";
+import { ApiError } from "@/http/ApiError.js";
 import IQuizRepository from "@/domains/Quiz/IQuizRepository.js";
 import { QuizAttachedTags } from "@/domains/QuizAttachedTags/index.js";
 import { IQuizAttachedTagsRepository } from "@/domains/QuizAttachedTags/IQuizAttachedTagsRepository.js";

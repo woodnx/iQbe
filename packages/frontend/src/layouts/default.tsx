@@ -1,3 +1,5 @@
+import { useQuery } from "@tanstack/react-query";
+import { api } from "@/utils/api";
 import {
   ActionIcon,
   AppShell,
@@ -28,7 +30,6 @@ import UserInfoMenu from "@/features/user/components/UserInfoMenu";
 import useHeaderHeight from "@/hooks/useHeaderHeight";
 import Logo from "@/shared/components/Logo";
 import NavbarLink from "@/shared/components/NavbarLink";
-import { $api } from "@/utils/client";
 import { checkAuth } from "../plugins/auth";
 
 const checkPathname = (pathname: string) => {
@@ -55,8 +56,14 @@ export default function DefaultLayout() {
   const isMobile = useIsMobile();
   const { headerHeight } = useHeaderHeight();
 
-  const { data: workbooks } = $api.useQuery("get", "/workbooks");
-  const { data: mylists } = $api.useQuery("get", "/mylists");
+  const { data: workbooks } = useQuery({
+    queryKey: ["get", "/workbooks"],
+    queryFn: ({ signal }) => api.getWorkbooks({}, signal),
+  });
+  const { data: mylists } = useQuery({
+    queryKey: ["get", "/mylists"],
+    queryFn: ({ signal }) => api.getMylists({}, signal),
+  });
 
   const mockdata = [
     {

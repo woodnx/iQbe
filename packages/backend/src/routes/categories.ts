@@ -1,4 +1,15 @@
-import express from "express";
+import { Hono } from "hono";
+import type { AppEnv } from "@/http/context.js";
+import {
+  getCategories,
+  postCategories,
+  getCategoriesId,
+  putCategoriesId,
+  deleteCategoriesId,
+  getCategoriesPreset,
+  postCategoriesPreset,
+} from "@/http/schemas.js";
+import { validate } from "@/http/validate.js";
 
 import { AddCategoryPresetUseCase } from "@/applications/usecases/Category/AddCategoryPresetUseCase.js";
 import { CreateCategoryUseCase } from "@/applications/usecases/Category/CreateCategoryUseCase.js";
@@ -26,15 +37,29 @@ const categoryController = new CategoryController(
   new AddCategoryPresetUseCase(transactionManager, categoryInfra),
 );
 
-const router = express.Router();
-
-router.get("/", categoryController.get());
-router.post("/", categoryController.post());
-router.get("/:id", categoryController.getFromId());
-router.put("/:id", categoryController.put());
-router.delete("/:id", categoryController.delete());
-
-router.get("/preset", categoryController.getPreset());
-router.post("/preset", categoryController.addFromPreset());
-
+const router = new Hono<AppEnv>()
+  .get("/", categoryController.get())
+  .post("/", validate("json", postCategories.json), categoryController.post())
+  .get("/preset", categoryController.getPreset())
+  .post(
+    "/preset",
+    validate("json", postCategoriesPreset.json),
+    categoryController.addFromPreset(),
+  )
+  .get(
+    "/:id",
+    validate("param", getCategoriesId.param),
+    categoryController.getFromId(),
+  )
+  .put(
+    "/:id",
+    validate("param", putCategoriesId.param),
+    validate("json", putCategoriesId.json),
+    categoryController.put(),
+  )
+  .delete(
+    "/:id",
+    validate("param", deleteCategoriesId.param),
+    categoryController.delete(),
+  );
 export default router;

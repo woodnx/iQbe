@@ -1,11 +1,14 @@
+import type {
+  Category as ApiCategory,
+  SubCategory as ApiSubCategory,
+} from "@/utils/api-types";
 import { BoxProps, Group, Text } from "@mantine/core";
 import { useCategories } from "@/hooks/useCategories";
 import FilteringCategoriesBase from "./FilteringCategoriesBase";
 import { useState } from "react";
-import { components } from "api/schema";
 
-type Category = components["schemas"]["Category"];
-type SubCategory = components["schemas"]["SubCategory"];
+type Category = ApiCategory;
+type SubCategory = ApiSubCategory;
 
 interface FilteringCategoriesProps extends BoxProps {
   value?: number[];

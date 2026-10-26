@@ -1,16 +1,16 @@
-import { components } from "api/schema";
 import dayjs from "dayjs";
 import { Expression, SqlBool, sql } from "kysely";
 import IQuizQueryService, {
   countOption,
   findOption,
 } from "@/applications/queryservices/IQuizQueryService.js";
-import Quiz from "@/domains/Quiz/index.js";
 import IQuizRepository from "@/domains/Quiz/IQuizRepository.js";
+import Quiz from "@/domains/Quiz/index.js";
+import type { QuizDTO as ApiQuizDTO } from "@/types/dto.js";
 import CategoryInfra from "./CategoryInfra.js";
 import KyselyClientManager from "./kysely/KyselyClientManager.js";
 
-type QuizDTO = components["schemas"]["Quiz"];
+type QuizDTO = ApiQuizDTO;
 
 export default class QuizInfra implements IQuizRepository, IQuizQueryService {
   constructor(
@@ -145,14 +145,39 @@ export default class QuizInfra implements IQuizRepository, IQuizQueryService {
         )
         .where("histories.user_id", "=", userId)
         .orderBy("histories.practiced", "desc");
-    } else if (!!option.judgements) {
+    } else if (option.judgements != null) {
+      const judgements = Array.isArray(option.judgements)
+        ? option.judgements
+        : [option.judgements];
+
+      const includeUnanswered = judgements.includes(3);
+      const answeredJudgements = judgements.filter((value) => value !== 3);
+
       query = query
-        .innerJoin("histories", "histories.quiz_id", "quizzes.id")
+        .leftJoin("histories", (join) =>
+          join
+            .onRef("histories.quiz_id", "=", "quizzes.id")
+            .on("histories.user_id", "=", userId),
+        )
         .select([
           "histories.judgement as judgement",
           "histories.practiced as practiced",
         ])
-        .where("histories.judgement", "in", option.judgements);
+        .where((eb) => {
+          const conditions: Expression<SqlBool>[] = [];
+
+          if (answeredJudgements.length > 0) {
+            conditions.push(
+              eb("histories.judgement", "in", answeredJudgements),
+            );
+          }
+
+          if (includeUnanswered) {
+            conditions.push(eb("histories.quiz_id", "is", null));
+          }
+
+          return eb.or(conditions);
+        });
     }
     if (!!option.mid) {
       query = query

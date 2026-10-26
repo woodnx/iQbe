@@ -4,24 +4,23 @@
   "description": "A powerful tool to enhance your quiz skills more fun and effective. ",
   "workspaces": [
     "packages/frontend",
-    "packages/backend",
-    "packages/spec"
+    "packages/backend"
   ],
   "packageManager": "pnpm@12.15.0",
   "private": true,
   "scripts": {
-    "test": "pnpm --filter ./packages/backend run test",
+    "test": "pnpm --filter ./packages/backend run test && pnpm --filter ./packages/frontend run test",
     "preinstall": "npx only-allow pnpm",
     "build": "./node_modules/.bin/env-cmd -f .config/.env node ./scripts/build.mjs",
     "start": "./node_modules/.bin/env-cmd -f .config/.env pnpm --filter ./packages/backend run start",
     "clean": "node ./scripts/clean.mjs",
-    "dev": "./node_modules/.bin/env-cmd -f .config/.env node ./scripts/dev.mjs",
-    "spec": "pnpm --filter ./packages/spec run build",
+    "dev": "./node_modules/.bin/env-cmd -f .config/.env pnpm -r --parallel dev",
     "migrate:create": "./node_modules/.bin/env-cmd -f .config/.env pnpm --filter ./packages/backend run migrate:create",
     "migrate:exe": "./node_modules/.bin/env-cmd -f .config/.env pnpm --filter ./packages/backend run migrate:exe",
     "migrate:dev": "./node_modules/.bin/env-cmd -f .config/.env pnpm --filter ./packages/backend run migrate:exe",
     "migrate:status": "./node_modules/.bin/env-cmd -f .config/.env pnpm --filter ./packages/backend run migrate:status",
-    "migrate:reset": "./node_modules/.bin/env-cmd -f .config/.env pnpm --filter ./packages/backend run migrate:reset"
+    "migrate:reset": "./node_modules/.bin/env-cmd -f .config/.env pnpm --filter ./packages/backend run migrate:reset",
+    "typecheck": "pnpm --filter backend run build && pnpm --filter frontend exec tsc --noEmit"
   },
   "repository": {
     "type": "git",

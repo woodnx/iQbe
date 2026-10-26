@@ -1,6 +1,7 @@
+import { useQuery } from "@tanstack/react-query";
+import { api } from "@/utils/api";
 import { useState } from "react";
 
-import { $api } from "@/utils/client";
 import {
   Badge,
   BoxProps,
@@ -30,12 +31,29 @@ export default function FilteringTags({
   ...others
 }: FilteringTagsProps) {
   const [search, setSearch] = useState("");
-  const { data: tags } = $api.useQuery("get", "/tags", {
-    params: {
-      query: {
-        q: search,
+  const { data: tags } = useQuery({
+    queryKey: [
+      "get",
+      "/tags",
+      {
+        params: {
+          query: {
+            q: search,
+          },
+        },
       },
-    },
+    ],
+    queryFn: ({ signal }) =>
+      api.getTags(
+        {
+          params: {
+            query: {
+              q: search,
+            },
+          },
+        },
+        signal,
+      ),
   });
 
   const combobox = useCombobox({

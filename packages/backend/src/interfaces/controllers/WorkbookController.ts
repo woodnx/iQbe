@@ -1,9 +1,17 @@
+import type { ApiContext } from "@/http/context.js";
+import {
+  getWorkbooks,
+  getWorkbooksWid,
+  getWorkbooksAll,
+  postWorkbooks,
+  putWorkbooksWid,
+  deleteWorkbooksWid,
+} from "@/http/schemas.js";
 import { CreateWorkbookUseCase } from "@/applications/usecases/Workbook/CreateWorkbookUseCase.js";
 import { DeleteWorkbookUseCase } from "@/applications/usecases/Workbook/DeleteWorkbookUseCase.js";
 import { GetAllWorkbooksUseCase } from "@/applications/usecases/Workbook/GetAllWorkbooksUseCase.js";
 import { GetWorkbookUseCase } from "@/applications/usecases/Workbook/GetWorkbookUseCase.js";
 import { UpdateWorkbookUseCase } from "@/applications/usecases/Workbook/UpdateWorkbookUseCase.js";
-import { typedAsyncWrapper } from "@/utils/index.js";
 
 export default class WorkbookController {
   constructor(
@@ -16,39 +24,41 @@ export default class WorkbookController {
   ) {}
 
   get() {
-    return typedAsyncWrapper<"/workbooks", "get">(async (req, res) => {
-      const uid = req.user.uid;
+    return async (c: ApiContext<typeof getWorkbooks>) => {
+      const uid = c.get("user").uid;
       const workbooks = await this.getWorkbooksUseCase.execute({ uid });
 
-      res.status(200).send(workbooks);
-    });
+      return c.json(workbooks, 200);
+    };
   }
 
   getFromWid() {
-    return typedAsyncWrapper<"/workbooks/{wid}", "get">(async (req, res) => {
-      const uid = req.user.uid;
-      const wid = req.params.wid;
+    return async (c: ApiContext<typeof getWorkbooksWid>) => {
+      const param = c.req.valid("param");
+      const uid = c.get("user").uid;
+      const wid = param.wid;
 
       const workbook = await this.getWorkbookUseCase.execute({ uid, wid });
 
-      res.status(200).send(workbook);
-    });
+      return c.json(workbook, 200);
+    };
   }
 
   getAll() {
-    return typedAsyncWrapper<"/workbooks/all", "get">(async (req, res) => {
-      const uid = req.user.uid;
+    return async (c: ApiContext<typeof getWorkbooksAll>) => {
+      const uid = c.get("user").uid;
       const workbooks = await this.getAllWorkbooksUseCase.execute({ uid });
 
-      res.status(200).send(workbooks);
-    });
+      return c.json(workbooks, 200);
+    };
   }
 
   post() {
-    return typedAsyncWrapper<"/workbooks", "post">(async (req, res) => {
-      const uid = req.user.uid;
-      const name = req.body.name;
-      const date = req.body.published || null;
+    return async (c: ApiContext<typeof postWorkbooks>) => {
+      const body = c.req.valid("json");
+      const uid = c.get("user").uid;
+      const name = body.name;
+      const date = body.published || null;
 
       const workbook = await this.createWorkbookUseCase.execute({
         uid,
@@ -56,16 +66,18 @@ export default class WorkbookController {
         date,
       });
 
-      res.status(200).send(workbook);
-    });
+      return c.json(workbook, 200);
+    };
   }
 
   put() {
-    return typedAsyncWrapper<"/workbooks/{wid}", "put">(async (req, res) => {
-      const uid = req.user.uid;
-      const wid = req.params.wid;
-      const name = req.body.name;
-      const date = req.body.published || null;
+    return async (c: ApiContext<typeof putWorkbooksWid>) => {
+      const param = c.req.valid("param");
+      const body = c.req.valid("json");
+      const uid = c.get("user").uid;
+      const wid = param.wid;
+      const name = body.name;
+      const date = body.published || null;
 
       const workbook = await this.updateWorkbookUseCase.execute({
         uid,
@@ -74,18 +86,19 @@ export default class WorkbookController {
         date,
       });
 
-      res.status(200).send(workbook);
-    });
+      return c.json(workbook, 200);
+    };
   }
 
   delete() {
-    return typedAsyncWrapper<"/workbooks/{wid}", "delete">(async (req, res) => {
-      const uid = req.user.uid;
-      const wid = req.params.wid;
+    return async (c: ApiContext<typeof deleteWorkbooksWid>) => {
+      const param = c.req.valid("param");
+      const uid = c.get("user").uid;
+      const wid = param.wid;
 
       const workbooks = await this.deleteWorkbookUseCase.execute({ uid, wid });
 
-      res.status(200).send(workbooks);
-    });
+      return c.json(workbooks, 200);
+    };
   }
 }

@@ -1,4 +1,5 @@
-import { $api } from "@/utils/client";
+import { useQuery } from "@tanstack/react-query";
+import { api } from "@/utils/api";
 import {
   ComboboxItem,
   Group,
@@ -18,13 +19,31 @@ export default function InviteCodeSetting() {
   const [status, setStatus] = useState<ComboboxItem>();
   const [sort, setSort] = useState<ComboboxItem>();
   console.log(status, sort);
-  const { data: inviteCodes } = $api.useQuery("get", "/invite-code", {
-    params: {
-      query: {
-        status: status && Number(status.value),
-        sort: sort?.value,
+  const { data: inviteCodes } = useQuery({
+    queryKey: [
+      "get",
+      "/invite-code",
+      {
+        params: {
+          query: {
+            status: status && Number(status.value),
+            sort: sort?.value,
+          },
+        },
       },
-    },
+    ],
+    queryFn: ({ signal }) =>
+      api.getInviteCode(
+        {
+          params: {
+            query: {
+              status: status && Number(status.value),
+              sort: sort?.value,
+            },
+          },
+        },
+        signal,
+      ),
   });
 
   const contents = inviteCodes?.map((inviteCode) => (

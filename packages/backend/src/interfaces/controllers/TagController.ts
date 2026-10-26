@@ -1,13 +1,15 @@
+import type { ApiContext } from "@/http/context.js";
+import { getTags } from "@/http/schemas.js";
 import ITagRepository from "@/domains/Tag/ITagRepository.js";
-import { typedAsyncWrapper } from "@/utils/index.js";
 
 export default class TagController {
   constructor(private tagRepository: ITagRepository) {}
 
   get() {
-    return typedAsyncWrapper<"/tags", "get">(async (req, res) => {
-      const q = req.query?.q;
-      const all = !!req.query?.all;
+    return async (c: ApiContext<typeof getTags>) => {
+      const query = c.req.valid("query");
+      const q = query?.q;
+      const all = !!query?.all;
 
       const tags = await this.tagRepository.search(q || "", all);
 
@@ -17,7 +19,7 @@ export default class TagController {
         modified: tag.created,
       }));
 
-      res.send(sendTags);
-    });
+      return c.json(sendTags, 200);
+    };
   }
 }

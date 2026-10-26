@@ -1,21 +1,23 @@
+import type { ApiContext } from "@/http/context.js";
+import { getLevels } from "@/http/schemas.js";
 import ILevelRepository from "@/domains/Level/ILevelRepository.js";
-import { typedAsyncWrapper } from "@/utils/index.js";
 
 export default class LevelController {
   constructor(private levelRepository: ILevelRepository) {}
 
   get() {
-    return typedAsyncWrapper<"/levels", "get">(async (req, res) => {
+    return async (c: ApiContext<typeof getLevels>) => {
       const levels = await this.levelRepository.findAll();
 
-      res.send(
+      return c.json(
         levels.map((level, idx) => ({
           id: idx + 1,
           name: level.name,
           value: level.value,
           color: level.color,
         })),
+        200,
       );
-    });
+    };
   }
 }

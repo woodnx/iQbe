@@ -42,7 +42,7 @@ export default function ActivityUserRanking() {
             name={r.nickname || r.username}
             icon={icons[idx]}
             rank={r.rank}
-            count={r.count}
+            count={Number(r.count)}
             key={r.uid}
           />
         );

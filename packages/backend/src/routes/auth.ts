@@ -1,4 +1,13 @@
-import express from "express";
+import { Hono } from "hono";
+import type { AppEnv } from "@/http/context.js";
+import {
+  postAuthLogin,
+  postAuthSignup,
+  postAuthToken,
+  postAuthRegister,
+  postAuthAvailable,
+} from "@/http/schemas.js";
+import { validate } from "@/http/validate.js";
 
 import AuthUseCase from "@/applications/usecases/AuthUseCase.js";
 import InviteCodeInfra from "@/interfaces/infra/InviteCodeInfra.js";
@@ -7,8 +16,6 @@ import KyselyTransactionManager from "@/interfaces/infra/kysely/KyselyTransactio
 import RefreshTokensInfra from "@/interfaces/infra/RefreshTokensInfra.js";
 import UserInfra from "@/interfaces/infra/UserInfra.js";
 import AuthController from "@/interfaces/controllers/AuthController.js";
-
-const router = express.Router();
 
 const clientManager = new KyselyClientManager();
 
@@ -21,10 +28,22 @@ const authController = new AuthController(
   ),
 );
 
-router.post("/login", authController.login());
-router.post("/signup", authController.signup());
-router.post("/token", authController.token());
-router.post("/register", authController.register());
-router.post("/available", authController.available());
-
+const router = new Hono<AppEnv>()
+  .post("/login", validate("json", postAuthLogin.json), authController.login())
+  .post(
+    "/signup",
+    validate("json", postAuthSignup.json),
+    authController.signup(),
+  )
+  .post("/token", validate("json", postAuthToken.json), authController.token())
+  .post(
+    "/register",
+    validate("json", postAuthRegister.json),
+    authController.register(),
+  )
+  .post(
+    "/available",
+    validate("json", postAuthAvailable.json),
+    authController.available(),
+  );
 export default router;

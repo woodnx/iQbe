@@ -1,42 +1,29 @@
 {
   "compilerOptions": {
-    /* Visit https://aka.ms/tsconfig to read more about this file */
-    /* Language and Environment */
     "target": "ES2022",
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
     "rootDir": "./src",
     "isolatedModules": true,
     "paths": {
-      "@/*": [
-        "./src/*"
-      ]
+      "@/*": ["./src/*"]
     },
-    // "typeRoots": ["./src/types"],
-    "types": [
-      "node",
-      "jest"
-    ],
+    "types": ["node", "jest"],
     "resolveJsonModule": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "sourceMap": true,
-    /* Emit */
     "outDir": "./dist",
-    /* Interop Constraints */
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
-    /* Type Checking */
     "strict": true,
-    /* Completeness */
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "declaration": true
   },
-  "include": [
-    "src",
-    "src/types"
-  ],
+  "include": ["src", "src/types"],
   "tsc-alias": {
     "resolveFullPaths": true,
     "resolveFullExtension": ".js"
-  }
+  },
+  "exclude": ["src/**/*.test.ts"]
 }

@@ -1,4 +1,4 @@
-import { ApiError } from "api";
+import { ApiError } from "@/http/ApiError.js";
 import ITransactionManager from "@/applications/shared/ITransactionManager.js";
 import abc23 from "@/db/categories/abc23.json" with { type: "json" };
 import minhaya from "@/db/categories/minhaya.json" with { type: "json" };

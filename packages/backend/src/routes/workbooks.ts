@@ -1,4 +1,14 @@
-import express from "express";
+import { Hono } from "hono";
+import type { AppEnv } from "@/http/context.js";
+import {
+  getWorkbooks,
+  getWorkbooksAll,
+  getWorkbooksWid,
+  postWorkbooks,
+  putWorkbooksWid,
+  deleteWorkbooksWid,
+} from "@/http/schemas.js";
+import { validate } from "@/http/validate.js";
 
 import { CreateWorkbookUseCase } from "@/applications/usecases/Workbook/CreateWorkbookUseCase.js";
 import { DeleteWorkbookUseCase } from "@/applications/usecases/Workbook/DeleteWorkbookUseCase.js";
@@ -31,13 +41,24 @@ const workbookController = new WorkbookController(
   deleteWorkbookUseCase,
 );
 
-const router = express.Router();
-
-router.get("/", workbookController.get());
-router.get("/all", workbookController.getAll());
-router.get("/:wid", workbookController.getFromWid());
-router.post("/", workbookController.post());
-router.put("/:wid", workbookController.put());
-router.delete("/:wid", workbookController.delete());
-
+const router = new Hono<AppEnv>()
+  .get("/", workbookController.get())
+  .get("/all", workbookController.getAll())
+  .post("/", validate("json", postWorkbooks.json), workbookController.post())
+  .get(
+    "/:wid",
+    validate("param", getWorkbooksWid.param),
+    workbookController.getFromWid(),
+  )
+  .put(
+    "/:wid",
+    validate("param", putWorkbooksWid.param),
+    validate("json", putWorkbooksWid.json),
+    workbookController.put(),
+  )
+  .delete(
+    "/:wid",
+    validate("param", deleteWorkbooksWid.param),
+    workbookController.delete(),
+  );
 export default router;

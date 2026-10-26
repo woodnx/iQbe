@@ -1,4 +1,7 @@
-import express from "express";
+import { Hono } from "hono";
+import type { AppEnv } from "@/http/context.js";
+import { postRegister } from "@/http/schemas.js";
+import { validate } from "@/http/validate.js";
 
 import RegisterUseCase from "@/applications/usecases/RegisterUseCase.js";
 import RegisterController from "@/interfaces/controllers/RegisterController.js";
@@ -8,7 +11,6 @@ import QuizInfra from "@/interfaces/infra/QuizInfra.js";
 import RegisteredQuizInfra from "@/interfaces/infra/ResisteredQuizInfra.js";
 import CategoryInfra from "@/interfaces/infra/CategoryInfra.js";
 
-const router = express.Router();
 const kyselyClientManager = new KyselyClientManager();
 const registerController = new RegisterController(
   new RegisterUseCase(
@@ -18,6 +20,9 @@ const registerController = new RegisterController(
   ),
 );
 
-router.post("/", registerController.register());
-
+const router = new Hono<AppEnv>().post(
+  "/",
+  validate("json", postRegister.json),
+  registerController.register(),
+);
 export default router;

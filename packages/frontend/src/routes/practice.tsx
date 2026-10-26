@@ -1,8 +1,9 @@
+import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, useSearch } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import z from "zod";
 import PracticeSceneChanger from "@/features/practice/components/PracticeSceneChanger";
-import { $api } from "@/utils/client";
+import { api } from "@/utils/api";
 import { quizSearchSchema } from "./_schemas/quizSearch";
 
 function shuffleSequense(n: number) {
@@ -36,13 +37,39 @@ export const Route = createFileRoute("/practice")({
 function RouteComponent() {
   const [shouldFetch, setShouldFetch] = useState(false);
   const search = useSearch({ from: "/practice" });
-  const { data: quizzes } = $api.useQuery("get", "/quizzes", {
-    params: { query: search },
-    enabled: shouldFetch,
+  const { data: quizzes } = useQuery({
+    queryKey: [
+      "get",
+      "/quizzes",
+      {
+        params: { query: search },
+      },
+    ],
+    queryFn: ({ signal }) =>
+      api.getQuizzes(
+        {
+          params: { query: search },
+        },
+        signal,
+      ),
+    enabled: shouldFetch || search.isTransfer === true,
   });
-  const { data: quizzesSize } = $api.useQuery("get", "/quizzes/size", {
-    params: { query: search },
-    enabled: shouldFetch,
+  const { data: quizzesSize } = useQuery({
+    queryKey: [
+      "get",
+      "/quizzes/size",
+      {
+        params: { query: search },
+      },
+    ],
+    queryFn: ({ signal }) =>
+      api.getQuizzesSize(
+        {
+          params: { query: search },
+        },
+        signal,
+      ),
+    enabled: shouldFetch || search.isTransfer === true,
   });
   const shuffledList = useMemo(() => {
     const length = quizzes?.length || 0;

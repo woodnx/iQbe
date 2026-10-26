@@ -1,4 +1,4 @@
-import axios from "@/plugins/axios";
+import { api } from "@/utils/api";
 import { Alert, Button, TextInput } from "@mantine/core";
 import { isNotEmpty, useForm } from "@mantine/form";
 import { IconAlertCircle } from "@tabler/icons-react";
@@ -25,12 +25,12 @@ export default function ResetPasswordModal({ onSubmit }: Props) {
   });
 
   const submit = async (v: SubmitValue) => {
-    await axios
-      .post("/request-reset-password", {
+    await api.postRequestResetPassword({
+      body: {
         email: v.email,
         username: v.username,
-      })
-      .then((res) => res.data);
+      },
+    });
     onSubmit();
   };
 

@@ -8,7 +8,7 @@ import {
   Title,
 } from "@mantine/core";
 import { isNotEmpty, matchesField, useForm } from "@mantine/form";
-import axios from "@/plugins/axios";
+import { api } from "@/utils/api";
 import { useSetRequestResetPassword } from "@/contexts/requestResetPassword";
 import { useNavigate, useSearch } from "@tanstack/react-router";
 
@@ -39,14 +39,15 @@ export default function ResetPassword() {
   });
 
   const submit = async (v: SubmitValue) => {
-    const message = await axios
-      .post("/reset-password", {
+    if (!token) return;
+    const message = await api.postResetPassword({
+      body: {
         token,
         newPassword: v.newPassword,
-      })
-      .then((res) => res.data);
+      },
+    });
 
-    if (message == "succeed reset password") {
+    if (message == "succeed resetting your password") {
       localStorage.setItem("uid", "");
       localStorage.setItem("accessToken", "");
       localStorage.setItem("refreshToken", "");

@@ -1,4 +1,7 @@
-import express from "express";
+import { Hono } from "hono";
+import type { AppEnv } from "@/http/context.js";
+import { postResetPassword } from "@/http/schemas.js";
+import { validate } from "@/http/validate.js";
 import ResetPasswordController from "@/interfaces/controllers/ResetPasswordController.js";
 import ResetPasswordUseCase from "@/applications/usecases/ResetPasswordUseCase.js";
 import KyselyClientManager from "@/interfaces/infra/kysely/KyselyClientManager.js";
@@ -19,8 +22,9 @@ const resetPasswordController = new ResetPasswordController(
   ),
 );
 
-const router = express.Router();
-
-router.post("/", resetPasswordController.reset());
-
+const router = new Hono<AppEnv>().post(
+  "/",
+  validate("json", postResetPassword.json),
+  resetPasswordController.reset(),
+);
 export default router;

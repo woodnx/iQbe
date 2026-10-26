@@ -1,3 +1,5 @@
+import { useQuery } from "@tanstack/react-query";
+import { api } from "@/utils/api";
 import { Card, Group, getGradient, Text, useMantineTheme } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { IconTrash } from "@tabler/icons-react";
@@ -17,7 +19,6 @@ import QuizList from "@/features/quiz/components/QuizList";
 import QuizShuffleButton from "@/features/quiz/components/QuizShuffleButton";
 import QuizTransfarButton from "@/features/quiz/components/QuizTransfarButton";
 import { useWorkbooks } from "@/hooks/useWorkbooks";
-import { $api } from "@/utils/client";
 import { quizSearchSchema } from "../_schemas/quizSearch";
 
 export const Route = createFileRoute("/workbook/$wid")({
@@ -42,21 +43,57 @@ function RouteComponent() {
   const workbookDate = workbook?.date;
   const [activePage, setPage] = useState(1);
   const [isHidden, setIsHidden] = useState(false);
-  const { data: quizzes } = $api.useQuery("get", "/quizzes", {
-    params: {
-      query: {
-        ...search,
-        wids: [wid],
+  const { data: quizzes } = useQuery({
+    queryKey: [
+      "get",
+      "/quizzes",
+      {
+        params: {
+          query: {
+            ...search,
+            wids: [wid],
+          },
+        },
       },
-    },
+    ],
+    queryFn: ({ signal }) =>
+      api.getQuizzes(
+        {
+          params: {
+            query: {
+              ...search,
+              wids: [wid],
+            },
+          },
+        },
+        signal,
+      ),
   });
-  const { data: quizzesSize } = $api.useQuery("get", "/quizzes/size", {
-    params: {
-      query: {
-        ...search,
-        wids: [wid],
+  const { data: quizzesSize } = useQuery({
+    queryKey: [
+      "get",
+      "/quizzes/size",
+      {
+        params: {
+          query: {
+            ...search,
+            wids: [wid],
+          },
+        },
       },
-    },
+    ],
+    queryFn: ({ signal }) =>
+      api.getQuizzesSize(
+        {
+          params: {
+            query: {
+              ...search,
+              wids: [wid],
+            },
+          },
+        },
+        signal,
+      ),
   });
   const size =
     !!quizzes && !!quizzes.length && !!quizzesSize ? quizzesSize.size : 0;

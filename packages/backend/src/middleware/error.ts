@@ -1,22 +1,17 @@
-import express from "express";
-import { createError } from "@/plugins/createError.js";
-import { ApiError } from "api";
+import type { ErrorHandler } from "hono";
+import { HTTPException } from "hono/http-exception";
+import type { ContentfulStatusCode } from "hono/utils/http-status";
+import { ApiError } from "@/http/ApiError.js";
+import type { AppEnv } from "@/http/context.js";
 
-export const errorHandler = (
-  err: any,
-  req: express.Request,
-  res: express.Response,
-  next: express.NextFunction,
-) => {
-  // エラー文をそのまま出力
-  // クライアントには表示されない
-  console.error(err);
-
-  if (res.headersSent) return next(err);
-
-  if (err instanceof ApiError) {
-    return res.status(err.schema.status).send(err.schema);
+export const errorHandler: ErrorHandler<AppEnv> = (err, c) => {
+  if (err instanceof ApiError)
+    return c.json(err.schema, err.status as ContentfulStatusCode);
+  if (err instanceof HTTPException && err.status < 500) {
+    const error = new ApiError().invalidParams(err.message).schema;
+    return c.json({ ...error, status: err.status }, err.status);
   }
-
-  return res.status(500).send(createError.internalProblems());
+  console.error(err);
+  const error = new ApiError().internalProblems();
+  return c.json(error.schema, 500);
 };

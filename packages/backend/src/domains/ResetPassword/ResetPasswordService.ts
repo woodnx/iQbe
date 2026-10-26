@@ -1,4 +1,4 @@
-import { ApiError } from "api";
+import { ApiError } from "@/http/ApiError.js";
 
 import dayjs from "@/plugins/day.js";
 

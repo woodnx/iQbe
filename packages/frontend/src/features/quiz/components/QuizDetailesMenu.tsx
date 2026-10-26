@@ -1,3 +1,4 @@
+import type { Quiz as ApiQuiz } from "@/utils/api-types";
 import { ActionIcon, Menu, rem, ScrollArea } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import {
@@ -6,9 +7,8 @@ import {
   IconPencil,
   IconTrash,
 } from "@tabler/icons-react";
-import { components } from "api/schema";
 
-type Quiz = components["schemas"]["Quiz"];
+type Quiz = ApiQuiz;
 
 interface Props {
   quiz: Quiz;

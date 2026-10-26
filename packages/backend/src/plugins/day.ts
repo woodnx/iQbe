@@ -1,10 +1,10 @@
-import dayjs, { extend } from "dayjs";
+import dayjs from "dayjs";
 import duration from "dayjs/plugin/duration.js";
 import timezone from "dayjs/plugin/timezone.js";
 import utc from "dayjs/plugin/utc.js";
 import type { ManipulateType } from "dayjs";
 
-extend(duration);
+dayjs.extend(duration);
 dayjs.extend(utc);
 dayjs.extend(timezone);
 dayjs.tz.setDefault("Asia/Tokyo");

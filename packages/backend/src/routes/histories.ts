@@ -1,4 +1,7 @@
-import express from "express";
+import { Hono } from "hono";
+import type { AppEnv } from "@/http/context.js";
+import { getHistories, getHistoriesSinceUntil } from "@/http/schemas.js";
+import { validate } from "@/http/validate.js";
 import HistoryController from "@/interfaces/controllers/HistoryController.js";
 import JudgementController from "@/interfaces/controllers/JudgementController.js";
 import HistoryInfra from "@/interfaces/infra/HistoryInfra.js";
@@ -13,9 +16,11 @@ const judgementController = new JudgementController(
   new JudgementInfra(kyselyClientManager),
 );
 
-const router = express.Router();
-
-router.get("/", historyController.get());
-router.get("/:since/:until", judgementController.get());
-
+const router = new Hono<AppEnv>()
+  .get("/", historyController.get())
+  .get(
+    "/:since/:until",
+    validate("param", getHistoriesSinceUntil.param),
+    judgementController.get(),
+  );
 export default router;

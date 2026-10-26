@@ -1,30 +1,33 @@
+import type { ApiContext } from "@/http/context.js";
+import { postRegister, postUnregister } from "@/http/schemas.js";
 import RegisterUseCase from "@/applications/usecases/RegisterUseCase.js";
-import { typedAsyncWrapper } from "@/utils/index.js";
 
 export default class RegisterController {
   constructor(private registerUseCase: RegisterUseCase) {}
 
   register() {
-    return typedAsyncWrapper<"/register", "post">(async (req, res) => {
-      const qid = req.body.qid;
-      const mid = req.body.mid;
-      const uid = req.user.uid;
+    return async (c: ApiContext<typeof postRegister>) => {
+      const body = c.req.valid("json");
+      const qid = body.qid;
+      const mid = body.mid;
+      const uid = c.get("user").uid;
 
       await this.registerUseCase.registerQuizToMylist(qid, mid, uid);
 
-      res.status(201).send();
-    });
+      return c.body(null, 201);
+    };
   }
 
   unregister() {
-    return typedAsyncWrapper<"/unregister", "post">(async (req, res) => {
-      const qid = req.body.qid;
-      const mid = req.body.mid;
-      const uid = req.user.uid;
+    return async (c: ApiContext<typeof postUnregister>) => {
+      const body = c.req.valid("json");
+      const qid = body.qid;
+      const mid = body.mid;
+      const uid = c.get("user").uid;
 
       await this.registerUseCase.unregisterQuizFromMylist(qid, mid, uid);
 
-      res.status(201).send();
-    });
+      return c.body(null, 201);
+    };
   }
 }

@@ -1,9 +1,7 @@
+import type { QuizQuery as ApiQuizQuery } from "@/utils/api-types";
 // Globalなtypeを定義
 
-import { paths } from "api/schema";
-
-export type QuizRequestParams =
-  paths["/quizzes"]["get"]["parameters"]["query"] & {};
+export type QuizRequestParams = ApiQuizQuery & {};
 
 export type KeywordOption = 1 | 2 | 3;
 

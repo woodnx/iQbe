@@ -1,5 +1,5 @@
-import User from "@/domains/User/index.js";
 import IUsersRepository from "@/domains/User/IUserRepository.js";
+import User from "@/domains/User/index.js";
 import KyselyClientManager from "./kysely/KyselyClientManager.js";
 
 export default class UserInfra implements IUsersRepository {
@@ -26,7 +26,6 @@ export default class UserInfra implements IUsersRepository {
       .where("uid", "=", uid)
       .executeTakeFirst();
 
-    console.log(data)
     if (!data) {
       return null;
     }

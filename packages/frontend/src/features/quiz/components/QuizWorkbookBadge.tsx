@@ -1,8 +1,8 @@
+import type { Workbook as ApiWorkbook } from "@/utils/api-types";
 import { Badge, BadgeProps } from "@mantine/core";
 import { useIsMobile } from "@/contexts/isMobile";
-import { components } from "api/schema";
 
-type Workbook = components["schemas"]["Workbook"];
+type Workbook = ApiWorkbook;
 
 interface Props extends BadgeProps {
   workbook: Workbook;

@@ -1,14 +1,16 @@
+import type { ApiContext } from "@/http/context.js";
+import { postLike, postUnlike } from "@/http/schemas.js";
 import FavoriteUseCase from "@/applications/usecases/FavoriteUseCase.js";
-import { typedAsyncWrapper } from "@/utils/index.js";
-import { ApiError } from "api";
+import { ApiError } from "@/http/ApiError.js";
 
 export default class FavoriteController {
   constructor(private favoriteUseCase: FavoriteUseCase) {}
 
   like() {
-    return typedAsyncWrapper<"/like", "post">(async (req, res) => {
-      const qid = req.body.qid;
-      const uid = req.user.uid;
+    return async (c: ApiContext<typeof postLike>) => {
+      const body = c.req.valid("json");
+      const qid = body.qid;
+      const uid = c.get("user").uid;
 
       if (!qid) {
         throw new ApiError().invalidParams();
@@ -16,14 +18,15 @@ export default class FavoriteController {
 
       await this.favoriteUseCase.addFavorite(uid, qid);
 
-      res.status(201).send();
-    });
+      return c.body(null, 201);
+    };
   }
 
   unlike() {
-    return typedAsyncWrapper<"/unlike", "post">(async (req, res) => {
-      const qid = req.body.qid;
-      const uid = req.user.uid;
+    return async (c: ApiContext<typeof postUnlike>) => {
+      const body = c.req.valid("json");
+      const qid = body.qid;
+      const uid = c.get("user").uid;
 
       if (!qid) {
         throw new ApiError().invalidParams();
@@ -31,7 +34,7 @@ export default class FavoriteController {
 
       await this.favoriteUseCase.removeFavorite(uid, qid);
 
-      res.status(201).send();
-    });
+      return c.body(null, 201);
+    };
   }
 }

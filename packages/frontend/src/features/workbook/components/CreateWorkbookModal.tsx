@@ -1,11 +1,12 @@
+import type { Workbook as ApiWorkbook } from "@/utils/api-types";
+import { useMutation } from "@tanstack/react-query";
+import { api } from "@/utils/api";
 import { ActionIcon, Button, Group, Modal, TextInput } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { IconSquarePlus2 } from "@tabler/icons-react";
 import { useQueryClient } from "@tanstack/react-query";
-import { components } from "api/schema";
 import { useRef, useState } from "react";
 import { useIsMobile } from "@/contexts/isMobile";
-import { $api } from "@/utils/client";
 import {
   ALL_WORKBOOKS_QUERY_KEY,
   QuerySnapshot,
@@ -14,7 +15,7 @@ import {
   WORKBOOKS_QUERY_KEY,
 } from "@/utils/queryCache";
 
-type Workbook = components["schemas"]["Workbook"];
+type Workbook = ApiWorkbook;
 
 export default function CreateWorkbookModal() {
   const [listName, setListName] = useState("");
@@ -23,7 +24,9 @@ export default function CreateWorkbookModal() {
   const previousWorkbooksRef = useRef<QuerySnapshot<Workbook[]>>([]);
   const previousAllWorkbooksRef = useRef<QuerySnapshot<Workbook[]>>([]);
   const tempWidRef = useRef<string | null>(null);
-  const { mutate } = $api.useMutation("post", "/workbooks", {
+  const { mutate } = useMutation({
+    mutationKey: ["post", "/workbooks"],
+    mutationFn: api.postWorkbooks,
     onMutate: async ({ body }) => {
       await queryClient.cancelQueries({ queryKey: WORKBOOKS_QUERY_KEY });
       await queryClient.cancelQueries({ queryKey: ALL_WORKBOOKS_QUERY_KEY });
@@ -46,6 +49,10 @@ export default function CreateWorkbookModal() {
         name: body.name,
         date: body.published ?? null,
         creatorId: "",
+        total: 0,
+        corrects: 0,
+        wrongs: 0,
+        ignored: 0,
       };
 
       previousWorkbooks.forEach(([key, data]) => {

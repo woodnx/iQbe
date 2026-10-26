@@ -1,15 +1,16 @@
-import express from "express";
-import multer from "multer";
+import { Hono } from "hono";
+import type { AppEnv } from "@/http/context.js";
+import { postCsvParse } from "@/http/schemas.js";
+import { validate } from "@/http/validate.js";
 
 import CsvController from "@/interfaces/controllers/CsvController.js";
 import CsvImportInfra from "@/interfaces/infra/CsvImportInfra.js";
 
-const router = express.Router();
-const storage = multer.memoryStorage();
-const upload = multer({ storage });
-
 const csvController = new CsvController(new CsvImportInfra());
 
-router.post("/parse", upload.single("file"), csvController.parse());
-
+const router = new Hono<AppEnv>().post(
+  "/parse",
+  validate("form", postCsvParse.form),
+  csvController.parse(),
+);
 export default router;

@@ -1,4 +1,5 @@
-import { isEqual } from "lodash";
+import lodash from "lodash";
+const { isEqual } = lodash;
 
 export default abstract class ValueObject<T, U> {
   // @ts-expect-error

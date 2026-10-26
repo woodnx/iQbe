@@ -1,10 +1,11 @@
+import type { Workbook as ApiWorkbook } from "@/utils/api-types";
+import { useMutation } from "@tanstack/react-query";
+import { api } from "@/utils/api";
 import { BoxProps, Button, Modal } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { IconPlus } from "@tabler/icons-react";
 import { useQueryClient } from "@tanstack/react-query";
-import { components } from "api/schema";
 import { useRef } from "react";
-import { $api } from "@/utils/client";
 import {
   ALL_WORKBOOKS_QUERY_KEY,
   QuerySnapshot,
@@ -14,7 +15,7 @@ import {
 } from "@/utils/queryCache";
 import WorkbookCreateForm from "./WorkbookCreateForm";
 
-type Workbook = components["schemas"]["Workbook"];
+type Workbook = ApiWorkbook;
 
 interface Props extends BoxProps {}
 
@@ -24,7 +25,9 @@ export default function WorkbookCreateModalButton({}: Props) {
   const previousWorkbooksRef = useRef<QuerySnapshot<Workbook[]>>([]);
   const previousAllWorkbooksRef = useRef<QuerySnapshot<Workbook[]>>([]);
   const tempWidRef = useRef<string | null>(null);
-  const { mutateAsync } = $api.useMutation("post", "/workbooks", {
+  const { mutateAsync } = useMutation({
+    mutationKey: ["post", "/workbooks"],
+    mutationFn: api.postWorkbooks,
     onMutate: async ({ body }) => {
       const tempWid = `tmp-${Date.now()}`;
       tempWidRef.current = tempWid;
@@ -50,6 +53,10 @@ export default function WorkbookCreateModalButton({}: Props) {
         name: body.name,
         date: body.published ?? null,
         creatorId: "",
+        total: 0,
+        corrects: 0,
+        wrongs: 0,
+        ignored: 0,
       };
 
       previousWorkbooks.forEach(([key, data]) => {
@@ -102,7 +109,7 @@ export default function WorkbookCreateModalButton({}: Props) {
       await mutateAsync({
         body: {
           name,
-          published,
+          published: published?.toISOString(),
         },
       });
     } catch (e) {

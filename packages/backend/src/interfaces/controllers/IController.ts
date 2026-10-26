@@ -1,36 +1,43 @@
-import { ApiError } from "api";
+import fs from "node:fs/promises";
+import path from "node:path";
+import type { ApiContext } from "@/http/context.js";
+import { getI, putI, postIImage } from "@/http/schemas.js";
+import { ApiError } from "@/http/ApiError.js";
 import IUserRepository from "@/domains/User/IUserRepository.js";
 import { format } from "@/plugins/day.js";
-import { asyncWrapper, typedAsyncWrapper } from "@/utils/index.js";
 
 export default class IController {
   constructor(private userRepository: IUserRepository) {}
 
   get() {
-    return typedAsyncWrapper<"/i", "get">(async (req, res) => {
-      const uid = req.user.uid;
+    return async (c: ApiContext<typeof getI>) => {
+      const uid = c.get("user").uid;
 
       const i = await this.userRepository.findByUid(uid);
 
       if (!i) throw new ApiError().invalidParams();
 
-      res.send({
-        uid: i.uid,
-        username: i.username,
-        nickname: i.nickname,
-        created: format(i.created),
-        modified: format(i.modified),
-        permission: i.permission,
-        photoURL: i.photoUrl,
-      });
-    });
+      return c.json(
+        {
+          uid: i.uid,
+          username: i.username,
+          nickname: i.nickname,
+          created: format(i.created),
+          modified: format(i.modified),
+          permission: i.permission,
+          photoURL: i.photoUrl,
+        },
+        200,
+      );
+    };
   }
 
   put() {
-    return typedAsyncWrapper<"/i", "put">(async (req, res) => {
-      const username = req.body.username;
-      const nickname = req.body.nickname || undefined;
-      const uid = req.user.uid;
+    return async (c: ApiContext<typeof putI>) => {
+      const body = c.req.valid("json");
+      const username = body.username;
+      const nickname = body.nickname || undefined;
+      const uid = c.get("user").uid;
 
       const i = await this.userRepository.findByUid(uid);
 
@@ -41,22 +48,25 @@ export default class IController {
 
       await this.userRepository.update(i);
 
-      res.send({
-        uid,
-        username: i.username,
-        nickname: i.nickname,
-        created: format(i.created),
-        modified: format(i.modified),
-        permission: i.permission,
-        photoURL: i.photoUrl,
-      });
-    });
+      return c.json(
+        {
+          uid,
+          username: i.username,
+          nickname: i.nickname,
+          created: format(i.created),
+          modified: format(i.modified),
+          permission: i.permission,
+          photoURL: i.photoUrl,
+        },
+        200,
+      );
+    };
   }
 
   registerProfileImage() {
-    return asyncWrapper(async (req, res) => {
-      const file = req.file;
-      const uid = req.user.uid;
+    return async (c: ApiContext<typeof postIImage>) => {
+      const file = c.req.valid("form").file;
+      const uid = c.get("user").uid;
 
       if (!file) {
         throw new ApiError({
@@ -66,7 +76,13 @@ export default class IController {
           status: 400,
         });
       }
-      const filename = file.filename;
+      const filename = `${uid}.png`;
+      const directory = path.join(process.cwd(), "public/images");
+      await fs.mkdir(directory, { recursive: true });
+      await fs.writeFile(
+        path.join(directory, filename),
+        Buffer.from(await file.arrayBuffer()),
+      );
 
       const i = await this.userRepository.findByUid(uid);
       if (!i) throw new ApiError().invalidParams();
@@ -76,7 +92,7 @@ export default class IController {
       i.setPhotoUrl(photoUrl);
       await this.userRepository.update(i);
 
-      res.send({
+      return c.json({
         uid,
         username: i.username,
         nickname: i.nickname,
@@ -85,6 +101,6 @@ export default class IController {
         permission: i.permission,
         photoUrl,
       });
-    });
+    };
   }
 }

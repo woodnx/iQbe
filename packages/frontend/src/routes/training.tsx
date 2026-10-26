@@ -1,3 +1,5 @@
+import { useQuery } from "@tanstack/react-query";
+import { api } from "@/utils/api";
 import {
   Button,
   Card,
@@ -15,7 +17,6 @@ import { IconHistory } from "@tabler/icons-react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import dayjs from "dayjs";
 import { useState } from "react";
-import { $api } from "@/utils/client";
 import { convertDates } from "@/utils/convertDates";
 
 export const Route = createFileRoute("/training")({
@@ -23,12 +24,16 @@ export const Route = createFileRoute("/training")({
 });
 
 function RouteComponent() {
-  const { data: workbooks } = $api.useQuery("get", "/workbooks");
+  const { data: workbooks } = useQuery({
+    queryKey: ["get", "/workbooks"],
+    queryFn: ({ signal }) => api.getWorkbooks({}, signal),
+  });
   // const { data: histories } = $api.useQuery("get", "/histories/{since}/{until}");
   const histories =
-    $api
-      .useQuery("get", "/histories")
-      .data?.map((d) => dayjs(d).format("YYYY-MM-DD")) || [];
+    useQuery({
+      queryKey: ["get", "/histories"],
+      queryFn: ({ signal }) => api.getHistories({}, signal),
+    }).data?.map((d) => dayjs(d).format("YYYY-MM-DD")) || [];
   const [dates, setDates] = useState<[Date | null, Date | null]>([null, null]);
   const navigate = useNavigate();
   const maxWorkbook = 5;

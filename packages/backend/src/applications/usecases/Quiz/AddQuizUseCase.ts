@@ -1,4 +1,4 @@
-import { components } from "api/schema";
+import type { QuizResponseDTO as ApiQuizResponseDTO } from "@/types/dto.js";
 import Quiz from "@/domains/Quiz/index.js";
 import IQuizRepository from "@/domains/Quiz/IQuizRepository.js";
 import QuizService from "@/domains/Quiz/QuizService.js";
@@ -8,8 +8,7 @@ import { QuizAttachedTagsService } from "@/domains/QuizAttachedTags/QuizAttached
 import ITagRepository from "@/domains/Tag/ITagRepository.js";
 import ITransactionManager from "../../shared/ITransactionManager.js";
 
-type QuizDTO =
-  components["responses"]["QuizResponse"]["content"]["application/json"];
+type QuizDTO = ApiQuizResponseDTO;
 
 export type AddQuizUseCaseCommand = {
   question: string;

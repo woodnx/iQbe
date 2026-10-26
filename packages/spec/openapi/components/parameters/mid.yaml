@@ -1,5 +1,0 @@
-name: mid
-in: query
-required: false
-schema: 
-  type: string

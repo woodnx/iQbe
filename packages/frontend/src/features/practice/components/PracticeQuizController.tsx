@@ -1,10 +1,10 @@
+import type { Quiz as ApiQuiz } from "@/utils/api-types";
 import { BoxProps, Button, Card, Center, Group } from "@mantine/core";
 import {
   IconChevronsRight,
   IconPlaystationCircle,
   IconX,
 } from "@tabler/icons-react";
-import { components } from "api/schema";
 import { useEffect, useState } from "react";
 // import { useTimer, useTypewriter } from "@/hooks";
 import { PracticeQuizButton } from "./PracticeQuizButton";
@@ -12,7 +12,7 @@ import { PracticeQuizInfo } from "./PracticeQuizInfo";
 import { Scene } from "./PracticeSceneChanger";
 import { PracticeTypewriteQuiz } from "./PracticeTypewriteQuiz";
 
-type Quiz = components["schemas"]["Quiz"];
+type Quiz = ApiQuiz;
 export type QuizScene =
   | "preparation"
   | "typewriting"

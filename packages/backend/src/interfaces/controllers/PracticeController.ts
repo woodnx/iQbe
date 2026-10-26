@@ -1,15 +1,17 @@
+import type { ApiContext } from "@/http/context.js";
+import { postPractice } from "@/http/schemas.js";
 import PracticeUseCase from "@/applications/usecases/PracticeUseCase.js";
-import { typedAsyncWrapper } from "@/utils/index.js";
 
 export default class PracticeController {
   constructor(private practiceUseCase: PracticeUseCase) {}
 
   practice() {
-    return typedAsyncWrapper<"/practice", "post">(async (req, res) => {
-      const uid = req.user.uid;
-      const qid = req.body.qid;
-      const judgement = req.body.judgement;
-      const pressedWordPosition = req.body.pressedWord;
+    return async (c: ApiContext<typeof postPractice>) => {
+      const body = c.req.valid("json");
+      const uid = c.get("user").uid;
+      const qid = body.qid;
+      const judgement = body.judgement;
+      const pressedWordPosition = body.pressedWord;
 
       await this.practiceUseCase.addPractice(
         uid,
@@ -18,7 +20,7 @@ export default class PracticeController {
         pressedWordPosition,
       );
 
-      res.status(200).send();
-    });
+      return c.body(null, 200);
+    };
   }
 }

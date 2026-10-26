@@ -1,8 +1,9 @@
+import type { Mylist as ApiMylist, Quiz as ApiQuiz } from "@/utils/api-types";
+import { useMutation } from "@tanstack/react-query";
+import { api } from "@/utils/api";
 import { BoxProps } from "@mantine/core";
 import { ContextModalProps } from "@mantine/modals";
 import { useQueryClient } from "@tanstack/react-query";
-import { components } from "api/schema";
-import { $api } from "@/utils/client";
 import {
   MYLISTS_QUERY_KEY,
   QUIZZES_QUERY_KEY,
@@ -18,8 +19,8 @@ interface MylistEditModalInnerProps extends BoxProps {
   name: string;
 }
 
-type Mylist = components["schemas"]["Mylist"];
-type Quiz = components["schemas"]["Quiz"];
+type Mylist = ApiMylist;
+type Quiz = ApiQuiz;
 
 export default function MylistEditModal({
   context,
@@ -28,7 +29,9 @@ export default function MylistEditModal({
 }: ContextModalProps<MylistEditModalInnerProps>) {
   const { mid, name } = innerProps;
   const queryClient = useQueryClient();
-  const { mutate } = $api.useMutation("put", "/mylists", {
+  const { mutate } = useMutation({
+    mutationKey: ["put", "/mylists"],
+    mutationFn: api.putMylists,
     onMutate: async ({ body }) => {
       await queryClient.cancelQueries({ queryKey: MYLISTS_QUERY_KEY });
       await queryClient.cancelQueries({ queryKey: QUIZZES_QUERY_KEY });

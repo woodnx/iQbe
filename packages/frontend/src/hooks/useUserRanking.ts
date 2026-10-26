@@ -1,17 +1,35 @@
+import { useQuery } from "@tanstack/react-query";
+import { api } from "@/utils/api";
 import { Period } from "@/plugins/dayjs";
-import { $api } from "@/utils/client";
 
 export const useAllUserRanking = (period: Period) => {
   const {
     data: allUserRanking,
     error,
     isLoading,
-  } = $api.useQuery("get", "/analysis/ranking/all/{period}", {
-    params: {
-      path: {
-        period,
+  } = useQuery({
+    queryKey: [
+      "get",
+      "/analysis/ranking/all/{period}",
+      {
+        params: {
+          path: {
+            period,
+          },
+        },
       },
-    },
+    ],
+    queryFn: ({ signal }) =>
+      api.getAnalysisRankingAllPeriod(
+        {
+          params: {
+            path: {
+              period,
+            },
+          },
+        },
+        signal,
+      ),
   });
 
   return {
@@ -26,12 +44,29 @@ export const usePersonalRank = (period: Period) => {
     data: personalRank,
     error,
     isLoading,
-  } = $api.useQuery("get", "/analysis/ranking/personal/{period}", {
-    params: {
-      path: {
-        period,
+  } = useQuery({
+    queryKey: [
+      "get",
+      "/analysis/ranking/personal/{period}",
+      {
+        params: {
+          path: {
+            period,
+          },
+        },
       },
-    },
+    ],
+    queryFn: ({ signal }) =>
+      api.getAnalysisRankingPersonalPeriod(
+        {
+          params: {
+            path: {
+              period,
+            },
+          },
+        },
+        signal,
+      ),
   });
 
   return {

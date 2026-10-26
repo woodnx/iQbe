@@ -1,5 +1,0 @@
-name: isFavorite
-in: query
-required: false
-schema: 
-  type: boolean 

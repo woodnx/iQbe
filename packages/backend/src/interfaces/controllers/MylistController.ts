@@ -1,9 +1,15 @@
-import { ApiError } from "api";
+import type { ApiContext } from "@/http/context.js";
+import {
+  getMylists,
+  postMylists,
+  putMylists,
+  deleteMylists,
+} from "@/http/schemas.js";
+import { ApiError } from "@/http/ApiError.js";
 
 import Mylist from "@/domains/Mylist/index.js";
 import IMylistRepository from "@/domains/Mylist/IMylistRepository.js";
 import MylistService from "@/domains/Mylist/MylistService.js";
-import { typedAsyncWrapper } from "@/utils/index.js";
 
 export default class MylistController {
   constructor(
@@ -12,12 +18,12 @@ export default class MylistController {
   ) {}
 
   get() {
-    return typedAsyncWrapper<"/mylists", "get">(async (req, res) => {
-      const uid = req.user.uid;
+    return async (c: ApiContext<typeof getMylists>) => {
+      const uid = c.get("user").uid;
 
       const mylists = await this.mylistRepository.findManyByCreatorUid(uid);
 
-      res.status(200).send(
+      return c.json(
         mylists.map((m) => ({
           mid: m.mid,
           name: m.name,
@@ -28,14 +34,16 @@ export default class MylistController {
           ignored: m.ignored,
           lastPracticedAt: m.lastPracticedAt,
         })),
+        200,
       );
-    });
+    };
   }
 
   post() {
-    return typedAsyncWrapper<"/mylists", "post">(async (req, res) => {
-      const uid = req.user.uid;
-      const listName = req.body.listName;
+    return async (c: ApiContext<typeof postMylists>) => {
+      const body = c.req.valid("json");
+      const uid = c.get("user").uid;
+      const listName = body.listName;
       const now = new Date();
 
       if (!listName) throw new ApiError().invalidParams();
@@ -45,57 +53,71 @@ export default class MylistController {
 
       await this.mylistRepository.save(mylist);
 
-      res.send({
-        mid,
-        name: listName,
-        created: now,
-        total: 0,
-        corrects: 0,
-        wrongs: 0,
-        ignored: 0,
-        lastPracticedAt: null,
-      });
-    });
+      return c.json(
+        {
+          mid,
+          name: listName,
+          created: now,
+          total: 0,
+          corrects: 0,
+          wrongs: 0,
+          ignored: 0,
+          lastPracticedAt: null,
+        },
+        200,
+      );
+    };
   }
 
   put() {
-    return typedAsyncWrapper<"/mylists", "put">(async (req, res) => {
-      const mid = req.body.mid;
-      const listName = req.body.listName;
+    return async (c: ApiContext<typeof putMylists>) => {
+      const body = c.req.valid("json");
+      const mid = body.mid;
+      const listName = body.listName;
       if (!mid || !listName) throw new ApiError().invalidParams();
 
-      const mylist = await this.mylistRepository.findByMid(mid, req.user.uid);
+      const mylist = await this.mylistRepository.findByMid(
+        mid,
+        c.get("user").uid,
+      );
       if (!mylist) throw new ApiError().invalidParams();
 
       mylist.rename(listName);
       await this.mylistRepository.update(mylist);
 
-      res.send({
-        mid,
-        name: listName,
-        created: mylist.created,
-        total: mylist.total,
-        corrects: mylist.corrects,
-        wrongs: mylist.wrongs,
-        ignored: mylist.ignored,
-        lastPracticedAt: mylist.lastPracticedAt,
-      });
-    });
+      return c.json(
+        {
+          mid,
+          name: listName,
+          created: mylist.created,
+          total: mylist.total,
+          corrects: mylist.corrects,
+          wrongs: mylist.wrongs,
+          ignored: mylist.ignored,
+          lastPracticedAt: mylist.lastPracticedAt,
+        },
+        200,
+      );
+    };
   }
 
   delete() {
-    return typedAsyncWrapper<"/mylists", "delete">(async (req, res) => {
-      const mid = req.body.mid;
-      const uid = req.user.uid;
+    return async (c: ApiContext<typeof deleteMylists>) => {
+      const body = c.req.valid("json");
+      const mid = body.mid;
+      const uid = c.get("user").uid;
       if (!mid) throw new ApiError().invalidParams();
 
-      const mylist = await this.mylistRepository.findByMid(mid, req.user.uid);
+      const mylist = await this.mylistRepository.findByMid(
+        mid,
+        c.get("user").uid,
+      );
       if (!mylist) throw new ApiError().invalidParams();
 
       await this.mylistRepository.delete(mylist);
       const mylists = await this.mylistRepository.findManyByCreatorUid(uid);
 
-      res.send(
+      return c.json(
         mylists.map((m) => ({
           mid: m.mid,
           name: m.name,
@@ -106,7 +128,8 @@ export default class MylistController {
           ignored: m.ignored,
           lastPracticedAt: m.lastPracticedAt,
         })),
+        200,
       );
-    });
+    };
   }
 }

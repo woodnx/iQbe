@@ -1,4 +1,4 @@
-import { ApiError } from "api";
+import { ApiError } from "@/http/ApiError.js";
 import Workbook from "@/domains/Workbook/index.js";
 import IWorkbookRepository from "@/domains/Workbook/IWorkbookRepository.js";
 import dayjs, { format } from "@/plugins/day.js";

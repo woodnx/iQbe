@@ -1,3 +1,5 @@
+import { useQuery } from "@tanstack/react-query";
+import { api } from "@/utils/api";
 import { Group } from "@mantine/core";
 import { createFileRoute, useRouter, useSearch } from "@tanstack/react-router";
 import { useState } from "react";
@@ -10,7 +12,6 @@ import QuizTransfarButton from "@/features/quiz/components/QuizTransfarButton";
 import { useHistories } from "@/hooks/useHistories";
 import dayjs from "@/plugins/dayjs";
 import { Judgement } from "@/types";
-import { $api } from "@/utils/client";
 import { convertJudgements } from "@/utils/convertJudgement";
 import { quizSearchSchema } from "./_schemas/quizSearch";
 
@@ -54,25 +55,65 @@ function RouteComponent() {
   const wrong = !!histories ? Number(histories.wrong) : 0;
   const throgh = !!histories ? Number(histories.through) : 0;
 
-  const { data: quizzes } = $api.useQuery("get", "/quizzes", {
-    params: {
-      query: {
-        ...search,
-        judgements,
-        since: dates[0],
-        until: dates[1],
+  const { data: quizzes } = useQuery({
+    queryKey: [
+      "get",
+      "/quizzes",
+      {
+        params: {
+          query: {
+            ...search,
+            judgements,
+            since: dates[0],
+            until: dates[1],
+          },
+        },
       },
-    },
+    ],
+    queryFn: ({ signal }) =>
+      api.getQuizzes(
+        {
+          params: {
+            query: {
+              ...search,
+              judgements,
+              since: dates[0],
+              until: dates[1],
+            },
+          },
+        },
+        signal,
+      ),
   });
-  const { data: quizzesSize } = $api.useQuery("get", "/quizzes/size", {
-    params: {
-      query: {
-        ...search,
-        judgements,
-        since: dates[0],
-        until: dates[1],
+  const { data: quizzesSize } = useQuery({
+    queryKey: [
+      "get",
+      "/quizzes/size",
+      {
+        params: {
+          query: {
+            ...search,
+            judgements,
+            since: dates[0],
+            until: dates[1],
+          },
+        },
       },
-    },
+    ],
+    queryFn: ({ signal }) =>
+      api.getQuizzesSize(
+        {
+          params: {
+            query: {
+              ...search,
+              judgements,
+              since: dates[0],
+              until: dates[1],
+            },
+          },
+        },
+        signal,
+      ),
   });
   const size =
     !!quizzes && !!quizzes.length && !!quizzesSize ? quizzesSize.size : 0;

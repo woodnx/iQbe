@@ -1,41 +1,44 @@
-import { ApiError } from "api";
+import type { ApiContext } from "@/http/context.js";
+import { getInviteCode, postInviteCode } from "@/http/schemas.js";
+import { ApiError } from "@/http/ApiError.js";
 import { nanoid } from "nanoid";
 
 import IInviteCodeRepository from "@/domains/InviteCode/IInviteCodeRepository.js";
-import { typedAsyncWrapper } from "@/utils/index.js";
 
 export default class InviteCodeController {
   constructor(private inviteCodeRepository: IInviteCodeRepository) {}
 
   get() {
-    return typedAsyncWrapper<"/invite-code", "get">(async (req, res) => {
-      if (!req.user.isSuperUser) throw new ApiError().accessDenied();
+    return async (c: ApiContext<typeof getInviteCode>) => {
+      const query = c.req.valid("query");
+      if (!c.get("user").isSuperUser) throw new ApiError().accessDenied();
 
-      const status = req.query?.status || undefined;
-      const sort = req.query?.sort || undefined;
+      const status = query?.status || undefined;
+      const sort = query?.sort || undefined;
 
       const inviteCodes = await this.inviteCodeRepository.findMany({
         status,
         sort,
       });
 
-      res.status(200).send(
+      return c.json(
         inviteCodes.map((inviteCode) => ({
           code: inviteCode.code,
           status: inviteCode.used,
           created: inviteCode.created,
         })),
+        200,
       );
-    });
+    };
   }
 
   create() {
-    return typedAsyncWrapper<"/invite-code", "post">(async (req, res) => {
-      if (!req.user.isSuperUser) throw new ApiError().accessDenied();
+    return async (c: ApiContext<typeof postInviteCode>) => {
+      if (!c.get("user").isSuperUser) throw new ApiError().accessDenied();
 
       const code = nanoid(8);
       await this.inviteCodeRepository.save(code);
-      res.status(200).send({ code });
-    });
+      return c.json({ code }, 200);
+    };
   }
 }

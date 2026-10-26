@@ -1,3 +1,5 @@
+import { useMutation } from "@tanstack/react-query";
+import { api } from "@/utils/api";
 import {
   Button,
   Flex,
@@ -13,7 +15,6 @@ import { IconAlertTriangle } from "@tabler/icons-react";
 import { useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { signupUser } from "@/plugins/auth";
-import { $api } from "@/utils/client";
 import UsernameInput from "./UsernameInput";
 
 interface SubmitValue {
@@ -27,7 +28,9 @@ const requiredInviteCode =
 
 export function UserSignupModal() {
   const [available, setAvailable] = useState(false);
-  const { mutate } = $api.useMutation("post", "/auth/available", {
+  const { mutate } = useMutation({
+    mutationKey: ["post", "/auth/available"],
+    mutationFn: api.postAuthAvailable,
     onMutate() {
       setAvailable(true);
     },

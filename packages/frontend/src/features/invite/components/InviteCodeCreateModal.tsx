@@ -1,7 +1,8 @@
+import { useQuery } from "@tanstack/react-query";
+import { api } from "@/utils/api";
 import { useState } from "react";
 
 import { useIsMobile } from "@/contexts/isMobile";
-import { $api } from "@/utils/client";
 import {
   ActionIcon,
   Button,
@@ -18,14 +19,13 @@ export interface InviteCodeCreateModalProps {}
 export default function InviteCodeCreateModal({}: InviteCodeCreateModalProps) {
   const [opened, { open, close }] = useDisclosure();
   const [enabled, setEnabled] = useState(false);
-  const { data } = $api.useQuery(
-    "post",
-    "/invite-code",
-    {},
-    {
+  const { data } = useQuery({
+    queryKey: ["post", "/invite-code", {}],
+    queryFn: ({ signal }) => api.postInviteCode({}, signal),
+    ...{
       enabled,
     },
-  );
+  });
   const inviteCode = data?.code;
   const isMobile = useIsMobile();
 

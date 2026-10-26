@@ -1,11 +1,15 @@
-import { $api } from "@/utils/client";
+import { useQuery } from "@tanstack/react-query";
+import { api } from "@/utils/api";
 
 export const useCategories = () => {
   const {
     data: categories,
     error,
     isLoading,
-  } = $api.useQuery("get", "/categories");
+  } = useQuery({
+    queryKey: ["get", "/categories"],
+    queryFn: ({ signal }) => api.getCategories({}, signal),
+  });
 
   return {
     categories,

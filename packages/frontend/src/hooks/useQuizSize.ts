@@ -1,33 +1,13 @@
-import { paths } from "api/schema";
-import { $api } from "@/utils/client";
+import type { QuizQuery } from "@/utils/api-types";
+import { useQuery } from "@tanstack/react-query";
+import { api } from "@/utils/api";
 
-type QuizSizeRequestParams =
-  paths["/quizzes/size"]["get"]["parameters"]["query"] & {};
-
-const useQuizSize = (params: QuizSizeRequestParams, shouldFetch = true) => {
-  const { data, error, isLoading } = $api.useQuery("get", "/quizzes/size", {
-    params: {
-      query: {
-        wids: params.wids,
-        keyword: params.keyword,
-        keywordOption: Number(params.keywordOption),
-        judgements: params.judgements,
-        since: params.since,
-        until: params.until,
-        mid: params.mid,
-        isFavorite: params.isFavorite,
-        categories: params.categories,
-        tags: params.tags,
-      },
-    },
+const useQuizSize = (query: QuizQuery, shouldFetch = true) => {
+  const { data, error, isLoading } = useQuery({
+    queryKey: ["get", "/quizzes/size", { params: { query } }],
+    queryFn: ({ signal }) => api.getQuizzesSize({ params: { query } }, signal),
     enabled: shouldFetch,
   });
-
-  return {
-    quizzesSize: data?.size,
-    isLoading,
-    error,
-  };
+  return { quizzesSize: data?.size, isLoading, error };
 };
-
 export default useQuizSize;

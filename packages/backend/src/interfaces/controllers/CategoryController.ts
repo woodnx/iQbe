@@ -1,4 +1,14 @@
-import { ApiError } from "api";
+import type { ApiContext } from "@/http/context.js";
+import {
+  getCategories,
+  getCategoriesId,
+  postCategories,
+  putCategoriesId,
+  deleteCategoriesId,
+  getCategoriesPreset,
+  postCategoriesPreset,
+} from "@/http/schemas.js";
+import { ApiError } from "@/http/ApiError.js";
 
 import { AddCategoryPresetUseCase } from "@/applications/usecases/Category/AddCategoryPresetUseCase.js";
 import { CreateCategoryUseCase } from "@/applications/usecases/Category/CreateCategoryUseCase.js";
@@ -7,7 +17,6 @@ import { GetCategoriesUseCase } from "@/applications/usecases/Category/GetCatego
 import { GetCategoryChainUseCase } from "@/applications/usecases/Category/GetCategoryChainUseCase.js";
 import { GetCategoryPresetListUseCase } from "@/applications/usecases/Category/GetCategoryPresetListUseCase.js";
 import { UpdateCategoryUseCase } from "@/applications/usecases/Category/UpdateCategoryUseCase.js";
-import { typedAsyncWrapper } from "@/utils/index.js";
 
 export default class CategoryController {
   constructor(
@@ -21,16 +30,17 @@ export default class CategoryController {
   ) {}
 
   get() {
-    return typedAsyncWrapper<"/categories", "get">(async (req, res) => {
+    return async (c: ApiContext<typeof getCategories>) => {
       const categories = await this.getCategoriesUseCase.execute();
 
-      res.status(200).send(categories);
-    });
+      return c.json(categories, 200);
+    };
   }
 
   getFromId() {
-    return typedAsyncWrapper<"/categories/{id}", "get">(async (req, res) => {
-      const { id } = req.params;
+    return async (c: ApiContext<typeof getCategoriesId>) => {
+      const param = c.req.valid("param");
+      const { id } = param;
       const parsedId = Number(id);
 
       if (!Number.isFinite(parsedId)) throw new ApiError().invalidParams();
@@ -39,15 +49,16 @@ export default class CategoryController {
         id: parsedId,
       });
 
-      res.status(200).send(categories);
-    });
+      return c.json(categories, 200);
+    };
   }
 
   post() {
-    return typedAsyncWrapper<"/categories", "post">(async (req, res) => {
-      if (!req.user.isSuperUser) throw new ApiError().accessDenied();
+    return async (c: ApiContext<typeof postCategories>) => {
+      const body = c.req.valid("json");
+      if (!c.get("user").isSuperUser) throw new ApiError().accessDenied();
 
-      const { name, description, parentId, disabled } = req.body;
+      const { name, description, parentId, disabled } = body;
 
       if (!name) {
         throw new ApiError().invalidParams();
@@ -60,16 +71,18 @@ export default class CategoryController {
         disabled,
       });
 
-      res.status(201).send();
-    });
+      return c.body(null, 201);
+    };
   }
 
   put() {
-    return typedAsyncWrapper<"/categories/{id}", "put">(async (req, res) => {
-      if (!req.user.isSuperUser) throw new ApiError().accessDenied();
+    return async (c: ApiContext<typeof putCategoriesId>) => {
+      const param = c.req.valid("param");
+      const body = c.req.valid("json");
+      if (!c.get("user").isSuperUser) throw new ApiError().accessDenied();
 
-      const { id } = req.params;
-      const { description, disabled } = req.body;
+      const { id } = param;
+      const { description, disabled } = body;
 
       if (!id) {
         throw new ApiError().invalidParams();
@@ -84,14 +97,17 @@ export default class CategoryController {
         description: description || null,
         disabled,
       });
-    });
+
+      return c.body(null, 200);
+    };
   }
 
   delete() {
-    return typedAsyncWrapper<"/categories/{id}", "delete">(async (req, res) => {
-      if (req.user.isSuperUser) throw new ApiError().accessDenied();
+    return async (c: ApiContext<typeof deleteCategoriesId>) => {
+      const param = c.req.valid("param");
+      if (c.get("user").isSuperUser) throw new ApiError().accessDenied();
 
-      const { id } = req.params;
+      const { id } = param;
 
       if (!id) throw new ApiError().invalidParams();
 
@@ -100,20 +116,23 @@ export default class CategoryController {
       if (!Number.isFinite(parsedId)) throw new ApiError().invalidParams();
 
       await this.deleteCategoryUseCase.execute({ id: parsedId });
-    });
+
+      return c.body(null, 204);
+    };
   }
 
   getPreset() {
-    return typedAsyncWrapper<"/categories/preset", "get">(async (req, res) => {
-      res.send(this.getCategoryPresetListUseCase.execute());
-    });
+    return async (c: ApiContext<typeof getCategoriesPreset>) => {
+      return c.json(this.getCategoryPresetListUseCase.execute(), 200);
+    };
   }
 
   addFromPreset() {
-    return typedAsyncWrapper<"/categories/preset", "post">(async (req, res) => {
-      if (!req.user.isSuperUser) throw new ApiError().accessDenied();
+    return async (c: ApiContext<typeof postCategoriesPreset>) => {
+      const body = c.req.valid("json");
+      if (!c.get("user").isSuperUser) throw new ApiError().accessDenied();
 
-      const preset = req.body.preset;
+      const preset = body.preset;
 
       if (!preset) {
         throw new ApiError().invalidParams();
@@ -121,7 +140,7 @@ export default class CategoryController {
 
       await this.addCategoryPresetUseCase.execute({ preset });
 
-      res.send();
-    });
+      return c.body(null, 200);
+    };
   }
 }

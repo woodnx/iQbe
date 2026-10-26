@@ -1,8 +1,7 @@
 import { Group, Loader, Overlay, Text } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter, useSearch } from "@tanstack/react-router";
-import { components } from "api/schema";
 import { useEffect, useState } from "react";
 import FilteringModal from "@/features/filtering/components/FilteringModal";
 import FilteringModalButton from "@/features/filtering/components/FilteringModalButton";
@@ -11,7 +10,8 @@ import { PracticeQuizController } from "@/features/practice/components/PracticeQ
 import { PracticeQuizIntro } from "@/features/practice/components/PracticeQuizIntro";
 import PracticeResultModal from "@/features/practice/components/PracticeResultModal";
 import { useTimer } from "@/hooks";
-import { $api } from "@/utils/client";
+import { api } from "@/utils/api";
+import type { Quiz as ApiQuiz } from "@/utils/api-types";
 import {
   QUIZZES_QUERY_KEY,
   QuerySnapshot,
@@ -19,7 +19,7 @@ import {
   takeQuerySnapshot,
 } from "@/utils/queryCache";
 
-type Quiz = components["schemas"]["Quiz"];
+type Quiz = ApiQuiz;
 export type Scene = "preparation" | "ready" | "quizzing" | "result";
 
 interface Props {
@@ -47,7 +47,9 @@ export default function ({
   const router = useRouter();
   const search = useSearch({ from: "/practice" });
   const queryClient = useQueryClient();
-  const { mutate } = $api.useMutation("post", "/practice", {
+  const { mutate } = useMutation({
+    mutationKey: ["post", "/practice"],
+    mutationFn: api.postPractice,
     onMutate: async ({ body }) => {
       await queryClient.cancelQueries({ queryKey: QUIZZES_QUERY_KEY });
       const previousQuizzes = takeQuerySnapshot<Quiz[]>(

@@ -1,4 +1,5 @@
-import { $api } from "@/utils/client";
+import { useQuery } from "@tanstack/react-query";
+import { api } from "@/utils/api";
 import { TagsInput } from "@mantine/core";
 import { useDebouncedValue } from "@mantine/hooks";
 import { useState } from "react";
@@ -17,12 +18,29 @@ export default function TagInput({
   const [search, setSearch] = useState("");
   const [debounced] = useDebouncedValue(search, 500);
 
-  const { data: searchedTags } = $api.useQuery("get", "/tags", {
-    params: {
-      query: {
-        q: debounced,
+  const { data: searchedTags } = useQuery({
+    queryKey: [
+      "get",
+      "/tags",
+      {
+        params: {
+          query: {
+            q: debounced,
+          },
+        },
       },
-    },
+    ],
+    queryFn: ({ signal }) =>
+      api.getTags(
+        {
+          params: {
+            query: {
+              q: debounced,
+            },
+          },
+        },
+        signal,
+      ),
   });
 
   const data = searchedTags?.map((item) => item.label);

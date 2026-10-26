@@ -1,12 +1,15 @@
+import type {
+  Mylist as ApiMylist,
+  Workbook as ApiWorkbook,
+} from "@/utils/api-types";
 import { BoxProps, Card, Group, Overlay, Text } from "@mantine/core";
-import { components } from "api/schema";
 import { useIsMobile } from "@/contexts/isMobile";
 import QuizFavoriteButton from "@/features/quiz/components/QuizFavoriteButton";
 import QuizMylistButton from "@/features/quiz/components/QuizMylistButton";
 import { QuizWorkbookBadge } from "@/features/quiz/components/QuizWorkbookBadge";
 
-type Mylist = components["schemas"]["Mylist"];
-type Workbook = components["schemas"]["Workbook"];
+type Mylist = ApiMylist;
+type Workbook = ApiWorkbook;
 
 interface Props extends BoxProps {
   qid?: string;

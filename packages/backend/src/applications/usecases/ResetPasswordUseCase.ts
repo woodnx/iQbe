@@ -1,4 +1,4 @@
-import { ApiError } from "api";
+import { ApiError } from "@/http/ApiError.js";
 import { randomUUID } from "crypto";
 
 import ITransactionManager from "@/applications/shared/ITransactionManager.js";

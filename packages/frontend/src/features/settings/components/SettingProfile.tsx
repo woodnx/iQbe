@@ -1,3 +1,5 @@
+import { useMutation } from "@tanstack/react-query";
+import { api } from "@/utils/api";
 import { Button, Center, Grid, Group, Modal, TextInput } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
@@ -8,7 +10,6 @@ import store from "storejs";
 import UsernameInput from "@/features/user/components/UsernameInput";
 import { useLoginedUser } from "@/hooks/useLoginedUser";
 import ImageCropper from "@/shared/components/ImageCropper";
-import { $api } from "@/utils/client";
 import getCroppedImg from "@/utils/getCroppedImage";
 import ButtonWithFileInput from "./ButtonWithFileInput";
 
@@ -23,7 +24,9 @@ export default function SettingProfile() {
     undefined,
   );
   const previousPreviewImageRef = useRef<string | undefined>(undefined);
-  const { mutateAsync: editUser } = $api.useMutation("put", "/i", {
+  const { mutateAsync: editUser } = useMutation({
+    mutationKey: ["put", "/i"],
+    mutationFn: api.putI,
     onMutate: ({ body }) => {
       const previousUser = store.get("loginedUser") as
         | Record<string, unknown>
@@ -53,7 +56,9 @@ export default function SettingProfile() {
       store.set("loginedUser", previousUser);
     },
   });
-  const { mutateAsync: postImage } = $api.useMutation("post", "/i/image", {
+  const { mutateAsync: postImage } = useMutation({
+    mutationKey: ["post", "/i/image"],
+    mutationFn: api.postIImage,
     onMutate: () => {
       previousPreviewImageRef.current = previewImage;
       if (imageSrc) {
@@ -100,13 +105,13 @@ export default function SettingProfile() {
     const croppedImage = await getCroppedImg(imageSrc || "", croppedAreaPixels);
 
     if (!!croppedImage) {
-      const formData = new FormData();
-      formData.append("file", croppedImage);
-
       try {
         await postImage({
-          // @ts-ignore
-          body: formData,
+          body: {
+            file: new File([croppedImage], "profile.png", {
+              type: "image/png",
+            }),
+          },
         });
       } catch {
         return;

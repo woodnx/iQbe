@@ -1,9 +1,10 @@
+import type { Quiz as ApiQuiz } from "@/utils/api-types";
+import { useMutation } from "@tanstack/react-query";
+import { api } from "@/utils/api";
 import { ActionIcon } from "@mantine/core";
 import { IconStar, IconStarFilled } from "@tabler/icons-react";
 import { useQueryClient } from "@tanstack/react-query";
-import { components } from "api/schema";
 import { useState } from "react";
-import { $api } from "@/utils/client";
 import {
   QUIZ_SIZES_QUERY_KEY,
   QUIZZES_QUERY_KEY,
@@ -18,7 +19,7 @@ interface QuizFavoriteButtonProps {
   qid: string;
 }
 
-type Quiz = components["schemas"]["Quiz"];
+type Quiz = ApiQuiz;
 
 export default function QuizFavoriteButton({
   isFavorite: innerIsFavorite,
@@ -26,7 +27,9 @@ export default function QuizFavoriteButton({
 }: QuizFavoriteButtonProps) {
   const [isFavorite, setFavorite] = useState(innerIsFavorite);
   const queryClient = useQueryClient();
-  const { mutate: like } = $api.useMutation("post", "/like", {
+  const { mutate: like } = useMutation({
+    mutationKey: ["post", "/like"],
+    mutationFn: api.postLike,
     onMutate: async ({ body }) => {
       await queryClient.cancelQueries({ queryKey: QUIZZES_QUERY_KEY });
       const previousQuizzes = takeQuerySnapshot<Quiz[]>(
@@ -62,7 +65,9 @@ export default function QuizFavoriteButton({
       queryClient.invalidateQueries({ queryKey: QUIZ_SIZES_QUERY_KEY });
     },
   });
-  const { mutate: unlike } = $api.useMutation("post", "/unlike", {
+  const { mutate: unlike } = useMutation({
+    mutationKey: ["post", "/unlike"],
+    mutationFn: api.postUnlike,
     onMutate: async ({ body }) => {
       await queryClient.cancelQueries({ queryKey: QUIZZES_QUERY_KEY });
       await queryClient.cancelQueries({ queryKey: QUIZ_SIZES_QUERY_KEY });

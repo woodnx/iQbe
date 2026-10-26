@@ -2,7 +2,7 @@ import { Button, Divider, Group, Modal, Text, Title } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { useState } from "react";
 import WorkbookCreateAndSelector from "@/features/workbook/components/WorkbookCreateAndSelector";
-import { Element } from "./CreateDashboard";
+import { Element } from "@/routes/create";
 import PreviewCsvTable from "./PreviewCsvTable";
 
 interface Props {

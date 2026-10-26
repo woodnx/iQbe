@@ -123,7 +123,7 @@ export interface FileRoutesByFullPath {
   '/welcome': typeof WelcomeRoute
   '/mylist/$mid': typeof MylistMidRoute
   '/workbook/$wid': typeof WorkbookWidRoute
-  '/workbook': typeof WorkbookIndexRoute
+  '/workbook/': typeof WorkbookIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -180,7 +180,7 @@ export interface FileRouteTypes {
     | '/welcome'
     | '/mylist/$mid'
     | '/workbook/$wid'
-    | '/workbook'
+    | '/workbook/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -334,7 +334,7 @@ declare module '@tanstack/react-router' {
     '/workbook/': {
       id: '/workbook/'
       path: '/workbook'
-      fullPath: '/workbook'
+      fullPath: '/workbook/'
       preLoaderRoute: typeof WorkbookIndexRouteImport
       parentRoute: typeof rootRouteImport
     }

@@ -1,43 +1,42 @@
-import { ApiError } from "api";
+import type { ApiContext } from "@/http/context.js";
+import { postResetPassword, postRequestResetPassword } from "@/http/schemas.js";
+import { ApiError } from "@/http/ApiError.js";
 
 import ResetPasswordUseCase from "@/applications/usecases/ResetPasswordUseCase.js";
-import { typedAsyncWrapper } from "@/utils/index.js";
 
 export default class ResetPasswordController {
   constructor(private resetPasswordUseCase: ResetPasswordUseCase) {}
 
   reset() {
-    return typedAsyncWrapper<"/reset-password", "post">(
-      async (req, res, next) => {
-        const token = req.body.token;
-        const newPassword = req.body.newPassword;
-        const uid = req.user.uid;
+    return async (c: ApiContext<typeof postResetPassword>) => {
+      const body = c.req.valid("json");
+      const token = body.token;
+      const newPassword = body.newPassword;
+      const uid = c.get("user").uid;
 
-        if (!token || !newPassword) {
-          throw new ApiError().invalidParams();
-        }
+      if (!token || !newPassword) {
+        throw new ApiError().invalidParams();
+      }
 
-        await this.resetPasswordUseCase.resetPassword(token, newPassword, uid);
+      await this.resetPasswordUseCase.resetPassword(token, newPassword, uid);
 
-        res.status(200).send("succeed resetting your password");
-      },
-    );
+      return c.text("succeed resetting your password", 200);
+    };
   }
 
   request() {
-    return typedAsyncWrapper<"/request-reset-password", "post">(
-      async (req, res) => {
-        const email = req.body.email;
-        const username = req.body.username;
+    return async (c: ApiContext<typeof postRequestResetPassword>) => {
+      const body = c.req.valid("json");
+      const email = body.email;
+      const username = body.username;
 
-        if (!email || !username) {
-          throw new ApiError().invalidParams();
-        }
+      if (!email || !username) {
+        throw new ApiError().invalidParams();
+      }
 
-        await this.resetPasswordUseCase.requestResetPassword(username, email);
+      await this.resetPasswordUseCase.requestResetPassword(username, email);
 
-        res.status(200).send("requested resetting your password");
-      },
-    );
+      return c.text("requested resetting your password", 200);
+    };
   }
 }

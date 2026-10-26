@@ -1,13 +1,14 @@
+import type { ApiContext } from "@/http/context.js";
+import { postCsvParse } from "@/http/schemas.js";
 import ICsvImportRepository from "@/domains/CsvImport/ICsvImportRepository.js";
-import { asyncWrapper } from "@/utils/index.js";
-import { ApiError } from "api";
+import { ApiError } from "@/http/ApiError.js";
 
 export default class CsvController {
   constructor(private csvImportRepository: ICsvImportRepository) {}
 
   parse() {
-    return asyncWrapper(async (req, res) => {
-      const file = req.file;
+    return async (c: ApiContext<typeof postCsvParse>) => {
+      const file = c.req.valid("form").file;
 
       if (!file) {
         throw new ApiError({
@@ -18,7 +19,9 @@ export default class CsvController {
         });
       }
 
-      const csv = await this.csvImportRepository.parseCsv(file);
+      const csv = await this.csvImportRepository.parseCsv(
+        Buffer.from(await file.arrayBuffer()),
+      );
 
       const sendCsv = csv.map((c) => ({
         question: c.question,
@@ -26,7 +29,7 @@ export default class CsvController {
         anotherAnswer: c.anotherAnswer,
       }));
 
-      res.send(sendCsv);
-    });
+      return c.json(sendCsv);
+    };
   }
 }

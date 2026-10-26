@@ -1,10 +1,11 @@
+import type { Quiz as ApiQuiz } from "@/utils/api-types";
+import { useMutation } from "@tanstack/react-query";
+import { api } from "@/utils/api";
 import { Button, Group, Text } from "@mantine/core";
 import { ContextModalProps } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
 import { IconTrash } from "@tabler/icons-react";
 import { useQueryClient } from "@tanstack/react-query";
-import { components } from "api/schema";
-import { $api } from "@/utils/client";
 import {
   QUIZ_SIZES_QUERY_KEY,
   QUIZZES_QUERY_KEY,
@@ -14,7 +15,7 @@ import {
   updateRelatedQuizSize,
 } from "@/utils/queryCache";
 
-type Quiz = components["schemas"]["Quiz"];
+type Quiz = ApiQuiz;
 
 export interface QuizDeleteModalInnerProps {
   qid: string;
@@ -27,7 +28,9 @@ const QuizDeleteModal = ({
 }: ContextModalProps<QuizDeleteModalInnerProps>) => {
   const { qid } = innerProps;
   const queryClient = useQueryClient();
-  const { mutate } = $api.useMutation("delete", "/quizzes/{qid}", {
+  const { mutate } = useMutation({
+    mutationKey: ["delete", "/quizzes/{qid}"],
+    mutationFn: api.deleteQuizzesQid,
     onMutate: async ({ params }) => {
       await queryClient.cancelQueries({ queryKey: QUIZZES_QUERY_KEY });
       await queryClient.cancelQueries({ queryKey: QUIZ_SIZES_QUERY_KEY });

@@ -1,8 +1,8 @@
+import type { Quiz as ApiQuiz } from "@/utils/api-types";
 import QuizCard from "./QuizCard";
 import { Center, Loader } from "@mantine/core";
-import { components } from "api/schema";
 
-type Quiz = components["schemas"]["Quiz"];
+type Quiz = ApiQuiz;
 
 interface QuizListProps {
   quizzes?: Quiz[];
