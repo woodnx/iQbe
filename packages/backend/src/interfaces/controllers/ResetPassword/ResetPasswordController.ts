@@ -1,8 +1,7 @@
-import type { ApiContext } from "@/http/context.js";
-import { postResetPassword, postRequestResetPassword } from "@/http/schemas.js";
-import { ApiError } from "@/http/ApiError.js";
-
 import ResetPasswordUseCase from "@/applications/usecases/ResetPasswordUseCase.js";
+import { ApiError } from "@/http/ApiError.js";
+import type { ApiContext } from "@/http/context.js";
+import { postRequestResetPassword, postResetPassword } from "./schema.js";
 
 export default class ResetPasswordController {
   constructor(private resetPasswordUseCase: ResetPasswordUseCase) {}

@@ -1,6 +1,6 @@
-import type { ApiContext } from "@/http/context.js";
-import { getLevels } from "@/http/schemas.js";
 import ILevelRepository from "@/domains/Level/ILevelRepository.js";
+import type { ApiContext } from "@/http/context.js";
+import { getLevels } from "./schema.js";
 
 export default class LevelController {
   constructor(private levelRepository: ILevelRepository) {}

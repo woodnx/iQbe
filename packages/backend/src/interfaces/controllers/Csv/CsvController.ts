@@ -1,7 +1,7 @@
-import type { ApiContext } from "@/http/context.js";
-import { postCsvParse } from "@/http/schemas.js";
 import ICsvImportRepository from "@/domains/CsvImport/ICsvImportRepository.js";
 import { ApiError } from "@/http/ApiError.js";
+import type { ApiContext } from "@/http/context.js";
+import { postCsvParse } from "./schema.js";
 
 export default class CsvController {
   constructor(private csvImportRepository: ICsvImportRepository) {}

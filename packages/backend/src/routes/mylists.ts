@@ -3,15 +3,15 @@ import RegisterUseCase from "@/applications/usecases/RegisterUseCase.js";
 import MylistService from "@/domains/Mylist/MylistService.js";
 import { ApiError } from "@/http/ApiError.js";
 import type { AppEnv } from "@/http/context.js";
+import { validate } from "@/http/validate.js";
+import MylistController from "@/interfaces/controllers/Mylist/MylistController.js";
 import {
   deleteMylists,
   deleteMylistsQuiz,
   postMylists,
   putMylists,
   putMylistsQuiz,
-} from "@/http/schemas.js";
-import { validate } from "@/http/validate.js";
-import MylistController from "@/interfaces/controllers/MylistController.js";
+} from "@/interfaces/controllers/Mylist/schema.js";
 import CategoryInfra from "@/interfaces/infra/CategoryInfra.js";
 import KyselyClientManager from "@/interfaces/infra/kysely/KyselyClientManager.js";
 import MylistInfra from "@/interfaces/infra/MylistInfra.js";

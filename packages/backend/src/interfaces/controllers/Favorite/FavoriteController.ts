@@ -1,7 +1,7 @@
-import type { ApiContext } from "@/http/context.js";
-import { postLike, postUnlike } from "@/http/schemas.js";
 import FavoriteUseCase from "@/applications/usecases/FavoriteUseCase.js";
 import { ApiError } from "@/http/ApiError.js";
+import type { ApiContext } from "@/http/context.js";
+import { postLike, postUnlike } from "./schema.js";
 
 export default class FavoriteController {
   constructor(private favoriteUseCase: FavoriteUseCase) {}

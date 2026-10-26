@@ -1,13 +1,13 @@
 import { Hono } from "hono";
 import type { AppEnv } from "@/http/context.js";
+import { validate } from "@/http/validate.js";
+import AnalysisQueryService from "@/interfaces/infra/AnalysisQueryService.js";
 import {
   getAnalysisRankingAllPeriod,
   getAnalysisRankingAllPeriodQuery,
   getAnalysisRankingPersonalPeriod,
   getAnalysisStatusDatePeriod,
-} from "@/http/schemas.js";
-import { validate } from "@/http/validate.js";
-import AnalysisQueryService from "@/interfaces/infra/AnalysisQueryService.js";
+} from "@/routes/analysis/schema.js";
 
 const analysis = new AnalysisQueryService();
 const router = new Hono<AppEnv>()

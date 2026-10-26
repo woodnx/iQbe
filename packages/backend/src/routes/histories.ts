@@ -1,9 +1,10 @@
 import { Hono } from "hono";
 import type { AppEnv } from "@/http/context.js";
-import { getHistories, getHistoriesSinceUntil } from "@/http/schemas.js";
 import { validate } from "@/http/validate.js";
-import HistoryController from "@/interfaces/controllers/HistoryController.js";
-import JudgementController from "@/interfaces/controllers/JudgementController.js";
+import HistoryController from "@/interfaces/controllers/History/HistoryController.js";
+import { getHistories } from "@/interfaces/controllers/History/schema.js";
+import JudgementController from "@/interfaces/controllers/Judgement/JudgementController.js";
+import { getHistoriesSinceUntil } from "@/interfaces/controllers/Judgement/schema.js";
 import HistoryInfra from "@/interfaces/infra/HistoryInfra.js";
 import JudgementInfra from "@/interfaces/infra/JudgementInfra.js";
 import KyselyClientManager from "@/interfaces/infra/kysely/KyselyClientManager.js";

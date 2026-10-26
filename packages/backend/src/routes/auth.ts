@@ -1,21 +1,20 @@
 import { Hono } from "hono";
+import AuthUseCase from "@/applications/usecases/AuthUseCase.js";
 import type { AppEnv } from "@/http/context.js";
+import { validate } from "@/http/validate.js";
+import AuthController from "@/interfaces/controllers/Auth/AuthController.js";
 import {
+  postAuthAvailable,
   postAuthLogin,
+  postAuthRegister,
   postAuthSignup,
   postAuthToken,
-  postAuthRegister,
-  postAuthAvailable,
-} from "@/http/schemas.js";
-import { validate } from "@/http/validate.js";
-
-import AuthUseCase from "@/applications/usecases/AuthUseCase.js";
+} from "@/interfaces/controllers/Auth/schema.js";
 import InviteCodeInfra from "@/interfaces/infra/InviteCodeInfra.js";
 import KyselyClientManager from "@/interfaces/infra/kysely/KyselyClientManager.js";
 import KyselyTransactionManager from "@/interfaces/infra/kysely/KyselyTransactionManager.js";
 import RefreshTokensInfra from "@/interfaces/infra/RefreshTokensInfra.js";
 import UserInfra from "@/interfaces/infra/UserInfra.js";
-import AuthController from "@/interfaces/controllers/AuthController.js";
 
 const clientManager = new KyselyClientManager();
 

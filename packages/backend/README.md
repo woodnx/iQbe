@@ -11,11 +11,11 @@ Clean Architecter をベースとした軽量DDD．
 - TypeScriptのORMである[Prisma](https://www.prisma.io/)のスキーマ定義ファイル`prisma/schema.prisma`とマイグレーションファイル群から成る
 - 本APIではORMとしてではなく，マイグレーション用でPrismaを用いている
 
-### src/controllers
-- 各エンドポイントに渡すコントローラを定義する
-- 各エンドポイントとコントローラは1対1で対応する
-- 適宜，`src/models`や，`src/services`を用いてレスポンスデータを作成
-- `src/contollers`においてDB処理は書いてはならない
+### src/interfaces/controllers
+- controller ごとにディレクトリを分け、`Quiz/QuizController.ts` と `Quiz/schema.ts` のようにハンドラーと HTTP 入力スキーマを隣接させます。
+- routes と controller は同じ `schema.ts` を参照します。共通の HTTP パーサーは `src/http/parsers.ts`、ドメインの入力制約は `src/domains` に配置します。
+- controller を持たない分析 API の入力スキーマは `src/routes/analysis/schema.ts` に配置します。
+- DB 処理は controller へ直接記述せず、ユースケースやリポジトリに委譲します。
 
 ### src/db
 - クエリビルダーである[kysely](https://kysely.dev/)の型定義ファイル

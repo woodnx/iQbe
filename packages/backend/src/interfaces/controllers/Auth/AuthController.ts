@@ -1,14 +1,13 @@
+import AuthUseCase from "@/applications/usecases/AuthUseCase.js";
+import { ApiError } from "@/http/ApiError.js";
 import type { ApiContext } from "@/http/context.js";
 import {
+  postAuthAvailable,
   postAuthLogin,
+  postAuthRegister,
   postAuthSignup,
   postAuthToken,
-  postAuthRegister,
-  postAuthAvailable,
-} from "@/http/schemas.js";
-import { ApiError } from "@/http/ApiError.js";
-
-import AuthUseCase from "@/applications/usecases/AuthUseCase.js";
+} from "./schema.js";
 
 export default class AuthController {
   constructor(private authUseCase: AuthUseCase) {}

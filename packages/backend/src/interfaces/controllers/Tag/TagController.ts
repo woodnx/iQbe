@@ -1,6 +1,6 @@
-import type { ApiContext } from "@/http/context.js";
-import { getTags } from "@/http/schemas.js";
 import ITagRepository from "@/domains/Tag/ITagRepository.js";
+import type { ApiContext } from "@/http/context.js";
+import { getTags } from "./schema.js";
 
 export default class TagController {
   constructor(private tagRepository: ITagRepository) {}

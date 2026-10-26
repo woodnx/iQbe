@@ -1,7 +1,7 @@
-import type { ApiContext } from "@/http/context.js";
-import { getHistoriesSinceUntil } from "@/http/schemas.js";
 import IJudgementRepository from "@/domains/Judgement/IJudgementRepository.js";
+import type { ApiContext } from "@/http/context.js";
 import dayjs from "@/plugins/day.js";
+import { getHistoriesSinceUntil } from "./schema.js";
 
 export default class JudgementController {
   constructor(private judgementRepository: IJudgementRepository) {}

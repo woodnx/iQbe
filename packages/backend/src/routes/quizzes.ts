@@ -4,6 +4,8 @@ import { AddQuizzesUseCase } from "@/applications/usecases/Quiz/AddQuizzesUseCas
 import { DeleteQuizUseCase } from "@/applications/usecases/Quiz/DeleteQuizUseCase.js";
 import { EditQuizUseCase } from "@/applications/usecases/Quiz/EditQuizUseCase.js";
 import type { AppEnv } from "@/http/context.js";
+import { validate } from "@/http/validate.js";
+import QuizController from "@/interfaces/controllers/Quiz/QuizController.js";
 import {
   deleteQuizzesQid,
   getQuizzes,
@@ -11,9 +13,7 @@ import {
   postQuizzes,
   postQuizzesMultiple,
   putQuizzesQid,
-} from "@/http/schemas.js";
-import { validate } from "@/http/validate.js";
-import QuizController from "@/interfaces/controllers/QuizController.js";
+} from "@/interfaces/controllers/Quiz/schema.js";
 import CategoryInfra from "@/interfaces/infra/CategoryInfra.js";
 import KyselyClientManager from "@/interfaces/infra/kysely/KyselyClientManager.js";
 import KyselyTransactionManager from "@/interfaces/infra/kysely/KyselyTransactionManager.js";

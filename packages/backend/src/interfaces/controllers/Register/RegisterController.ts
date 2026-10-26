@@ -1,6 +1,6 @@
-import type { ApiContext } from "@/http/context.js";
-import { postRegister, postUnregister } from "@/http/schemas.js";
 import RegisterUseCase from "@/applications/usecases/RegisterUseCase.js";
+import type { ApiContext } from "@/http/context.js";
+import { postRegister, postUnregister } from "./schema.js";
 
 export default class RegisterController {
   constructor(private registerUseCase: RegisterUseCase) {}

@@ -1,10 +1,10 @@
 import fs from "node:fs/promises";
 import path from "node:path";
-import type { ApiContext } from "@/http/context.js";
-import { getI, putI, postIImage } from "@/http/schemas.js";
-import { ApiError } from "@/http/ApiError.js";
 import IUserRepository from "@/domains/User/IUserRepository.js";
+import { ApiError } from "@/http/ApiError.js";
+import type { ApiContext } from "@/http/context.js";
 import { format } from "@/plugins/day.js";
+import { getI, postIImage, putI } from "./schema.js";
 
 export default class IController {
   constructor(private userRepository: IUserRepository) {}

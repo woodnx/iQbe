@@ -1,9 +1,8 @@
 import { Hono } from "hono";
 import type { AppEnv } from "@/http/context.js";
-import { getI, putI, postIImage } from "@/http/schemas.js";
 import { validate } from "@/http/validate.js";
-
-import IController from "@/interfaces/controllers/IController.js";
+import IController from "@/interfaces/controllers/I/IController.js";
+import { getI, postIImage, putI } from "@/interfaces/controllers/I/schema.js";
 import KyselyClientManager from "@/interfaces/infra/kysely/KyselyClientManager.js";
 import UserInfra from "@/interfaces/infra/UserInfra.js";
 

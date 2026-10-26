@@ -1,6 +1,6 @@
-import type { ApiContext } from "@/http/context.js";
-import { getHistories } from "@/http/schemas.js";
 import IHistoryRepository from "@/domains/History/IHistoryRepository.js";
+import type { ApiContext } from "@/http/context.js";
+import { getHistories } from "./schema.js";
 
 export default class HistoriesController {
   constructor(private historyRepository: IHistoryRepository) {}

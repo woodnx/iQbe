@@ -1,8 +1,8 @@
 import { Hono } from "hono";
 import type { AppEnv } from "@/http/context.js";
-import { getTags } from "@/http/schemas.js";
 import { validate } from "@/http/validate.js";
-import TagController from "@/interfaces/controllers/TagController.js";
+import { getTags } from "@/interfaces/controllers/Tag/schema.js";
+import TagController from "@/interfaces/controllers/Tag/TagController.js";
 import KyselyClientManager from "@/interfaces/infra/kysely/KyselyClientManager.js";
 import TagInfra from "@/interfaces/infra/TagInfra.js";
 

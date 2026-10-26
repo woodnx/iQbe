@@ -1,9 +1,8 @@
-import type { ApiContext } from "@/http/context.js";
-import { getInviteCode, postInviteCode } from "@/http/schemas.js";
-import { ApiError } from "@/http/ApiError.js";
 import { nanoid } from "nanoid";
-
 import IInviteCodeRepository from "@/domains/InviteCode/IInviteCodeRepository.js";
+import { ApiError } from "@/http/ApiError.js";
+import type { ApiContext } from "@/http/context.js";
+import { getInviteCode, postInviteCode } from "./schema.js";
 
 export default class InviteCodeController {
   constructor(private inviteCodeRepository: IInviteCodeRepository) {}

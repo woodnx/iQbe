@@ -1,17 +1,17 @@
-import type { ApiContext } from "@/http/context.js";
-import {
-  getWorkbooks,
-  getWorkbooksWid,
-  getWorkbooksAll,
-  postWorkbooks,
-  putWorkbooksWid,
-  deleteWorkbooksWid,
-} from "@/http/schemas.js";
 import { CreateWorkbookUseCase } from "@/applications/usecases/Workbook/CreateWorkbookUseCase.js";
 import { DeleteWorkbookUseCase } from "@/applications/usecases/Workbook/DeleteWorkbookUseCase.js";
 import { GetAllWorkbooksUseCase } from "@/applications/usecases/Workbook/GetAllWorkbooksUseCase.js";
 import { GetWorkbookUseCase } from "@/applications/usecases/Workbook/GetWorkbookUseCase.js";
 import { UpdateWorkbookUseCase } from "@/applications/usecases/Workbook/UpdateWorkbookUseCase.js";
+import type { ApiContext } from "@/http/context.js";
+import {
+  deleteWorkbooksWid,
+  getWorkbooks,
+  getWorkbooksAll,
+  getWorkbooksWid,
+  postWorkbooks,
+  putWorkbooksWid,
+} from "./schema.js";
 
 export default class WorkbookController {
   constructor(

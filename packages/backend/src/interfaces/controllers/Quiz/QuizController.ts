@@ -12,7 +12,7 @@ import {
   postQuizzes,
   postQuizzesMultiple,
   putQuizzesQid,
-} from "@/http/schemas.js";
+} from "./schema.js";
 
 export default class QuizController {
   constructor(

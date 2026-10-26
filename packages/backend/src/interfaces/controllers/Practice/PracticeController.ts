@@ -1,6 +1,6 @@
-import type { ApiContext } from "@/http/context.js";
-import { postPractice } from "@/http/schemas.js";
 import PracticeUseCase from "@/applications/usecases/PracticeUseCase.js";
+import type { ApiContext } from "@/http/context.js";
+import { postPractice } from "./schema.js";
 
 export default class PracticeController {
   constructor(private practiceUseCase: PracticeUseCase) {}

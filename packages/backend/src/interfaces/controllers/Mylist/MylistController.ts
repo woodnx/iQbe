@@ -1,15 +1,14 @@
+import IMylistRepository from "@/domains/Mylist/IMylistRepository.js";
+import Mylist from "@/domains/Mylist/index.js";
+import MylistService from "@/domains/Mylist/MylistService.js";
+import { ApiError } from "@/http/ApiError.js";
 import type { ApiContext } from "@/http/context.js";
 import {
+  deleteMylists,
   getMylists,
   postMylists,
   putMylists,
-  deleteMylists,
-} from "@/http/schemas.js";
-import { ApiError } from "@/http/ApiError.js";
-
-import Mylist from "@/domains/Mylist/index.js";
-import IMylistRepository from "@/domains/Mylist/IMylistRepository.js";
-import MylistService from "@/domains/Mylist/MylistService.js";
+} from "./schema.js";
 
 export default class MylistController {
   constructor(

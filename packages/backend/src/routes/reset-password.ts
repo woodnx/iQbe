@@ -1,13 +1,13 @@
 import { Hono } from "hono";
-import type { AppEnv } from "@/http/context.js";
-import { postResetPassword } from "@/http/schemas.js";
-import { validate } from "@/http/validate.js";
-import ResetPasswordController from "@/interfaces/controllers/ResetPasswordController.js";
 import ResetPasswordUseCase from "@/applications/usecases/ResetPasswordUseCase.js";
-import KyselyClientManager from "@/interfaces/infra/kysely/KyselyClientManager.js";
-import KyselyTransactionManager from "@/interfaces/infra/kysely/KyselyTransactionManager.js";
 import AuthService from "@/domains/Auth/AuthService.js";
 import ResetPasswordService from "@/domains/ResetPassword/ResetPasswordService.js";
+import type { AppEnv } from "@/http/context.js";
+import { validate } from "@/http/validate.js";
+import ResetPasswordController from "@/interfaces/controllers/ResetPassword/ResetPasswordController.js";
+import { postResetPassword } from "@/interfaces/controllers/ResetPassword/schema.js";
+import KyselyClientManager from "@/interfaces/infra/kysely/KyselyClientManager.js";
+import KyselyTransactionManager from "@/interfaces/infra/kysely/KyselyTransactionManager.js";
 import ResetPasswordInfra from "@/interfaces/infra/ResetPasswordInfra.js";
 import UserInfra from "@/interfaces/infra/UserInfra.js";
 
