@@ -7,7 +7,7 @@
     "packages/backend",
     "packages/spec"
   ],
-  "packageManager": "pnpm@10.18.3",
+  "packageManager": "pnpm@12.15.0",
   "private": true,
   "scripts": {
     "test": "pnpm --filter ./packages/backend run test",
@@ -36,9 +36,9 @@
   "devDependencies": {
     "@biomejs/biome": "2.0.0",
     "@types/jest": "^30.0.0",
-    "@types/node": "^20.19.27",
-    "jest": "^30.2.0",
-    "ts-jest": "^29.4.6",
-    "vitest": "^4.0.18"
+    "@types/node": "^20.19.43",
+    "jest": "^30.5.2",
+    "ts-jest": "^29.4.15",
+    "vitest": "^5.0.5"
   }
 }
