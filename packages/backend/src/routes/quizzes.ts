@@ -1,23 +1,24 @@
 import { Hono } from "hono";
+import { AddQuizUseCase } from "@/applications/usecases/Quiz/AddQuizUseCase.js";
+import { AddQuizzesUseCase } from "@/applications/usecases/Quiz/AddQuizzesUseCase.js";
+import { DeleteQuizUseCase } from "@/applications/usecases/Quiz/DeleteQuizUseCase.js";
+import { EditQuizUseCase } from "@/applications/usecases/Quiz/EditQuizUseCase.js";
 import type { AppEnv } from "@/http/context.js";
 import {
+  deleteQuizzesQid,
   getQuizzes,
   getQuizzesSize,
   postQuizzes,
   postQuizzesMultiple,
   putQuizzesQid,
-  deleteQuizzesQid,
 } from "@/http/schemas.js";
 import { validate } from "@/http/validate.js";
-
-import { AddQuizUseCase } from "@/applications/usecases/Quiz/AddQuizUseCase.js";
-import { DeleteQuizUseCase } from "@/applications/usecases/Quiz/DeleteQuizUseCase.js";
-import { EditQuizUseCase } from "@/applications/usecases/Quiz/EditQuizUseCase.js";
 import QuizController from "@/interfaces/controllers/QuizController.js";
 import CategoryInfra from "@/interfaces/infra/CategoryInfra.js";
 import KyselyClientManager from "@/interfaces/infra/kysely/KyselyClientManager.js";
 import KyselyTransactionManager from "@/interfaces/infra/kysely/KyselyTransactionManager.js";
 import { QuizAssignedTagsInfra } from "@/interfaces/infra/QuizAssignedTags.js";
+import QuizBulkInfra from "@/interfaces/infra/QuizBulkInfra.js";
 import QuizInfra from "@/interfaces/infra/QuizInfra.js";
 import TagInfra from "@/interfaces/infra/TagInfra.js";
 
@@ -54,6 +55,10 @@ const quizController = new QuizController(
   addQuizUseCase,
   editQuizUseCase,
   deleteQuizUseCase,
+  new AddQuizzesUseCase(
+    kyselyTransactionManager,
+    new QuizBulkInfra(kyselyClientManager),
+  ),
 );
 
 const router = new Hono<AppEnv>()

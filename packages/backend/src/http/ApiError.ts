@@ -74,6 +74,15 @@ export class ApiError extends Error {
     });
   }
 
+  public notFound(detail = "Resource not found.") {
+    return new ApiError({
+      title: "NOT_FOUND",
+      type: "about:blank",
+      status: 404,
+      detail,
+    });
+  }
+
   public internalProblems() {
     return new ApiError({
       title: "INTERNAL_PROBLEMS",

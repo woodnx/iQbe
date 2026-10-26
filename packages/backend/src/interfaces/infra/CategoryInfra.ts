@@ -1,8 +1,8 @@
 import ICategoryQueryService, {
   CategoryDTO,
 } from "@/applications/queryservices/ICategoryQueryService.js";
-import Category from "@/domains/Category/index.js";
 import ICategoryRepository from "@/domains/Category/ICategoryRepository.js";
+import Category from "@/domains/Category/index.js";
 
 import KyselyClientManager from "./kysely/KyselyClientManager.js";
 
@@ -159,50 +159,30 @@ export default class CategoryInfra
     );
   }
 
-  async findChainById(id: number): Promise<Category[]> {
-    const client = this.clientManager.getClient();
-
-    const category = await client
-      .selectFrom("categories")
-      .selectAll()
-      .where("id", "=", id)
-      .executeTakeFirst();
-
-    if (!category) return [];
-
-    const chain: Category[] = [];
-    chain.push(
-      new Category(
-        category.id,
-        category.name,
-        category.description,
-        category.parent_id,
-      ),
-    );
-
-    let parentId = category.parent_id;
-    while (parentId !== -1) {
-      const parent = await client
-        .selectFrom("categories")
-        .selectAll()
-        .where("id", "=", parentId)
-        .executeTakeFirst();
-
-      if (!parent) break;
-
-      chain.push(
-        new Category(
-          parent.id,
-          parent.name,
-          parent.description,
-          parent.parent_id,
-        ),
-      );
-
-      parentId = parent.parent_id;
+  async findChainsByIds(ids: number[]): Promise<Map<number, Category[]>> {
+    const chains = new Map<number, Category[]>();
+    if (!ids.length) return chains;
+    const rows = await this.getAll();
+    const byId = new Map(rows.map((row) => [row.id, row]));
+    for (const id of new Set(ids)) {
+      const chain: Category[] = [];
+      const visited = new Set<number>();
+      let current: Category | undefined = byId.get(id);
+      while (current) {
+        if (visited.has(current.id))
+          throw new Error("Cyclic category hierarchy");
+        visited.add(current.id);
+        chain.push(current);
+        current =
+          current.parentId === -1 ? undefined : byId.get(current.parentId);
+      }
+      chains.set(id, chain.reverse());
     }
+    return chains;
+  }
 
-    return chain.reverse();
+  async findChainById(id: number): Promise<Category[]> {
+    return (await this.findChainsByIds([id])).get(id) ?? [];
   }
 
   async save(category: Category): Promise<void> {

@@ -1,26 +1,43 @@
 import { Hono } from "hono";
+import RegisterUseCase from "@/applications/usecases/RegisterUseCase.js";
+import MylistService from "@/domains/Mylist/MylistService.js";
+import { ApiError } from "@/http/ApiError.js";
 import type { AppEnv } from "@/http/context.js";
 import {
-  getMylists,
+  deleteMylists,
+  deleteMylistsQuiz,
   postMylists,
   putMylists,
-  deleteMylists,
   putMylistsQuiz,
-  deleteMylistsQuiz,
 } from "@/http/schemas.js";
 import { validate } from "@/http/validate.js";
-
-import { db } from "@/database.js";
-import MylistService from "@/domains/Mylist/MylistService.js";
 import MylistController from "@/interfaces/controllers/MylistController.js";
+import CategoryInfra from "@/interfaces/infra/CategoryInfra.js";
 import KyselyClientManager from "@/interfaces/infra/kysely/KyselyClientManager.js";
 import MylistInfra from "@/interfaces/infra/MylistInfra.js";
-import dayjs from "@/plugins/day.js";
+import QuizInfra from "@/interfaces/infra/QuizInfra.js";
+import RegisteredQuizInfra from "@/interfaces/infra/ResisteredQuizInfra.js";
 
 const clientManager = new KyselyClientManager();
 const mylistInfra = new MylistInfra(clientManager);
 
 const mylistController = new MylistController(mylistInfra, new MylistService());
+
+const quizInfra = new QuizInfra(
+  clientManager,
+  new CategoryInfra(clientManager),
+);
+const registration = new RegisterUseCase(
+  mylistInfra,
+  quizInfra,
+  new RegisteredQuizInfra(clientManager),
+);
+
+async function resolveQid(quizId: number): Promise<string> {
+  const qid = await quizInfra.findQidById(quizId);
+  if (qid == null) throw new ApiError().notFound("Quiz not found.");
+  return qid;
+}
 
 const router = new Hono<AppEnv>()
   .get("/", mylistController.get())
@@ -28,68 +45,21 @@ const router = new Hono<AppEnv>()
   .put("/", validate("json", putMylists.json), mylistController.put())
   .delete("/", validate("json", deleteMylists.json), mylistController.delete())
   .put("/quiz", validate("json", putMylistsQuiz.json), async (c) => {
-    const body = c.req.valid("json");
-    const quiz_id = body.quizId;
-    const mid = body.mid;
-    const registered = dayjs().format("YYYY-MM-DD HH:mm:ss");
-
-    if (!quiz_id || !mid) {
-      return c.text("Undefined quiz id or mylist id", 400);
-    }
-
-    try {
-      const inserts = await db.transaction().execute(async (trx) => {
-        const mylist_id = (
-          await trx
-            .selectFrom("mylists")
-            .select("id")
-            .where("mid", "=", mid)
-            .executeTakeFirstOrThrow()
-        ).id;
-
-        const data = {
-          quiz_id,
-          mylist_id,
-          registered,
-        };
-
-        return await trx.insertInto("mylists_quizzes").values(data).execute();
-      });
-
-      const message = `${inserts.length} new quizzes saved into mylist (mylist: ${mid})`;
-      return c.text(message, 201);
-    } catch (e) {
-      console.error(e);
-      return c.text("An Error Occurd", 400);
-    }
+    const { quizId, mid } = c.req.valid("json");
+    await registration.registerQuizToMylist(
+      await resolveQid(quizId),
+      mid,
+      c.get("user").uid,
+    );
+    return c.text(`1 new quizzes saved into mylist (mylist: ${mid})`, 201);
   })
   .delete("/quiz", validate("json", deleteMylistsQuiz.json), async (c) => {
-    const body = c.req.valid("json");
-    const quizId = body.quizId;
-    const mid = body.mid;
-
-    try {
-      await db.transaction().execute(async (trx) => {
-        const mylsitId = (
-          await trx
-            .selectFrom("mylists")
-            .select("id")
-            .where("mid", "=", mid)
-            .executeTakeFirstOrThrow()
-        )?.id;
-
-        const deletes = await trx
-          .deleteFrom("mylists_quizzes")
-          .where(({ and, eb }) =>
-            and([eb("mylist_id", "=", mylsitId), eb("quiz_id", "=", quizId)]),
-          )
-          .executeTakeFirst();
-      });
-
-      return c.body(null, 204);
-    } catch (e) {
-      console.error(e);
-      return c.text("An Error Occured", 400);
-    }
+    const { quizId, mid } = c.req.valid("json");
+    await registration.unregisterQuizFromMylist(
+      await resolveQid(quizId),
+      mid,
+      c.get("user").uid,
+    );
+    return c.body(null, 204);
   });
 export default router;

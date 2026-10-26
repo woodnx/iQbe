@@ -1,12 +1,12 @@
-import { jest } from "@jest/globals";
-import { createMiddleware } from "hono/factory";
-import { hc } from "hono/client";
-import jwt from "jsonwebtoken";
 import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
-import type { AppEnv, AuthUser } from "./http/context.js";
+import { jest } from "@jest/globals";
+import { hc } from "hono/client";
+import { createMiddleware } from "hono/factory";
+import jwt from "jsonwebtoken";
 import type { AppType } from "./app.js";
+import type { AppEnv, AuthUser } from "./http/context.js";
 
 const user: AuthUser = {
   userId: 1,
@@ -174,6 +174,63 @@ describe("validation and Hono RPC", () => {
   ])("rejects invalid input for %s", async (url, body) => {
     expect((await jsonRequest(url, body)).status).toBe(400);
   });
+  it.each([
+    "/api/quizzes?page=0",
+    "/api/quizzes?page=1.5",
+    "/api/quizzes?maxView=0",
+    "/api/quizzes?judgements=4",
+    "/api/quizzes?since=20&until=10",
+    "/api/quizzes?crctAnsRatio=90&crctAnsRatio=20",
+    "/api/analysis/ranking/all/day?limit=101",
+    "/api/analysis/ranking/all/invalid",
+    "/api/analysis/status/2026-02-30/day",
+    "/api/analysis/status/invalid/day",
+  ])("rejects out-of-range query %s", async (url) => {
+    expect((await app.request(url)).status).toBe(400);
+  });
+  it("rejects empty and oversized bulk requests and oversized text", async () => {
+    expect(
+      (await jsonRequest("/api/quizzes/multiple", { records: [] })).status,
+    ).toBe(400);
+    expect(
+      (
+        await jsonRequest("/api/quizzes/multiple", {
+          records: Array.from({ length: 1001 }, () => ({
+            question: "Q",
+            answer: "A",
+          })),
+        })
+      ).status,
+    ).toBe(400);
+    expect(
+      (
+        await jsonRequest("/api/quizzes", {
+          question: "q".repeat(2049),
+          answer: "A",
+        })
+      ).status,
+    ).toBe(400);
+  });
+  it("forwards all count filters including scalar judgement zero", async () => {
+    const { default: QuizInfra } = await import(
+      "./interfaces/infra/QuizInfra.js"
+    );
+    const count = jest.spyOn(QuizInfra.prototype, "count").mockResolvedValue(1);
+    const response = await app.request(
+      "/api/quizzes/size?tags=a&categories=2&judgements=0&tagMatchAll=true&crctAnsRatio=0&crctAnsRatio=100",
+    );
+    expect(response.status).toBe(200);
+    expect(count).toHaveBeenCalledWith(
+      user.uid,
+      expect.objectContaining({
+        tags: "a",
+        categories: 2,
+        judgements: 0,
+        tagMatchAll: true,
+        crctAnsRatio: [0, 100],
+      }),
+    );
+  });
   it("parses repeated and scalar array queries and false booleans", async () => {
     const { default: QuizInfra } = await import(
       "./interfaces/infra/QuizInfra.js"
@@ -299,6 +356,19 @@ describe("file uploads and static delivery", () => {
     expect(missing.status).toBe(400);
     expect(await missing.json()).toMatchObject({ title: "NO_FILE" });
   });
+  it.each(["/api/csv/parse", "/api/i/image"])(
+    "limits multipart request size for %s",
+    async (url) => {
+      const form = new FormData();
+      form.append("file", new File(["x".repeat(5 * 1024 * 1024)], "large.csv"));
+      const response = await app.request(url, { method: "POST", body: form });
+      expect(response.status).toBe(413);
+      expect(await response.json()).toMatchObject({
+        status: 413,
+        title: "PAYLOAD_TOO_LARGE",
+      });
+    },
+  );
   it("stores profile uploads with the existing filename and URL", async () => {
     const { default: UserInfra } = await import(
       "./interfaces/infra/UserInfra.js"
@@ -351,9 +421,12 @@ describe("file uploads and static delivery", () => {
     expect(await (await app.request("/workbook/test")).text()).toBe(
       "<html>SPA</html>",
     );
-    expect(await (await app.request("/api/unknown")).text()).toBe(
-      "Undefined api root",
-    );
+    const missing = await app.request("/api/unknown");
+    expect(missing.status).toBe(404);
+    expect(await missing.json()).toMatchObject({
+      title: "NOT_FOUND",
+      status: 404,
+    });
   });
   it("preserves allowed CORS origin, credentials and preflight status", async () => {
     const response = await app.request("/api/quizzes", {

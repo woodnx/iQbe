@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { quizContentSchema } from "@/domains/Quiz/input.js";
 
 // Accept the HTTP representation without treating the string "false" as truthy.
 // RPC callers supply numbers; HTTP query strings are parsed at the boundary.
@@ -16,14 +17,59 @@ const queryBoolean = z.preprocess(
   z.boolean(),
 ) as z.ZodType<boolean, boolean>;
 
+const period = z.enum(["day", "week", "month"]);
+const dateString = z.string().refine((value) => {
+  if (!/^\d{4}-\d{2}-\d{2}(?:T.*)?$/.test(value)) return false;
+  const parsed = new Date(value);
+  if (!Number.isFinite(parsed.getTime())) return false;
+  // Reject normalized dates such as February 30, including offset timestamps.
+  const calendar = new Date(`${value.slice(0, 10)}T00:00:00Z`);
+  return calendar.toISOString().slice(0, 10) === value.slice(0, 10);
+}, "Invalid date");
+const positiveId = queryNumber.pipe(z.number().int().positive().safe());
+const timestamp = queryNumber.pipe(
+  z.number().int().min(-8640000000000000).max(8640000000000000),
+);
+const judgement = queryNumber.pipe(z.number().int().min(0).max(3));
+const filterShape = {
+  wids: z
+    .union([
+      z.array(z.string().min(1).max(20)).max(100),
+      z.string().min(1).max(20),
+    ])
+    .nullish(),
+  keyword: z.string().max(2048).nullish(),
+  keywordOption: queryNumber.pipe(z.number().int().min(1).max(3)).nullish(),
+  crctAnsRatio: z
+    .array(queryNumber.pipe(z.number().min(0).max(100)))
+    .length(2)
+    .refine(([min, max]) => min <= max)
+    .nullish(),
+  since: timestamp.nullish(),
+  until: timestamp.nullish(),
+  judgements: z.union([z.array(judgement).max(4), judgement]).nullish(),
+  mid: z.string().min(1).max(20).nullish(),
+  isFavorite: queryBoolean.nullish(),
+  tags: z
+    .union([
+      z.array(z.string().min(1).max(128)).max(100),
+      z.string().min(1).max(128),
+    ])
+    .nullish(),
+  tagMatchAll: queryBoolean.nullish(),
+  categories: z.union([z.array(positiveId).max(100), positiveId]).nullish(),
+};
+const validRange = (value: { since?: number | null; until?: number | null }) =>
+  value.since == null || value.until == null || value.since <= value.until;
+
 export const getAnalysisRankingAllPeriod = {
-  param: z.object({ period: z.string() }),
+  param: z.object({ period }),
 };
 export const getAnalysisRankingPersonalPeriod = {
-  param: z.object({ period: z.string() }),
+  param: z.object({ period }),
 };
 export const getAnalysisStatusDatePeriod = {
-  param: z.object({ date: z.string(), period: z.string() }),
+  param: z.object({ date: dateString, period }),
 };
 export const postAuthLogin = {
   json: z.object({ username: z.string(), password: z.string() }),
@@ -74,7 +120,9 @@ export const postCsvParse = {
   form: z.object({ file: z.instanceof(File).optional() }),
 };
 export const getHistoriesSinceUntil = {
-  param: z.object({ since: queryNumber, until: queryNumber }),
+  param: z
+    .object({ since: timestamp, until: timestamp })
+    .refine(validRange, "since must not be after until"),
 };
 export const getHistories = {};
 export const getI = {};
@@ -103,82 +151,44 @@ export const deleteMylists = { json: z.object({ mid: z.string() }) };
 export const postPractice = {
   json: z.object({
     qid: z.string(),
-    judgement: z.number(),
-    pressedWord: z.number(),
+    judgement: z.number().int().min(0).max(2),
+    pressedWord: z.number().int().min(-1),
   }),
 };
 export const getQuizzes = {
-  query: z.object({
-    page: queryNumber.nullish(),
-    maxView: queryNumber.pipe(z.number().min(0).max(100)).nullish(),
-    seed: queryNumber.nullish(),
-    wids: z.union([z.array(z.string()), z.string()]).nullish(),
-    keyword: z.string().nullish(),
-    keywordOption: queryNumber.nullish(),
-    crctAnsRatio: z.array(queryNumber).nullish(),
-    since: queryNumber.nullish(),
-    until: queryNumber.nullish(),
-    judgements: z.union([z.array(queryNumber), queryNumber]).nullish(),
-    mid: z.string().nullish(),
-    isFavorite: queryBoolean.nullish(),
-    tags: z.union([z.array(z.string()), z.string()]).nullish(),
-    tagMatchAll: queryBoolean.nullish(),
-    categories: z.union([z.array(queryNumber), queryNumber]).nullish(),
-  }),
+  query: z
+    .object({
+      ...filterShape,
+      page: positiveId.nullish().transform((value) => value ?? 1),
+      maxView: positiveId
+        .pipe(z.number().max(100))
+        .nullish()
+        .transform((value) => value ?? 100),
+      seed: queryNumber.pipe(z.number().int().safe()).nullish(),
+    })
+    .refine(validRange, "since must not be after until"),
 };
-export const postQuizzes = {
-  json: z.object({
-    question: z.string(),
-    answer: z.string(),
-    anotherAnswer: z.string().nullish(),
-    tags: z.array(z.string()).nullish(),
-    wid: z.string().nullish(),
-    category: z.number().nullish(),
-  }),
-};
+export const postQuizzes = { json: quizContentSchema };
 export const putQuizzesQid = {
-  param: z.object({ qid: z.string() }),
-  json: z.object({
-    question: z.string(),
-    anotherAnswer: z.string().nullish(),
-    answer: z.string(),
-    tags: z.array(z.string()).nullish(),
-    wid: z.string().nullish(),
-    category: z.number().nullish(),
-  }),
+  param: z.object({ qid: z.string().min(1).max(64) }),
+  json: quizContentSchema,
 };
-export const deleteQuizzesQid = { param: z.object({ qid: z.string() }) };
+export const deleteQuizzesQid = { param: putQuizzesQid.param };
 export const getQuizzesSize = {
-  query: z.object({
-    wids: z.union([z.array(z.string()), z.string()]).nullish(),
-    keyword: z.string().nullish(),
-    keywordOption: queryNumber.nullish(),
-    crctAnsRatio: z.array(queryNumber).nullish(),
-    since: queryNumber.nullish(),
-    until: queryNumber.nullish(),
-    judgements: z.union([z.array(queryNumber), queryNumber]).nullish(),
-    mid: z.string().nullish(),
-    isFavorite: queryBoolean.nullish(),
-    tags: z.union([z.array(z.string()), z.string()]).nullish(),
-    tagMatchAll: queryBoolean.nullish(),
-    categories: z.union([z.array(queryNumber), queryNumber]).nullish(),
-  }),
+  query: z
+    .object(filterShape)
+    .refine(validRange, "since must not be after until"),
 };
 export const postQuizzesMultiple = {
   json: z.object({
     records: z
       .array(
-        z.object({
-          question: z.string(),
-          answer: z.string(),
-          anotherAnswer: z.string().nullish(),
-          tags: z.array(z.string()).nullish(),
-          wid: z.string().nullish(),
-          category: z.number().nullish(),
-          subCategory: z.number().nullish(),
+        quizContentSchema.extend({
+          subCategory: z.number().int().positive().nullish(),
         }),
       )
-      .nullish(),
+      .min(1)
+      .max(1000),
   }),
 };
 export const postRequestResetPassword = {
@@ -208,11 +218,17 @@ export const putWorkbooksWid = {
 export const deleteWorkbooksWid = { param: z.object({ wid: z.string() }) };
 export const getWorkbooksAll = {};
 export const putMylistsQuiz = {
-  json: z.object({ quizId: z.number(), mid: z.string() }),
+  json: z.object({
+    quizId: z.number().int().positive().safe(),
+    mid: z.string().min(1).max(20),
+  }),
 };
 export const deleteMylistsQuiz = {
-  json: z.object({ quizId: z.number(), mid: z.string() }),
+  json: z.object({
+    quizId: z.number().int().positive().safe(),
+    mid: z.string().min(1).max(20),
+  }),
 };
 export const getAnalysisRankingAllPeriodQuery = z.object({
-  limit: queryNumber.optional(),
+  limit: positiveId.pipe(z.number().max(100)).optional().default(5),
 });

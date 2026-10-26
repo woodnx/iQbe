@@ -1,12 +1,11 @@
-import type { QuizResponseDTO as ApiQuizResponseDTO } from "@/types/dto.js";
-import Quiz from "@/domains/Quiz/index.js";
 import IQuizRepository from "@/domains/Quiz/IQuizRepository.js";
-import QuizService from "@/domains/Quiz/QuizService.js";
-import { QuizAttachedTags } from "@/domains/QuizAttachedTags/index.js";
 import { IQuizAttachedTagsRepository } from "@/domains/QuizAttachedTags/IQuizAttachedTagsRepository.js";
+import { QuizAttachedTags } from "@/domains/QuizAttachedTags/index.js";
 import { QuizAttachedTagsService } from "@/domains/QuizAttachedTags/QuizAttachedTagsService.js";
 import ITagRepository from "@/domains/Tag/ITagRepository.js";
+import type { QuizResponseDTO as ApiQuizResponseDTO } from "@/types/dto.js";
 import ITransactionManager from "../../shared/ITransactionManager.js";
+import { createQuiz } from "./createQuiz.js";
 
 type QuizDTO = ApiQuizResponseDTO;
 
@@ -37,22 +36,21 @@ export class AddQuizUseCase {
     categoryId,
     wid,
   }: AddQuizUseCaseCommand): Promise<QuizDTO> {
-    const quizService = new QuizService();
     const quizAttachedTagsService = new QuizAttachedTagsService(
       this.quizAttachedTagsRepository,
       this.tagRepository,
     );
 
-    const qid = quizService.generateQid();
-    const quiz = Quiz.create(
-      qid,
+    const quiz = createQuiz({
       question,
       answer,
       uid,
       anotherAnswer,
       wid,
       categoryId,
-    );
+      tagLabels,
+    });
+    const qid = quiz.qid;
     const assignedTags = QuizAttachedTags.create(qid, tagLabels);
 
     await this.transactionManager.begin(async () => {

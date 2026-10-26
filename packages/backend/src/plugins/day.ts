@@ -2,7 +2,6 @@ import dayjs from "dayjs";
 import duration from "dayjs/plugin/duration.js";
 import timezone from "dayjs/plugin/timezone.js";
 import utc from "dayjs/plugin/utc.js";
-import type { ManipulateType } from "dayjs";
 
 dayjs.extend(duration);
 dayjs.extend(utc);
@@ -11,18 +10,16 @@ dayjs.tz.setDefault("Asia/Tokyo");
 
 export type Period = "day" | "week" | "month";
 
-export const generateRange = (basicDate: string, period: ManipulateType) => {
-  const date = dayjs(basicDate);
-
-  const ranges = Array(7)
-    .fill([])
-    .map((_, idx) => {
-      const end = date.subtract(idx, period).endOf(period).toDate();
-      const start = date.subtract(idx, period).startOf(period).toDate();
-      return [start, end];
-    });
-
-  return ranges;
+// Half-open intervals in Japan time. Date parameters use the same mysql2
+// serialization as history inserts; existing DATETIME values are not rewritten.
+export const generateRange = (basicDate: string, period: Period) => {
+  const date = /(?:Z|[+-]\d{2}:?\d{2})$/.test(basicDate)
+    ? dayjs(basicDate).tz("Asia/Tokyo")
+    : dayjs.tz(basicDate, "Asia/Tokyo");
+  return Array.from({ length: 7 }, (_, index) => {
+    const start = date.subtract(index, period).startOf(period);
+    return [start.toDate(), start.add(1, period).toDate()] as const;
+  });
 };
 
 export const format = (day: Date) => {

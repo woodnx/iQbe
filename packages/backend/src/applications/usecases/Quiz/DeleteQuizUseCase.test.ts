@@ -37,9 +37,18 @@ describe("DeleteQuizUseCase", () => {
     };
     const createdQuiz = await addQuizUseCase.execute(command);
 
+    await expect(
+      deleteQuizUseCase.execute({ qid: createdQuiz.qid, uid: "another-user" }),
+    ).rejects.toMatchObject({ status: 403 });
+    expect(await quizRepository.findByQid(createdQuiz.qid)).not.toBeNull();
+    await expect(
+      deleteQuizUseCase.execute({ qid: "missing", uid: command.uid }),
+    ).rejects.toMatchObject({ status: 404 });
+
     // クイズの削除実行
     await deleteQuizUseCase.execute({
       qid: createdQuiz.qid,
+      uid: command.uid,
     });
 
     // 削除後のクイズの検証

@@ -1,6 +1,5 @@
+import { Group, Text } from "@mantine/core";
 import { useQuery } from "@tanstack/react-query";
-import { api } from "@/utils/api";
-import { Group } from "@mantine/core";
 import { createFileRoute, useRouter, useSearch } from "@tanstack/react-router";
 import { useState } from "react";
 import FilteringModalButton from "@/features/filtering/components/FilteringModalButton";
@@ -12,6 +11,7 @@ import QuizTransfarButton from "@/features/quiz/components/QuizTransfarButton";
 import { useHistories } from "@/hooks/useHistories";
 import dayjs from "@/plugins/dayjs";
 import { Judgement } from "@/types";
+import { api } from "@/utils/api";
 import { convertJudgements } from "@/utils/convertJudgement";
 import { quizSearchSchema } from "./_schemas/quizSearch";
 
@@ -37,7 +37,7 @@ export const Route = createFileRoute("/history")({
 function RouteComponent() {
   const router = useRouter();
   const search = useSearch({ from: "/history" });
-  const [activePage, setPage] = useState(1);
+  const [activePage, setPage] = useState(search.page ?? 1);
   const [isHidden, setIsHidden] = useState(false);
   const [judgements, setJudgements] = useState<Judgement[]>(
     convertJudgements(search.judgements || []),
@@ -115,8 +115,7 @@ function RouteComponent() {
         signal,
       ),
   });
-  const size =
-    !!quizzes && !!quizzes.length && !!quizzesSize ? quizzesSize.size : 0;
+  const size = quizzesSize?.size ?? 0;
 
   const toFilter = (
     workbooks?: string | string[],
@@ -129,7 +128,7 @@ function RouteComponent() {
   ) => {
     setPage(1);
     router.navigate({
-      to: "/search",
+      to: "/history",
       search: (old) => ({
         ...old,
         page: 1,
@@ -191,6 +190,7 @@ function RouteComponent() {
   };
 
   const changeJudgement = (judgements: Judgement[]) => {
+    setPage(1);
     setJudgements(judgements);
     router.navigate({
       to: "/history",
@@ -206,6 +206,7 @@ function RouteComponent() {
   };
 
   const changeDates = (dates: number[]) => {
+    setPage(1);
     setDates(dates);
     router.navigate({
       to: "/history",
@@ -254,7 +255,7 @@ function RouteComponent() {
       <QuizList
         quizzes={quizzes}
         page={activePage}
-        perPage={activePage}
+        perPage={search.maxView ?? 100}
         isHidden={isHidden}
         coloring
       />

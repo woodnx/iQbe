@@ -13,7 +13,10 @@
     "migrate:create": "prisma migrate dev --create-only",
     "migrate:exe": "prisma migrate dev",
     "migrate:status": "prisma migrate status",
-    "migrate:reset": "prisma migrate reset"
+    "migrate:reset": "prisma migrate reset",
+    "test:integration": "API_MYSQL_TESTS=1 node --experimental-vm-modules ./node_modules/jest/bin/jest.js --runInBand --testPathPatterns=api.integration.test.ts",
+    "indexes:check": "tsx src/scripts/checkApiIndexes.ts",
+    "test:benchmark": "API_BENCHMARK=1 pnpm run test:integration"
   },
   "author": "",
   "license": "ISC",

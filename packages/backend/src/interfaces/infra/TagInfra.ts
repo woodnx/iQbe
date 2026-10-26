@@ -1,5 +1,5 @@
-import Tag from "@/domains/Tag/index.js";
 import ITagRepository from "@/domains/Tag/ITagRepository.js";
+import Tag from "@/domains/Tag/index.js";
 import KyselyClientManager from "./kysely/KyselyClientManager.js";
 
 export default class TagInfra implements ITagRepository {
@@ -71,6 +71,21 @@ export default class TagInfra implements ITagRepository {
   async delete(label: string): Promise<void> {
     const client = this.clientManager.getClient();
 
-    await client.deleteFrom("tags").where("label", "=", label).execute();
+    // Usage is derived from tagging in MySQL; do not remove a label still
+    // referenced by another quiz after this quiz has detached it.
+    await client
+      .deleteFrom("tags")
+      .where("label", "=", label)
+      .where((eb) =>
+        eb.not(
+          eb.exists(
+            eb
+              .selectFrom("tagging")
+              .select("tag_id")
+              .whereRef("tagging.tag_id", "=", "tags.id"),
+          ),
+        ),
+      )
+      .execute();
   }
 }

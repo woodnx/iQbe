@@ -1,3 +1,5 @@
+import { ApiError } from "@/http/ApiError.js";
+import { quizContentSchema } from "./input.js";
 export default class Quiz {
   private constructor(
     private _qid: string,
@@ -20,6 +22,14 @@ export default class Quiz {
     wid?: string,
     categoryId?: number,
   ) {
+    const valid = quizContentSchema.safeParse({
+      question,
+      answer,
+      anotherAnswer,
+      wid,
+      category: categoryId,
+    });
+    if (!valid.success) throw new ApiError().invalidParams(valid.error.message);
     return new Quiz(
       qid,
       question,

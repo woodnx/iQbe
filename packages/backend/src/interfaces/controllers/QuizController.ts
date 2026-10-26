@@ -1,18 +1,18 @@
+import IQuizQueryService from "@/applications/queryservices/IQuizQueryService.js";
+import { AddQuizUseCase } from "@/applications/usecases/Quiz/AddQuizUseCase.js";
+import { AddQuizzesUseCase } from "@/applications/usecases/Quiz/AddQuizzesUseCase.js";
+import { DeleteQuizUseCase } from "@/applications/usecases/Quiz/DeleteQuizUseCase.js";
+import { EditQuizUseCase } from "@/applications/usecases/Quiz/EditQuizUseCase.js";
+import { ApiError } from "@/http/ApiError.js";
 import type { ApiContext } from "@/http/context.js";
 import {
+  deleteQuizzesQid,
   getQuizzes,
   getQuizzesSize,
   postQuizzes,
   postQuizzesMultiple,
   putQuizzesQid,
-  deleteQuizzesQid,
 } from "@/http/schemas.js";
-import { ApiError } from "@/http/ApiError.js";
-
-import IQuizQueryService from "@/applications/queryservices/IQuizQueryService.js";
-import { AddQuizUseCase } from "@/applications/usecases/Quiz/AddQuizUseCase.js";
-import { DeleteQuizUseCase } from "@/applications/usecases/Quiz/DeleteQuizUseCase.js";
-import { EditQuizUseCase } from "@/applications/usecases/Quiz/EditQuizUseCase.js";
 
 export default class QuizController {
   constructor(
@@ -20,90 +20,33 @@ export default class QuizController {
     private addQuizUseCase: AddQuizUseCase,
     private editQuizUseCase: EditQuizUseCase,
     private deleteQuizUseCase: DeleteQuizUseCase,
+    private addQuizzesUseCase: AddQuizzesUseCase,
   ) {}
 
   get() {
     return async (c: ApiContext<typeof getQuizzes>) => {
       const query = c.req.valid("query");
-
-      const page = !!query.page ? Number(query.page) : 1;
-      const maxView =
-        !!query.maxView || Number(query.maxView) <= 100
-          ? Number(query.maxView)
-          : 100;
-      const seed = !!query.seed ? Number(query.seed) : undefined;
-      const wids = query.wids || [];
-      const keyword = query.keyword || undefined;
-      const keywordOption = query.keywordOption || undefined;
-      const uid = c.get("user").uid;
-      const since =
-        "since" in query ? Number(query.since) || undefined : undefined;
-      const until =
-        "until" in query ? Number(query.until) || undefined : undefined;
-      const mid = query && "mid" in query ? query.mid || undefined : undefined;
-      const isFavorite = !!query.isFavorite;
-      const judgements =
-        query.judgements != null
-          ? Array.isArray(query.judgements)
-            ? query.judgements
-            : [query.judgements]
-          : undefined;
-      const categories = query.categories || undefined;
-      const tags = query.tags || undefined;
-      const tagMatchAll = query.tagMatchAll;
-
-      const quizzes = await this.quizQueryService.findMany(uid, {
-        page,
-        maxView,
-        seed,
-        wids,
-        keyword,
-        keywordOption,
-        since,
-        until,
-        judgements,
-        mid,
-        isFavorite,
-        categories,
-        tags,
-        tagMatchAll,
+      const quizzes = await this.quizQueryService.findMany(c.get("user").uid, {
+        ...query,
+        wids: query.wids ?? [],
+        isFavorite: query.isFavorite ?? false,
+        judgements:
+          query.judgements == null
+            ? undefined
+            : Array.isArray(query.judgements)
+              ? query.judgements
+              : [query.judgements],
       });
-
       return c.json(quizzes, 200);
     };
   }
 
   size() {
     return async (c: ApiContext<typeof getQuizzesSize>) => {
-      const query = c.req.valid("query");
-
-      const wids = query.wids || [];
-      const keyword = query.keyword || undefined;
-      const keywordOption = query.keywordOption || undefined;
-      const uid = c.get("user").uid;
-      const since =
-        "since" in query ? Number(query.since) || undefined : undefined;
-      const until =
-        "until" in query ? Number(query.until) || undefined : undefined;
-      const mid = query && "mid" in query ? query.mid || undefined : undefined;
-      const isFavorite = !!query.isFavorite;
-      const judgements = query.judgements
-        ? Array.isArray(query.judgements)
-          ? query.judgements
-          : [query.judgements]
-        : undefined;
-
-      const size = await this.quizQueryService.count(uid, {
-        wids,
-        keyword,
-        keywordOption,
-        since,
-        until,
-        judgements,
-        mid,
-        isFavorite,
-      });
-
+      const size = await this.quizQueryService.count(
+        c.get("user").uid,
+        c.req.valid("query"),
+      );
       return c.json({ size }, 200);
     };
   }
@@ -147,17 +90,17 @@ export default class QuizController {
         throw new ApiError().invalidParams();
       }
 
-      for (const r of records) {
-        await this.addQuizUseCase.execute({
-          question: r.question,
-          answer: r.answer,
-          anotherAnswer: r.anotherAnswer || undefined,
-          tagLabels: r.tags || [],
-          wid: r.wid || undefined,
-          categoryId: r.category || undefined,
-          uid,
-        });
-      }
+      await this.addQuizzesUseCase.execute(
+        uid,
+        records.map((record) => ({
+          question: record.question,
+          answer: record.answer,
+          anotherAnswer: record.anotherAnswer ?? undefined,
+          tagLabels: record.tags ?? [],
+          wid: record.wid ?? undefined,
+          categoryId: record.category ?? undefined,
+        })),
+      );
 
       return c.body(null, 201);
     };
@@ -202,7 +145,7 @@ export default class QuizController {
 
       if (!qid) throw new ApiError().internalProblems();
 
-      await this.deleteQuizUseCase.execute({ qid });
+      await this.deleteQuizUseCase.execute({ qid, uid: c.get("user").uid });
 
       return c.body(null, 204);
     };

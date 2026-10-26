@@ -4,6 +4,7 @@ import { Hono } from "hono";
 import { bodyLimit } from "hono/body-limit";
 import { cors } from "hono/cors";
 import server from "./allowed-server.json" with { type: "json" };
+import { ApiError } from "./http/ApiError.js";
 import type { AppEnv } from "./http/context.js";
 import { errorHandler } from "./middleware/error.js";
 import verifyAuthToken from "./middleware/verifyAuthToken.js";
@@ -48,12 +49,20 @@ export function createApp(
         headers: response.headers,
       });
   });
-  app.use("/api/*", async (c, next) => {
-    if (c.req.header("content-type")?.split(";")[0] === "application/json") {
-      return bodyLimit({ maxSize: 5 * 1024 * 1024 })(c, next);
-    }
-    await next();
-  });
+  app.use(
+    "/api/*",
+    bodyLimit({
+      maxSize: 5 * 1024 * 1024,
+      onError: () => {
+        throw new ApiError({
+          title: "PAYLOAD_TOO_LARGE",
+          type: "about:blank",
+          status: 413,
+          detail: "Request body exceeds 5 MiB.",
+        });
+      },
+    }),
+  );
   app.use("/api/*", async (c, next) => {
     if (c.req.path === "/api/auth" || c.req.path.startsWith("/api/auth/"))
       return next();
@@ -82,8 +91,12 @@ export function createApp(
     .route("/api/users", users)
     .route("/api/workbooks", workbooks);
 
-  app.all("/api", (c) => c.text("Undefined api root"));
-  app.all("/api/*", (c) => c.text("Undefined api root"));
+  app.all("/api", () => {
+    throw new ApiError().notFound();
+  });
+  app.all("/api/*", () => {
+    throw new ApiError().notFound();
+  });
 
   const publicRoot = options.publicRoot ?? `${process.cwd()}/public`;
   const webRoot =
