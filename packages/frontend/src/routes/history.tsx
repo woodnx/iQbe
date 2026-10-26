@@ -1,4 +1,4 @@
-import { Group, Text } from "@mantine/core";
+import { Group } from "@mantine/core";
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, useRouter, useSearch } from "@tanstack/react-router";
 import { useState } from "react";
@@ -12,19 +12,14 @@ import { useHistories } from "@/hooks/useHistories";
 import dayjs from "@/plugins/dayjs";
 import { Judgement } from "@/types";
 import { api } from "@/utils/api";
-import { convertJudgements } from "@/utils/convertJudgement";
 import { quizSearchSchema } from "./_schemas/quizSearch";
 
 export const Route = createFileRoute("/history")({
   validateSearch: quizSearchSchema.transform((value) => {
     const since =
-      typeof value.since === "number" && !Number.isNaN(value.since)
-        ? value.since
-        : dayjs().startOf("day").valueOf();
+      value.since != null ? value.since : dayjs().startOf("day").toISOString();
     const until =
-      typeof value.until === "number" && !Number.isNaN(value.until)
-        ? value.until
-        : dayjs().endOf("day").valueOf();
+      value.until != null ? value.until : dayjs().endOf("day").toISOString();
     return {
       ...value,
       since,
@@ -40,15 +35,15 @@ function RouteComponent() {
   const [activePage, setPage] = useState(search.page ?? 1);
   const [isHidden, setIsHidden] = useState(false);
   const [judgements, setJudgements] = useState<Judgement[]>(
-    convertJudgements(search.judgements || []),
+    search.judgements || [],
   );
-  const [dates, setDates] = useState<number[]>([
+  const [dates, setDates] = useState<string[]>([
     dayjs(search.since || undefined)
       .startOf("day")
-      .valueOf(),
+      .toISOString(),
     dayjs(search.until || undefined)
       .endOf("day")
-      .valueOf(),
+      .toISOString(),
   ]);
   const { histories } = useHistories(dates[0], dates[1]);
   const right = !!histories ? Number(histories.right) : 0;
@@ -205,7 +200,7 @@ function RouteComponent() {
     });
   };
 
-  const changeDates = (dates: number[]) => {
+  const changeDates = (dates: string[]) => {
     setPage(1);
     setDates(dates);
     router.navigate({

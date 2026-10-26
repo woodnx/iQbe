@@ -211,6 +211,50 @@ describe("validation and Hono RPC", () => {
       ).status,
     ).toBe(400);
   });
+  it("converts named judgements and ISO dates for list and count filters", async () => {
+    const { default: QuizInfra } = await import("./interfaces/infra/QuizInfra.js");
+    const find = jest.spyOn(QuizInfra.prototype, "findMany").mockResolvedValue([]);
+    const count = jest.spyOn(QuizInfra.prototype, "count").mockResolvedValue(0);
+    for (const path of ["/api/quizzes", "/api/quizzes/size"]) {
+      const params = new URLSearchParams({
+        since: "2026-10-25T00:00:00+09:00",
+        until: "2026-10-26T23:59:59.999+09:00",
+      });
+      for (const name of ["wrong", "right", "through", "unanswered"])
+        params.append("judgements", name);
+      expect((await app.request(`${path}?${params}`)).status).toBe(200);
+    }
+    const filters = expect.objectContaining({
+      since: Date.parse("2026-10-25T00:00:00+09:00"),
+      until: Date.parse("2026-10-26T23:59:59.999+09:00"),
+      judgements: [0, 1, 2, 3],
+    });
+    expect(find).toHaveBeenCalledWith(user.uid, filters);
+    expect(count).toHaveBeenCalledWith(user.uid, filters);
+    expect((await app.request("/api/quizzes?since=2026-02-30")).status).toBe(400);
+    expect((await app.request("/api/quizzes?since=2026-10-26&until=2026-10-25")).status).toBe(400);
+    expect((await app.request("/api/quizzes?judgements=unknown")).status).toBe(400);
+    expect((await app.request("/api/quizzes?judgements=wrong")).status).toBe(200);
+    expect((await app.request("/api/quizzes?since=2026-10-26")).status).toBe(200);
+    expect((await app.request("/api/quizzes?since=0&until=1")).status).toBe(200);
+  });
+  it("accepts ISO dates from the history components for history totals", async () => {
+    const { default: JudgementInfra } = await import("./interfaces/infra/JudgementInfra.js");
+    const { default: Judgement } = await import("./domains/Judgement/index.js");
+    const find = jest.spyOn(JudgementInfra.prototype, "findByUidAndDate")
+      .mockResolvedValue(new Judgement(1, 2, 3));
+    for (const [since, until] of [
+      ["2026-10-26T00:00:00.000Z", "2026-10-26T23:59:59.999Z"],
+      ["1792972800000", "1793059199999"],
+    ]) {
+      const response = await app.request(`/api/histories/${encodeURIComponent(since)}/${encodeURIComponent(until)}`);
+      expect(response.status).toBe(200);
+      expect(await response.json()).toEqual({ right: 1, wrong: 2, through: 3 });
+    }
+    expect(find).toHaveBeenCalledWith(user.uid, [
+      new Date("2026-10-26T00:00:00.000Z"), new Date("2026-10-26T23:59:59.999Z"),
+    ]);
+  });
   it("forwards all count filters including scalar judgement zero", async () => {
     const { default: QuizInfra } = await import(
       "./interfaces/infra/QuizInfra.js"

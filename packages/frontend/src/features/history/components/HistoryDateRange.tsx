@@ -1,29 +1,14 @@
-import { useState } from "react";
 import { ActionIcon, BoxProps, Popover, UnstyledButton } from "@mantine/core";
 import { DatePicker } from "@mantine/dates";
 import { IconChevronLeft, IconChevronRight } from "@tabler/icons-react";
+import { useState } from "react";
 import dayjs from "@/plugins/dayjs";
+import { convertDates, type DateRangeValue } from "@/utils/convertDates";
 
 interface Props extends BoxProps {
-  dates: number[];
-  onChangeDates: (dates: number[]) => void;
+  dates: string[];
+  onChangeDates: (dates: string[]) => void;
 }
-
-type DateRangeValue = [Date | null, Date | null];
-
-const convertDates = (dates: DateRangeValue) => {
-  if (dates[1] != null) {
-    return [
-      dayjs(dates[0]).startOf("day").valueOf(),
-      dayjs(dates[1]).endOf("day").valueOf(),
-    ];
-  } else {
-    return [
-      dayjs(dates[0]).startOf("day").valueOf(),
-      dayjs(dates[0]).endOf("day").valueOf(),
-    ];
-  }
-};
 
 export default function HistoryDateRange({
   dates: stringDates,
@@ -53,7 +38,7 @@ export default function HistoryDateRange({
 
   const setDates = (dates: DateRangeValue) => {
     setInnerDates(dates);
-    onChangeDates(convertDates(dates));
+    if (dates[0] != null) onChangeDates(convertDates(dates));
   };
 
   return (

@@ -29,8 +29,8 @@ type Props = ComponentProps<typeof Stack> &
         wrong: number;
         throgh: number;
         onSelectJudgement: (judgements: Judgement[]) => void;
-        dates: number[];
-        onChangeDates: (dates: number[]) => void;
+        dates: string[];
+        onChangeDates: (dates: string[]) => void;
       }
   );
 

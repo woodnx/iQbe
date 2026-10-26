@@ -1,6 +1,3 @@
-import type { Quiz as ApiQuiz } from "@/utils/api-types";
-
-import { ContextModalProps } from "@mantine/modals";
 import {
   ActionIcon,
   Code,
@@ -9,7 +6,10 @@ import {
   rem,
   Tooltip,
 } from "@mantine/core";
+
+import { ContextModalProps } from "@mantine/modals";
 import { IconCheck, IconCopy } from "@tabler/icons-react";
+import type { Quiz as ApiQuiz } from "@/utils/api-types";
 
 type Quiz = ApiQuiz;
 

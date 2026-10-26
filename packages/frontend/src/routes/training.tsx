@@ -249,7 +249,7 @@ function RouteComponent() {
                   search: () => ({
                     since: d[0],
                     until: d[1],
-                    judgements: [0, 1, 2],
+                    judgements: ["wrong", "right", "through"],
                   }),
                 });
               }}

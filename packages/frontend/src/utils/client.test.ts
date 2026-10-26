@@ -55,6 +55,31 @@ describe("RPC transport", () => {
     expect(params.has("keyword")).toBe(false);
     expect(new Headers(init?.headers).get("Authorization")).toBe("old-token");
   });
+  it("sends ISO dates and named judgements for list and count requests", async () => {
+    fetchMock.mockImplementation(async () => Response.json([]));
+    for (const request of [api.getQuizzes, api.getQuizzesSize]) {
+      await request({
+        params: {
+          query: {
+            since: "1970-01-01T00:00:00.000Z",
+            until: "1970-01-01T00:00:00.001Z",
+            judgements: ["wrong", "right", "through", "unanswered"],
+          },
+        },
+      });
+    }
+    for (const [url] of fetchMock.mock.calls) {
+      const params = new URL(String(url), "http://localhost").searchParams;
+      expect(params.get("since")).toBe("1970-01-01T00:00:00.000Z");
+      expect(params.get("until")).toBe("1970-01-01T00:00:00.001Z");
+      expect(params.getAll("judgements")).toEqual([
+        "wrong",
+        "right",
+        "through",
+        "unanswered",
+      ]);
+    }
+  });
   it("throws a typed HTTP error for React Query mutations", async () => {
     fetchMock.mockImplementation(async () => problem("ACCESS_DENIED", 403));
     await expect(api.postLike({ body: { qid: "q" } })).rejects.toMatchObject({

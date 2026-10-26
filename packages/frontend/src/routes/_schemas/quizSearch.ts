@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { savedQuizDate, savedJudgements } from "@/utils/quizFilters";
 
 export const quizSearchSchema = z.object({
   page: z.number().optional(),
@@ -19,12 +20,9 @@ export const quizSearchSchema = z.object({
     .optional()
     .transform((v) => (Number.isNaN(v) ? undefined : v)),
   crctAnsRatio: z.array(z.number()).nullable().optional(),
-  since: z.number().nullable().optional(),
-  until: z.number().nullable().optional(),
-  judgements: z
-    .union([z.array(z.number())])
-    .nullable()
-    .optional(),
+  since: savedQuizDate,
+  until: savedQuizDate,
+  judgements: savedJudgements,
   mid: z.string().nullable().optional(),
   isFavorite: z
     .boolean()

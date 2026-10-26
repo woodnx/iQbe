@@ -9,17 +9,17 @@ const mocks = vi.hoisted(() => ({
   search: {
     page: 2,
     maxView: 25,
-    since: 1792368000000,
-    until: 1792454399999,
-    judgements: [0],
+    since: "2026-10-19T00:00:00.000Z",
+    until: "2026-10-19T23:59:59.999Z",
+    judgements: ["wrong"],
     tags: ["a"],
   },
   navigate: vi.fn(),
   getQuizzes: vi.fn(),
   getQuizzesSize: vi.fn(),
   control: {} as {
-    onSelectJudgement: (value: number[]) => void;
-    onChangeDates: (dates: number[]) => void;
+    onSelectJudgement: (value: import("@/types").Judgement[]) => void;
+    onChangeDates: (dates: string[]) => void;
   },
   list: {} as { page: number; perPage: number },
 }));
@@ -97,8 +97,8 @@ const renderRoute = () =>
   );
 
 describe("latest quiz history", () => {
-  it("explains latest-answer semantics and forwards identical period/judgement filters to list and count", async () => {
-    expect(renderRoute()).toContain("各問題の最新の解答結果");
+  it("forwards identical ISO period and named judgement filters to list and count", async () => {
+    renderRoute();
     await vi.waitFor(() => {
       expect(mocks.getQuizzes).toHaveBeenCalledTimes(1);
       expect(mocks.getQuizzesSize).toHaveBeenCalledTimes(1);
@@ -106,27 +106,32 @@ describe("latest quiz history", () => {
     const listInput = mocks.getQuizzes.mock.calls[0][0];
     expect(listInput).toEqual(mocks.getQuizzesSize.mock.calls[0][0]);
     expect(listInput.params.query).toMatchObject({
-      judgements: [0],
+      judgements: ["wrong"],
       tags: ["a"],
+      since: mocks.search.since,
+      until: mocks.search.until,
       page: 2,
     });
     expect(mocks.list).toMatchObject({ page: 2, perPage: 25 });
   });
   it("resets pagination when judgement or period changes", () => {
     renderRoute();
-    mocks.control.onSelectJudgement([1]);
+    mocks.control.onSelectJudgement(["right"]);
     const judgementNavigation = mocks.navigate.mock.calls[0][0];
     expect(judgementNavigation.to).toBe("/history");
     expect(judgementNavigation.search(mocks.search)).toMatchObject({
       page: 1,
-      judgements: [1],
+      judgements: ["right"],
     });
-    mocks.control.onChangeDates([1792454400000, 1792540799999]);
+    mocks.control.onChangeDates([
+      "2026-10-20T00:00:00.000Z",
+      "2026-10-20T23:59:59.999Z",
+    ]);
     const dateNavigation = mocks.navigate.mock.calls[1][0];
     expect(dateNavigation.search(mocks.search)).toMatchObject({
       page: 1,
-      since: 1792454400000,
-      until: 1792540799999,
+      since: "2026-10-20T00:00:00.000Z",
+      until: "2026-10-20T23:59:59.999Z",
     });
   });
 });

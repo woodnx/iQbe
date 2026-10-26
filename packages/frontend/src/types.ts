@@ -20,7 +20,7 @@ export interface Rank {
   count: number;
 }
 
-export type Judgement = 0 | 1 | 2;
+export type { Judgement } from "@/utils/quizFilters";
 
 export interface MylistInformation {
   name: string;

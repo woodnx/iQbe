@@ -1,13 +1,12 @@
+import { ContextModalProps } from "@mantine/modals";
+import { notifications } from "@mantine/notifications";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { api } from "@/utils/api";
 import type {
   Category as ApiCategory,
   Quiz as ApiQuiz,
   QuizInput as ApiQuizInput,
 } from "@/utils/api-types";
-import { useMutation } from "@tanstack/react-query";
-import { api } from "@/utils/api";
-import { ContextModalProps } from "@mantine/modals";
-import { notifications } from "@mantine/notifications";
-import { useQueryClient } from "@tanstack/react-query";
 import {
   QUIZZES_QUERY_KEY,
   QuerySnapshot,

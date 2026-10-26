@@ -30,7 +30,30 @@ const positiveId = queryNumber.pipe(z.number().int().positive().safe());
 const timestamp = queryNumber.pipe(
   z.number().int().min(-8640000000000000).max(8640000000000000),
 );
-const judgement = queryNumber.pipe(z.number().int().min(0).max(3));
+// Keep persisted numeric history values; expose named filters at the HTTP boundary.
+const judgementNames = ["wrong", "right", "through", "unanswered"] as const;
+const judgement = z.preprocess(
+  (value: unknown) => {
+    if (typeof value === "number" && Number.isInteger(value))
+      return judgementNames[value] ?? value;
+    if (typeof value === "string" && /^[0-3]$/.test(value))
+      return judgementNames[Number(value)];
+    return value;
+  },
+  z.enum(judgementNames),
+).transform((value) => judgementNames.indexOf(value)) as z.ZodType<
+  number,
+  (typeof judgementNames)[number]
+>;
+
+// Legacy millisecond timestamps remain readable for saved links and older clients.
+const quizDate = z.preprocess(
+  (value: unknown) => {
+    const legacy = timestamp.safeParse(value);
+    return legacy.success ? new Date(legacy.data).toISOString() : value;
+  },
+  z.union([z.iso.date(), z.iso.datetime({ offset: true })]),
+).transform((value) => new Date(value).getTime()) as z.ZodType<number, string>;
 const filterShape = {
   wids: z
     .union([
@@ -45,8 +68,8 @@ const filterShape = {
     .length(2)
     .refine(([min, max]) => min <= max)
     .nullish(),
-  since: timestamp.nullish(),
-  until: timestamp.nullish(),
+  since: quizDate.nullish(),
+  until: quizDate.nullish(),
   judgements: z.union([z.array(judgement).max(4), judgement]).nullish(),
   mid: z.string().min(1).max(20).nullish(),
   isFavorite: queryBoolean.nullish(),
@@ -121,7 +144,7 @@ export const postCsvParse = {
 };
 export const getHistoriesSinceUntil = {
   param: z
-    .object({ since: timestamp, until: timestamp })
+    .object({ since: quizDate, until: quizDate })
     .refine(validRange, "since must not be after until"),
 };
 export const getHistories = {};
