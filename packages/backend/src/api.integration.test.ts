@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import { execFileSync } from "node:child_process";
 import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import os from "node:os";
@@ -285,6 +286,31 @@ integration("MySQL API integration", () => {
       ),
     ).toEqual(["q2"]);
   });
+
+  it.each([0, 12345])(
+    "keeps seeded quiz order stable across answers and pages (seed %s)",
+    async (seed) => {
+      const key = (qid: string) =>
+        createHash("md5").update(`${seed}:${qid}`).digest("hex");
+      const expected = ["q1", "q2", "q3"].sort((a, b) =>
+        key(a).localeCompare(key(b)),
+      );
+      const ids = async (option = {}) =>
+        (await quizzes.findMany("owner", { seed, ...option })).map(
+          (q) => q.qid,
+        );
+      expect(await ids()).toEqual(expected);
+      await db
+        .updateTable("quizzes")
+        .set({ total_crct_ans: 10 })
+        .where("qid", "=", "q1")
+        .execute();
+      expect(await ids()).toEqual(expected);
+      for (let page = 1; page <= expected.length; page++) {
+        expect(await ids({ maxView: 1, page })).toEqual([expected[page - 1]]);
+      }
+    },
+  );
 
   it.each([
     [{ tags: ["a", "b"] }, ["q2", "q1"]],

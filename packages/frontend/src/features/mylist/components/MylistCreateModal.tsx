@@ -1,11 +1,11 @@
-import type { Mylist as ApiMylist, Quiz as ApiQuiz } from "@/utils/api-types";
-import { useMutation } from "@tanstack/react-query";
-import { api } from "@/utils/api";
 import { BoxProps } from "@mantine/core";
 import { ContextModalProps } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
-import { useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import type { InferRequestType } from "hono/client";
 import { useRef } from "react";
+import type { Mylist as ApiMylist, Quiz as ApiQuiz } from "@/utils/api-types";
+import { readResponse, rpc } from "@/utils/client";
 import {
   MYLISTS_QUERY_KEY,
   QUIZZES_QUERY_KEY,
@@ -34,8 +34,9 @@ export default function MylistCreateModal({
   const tempMidRef = useRef<string | null>(null);
   const { mutate: addMylist } = useMutation({
     mutationKey: ["post", "/mylists"],
-    mutationFn: api.postMylists,
-    onMutate: async ({ body }) => {
+    mutationFn: (input: InferRequestType<typeof rpc.api.mylists.$post>) =>
+      rpc.api.mylists.$post(input).then(readResponse),
+    onMutate: async ({ json: body }) => {
       await queryClient.cancelQueries({ queryKey: MYLISTS_QUERY_KEY });
       const previousMylists = takeQuerySnapshot<Mylist[]>(
         queryClient,
@@ -82,8 +83,9 @@ export default function MylistCreateModal({
   });
   const { mutate: addQuizToMylist } = useMutation({
     mutationKey: ["post", "/register"],
-    mutationFn: api.postRegister,
-    onMutate: async ({ body }) => {
+    mutationFn: (input: InferRequestType<typeof rpc.api.register.$post>) =>
+      rpc.api.register.$post(input).then(readResponse),
+    onMutate: async ({ json: body }) => {
       await queryClient.cancelQueries({ queryKey: QUIZZES_QUERY_KEY });
       const previousQuizzes = takeQuerySnapshot<Quiz[]>(
         queryClient,
@@ -137,14 +139,14 @@ export default function MylistCreateModal({
   const toCreate = async (mylistname: string) => {
     addMylist(
       {
-        body: {
+        json: {
           listName: mylistname,
         },
       },
       {
         onSuccess: (createdMylist) => {
           addQuizToMylist({
-            body: {
+            json: {
               qid,
               mid: createdMylist.mid,
             },

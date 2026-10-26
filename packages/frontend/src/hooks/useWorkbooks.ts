@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { api } from "@/utils/api";
+import { readResponse, rpc } from "@/utils/client";
 export const useWorkbooks = (isAll = false, shouldFetch = true) => {
   const {
     data: workbooks,
@@ -8,7 +8,13 @@ export const useWorkbooks = (isAll = false, shouldFetch = true) => {
   } = useQuery({
     queryKey: ["get", isAll ? "/workbooks/all" : "/workbooks", {}],
     queryFn: ({ signal }) =>
-      isAll ? api.getWorkbooksAll({}, signal) : api.getWorkbooks({}, signal),
+      isAll
+        ? rpc.api.workbooks.all
+            .$get({}, { init: { signal: signal } })
+            .then(readResponse)
+        : rpc.api.workbooks
+            .$get({}, { init: { signal: signal } })
+            .then(readResponse),
     enabled: shouldFetch,
   });
   return { workbooks, isLoading, error };

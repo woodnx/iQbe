@@ -25,7 +25,14 @@ const mocks = vi.hoisted(() => ({
 }));
 let client: QueryClient;
 let unsubscribe: Array<() => void>;
-vi.mock("@/utils/api", () => ({ api: mocks }));
+vi.mock("@/utils/client", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@/utils/client")>()),
+  rpc: {
+    api: {
+      quizzes: { $get: mocks.getQuizzes, size: { $get: mocks.getQuizzesSize } },
+    },
+  },
+}));
 vi.mock("@tanstack/react-router", () => ({
   createFileRoute: () => (options: object) => ({ options }),
   useSearch: () => mocks.search,
@@ -82,8 +89,12 @@ beforeEach(() => {
   mocks.navigate.mockReset();
   mocks.getQuizzes
     .mockReset()
-    .mockResolvedValue([{ qid: "latest-quiz", judgement: 0 }]);
-  mocks.getQuizzesSize.mockReset().mockResolvedValue({ size: 1 });
+    .mockImplementation(async () =>
+      Response.json([{ qid: "latest-quiz", judgement: 0 }]),
+    );
+  mocks.getQuizzesSize
+    .mockReset()
+    .mockImplementation(async () => Response.json({ size: 1 }));
 });
 afterEach(() => {
   unsubscribe.forEach((stop) => stop());
@@ -105,7 +116,7 @@ describe("latest quiz history", () => {
     });
     const listInput = mocks.getQuizzes.mock.calls[0][0];
     expect(listInput).toEqual(mocks.getQuizzesSize.mock.calls[0][0]);
-    expect(listInput.params.query).toMatchObject({
+    expect(listInput.query).toMatchObject({
       judgements: ["wrong"],
       tags: ["a"],
       since: mocks.search.since,

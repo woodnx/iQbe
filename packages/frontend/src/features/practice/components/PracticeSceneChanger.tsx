@@ -2,6 +2,7 @@ import { Group, Loader, Overlay, Text } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter, useSearch } from "@tanstack/react-router";
+import type { InferRequestType } from "hono/client";
 import { useEffect, useState } from "react";
 import FilteringModal from "@/features/filtering/components/FilteringModal";
 import FilteringModalButton from "@/features/filtering/components/FilteringModalButton";
@@ -10,8 +11,8 @@ import { PracticeQuizController } from "@/features/practice/components/PracticeQ
 import { PracticeQuizIntro } from "@/features/practice/components/PracticeQuizIntro";
 import PracticeResultModal from "@/features/practice/components/PracticeResultModal";
 import { useTimer } from "@/hooks";
-import { api } from "@/utils/api";
 import type { Quiz as ApiQuiz } from "@/utils/api-types";
+import { readResponse, rpc } from "@/utils/client";
 import {
   QUIZZES_QUERY_KEY,
   QuerySnapshot,
@@ -37,20 +38,22 @@ export default function ({
   isTransfer = false,
   onFilter = () => {},
 }: Props) {
+  const search = useSearch({ from: "/practice" });
+  const startImmediately = isTransfer || search.seed != null;
   const [nowNumber, setNowNumber] = useState(0);
   const [scene, setScene] = useState<Scene>(
-    isTransfer ? "ready" : "preparation",
+    startImmediately ? "ready" : "preparation",
   );
-  const [startTrigger, setStartTrigger] = useState(isTransfer);
+  const [startTrigger, setStartTrigger] = useState(startImmediately);
   const [filtering, filter] = useDisclosure(false);
   const [_, result] = useDisclosure(false);
   const router = useRouter();
-  const search = useSearch({ from: "/practice" });
   const queryClient = useQueryClient();
   const { mutate } = useMutation({
     mutationKey: ["post", "/practice"],
-    mutationFn: api.postPractice,
-    onMutate: async ({ body }) => {
+    mutationFn: (input: InferRequestType<typeof rpc.api.practice.$post>) =>
+      rpc.api.practice.$post(input).then(readResponse),
+    onMutate: async ({ json: body }) => {
       await queryClient.cancelQueries({ queryKey: QUIZZES_QUERY_KEY });
       const previousQuizzes = takeQuerySnapshot<Quiz[]>(
         queryClient,
@@ -84,7 +87,11 @@ export default function ({
       restoreQuerySnapshot(queryClient, rollback.previousQuizzes);
     },
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: QUIZZES_QUERY_KEY });
+      // Keep the current practice list stable; refresh it on the next visit.
+      queryClient.invalidateQueries({
+        queryKey: QUIZZES_QUERY_KEY,
+        refetchType: "none",
+      });
     },
   });
   const [rightList, setRightList] = useState<string[]>([]);
@@ -94,8 +101,8 @@ export default function ({
   const delay = useTimer(500, 100, () => setScene("quizzing"));
 
   useEffect(() => {
-    if (!isTransfer) filter.open();
-    return () => setScene(isTransfer ? "ready" : "preparation");
+    if (!startImmediately) filter.open();
+    return () => setScene(startImmediately ? "ready" : "preparation");
   }, []);
 
   const toFilter = (
@@ -107,7 +114,7 @@ export default function ({
     tagMatchAll?: boolean,
     maxView?: number,
   ) => {
-    const seed = Math.floor(Math.random() * 100000);
+    const seed = search.seed ?? Math.floor(Math.random() * 100000);
     router.navigate({
       to: "/practice",
       search: (old) => ({
@@ -135,7 +142,7 @@ export default function ({
     if (!quiz) return;
 
     mutate({
-      body: {
+      json: {
         qid: quiz?.qid,
         judgement,
         pressedWord,

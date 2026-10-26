@@ -1,8 +1,8 @@
-import { useQuery } from "@tanstack/react-query";
-import { api } from "@/utils/api";
 import { TagsInput } from "@mantine/core";
 import { useDebouncedValue } from "@mantine/hooks";
+import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
+import { cleanQuery, readResponse, rpc } from "@/utils/client";
 
 export interface TagInputProps {
   value?: string[];
@@ -31,16 +31,16 @@ export default function TagInput({
       },
     ],
     queryFn: ({ signal }) =>
-      api.getTags(
-        {
-          params: {
-            query: {
+      rpc.api.tags
+        .$get(
+          {
+            query: cleanQuery({
               q: debounced,
-            },
+            }),
           },
-        },
-        signal,
-      ),
+          { init: { signal: signal } },
+        )
+        .then(readResponse),
   });
 
   const data = searchedTags?.map((item) => item.label);

@@ -6,20 +6,31 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { Route } from "@/routes/practice";
 
 const mocks = vi.hoisted(() => ({
-  search: {} as { isTransfer?: boolean; keyword?: string },
+  search: {} as { isTransfer?: boolean; keyword?: string; seed?: number },
+  scene: vi.fn(),
   getQuizzes: vi.fn(),
   getQuizzesSize: vi.fn(),
 }));
 let client: QueryClient;
 let unsubscribe: Array<() => void>;
 
-vi.mock("@/utils/api", () => ({ api: mocks }));
+vi.mock("@/utils/client", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@/utils/client")>()),
+  rpc: {
+    api: {
+      quizzes: { $get: mocks.getQuizzes, size: { $get: mocks.getQuizzesSize } },
+    },
+  },
+}));
 vi.mock("@tanstack/react-router", () => ({
   createFileRoute: () => (options: object) => ({ options }),
   useSearch: () => mocks.search,
 }));
 vi.mock("@/features/practice/components/PracticeSceneChanger", () => ({
-  default: () => null,
+  default: (props: unknown) => {
+    mocks.scene(props);
+    return null;
+  },
 }));
 // Subscribe to the actual query observers to exercise fetch enablement without a DOM.
 vi.mock("@tanstack/react-query", async (importOriginal) => {
@@ -38,8 +49,12 @@ beforeEach(() => {
   client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   unsubscribe = [];
   mocks.search = {};
-  mocks.getQuizzes.mockReset().mockResolvedValue([{ qid: "q1" }]);
-  mocks.getQuizzesSize.mockReset().mockResolvedValue({ size: 1 });
+  mocks.getQuizzes
+    .mockReset()
+    .mockImplementation(async () => Response.json([{ qid: "q1" }]));
+  mocks.getQuizzesSize
+    .mockReset()
+    .mockImplementation(async () => Response.json({ size: 1 }));
   vi.spyOn(console, "log").mockImplementation(() => {});
 });
 afterEach(() => {
@@ -71,6 +86,50 @@ describe("practice data loading", () => {
       ).toEqual([{ qid: "q1" }]);
     });
   });
+  it.each([0, 12345])(
+    "reloads a seeded practice in the same API order (seed %s)",
+    async (seed) => {
+      mocks.search = { seed, isTransfer: true };
+      const quizzes = [{ qid: "q3" }, { qid: "q1" }, { qid: "q2" }];
+      mocks.getQuizzes.mockImplementation(async () => Response.json(quizzes));
+      renderRoute();
+      await vi.waitFor(() =>
+        expect(
+          client.getQueryData([
+            "get",
+            "/quizzes",
+            { params: { query: mocks.search } },
+          ]),
+        ).toEqual(quizzes),
+      );
+      renderRoute();
+      expect(mocks.scene).toHaveBeenLastCalledWith(
+        expect.objectContaining({
+          quizzes,
+          shuffledList: [0, 1, 2],
+        }),
+      );
+      client.clear();
+      mocks.search = { seed };
+      renderRoute();
+      await vi.waitFor(() =>
+        expect(
+          client.getQueryData([
+            "get",
+            "/quizzes",
+            { params: { query: mocks.search } },
+          ]),
+        ).toEqual(quizzes),
+      );
+      renderRoute();
+      expect(mocks.scene).toHaveBeenLastCalledWith(
+        expect.objectContaining({
+          quizzes,
+          shuffledList: [0, 1, 2],
+        }),
+      );
+    },
+  );
   it("waits for filtering on an ordinary visit", () => {
     mocks.search = { isTransfer: false };
     renderRoute();

@@ -200,7 +200,9 @@ export default class QuizInfra implements IQuizRepository, IQuizQueryService {
           "total",
         ),
       ]);
-    if (option.seed != null) query = query.orderBy(sql`RAND(${option.seed})`);
+    // Tie each sort key to the quiz so query scan order cannot change the shuffle.
+    if (option.seed != null)
+      query = query.orderBy(sql`MD5(CONCAT(${option.seed}, ':', quizzes.qid))`);
     if (option.isFavorite)
       query = query.orderBy(
         (eb) =>

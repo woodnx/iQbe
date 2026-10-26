@@ -59,3 +59,28 @@ export async function readResponse<
   }
   return (text ? data : undefined) as ResponseData<R>;
 }
+
+// Preserve meaningful false/zero values and omit unset query parameters.
+export const cleanQuery = <T extends object>(query: T): T =>
+  Object.fromEntries(
+    Object.entries(query).filter(
+      ([, value]) =>
+        value != null && !(typeof value === "number" && Number.isNaN(value)),
+    ),
+  ) as T;
+
+// Legacy ranking failures return text with HTTP 200; expose them as query errors.
+export async function readJsonResponse<
+  R extends ClientResponse<unknown, number, string>,
+>(response: R): Promise<Exclude<ResponseData<R>, string>> {
+  const data = await readResponse(response);
+  if (typeof data === "string") {
+    throw new ApiClientError({
+      title: "HTTP_ERROR",
+      type: "about:blank",
+      status: 500,
+      detail: data,
+    });
+  }
+  return data as Exclude<ResponseData<R>, string>;
+}

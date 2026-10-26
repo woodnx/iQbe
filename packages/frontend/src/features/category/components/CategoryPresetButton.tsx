@@ -1,11 +1,10 @@
-import type { Category as ApiCategory } from "@/utils/api-types";
-import { useMutation } from "@tanstack/react-query";
-import { api } from "@/utils/api";
 import { Button, ButtonProps, Modal } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import type { InferRequestType } from "hono/client";
+import type { Category as ApiCategory } from "@/utils/api-types";
+import { readResponse, rpc } from "@/utils/client";
 import CategoryPresetModal from "./CategoryPresetModal";
-import { useQueryClient } from "@tanstack/react-query";
 
 interface CategoryPresetButtonProps extends ButtonProps {}
 type Category = ApiCategory;
@@ -17,7 +16,9 @@ const CategoryPresetButton = ({ ...others }: CategoryPresetButtonProps) => {
   const queryKey = ["get", "/categories"];
   const { mutate } = useMutation({
     mutationKey: ["post", "/categories/preset"],
-    mutationFn: api.postCategoriesPreset,
+    mutationFn: (
+      input: InferRequestType<typeof rpc.api.categories.preset.$post>,
+    ) => rpc.api.categories.preset.$post(input).then(readResponse),
     onMutate: async () => {
       await queryClient.cancelQueries({ queryKey });
       const previous = queryClient.getQueryData(queryKey);
@@ -45,7 +46,7 @@ const CategoryPresetButton = ({ ...others }: CategoryPresetButtonProps) => {
   const addPreset = (preset: string) => {
     close();
     mutate({
-      body: {
+      json: {
         preset,
       },
     });

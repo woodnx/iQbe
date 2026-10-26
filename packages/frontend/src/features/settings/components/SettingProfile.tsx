@@ -1,15 +1,16 @@
-import { useMutation } from "@tanstack/react-query";
-import { api } from "@/utils/api";
 import { Button, Center, Grid, Group, Modal, TextInput } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
+import { useMutation } from "@tanstack/react-query";
+import type { InferRequestType } from "hono/client";
 import { useRef, useState } from "react";
 import { Area } from "react-easy-crop";
 import store from "storejs";
 import UsernameInput from "@/features/user/components/UsernameInput";
 import { useLoginedUser } from "@/hooks/useLoginedUser";
 import ImageCropper from "@/shared/components/ImageCropper";
+import { readResponse, rpc } from "@/utils/client";
 import getCroppedImg from "@/utils/getCroppedImage";
 import ButtonWithFileInput from "./ButtonWithFileInput";
 
@@ -26,8 +27,9 @@ export default function SettingProfile() {
   const previousPreviewImageRef = useRef<string | undefined>(undefined);
   const { mutateAsync: editUser } = useMutation({
     mutationKey: ["put", "/i"],
-    mutationFn: api.putI,
-    onMutate: ({ body }) => {
+    mutationFn: (input: InferRequestType<typeof rpc.api.i.$put>) =>
+      rpc.api.i.$put(input).then(readResponse),
+    onMutate: ({ json: body }) => {
       const previousUser = store.get("loginedUser") as
         | Record<string, unknown>
         | undefined;
@@ -58,7 +60,8 @@ export default function SettingProfile() {
   });
   const { mutateAsync: postImage } = useMutation({
     mutationKey: ["post", "/i/image"],
-    mutationFn: api.postIImage,
+    mutationFn: (input: InferRequestType<typeof rpc.api.i.image.$post>) =>
+      rpc.api.i.image.$post(input).then(readResponse),
     onMutate: () => {
       previousPreviewImageRef.current = previewImage;
       if (imageSrc) {
@@ -107,7 +110,7 @@ export default function SettingProfile() {
     if (!!croppedImage) {
       try {
         await postImage({
-          body: {
+          form: {
             file: new File([croppedImage], "profile.png", {
               type: "image/png",
             }),
@@ -122,7 +125,7 @@ export default function SettingProfile() {
 
   const submit = async (v: { username: string; nickname?: string }) => {
     await editUser({
-      body: {
+      json: {
         username: v.username,
         nickname: v.nickname,
       },

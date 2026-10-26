@@ -1,8 +1,3 @@
-import { useQuery } from "@tanstack/react-query";
-import { api } from "@/utils/api";
-import { useState } from "react";
-
-import { useIsMobile } from "@/contexts/isMobile";
 import {
   ActionIcon,
   Button,
@@ -13,6 +8,10 @@ import {
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { IconUsersPlus } from "@tabler/icons-react";
+import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
+import { useIsMobile } from "@/contexts/isMobile";
+import { readResponse, rpc } from "@/utils/client";
 
 export interface InviteCodeCreateModalProps {}
 
@@ -21,7 +20,10 @@ export default function InviteCodeCreateModal({}: InviteCodeCreateModalProps) {
   const [enabled, setEnabled] = useState(false);
   const { data } = useQuery({
     queryKey: ["post", "/invite-code", {}],
-    queryFn: ({ signal }) => api.postInviteCode({}, signal),
+    queryFn: ({ signal }) =>
+      rpc.api["invite-code"]
+        .$post({}, { init: { signal: signal } })
+        .then(readResponse),
     ...{
       enabled,
     },

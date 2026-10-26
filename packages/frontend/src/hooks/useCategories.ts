@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { api } from "@/utils/api";
+import { readResponse, rpc } from "@/utils/client";
 
 export const useCategories = () => {
   const {
@@ -8,7 +8,10 @@ export const useCategories = () => {
     isLoading,
   } = useQuery({
     queryKey: ["get", "/categories"],
-    queryFn: ({ signal }) => api.getCategories({}, signal),
+    queryFn: ({ signal }) =>
+      rpc.api.categories
+        .$get({}, { init: { signal: signal } })
+        .then(readResponse),
   });
 
   return {

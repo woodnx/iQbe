@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
-import { api } from "@/utils/api";
 import dayjs, { Period } from "@/plugins/dayjs";
+import { readResponse, rpc } from "@/utils/client";
 
 const defineLabel = (start: string, period: Period): string => {
   if (period === "month") {
@@ -28,17 +28,17 @@ const useUserStatus = (date: string, period: Period) => {
       },
     ],
     queryFn: ({ signal }) =>
-      api.getAnalysisStatusDatePeriod(
-        {
-          params: {
-            path: {
+      rpc.api.analysis.status[":date"][":period"]
+        .$get(
+          {
+            param: {
               date,
               period,
             },
           },
-        },
-        signal,
-      ),
+          { init: { signal: signal } },
+        )
+        .then(readResponse),
   });
 
   const userStatus = data

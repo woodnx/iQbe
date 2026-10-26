@@ -1,11 +1,14 @@
 import { useQuery } from "@tanstack/react-query";
-import { api } from "@/utils/api";
 import WorkbookSearch from "@/features/workbook/components/WorkbookSearch";
+import { readResponse, rpc } from "@/utils/client";
 
 export default function Workbooks() {
   const { data: workbooks } = useQuery({
     queryKey: ["get", "/workbooks"],
-    queryFn: ({ signal }) => api.getWorkbooks({}, signal),
+    queryFn: ({ signal }) =>
+      rpc.api.workbooks
+        .$get({}, { init: { signal: signal } })
+        .then(readResponse),
   });
 
   return (

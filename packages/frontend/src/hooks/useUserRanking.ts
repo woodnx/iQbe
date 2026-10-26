@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
-import { api } from "@/utils/api";
 import { Period } from "@/plugins/dayjs";
+import { readJsonResponse, rpc } from "@/utils/client";
 
 export const useAllUserRanking = (period: Period) => {
   const {
@@ -20,16 +20,17 @@ export const useAllUserRanking = (period: Period) => {
       },
     ],
     queryFn: ({ signal }) =>
-      api.getAnalysisRankingAllPeriod(
-        {
-          params: {
-            path: {
+      rpc.api.analysis.ranking.all[":period"]
+        .$get(
+          {
+            param: {
               period,
             },
+            query: {},
           },
-        },
-        signal,
-      ),
+          { init: { signal: signal } },
+        )
+        .then(readJsonResponse),
   });
 
   return {
@@ -57,16 +58,16 @@ export const usePersonalRank = (period: Period) => {
       },
     ],
     queryFn: ({ signal }) =>
-      api.getAnalysisRankingPersonalPeriod(
-        {
-          params: {
-            path: {
+      rpc.api.analysis.ranking.personal[":period"]
+        .$get(
+          {
+            param: {
               period,
             },
           },
-        },
-        signal,
-      ),
+          { init: { signal: signal } },
+        )
+        .then(readJsonResponse),
   });
 
   return {

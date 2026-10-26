@@ -1,11 +1,11 @@
-import { useMutation } from "@tanstack/react-query";
-import { api } from "@/utils/api";
 import { Code, Text, Title } from "@mantine/core";
 import { FileWithPath } from "@mantine/dropzone";
 import { notifications } from "@mantine/notifications";
-import { useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import type { InferRequestType } from "hono/client";
 import { useRef, useState } from "react";
 import { Element } from "@/routes/create";
+import { readResponse, rpc } from "@/utils/client";
 import {
   QUIZ_SIZES_QUERY_KEY,
   QUIZZES_QUERY_KEY,
@@ -23,8 +23,10 @@ export default function CsvFileImporter() {
   const previousQuizSizesRef = useRef<QuerySnapshot<{ size: number }>>([]);
   const { mutateAsync: addQuizzes } = useMutation({
     mutationKey: ["post", "/quizzes/multiple"],
-    mutationFn: api.postQuizzesMultiple,
-    onMutate: async ({ body }) => {
+    mutationFn: (
+      input: InferRequestType<typeof rpc.api.quizzes.multiple.$post>,
+    ) => rpc.api.quizzes.multiple.$post(input).then(readResponse),
+    onMutate: async ({ json: body }) => {
       const addCount = body.records?.length || 0;
 
       if (addCount <= 0) {
@@ -59,7 +61,9 @@ export default function CsvFileImporter() {
     const file = files[0];
 
     try {
-      const data = await api.postCsvParse({ body: { file } });
+      const data = await rpc.api.csv.parse
+        .$post({ form: { file } })
+        .then(readResponse);
       setPasedCsv(data);
     } catch {
       notifications.show({
@@ -81,7 +85,7 @@ export default function CsvFileImporter() {
     }));
 
     await addQuizzes({
-      body: {
+      json: {
         records: _quizzes,
       },
     });

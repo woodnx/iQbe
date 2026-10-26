@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import {
   Button,
   Center,
@@ -8,9 +7,10 @@ import {
   Title,
 } from "@mantine/core";
 import { isNotEmpty, matchesField, useForm } from "@mantine/form";
-import { api } from "@/utils/api";
-import { useSetRequestResetPassword } from "@/contexts/requestResetPassword";
 import { useNavigate, useSearch } from "@tanstack/react-router";
+import { useEffect } from "react";
+import { useSetRequestResetPassword } from "@/contexts/requestResetPassword";
+import { readResponse, rpc } from "@/utils/client";
 
 interface SubmitValue {
   username: string;
@@ -40,12 +40,14 @@ export default function ResetPassword() {
 
   const submit = async (v: SubmitValue) => {
     if (!token) return;
-    const message = await api.postResetPassword({
-      body: {
-        token,
-        newPassword: v.newPassword,
-      },
-    });
+    const message = await rpc.api["reset-password"]
+      .$post({
+        json: {
+          token,
+          newPassword: v.newPassword,
+        },
+      })
+      .then(readResponse);
 
     if (message == "succeed resetting your password") {
       localStorage.setItem("uid", "");

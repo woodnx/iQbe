@@ -11,7 +11,7 @@ import QuizTransfarButton from "@/features/quiz/components/QuizTransfarButton";
 import { useHistories } from "@/hooks/useHistories";
 import dayjs from "@/plugins/dayjs";
 import { Judgement } from "@/types";
-import { api } from "@/utils/api";
+import { cleanQuery, readResponse, rpc } from "@/utils/client";
 import { quizSearchSchema } from "./_schemas/quizSearch";
 
 export const Route = createFileRoute("/history")({
@@ -66,19 +66,19 @@ function RouteComponent() {
       },
     ],
     queryFn: ({ signal }) =>
-      api.getQuizzes(
-        {
-          params: {
-            query: {
+      rpc.api.quizzes
+        .$get(
+          {
+            query: cleanQuery({
               ...search,
               judgements,
               since: dates[0],
               until: dates[1],
-            },
+            }),
           },
-        },
-        signal,
-      ),
+          { init: { signal: signal } },
+        )
+        .then(readResponse),
   });
   const { data: quizzesSize } = useQuery({
     queryKey: [
@@ -96,19 +96,19 @@ function RouteComponent() {
       },
     ],
     queryFn: ({ signal }) =>
-      api.getQuizzesSize(
-        {
-          params: {
-            query: {
+      rpc.api.quizzes.size
+        .$get(
+          {
+            query: cleanQuery({
               ...search,
               judgements,
               since: dates[0],
               until: dates[1],
-            },
+            }),
           },
-        },
-        signal,
-      ),
+          { init: { signal: signal } },
+        )
+        .then(readResponse),
   });
   const size = quizzesSize?.size ?? 0;
 

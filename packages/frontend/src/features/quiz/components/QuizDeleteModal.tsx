@@ -1,11 +1,11 @@
-import type { Quiz as ApiQuiz } from "@/utils/api-types";
-import { useMutation } from "@tanstack/react-query";
-import { api } from "@/utils/api";
 import { Button, Group, Text } from "@mantine/core";
 import { ContextModalProps } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
 import { IconTrash } from "@tabler/icons-react";
-import { useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import type { InferRequestType } from "hono/client";
+import type { Quiz as ApiQuiz } from "@/utils/api-types";
+import { readResponse, rpc } from "@/utils/client";
 import {
   QUIZ_SIZES_QUERY_KEY,
   QUIZZES_QUERY_KEY,
@@ -30,8 +30,10 @@ const QuizDeleteModal = ({
   const queryClient = useQueryClient();
   const { mutate } = useMutation({
     mutationKey: ["delete", "/quizzes/{qid}"],
-    mutationFn: api.deleteQuizzesQid,
-    onMutate: async ({ params }) => {
+    mutationFn: (
+      input: InferRequestType<(typeof rpc.api.quizzes)[":qid"]["$delete"]>,
+    ) => rpc.api.quizzes[":qid"].$delete(input).then(readResponse),
+    onMutate: async ({ param: params }) => {
       await queryClient.cancelQueries({ queryKey: QUIZZES_QUERY_KEY });
       await queryClient.cancelQueries({ queryKey: QUIZ_SIZES_QUERY_KEY });
 
@@ -41,7 +43,7 @@ const QuizDeleteModal = ({
       );
 
       previousQuizzes.forEach(([key, data]) => {
-        const nextData = data?.filter((quiz) => quiz.qid !== params.path.qid);
+        const nextData = data?.filter((quiz) => quiz.qid !== params.qid);
         queryClient.setQueryData<Quiz[] | undefined>(key, nextData);
 
         if (data && nextData && data.length !== nextData.length) {
@@ -74,10 +76,8 @@ const QuizDeleteModal = ({
   const submit = () => {
     mutate(
       {
-        params: {
-          path: {
-            qid,
-          },
+        param: {
+          qid,
         },
       },
       {

@@ -1,7 +1,3 @@
-import { useQuery } from "@tanstack/react-query";
-import { api } from "@/utils/api";
-import { useState } from "react";
-
 import {
   Badge,
   BoxProps,
@@ -15,6 +11,9 @@ import {
   useCombobox,
 } from "@mantine/core";
 import { IconTag } from "@tabler/icons-react";
+import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
+import { cleanQuery, readResponse, rpc } from "@/utils/client";
 
 interface FilteringTagsProps extends BoxProps {
   value?: string[] | undefined;
@@ -44,16 +43,16 @@ export default function FilteringTags({
       },
     ],
     queryFn: ({ signal }) =>
-      api.getTags(
-        {
-          params: {
-            query: {
+      rpc.api.tags
+        .$get(
+          {
+            query: cleanQuery({
               q: search,
-            },
+            }),
           },
-        },
-        signal,
-      ),
+          { init: { signal: signal } },
+        )
+        .then(readResponse),
   });
 
   const combobox = useCombobox({

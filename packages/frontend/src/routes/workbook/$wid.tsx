@@ -1,8 +1,7 @@
-import { useQuery } from "@tanstack/react-query";
-import { api } from "@/utils/api";
 import { Card, Group, getGradient, Text, useMantineTheme } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { IconTrash } from "@tabler/icons-react";
+import { useQuery } from "@tanstack/react-query";
 import {
   createFileRoute,
   useParams,
@@ -19,6 +18,7 @@ import QuizList from "@/features/quiz/components/QuizList";
 import QuizShuffleButton from "@/features/quiz/components/QuizShuffleButton";
 import QuizTransfarButton from "@/features/quiz/components/QuizTransfarButton";
 import { useWorkbooks } from "@/hooks/useWorkbooks";
+import { cleanQuery, readResponse, rpc } from "@/utils/client";
 import { quizSearchSchema } from "../_schemas/quizSearch";
 
 export const Route = createFileRoute("/workbook/$wid")({
@@ -57,17 +57,17 @@ function RouteComponent() {
       },
     ],
     queryFn: ({ signal }) =>
-      api.getQuizzes(
-        {
-          params: {
-            query: {
+      rpc.api.quizzes
+        .$get(
+          {
+            query: cleanQuery({
               ...search,
               wids: [wid],
-            },
+            }),
           },
-        },
-        signal,
-      ),
+          { init: { signal: signal } },
+        )
+        .then(readResponse),
   });
   const { data: quizzesSize } = useQuery({
     queryKey: [
@@ -83,17 +83,17 @@ function RouteComponent() {
       },
     ],
     queryFn: ({ signal }) =>
-      api.getQuizzesSize(
-        {
-          params: {
-            query: {
+      rpc.api.quizzes.size
+        .$get(
+          {
+            query: cleanQuery({
               ...search,
               wids: [wid],
-            },
+            }),
           },
-        },
-        signal,
-      ),
+          { init: { signal: signal } },
+        )
+        .then(readResponse),
   });
   const size =
     !!quizzes && !!quizzes.length && !!quizzesSize ? quizzesSize.size : 0;

@@ -1,9 +1,8 @@
-import type { Category as ApiCategory } from "@/utils/api-types";
-import { useQuery } from "@tanstack/react-query";
-import { api } from "@/utils/api";
-import { useState } from "react";
-
 import { BoxProps, Group } from "@mantine/core";
+import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
+import type { Category as ApiCategory } from "@/utils/api-types";
+import { readResponse, rpc } from "@/utils/client";
 
 import CategorySelectorBase from "./CategorySelectorBase";
 
@@ -30,7 +29,10 @@ export default function CategorySelector({
 
   const { data: categories } = useQuery({
     queryKey: ["get", "/categories"],
-    queryFn: ({ signal }) => api.getCategories({}, signal),
+    queryFn: ({ signal }) =>
+      rpc.api.categories
+        .$get({}, { init: { signal: signal } })
+        .then(readResponse),
   });
   const subCategories =
     categories?.find((c) => c.id == category?.id)?.sub || [];

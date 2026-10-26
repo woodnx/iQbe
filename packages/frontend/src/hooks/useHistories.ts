@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { api } from "@/utils/api";
+import { readResponse, rpc } from "@/utils/client";
 
 export const useHistories = (since: string, until: string) => {
   const {
@@ -20,17 +20,17 @@ export const useHistories = (since: string, until: string) => {
       },
     ],
     queryFn: ({ signal }) =>
-      api.getHistoriesSinceUntil(
-        {
-          params: {
-            path: {
+      rpc.api.histories[":since"][":until"]
+        .$get(
+          {
+            param: {
               since,
               until,
             },
           },
-        },
-        signal,
-      ),
+          { init: { signal: signal } },
+        )
+        .then(readResponse),
   });
 
   return {

@@ -1,4 +1,3 @@
-import { api } from "@/utils/api";
 import {
   Flex,
   Loader,
@@ -10,10 +9,12 @@ import {
 import { useDebouncedCallback } from "@mantine/hooks";
 import { IconAlertCircle, IconCheck } from "@tabler/icons-react";
 import { useState } from "react";
+import { readResponse, rpc } from "@/utils/client";
 
 function checkUsernameAvailable(username: string): Promise<boolean> {
-  return api
-    .postAuthAvailable({ body: { username } })
+  return rpc.api.auth.available
+    .$post({ json: { username } })
+    .then(readResponse)
     .then((data) => data.available);
 }
 

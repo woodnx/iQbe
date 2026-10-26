@@ -1,12 +1,13 @@
 import { ContextModalProps } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { api } from "@/utils/api";
+import type { InferRequestType } from "hono/client";
 import type {
   Category as ApiCategory,
   Quiz as ApiQuiz,
   QuizInput as ApiQuizInput,
 } from "@/utils/api-types";
+import { readResponse, rpc } from "@/utils/client";
 import {
   QUIZZES_QUERY_KEY,
   QuerySnapshot,
@@ -38,8 +39,10 @@ export default function ({
   const queryClient = useQueryClient();
   const { mutate } = useMutation({
     mutationKey: ["put", "/quizzes/{qid}"],
-    mutationFn: api.putQuizzesQid,
-    onMutate: async ({ body, params }) => {
+    mutationFn: (
+      input: InferRequestType<(typeof rpc.api.quizzes)[":qid"]["$put"]>,
+    ) => rpc.api.quizzes[":qid"].$put(input).then(readResponse),
+    onMutate: async ({ json: body, param: params }) => {
       await queryClient.cancelQueries({ queryKey: QUIZZES_QUERY_KEY });
       const previousQuizzes = takeQuerySnapshot<ApiQuiz[]>(
         queryClient,
@@ -50,7 +53,7 @@ export default function ({
         { queryKey: QUIZZES_QUERY_KEY },
         (data) =>
           data?.map((quiz) =>
-            quiz.qid === params.path.qid
+            quiz.qid === params.qid
               ? {
                   ...quiz,
                   question: body.question,
@@ -87,14 +90,14 @@ export default function ({
   }: QuizEditSubmitValues) => {
     mutate(
       {
-        body: {
+        json: {
           question,
           answer,
           category,
           tags,
           wid,
         },
-        params: { path: { qid } },
+        param: { qid },
       },
       {
         onSuccess: () => {

@@ -1,13 +1,13 @@
-import type { QuizInput as ApiQuizInput } from "@/utils/api-types";
-import { useMutation } from "@tanstack/react-query";
-import { api } from "@/utils/api";
 import { Tabs } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
-import { useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
+import type { InferRequestType } from "hono/client";
 import { useRef } from "react";
 import CsvFileImporter from "@/features/create/components/CsvFileImporter";
 import QuizEditForm from "@/features/quiz/components/QuizEditForm";
+import type { QuizInput as ApiQuizInput } from "@/utils/api-types";
+import { readResponse, rpc } from "@/utils/client";
 import {
   QUIZ_SIZES_QUERY_KEY,
   QUIZZES_QUERY_KEY,
@@ -33,7 +33,8 @@ function RouteComponent() {
   const previousQuizSizesRef = useRef<QuerySnapshot<{ size: number }>>([]);
   const { mutate } = useMutation({
     mutationKey: ["post", "/quizzes"],
-    mutationFn: api.postQuizzes,
+    mutationFn: (input: InferRequestType<typeof rpc.api.quizzes.$post>) =>
+      rpc.api.quizzes.$post(input).then(readResponse),
     onMutate: async () => {
       await queryClient.cancelQueries({ queryKey: QUIZ_SIZES_QUERY_KEY });
 
@@ -77,7 +78,7 @@ function RouteComponent() {
     wid,
   }: QuizEditSubmitValues) => {
     mutate({
-      body: {
+      json: {
         question,
         answer,
         category,

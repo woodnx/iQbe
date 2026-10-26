@@ -1,12 +1,12 @@
-import type { Workbook as ApiWorkbook } from "@/utils/api-types";
-import { useMutation } from "@tanstack/react-query";
-import { api } from "@/utils/api";
 import { ActionIcon, Button, Group, Modal, TextInput } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { IconSquarePlus2 } from "@tabler/icons-react";
-import { useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import type { InferRequestType } from "hono/client";
 import { useRef, useState } from "react";
 import { useIsMobile } from "@/contexts/isMobile";
+import type { Workbook as ApiWorkbook } from "@/utils/api-types";
+import { readResponse, rpc } from "@/utils/client";
 import {
   ALL_WORKBOOKS_QUERY_KEY,
   QuerySnapshot,
@@ -26,8 +26,9 @@ export default function CreateWorkbookModal() {
   const tempWidRef = useRef<string | null>(null);
   const { mutate } = useMutation({
     mutationKey: ["post", "/workbooks"],
-    mutationFn: api.postWorkbooks,
-    onMutate: async ({ body }) => {
+    mutationFn: (input: InferRequestType<typeof rpc.api.workbooks.$post>) =>
+      rpc.api.workbooks.$post(input).then(readResponse),
+    onMutate: async ({ json: body }) => {
       await queryClient.cancelQueries({ queryKey: WORKBOOKS_QUERY_KEY });
       await queryClient.cancelQueries({ queryKey: ALL_WORKBOOKS_QUERY_KEY });
 
@@ -116,7 +117,7 @@ export default function CreateWorkbookModal() {
       name: listName,
     };
 
-    mutate({ body });
+    mutate({ json: body });
     close();
   };
 

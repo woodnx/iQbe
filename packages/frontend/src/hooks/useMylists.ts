@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { api } from "@/utils/api";
+import { readResponse, rpc } from "@/utils/client";
 
 export const useMylists = (shouldFetch = true) => {
   const {
@@ -8,7 +8,8 @@ export const useMylists = (shouldFetch = true) => {
     isLoading,
   } = useQuery({
     queryKey: ["get", "/mylists", {}],
-    queryFn: ({ signal }) => api.getMylists({}, signal),
+    queryFn: ({ signal }) =>
+      rpc.api.mylists.$get({}, { init: { signal: signal } }).then(readResponse),
     ...{
       enabled: shouldFetch,
     },

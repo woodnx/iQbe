@@ -1,11 +1,10 @@
-import type { Category as ApiCategory } from "@/utils/api-types";
-import { useMutation } from "@tanstack/react-query";
-import { api } from "@/utils/api";
-
 import { Button, Group, Text } from "@mantine/core";
 import { ContextModalProps } from "@mantine/modals";
 import { IconTrash } from "@tabler/icons-react";
-import { useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import type { InferRequestType } from "hono/client";
+import type { Category as ApiCategory } from "@/utils/api-types";
+import { readResponse, rpc } from "@/utils/client";
 
 type Category = ApiCategory;
 
@@ -26,7 +25,9 @@ const CategoryDeleteModal = <T extends boolean>({
 
   const { mutate } = useMutation({
     mutationKey: ["delete", "/categories/{id}"],
-    mutationFn: api.deleteCategoriesId,
+    mutationFn: (
+      input: InferRequestType<(typeof rpc.api.categories)[":id"]["$delete"]>,
+    ) => rpc.api.categories[":id"].$delete(input).then(readResponse),
     onMutate: () => {
       const previous = queryClient.getQueryData(queryKey);
 
@@ -61,11 +62,7 @@ const CategoryDeleteModal = <T extends boolean>({
   });
 
   const submit = () => {
-    mutate({
-      params: {
-        path: { id },
-      },
-    });
+    mutate({ param: { id } });
 
     context.closeModal(modalId);
   };

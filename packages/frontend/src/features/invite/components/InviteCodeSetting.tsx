@@ -1,5 +1,3 @@
-import { useQuery } from "@tanstack/react-query";
-import { api } from "@/utils/api";
 import {
   ComboboxItem,
   Group,
@@ -9,9 +7,10 @@ import {
   Text,
   Title,
 } from "@mantine/core";
-
-import InviteCodeCreateModal from "./InviteCodeCreateModal";
+import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
+import { cleanQuery, readResponse, rpc } from "@/utils/client";
+import InviteCodeCreateModal from "./InviteCodeCreateModal";
 
 export interface InviteCodeSettingProps {}
 
@@ -33,17 +32,17 @@ export default function InviteCodeSetting() {
       },
     ],
     queryFn: ({ signal }) =>
-      api.getInviteCode(
-        {
-          params: {
-            query: {
+      rpc.api["invite-code"]
+        .$get(
+          {
+            query: cleanQuery({
               status: status && Number(status.value),
               sort: sort?.value,
-            },
+            }),
           },
-        },
-        signal,
-      ),
+          { init: { signal: signal } },
+        )
+        .then(readResponse),
   });
 
   const contents = inviteCodes?.map((inviteCode) => (

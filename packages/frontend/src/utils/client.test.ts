@@ -1,12 +1,17 @@
-import { beforeEach, afterEach, describe, expect, it, vi } from "vitest";
 import { QueryClient } from "@tanstack/react-query";
-import { api } from "./api";
-import { ApiClientError } from "./client";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
-  takeQuerySnapshot,
-  restoreQuerySnapshot,
-  updateRelatedQuizSize,
+  ApiClientError,
+  cleanQuery,
+  readJsonResponse,
+  readResponse,
+  rpc,
+} from "./client";
+import {
   QUIZZES_QUERY_KEY,
+  restoreQuerySnapshot,
+  takeQuerySnapshot,
+  updateRelatedQuizSize,
 } from "./queryCache";
 
 vi.mock("storejs", () => ({ default: { set: vi.fn() } }));
@@ -35,17 +40,17 @@ const problem = (title: string, status = 401) =>
 describe("RPC transport", () => {
   it("serializes repeated queries, false and numeric zero while omitting null", async () => {
     fetchMock.mockResolvedValue(Response.json([]));
-    await api.getQuizzes({
-      params: {
-        query: {
+    await rpc.api.quizzes
+      .$get({
+        query: cleanQuery({
           wids: ["a", "b"],
           isFavorite: false,
           tagMatchAll: false,
           seed: 0,
           keyword: null,
-        },
-      },
-    });
+        }),
+      })
+      .then(readResponse);
     const [url, init] = fetchMock.mock.calls[0];
     const params = new URL(String(url), "http://localhost").searchParams;
     expect(params.getAll("wids")).toEqual(["a", "b"]);
@@ -57,16 +62,14 @@ describe("RPC transport", () => {
   });
   it("sends ISO dates and named judgements for list and count requests", async () => {
     fetchMock.mockImplementation(async () => Response.json([]));
-    for (const request of [api.getQuizzes, api.getQuizzesSize]) {
+    for (const request of [rpc.api.quizzes.$get, rpc.api.quizzes.size.$get]) {
       await request({
-        params: {
-          query: {
-            since: "1970-01-01T00:00:00.000Z",
-            until: "1970-01-01T00:00:00.001Z",
-            judgements: ["wrong", "right", "through", "unanswered"],
-          },
+        query: {
+          since: "1970-01-01T00:00:00.000Z",
+          until: "1970-01-01T00:00:00.001Z",
+          judgements: ["wrong", "right", "through", "unanswered"],
         },
-      });
+      }).then(readResponse);
     }
     for (const [url] of fetchMock.mock.calls) {
       const params = new URL(String(url), "http://localhost").searchParams;
@@ -82,18 +85,19 @@ describe("RPC transport", () => {
   });
   it("throws a typed HTTP error for React Query mutations", async () => {
     fetchMock.mockImplementation(async () => problem("ACCESS_DENIED", 403));
-    await expect(api.postLike({ body: { qid: "q" } })).rejects.toMatchObject({
-      title: "ACCESS_DENIED",
-      status: 403,
-    });
-    await expect(api.postLike({ body: { qid: "q" } })).rejects.toBeInstanceOf(
-      ApiClientError,
-    );
+    await expect(
+      rpc.api.like.$post({ json: { qid: "q" } }).then(readResponse),
+    ).rejects.toMatchObject({ title: "ACCESS_DENIED", status: 403 });
+    await expect(
+      rpc.api.like.$post({ json: { qid: "q" } }).then(readResponse),
+    ).rejects.toBeInstanceOf(ApiClientError);
   });
   it("handles empty success bodies without trying to parse JSON", async () => {
     fetchMock.mockResolvedValue(new Response(null, { status: 204 }));
     expect(
-      await api.deleteQuizzesQid({ params: { path: { qid: "q" } } }),
+      await rpc.api.quizzes[":qid"]
+        .$delete({ param: { qid: "q" } })
+        .then(readResponse),
     ).toBeUndefined();
   });
   it("uploads multipart files without forcing a JSON content type", async () => {
@@ -103,7 +107,7 @@ describe("RPC transport", () => {
     const file = new File(["question,answer\nQ,A"], "quiz.csv", {
       type: "text/csv",
     });
-    await api.postCsvParse({ body: { file } });
+    await rpc.api.csv.parse.$post({ form: { file } }).then(readResponse);
     const [, init] = fetchMock.mock.calls[0];
     expect(init?.body).toBeInstanceOf(FormData);
     expect((init?.body as FormData).get("file")).toBe(file);
@@ -112,7 +116,9 @@ describe("RPC transport", () => {
   it("passes AbortSignal through to fetch", async () => {
     fetchMock.mockResolvedValue(Response.json([]));
     const controller = new AbortController();
-    await api.getQuizzes({}, controller.signal);
+    await rpc.api.quizzes
+      .$get({ query: {} }, { init: { signal: controller.signal } })
+      .then(readResponse);
     expect(fetchMock.mock.calls[0][1]?.signal).toBe(controller.signal);
   });
   it("refreshes expired access tokens once for concurrent requests and replays them", async () => {
@@ -130,7 +136,10 @@ describe("RPC transport", () => {
         ? Response.json([])
         : problem("EXPIRED_TOKEN");
     });
-    await Promise.all([api.getQuizzes(), api.getQuizzes()]);
+    await Promise.all([
+      rpc.api.quizzes.$get({ query: {} }).then(readResponse),
+      rpc.api.quizzes.$get({ query: {} }).then(readResponse),
+    ]);
     expect(refreshes).toBe(1);
     expect(storage.get("accessToken")).toBe("new-token");
   });
@@ -140,16 +149,28 @@ describe("RPC transport", () => {
         ? problem("INVAILD_TOKEN")
         : problem("EXPIRED_TOKEN"),
     );
-    await expect(api.getQuizzes()).rejects.toMatchObject({
-      title: "EXPIRED_TOKEN",
-    });
+    await expect(
+      rpc.api.quizzes.$get({ query: {} }).then(readResponse),
+    ).rejects.toMatchObject({ title: "EXPIRED_TOKEN" });
     expect(fetchMock).toHaveBeenCalledTimes(2);
   });
   it("keeps authentication error codes available to the UI", async () => {
     fetchMock.mockResolvedValue(problem("REQUIRE_REREGISTRATION", 400));
     await expect(
-      api.postAuthLogin({ body: { username: "tester", password: "password" } }),
+      rpc.api.auth.login
+        .$post({ json: { username: "tester", password: "password" } })
+        .then(readResponse),
     ).rejects.toMatchObject({ title: "REQUIRE_REREGISTRATION" });
+  });
+  it("treats legacy HTTP 200 ranking text failures as errors", async () => {
+    fetchMock.mockResolvedValue(
+      new Response("An Error Occured", { status: 200 }),
+    );
+    await expect(
+      rpc.api.analysis.ranking.all[":period"]
+        .$get({ param: { period: "day" }, query: {} })
+        .then(readJsonResponse),
+    ).rejects.toMatchObject({ title: "HTTP_ERROR", status: 500 });
   });
 });
 
@@ -172,9 +193,9 @@ it("restores optimistic query snapshots after a failed mutation and updates the 
 // These calls are compiled but never executed: input mistakes must be rejected by RPC types.
 export function checkRpcInputTypes() {
   // @ts-expect-error question and answer are required
-  api.postQuizzes({ body: { question: "Q" } });
+  rpc.api.quizzes.$post({ json: { question: "Q" } });
   // @ts-expect-error boolean filters are not arbitrary strings
-  api.getQuizzes({ params: { query: { isFavorite: "false" } } });
+  rpc.api.quizzes.$get({ query: { isFavorite: "false" } });
   // @ts-expect-error JSON password must be a string
-  api.postAuthLogin({ body: { username: "tester", password: 123 } });
+  rpc.api.auth.login.$post({ json: { username: "tester", password: 123 } });
 }

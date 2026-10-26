@@ -1,5 +1,3 @@
-import { useQuery } from "@tanstack/react-query";
-import { api } from "@/utils/api";
 import {
   ActionIcon,
   AppShell,
@@ -23,6 +21,7 @@ import {
   IconSearch,
   IconStar,
 } from "@tabler/icons-react";
+import { useQuery } from "@tanstack/react-query";
 import { Outlet, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useLayoutEffect, useState } from "react";
 import { useIsMobile } from "@/contexts/isMobile";
@@ -30,6 +29,7 @@ import UserInfoMenu from "@/features/user/components/UserInfoMenu";
 import useHeaderHeight from "@/hooks/useHeaderHeight";
 import Logo from "@/shared/components/Logo";
 import NavbarLink from "@/shared/components/NavbarLink";
+import { readResponse, rpc } from "@/utils/client";
 import { checkAuth } from "../plugins/auth";
 
 const checkPathname = (pathname: string) => {
@@ -58,11 +58,15 @@ export default function DefaultLayout() {
 
   const { data: workbooks } = useQuery({
     queryKey: ["get", "/workbooks"],
-    queryFn: ({ signal }) => api.getWorkbooks({}, signal),
+    queryFn: ({ signal }) =>
+      rpc.api.workbooks
+        .$get({}, { init: { signal: signal } })
+        .then(readResponse),
   });
   const { data: mylists } = useQuery({
     queryKey: ["get", "/mylists"],
-    queryFn: ({ signal }) => api.getMylists({}, signal),
+    queryFn: ({ signal }) =>
+      rpc.api.mylists.$get({}, { init: { signal: signal } }).then(readResponse),
   });
 
   const mockdata = [

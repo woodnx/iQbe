@@ -1,23 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, useSearch } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import z from "zod";
 import PracticeSceneChanger from "@/features/practice/components/PracticeSceneChanger";
-import { api } from "@/utils/api";
+import { cleanQuery, readResponse, rpc } from "@/utils/client";
 import { quizSearchSchema } from "./_schemas/quizSearch";
-
-function shuffleSequense(n: number) {
-  const a = [...Array(n).keys()];
-
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    const tmp = a[i];
-    a[i] = a[j];
-    a[j] = tmp;
-  }
-
-  return a;
-}
 
 export const Route = createFileRoute("/practice")({
   component: RouteComponent,
@@ -46,13 +33,10 @@ function RouteComponent() {
       },
     ],
     queryFn: ({ signal }) =>
-      api.getQuizzes(
-        {
-          params: { query: search },
-        },
-        signal,
-      ),
-    enabled: shouldFetch || search.isTransfer === true,
+      rpc.api.quizzes
+        .$get({ query: cleanQuery(search) }, { init: { signal: signal } })
+        .then(readResponse),
+    enabled: shouldFetch || search.isTransfer === true || search.seed != null,
   });
   const { data: quizzesSize } = useQuery({
     queryKey: [
@@ -63,20 +47,12 @@ function RouteComponent() {
       },
     ],
     queryFn: ({ signal }) =>
-      api.getQuizzesSize(
-        {
-          params: { query: search },
-        },
-        signal,
-      ),
-    enabled: shouldFetch || search.isTransfer === true,
+      rpc.api.quizzes.size
+        .$get({ query: cleanQuery(search) }, { init: { signal: signal } })
+        .then(readResponse),
+    enabled: shouldFetch || search.isTransfer === true || search.seed != null,
   });
-  const shuffledList = useMemo(() => {
-    const length = quizzes?.length || 0;
-    return search.isTransfer
-      ? shuffleSequense(length)
-      : [...Array(length).keys()];
-  }, [quizzes?.length, search.isTransfer]);
+  const shuffledList = [...Array(quizzes?.length ?? 0).keys()];
 
   return (
     <>

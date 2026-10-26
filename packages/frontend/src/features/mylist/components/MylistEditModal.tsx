@@ -1,9 +1,9 @@
-import type { Mylist as ApiMylist, Quiz as ApiQuiz } from "@/utils/api-types";
-import { useMutation } from "@tanstack/react-query";
-import { api } from "@/utils/api";
 import { BoxProps } from "@mantine/core";
 import { ContextModalProps } from "@mantine/modals";
-import { useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import type { InferRequestType } from "hono/client";
+import type { Mylist as ApiMylist, Quiz as ApiQuiz } from "@/utils/api-types";
+import { readResponse, rpc } from "@/utils/client";
 import {
   MYLISTS_QUERY_KEY,
   QUIZZES_QUERY_KEY,
@@ -31,8 +31,9 @@ export default function MylistEditModal({
   const queryClient = useQueryClient();
   const { mutate } = useMutation({
     mutationKey: ["put", "/mylists"],
-    mutationFn: api.putMylists,
-    onMutate: async ({ body }) => {
+    mutationFn: (input: InferRequestType<typeof rpc.api.mylists.$put>) =>
+      rpc.api.mylists.$put(input).then(readResponse),
+    onMutate: async ({ json: body }) => {
       await queryClient.cancelQueries({ queryKey: MYLISTS_QUERY_KEY });
       await queryClient.cancelQueries({ queryKey: QUIZZES_QUERY_KEY });
 
@@ -91,7 +92,7 @@ export default function MylistEditModal({
 
   const toEdit = async (listName: string) => {
     mutate({
-      body: {
+      json: {
         mid,
         listName,
       },

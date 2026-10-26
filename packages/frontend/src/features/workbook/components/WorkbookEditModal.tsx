@@ -1,9 +1,9 @@
-import type { Workbook as ApiWorkbook } from "@/utils/api-types";
-import { useMutation } from "@tanstack/react-query";
-import { api } from "@/utils/api";
 import { BoxProps } from "@mantine/core";
 import { ContextModalProps } from "@mantine/modals";
-import { useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import type { InferRequestType } from "hono/client";
+import type { Workbook as ApiWorkbook } from "@/utils/api-types";
+import { readResponse, rpc } from "@/utils/client";
 import {
   ALL_WORKBOOKS_QUERY_KEY,
   QuerySnapshot,
@@ -31,8 +31,10 @@ export default function WorkbookEditModal({
   const queryClient = useQueryClient();
   const { mutate } = useMutation({
     mutationKey: ["put", "/workbooks/{wid}"],
-    mutationFn: api.putWorkbooksWid,
-    onMutate: async ({ body, params }) => {
+    mutationFn: (
+      input: InferRequestType<(typeof rpc.api.workbooks)[":wid"]["$put"]>,
+    ) => rpc.api.workbooks[":wid"].$put(input).then(readResponse),
+    onMutate: async ({ json: body, param: params }) => {
       await queryClient.cancelQueries({ queryKey: WORKBOOKS_QUERY_KEY });
       await queryClient.cancelQueries({ queryKey: ALL_WORKBOOKS_QUERY_KEY });
 
@@ -45,7 +47,7 @@ export default function WorkbookEditModal({
         ALL_WORKBOOKS_QUERY_KEY,
       );
 
-      const targetWid = params.path.wid;
+      const targetWid = params.wid;
       const patchWorkbook = (data?: Workbook[]) => {
         if (!data) return data;
         return data.map((workbook) =>
@@ -89,14 +91,12 @@ export default function WorkbookEditModal({
 
   const toEdit = async (name: string, published?: Date) => {
     mutate({
-      body: {
+      json: {
         name,
         published: published?.toISOString(),
       },
-      params: {
-        path: {
-          wid,
-        },
+      param: {
+        wid,
       },
     });
     context.closeModal(id);

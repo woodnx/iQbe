@@ -1,9 +1,8 @@
-import { useQuery } from "@tanstack/react-query";
-import { api } from "@/utils/api";
-import { useState } from "react";
-
 import { Alert, Button, Group, RadioGroup, Stack } from "@mantine/core";
 import { IconAlertTriangle } from "@tabler/icons-react";
+import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
+import { readResponse, rpc } from "@/utils/client";
 
 import CategoryPresetRadioCard from "./CategoryPresetRadioCard";
 
@@ -17,7 +16,10 @@ const CategoryPresetModal = ({
   const [value, setValue] = useState<string | null>(null);
   const { data: presets } = useQuery({
     queryKey: ["get", "/categories/preset"],
-    queryFn: ({ signal }) => api.getCategoriesPreset({}, signal),
+    queryFn: ({ signal }) =>
+      rpc.api.categories.preset
+        .$get({}, { init: { signal: signal } })
+        .then(readResponse),
   });
 
   const cards = presets?.map((item) => (

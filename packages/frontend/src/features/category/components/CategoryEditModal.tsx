@@ -1,11 +1,9 @@
-import type { Category as ApiCategory } from "@/utils/api-types";
-import { useMutation } from "@tanstack/react-query";
-import { api } from "@/utils/api";
-
 import { ContextModalProps } from "@mantine/modals";
-
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import type { InferRequestType } from "hono/client";
+import type { Category as ApiCategory } from "@/utils/api-types";
+import { readResponse, rpc } from "@/utils/client";
 import CategoryEditForm from "./CategoryEditForm";
-import { useQueryClient } from "@tanstack/react-query";
 
 export interface CategoryEditModalInnerProps<T extends boolean> {
   name: string;
@@ -29,8 +27,10 @@ export default function CategoryEditModal<T extends boolean>({
 
   const { mutate: edit } = useMutation({
     mutationKey: ["put", "/categories/{id}"],
-    mutationFn: api.putCategoriesId,
-    onMutate: async ({ body }) => {
+    mutationFn: (
+      input: InferRequestType<(typeof rpc.api.categories)[":id"]["$put"]>,
+    ) => rpc.api.categories[":id"].$put(input).then(readResponse),
+    onMutate: async ({ json: body }) => {
       const previous = queryClient.getQueryData(queryKey);
 
       queryClient.setQueryData(queryKey, (old: Category[] | undefined) => {
@@ -67,14 +67,12 @@ export default function CategoryEditModal<T extends boolean>({
 
   const submit = (name: string, disabled: boolean, description?: string) => {
     edit({
-      body: {
+      json: {
         name,
         description,
         disabled,
       },
-      params: {
-        path: { id },
-      },
+      param: { id },
     });
 
     context.closeModal(modalId);

@@ -1,10 +1,7 @@
-import type { Mylist as ApiMylist, Quiz as ApiQuiz } from "@/utils/api-types";
-import { useQuery, useMutation } from "@tanstack/react-query";
-import { api } from "@/utils/api";
 import { Card, Group, getGradient, Text, useMantineTheme } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
-import { useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   createFileRoute,
   useNavigate,
@@ -12,6 +9,7 @@ import {
   useRouter,
   useSearch,
 } from "@tanstack/react-router";
+import type { InferRequestType } from "hono/client";
 import { ReactNode, useRef, useState } from "react";
 import { z } from "zod";
 import FilteringModalButton from "@/features/filtering/components/FilteringModalButton";
@@ -23,6 +21,8 @@ import QuizList from "@/features/quiz/components/QuizList";
 import QuizShuffleButton from "@/features/quiz/components/QuizShuffleButton";
 import QuizTransfarButton from "@/features/quiz/components/QuizTransfarButton";
 import { useMylists } from "@/hooks/useMylists";
+import type { Mylist as ApiMylist, Quiz as ApiQuiz } from "@/utils/api-types";
+import { cleanQuery, readResponse, rpc } from "@/utils/client";
 import {
   MYLISTS_QUERY_KEY,
   QUIZ_SIZES_QUERY_KEY,
@@ -60,8 +60,9 @@ function RouteComponent() {
   const { mylists } = useMylists();
   const { mutate: deleteMylist } = useMutation({
     mutationKey: ["delete", "/mylists"],
-    mutationFn: api.deleteMylists,
-    onMutate: async ({ body }) => {
+    mutationFn: (input: InferRequestType<typeof rpc.api.mylists.$delete>) =>
+      rpc.api.mylists.$delete(input).then(readResponse),
+    onMutate: async ({ json: body }) => {
       const targetMid = body.mid;
 
       await queryClient.cancelQueries({ queryKey: MYLISTS_QUERY_KEY });
@@ -154,17 +155,17 @@ function RouteComponent() {
       },
     ],
     queryFn: ({ signal }) =>
-      api.getQuizzes(
-        {
-          params: {
-            query: {
+      rpc.api.quizzes
+        .$get(
+          {
+            query: cleanQuery({
               ...search,
               mid,
-            },
+            }),
           },
-        },
-        signal,
-      ),
+          { init: { signal: signal } },
+        )
+        .then(readResponse),
   });
   const { data: quizzesSize } = useQuery({
     queryKey: [
@@ -180,17 +181,17 @@ function RouteComponent() {
       },
     ],
     queryFn: ({ signal }) =>
-      api.getQuizzesSize(
-        {
-          params: {
-            query: {
+      rpc.api.quizzes.size
+        .$get(
+          {
+            query: cleanQuery({
               ...search,
               mid,
-            },
+            }),
           },
-        },
-        signal,
-      ),
+          { init: { signal: signal } },
+        )
+        .then(readResponse),
   });
   const size =
     !!quizzes && !!quizzes.length && !!quizzesSize ? quizzesSize.size : 0;
@@ -269,7 +270,7 @@ function RouteComponent() {
 
   const toDelete = async () => {
     deleteMylist({
-      body: {
+      json: {
         mid,
       },
     });

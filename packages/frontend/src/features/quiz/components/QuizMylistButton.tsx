@@ -1,13 +1,13 @@
-import type { Mylist as ApiMylist, Quiz as ApiQuiz } from "@/utils/api-types";
-import { useQuery, useMutation } from "@tanstack/react-query";
-import { api } from "@/utils/api";
 import { ActionIcon, Button, Checkbox, Divider, Menu } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
 import { IconPlaylistAdd, IconPlus } from "@tabler/icons-react";
-import { useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import type { InferRequestType } from "hono/client";
 import { ComponentProps, useState } from "react";
 import { useIsMobile } from "@/contexts/isMobile";
+import type { Mylist as ApiMylist, Quiz as ApiQuiz } from "@/utils/api-types";
+import { readResponse, rpc } from "@/utils/client";
 import {
   QUIZZES_QUERY_KEY,
   QuerySnapshot,
@@ -29,7 +29,10 @@ interface Props extends ComponentProps<typeof Button> {
 export default function QuizMylistButton({ qid, registerdMylists }: Props) {
   const { data: mylists } = useQuery({
     queryKey: ["get", "/mylists"],
-    queryFn: ({ signal }) => api.getMylists({}, signal),
+    // This button mounts for every practice question. Reuse the cached lists.
+    refetchOnMount: false,
+    queryFn: ({ signal }) =>
+      rpc.api.mylists.$get({}, { init: { signal: signal } }).then(readResponse),
   });
   const [selectedMids, setSelectedMids] = useState(
     registerdMylists.map((mylist) => mylist.mid),
@@ -38,8 +41,9 @@ export default function QuizMylistButton({ qid, registerdMylists }: Props) {
   const isMobile = useIsMobile();
   const { mutate: addQuizToMylist } = useMutation({
     mutationKey: ["post", "/register"],
-    mutationFn: api.postRegister,
-    onMutate: async ({ body }) => {
+    mutationFn: (input: InferRequestType<typeof rpc.api.register.$post>) =>
+      rpc.api.register.$post(input).then(readResponse),
+    onMutate: async ({ json: body }) => {
       await queryClient.cancelQueries({ queryKey: QUIZZES_QUERY_KEY });
       const previousQuizzes = takeQuerySnapshot<Quiz[]>(
         queryClient,
@@ -112,8 +116,9 @@ export default function QuizMylistButton({ qid, registerdMylists }: Props) {
   });
   const { mutate: deleteQuizFromMylist } = useMutation({
     mutationKey: ["post", "/unregister"],
-    mutationFn: api.postUnregister,
-    onMutate: async ({ body }) => {
+    mutationFn: (input: InferRequestType<typeof rpc.api.unregister.$post>) =>
+      rpc.api.unregister.$post(input).then(readResponse),
+    onMutate: async ({ json: body }) => {
       await queryClient.cancelQueries({ queryKey: QUIZZES_QUERY_KEY });
       const previousQuizzes = takeQuerySnapshot<Quiz[]>(
         queryClient,
@@ -183,14 +188,14 @@ export default function QuizMylistButton({ qid, registerdMylists }: Props) {
   const saveToList = async (mid: string) => {
     if (!selectedMids.includes(mid)) {
       addQuizToMylist({
-        body: {
+        json: {
           qid,
           mid,
         },
       });
     } else {
       deleteQuizFromMylist({
-        body: {
+        json: {
           qid,
           mid,
         },

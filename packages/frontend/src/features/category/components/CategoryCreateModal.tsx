@@ -1,9 +1,8 @@
-import type { Category as ApiCategory } from "@/utils/api-types";
-import { useMutation } from "@tanstack/react-query";
-import { api } from "@/utils/api";
-
 import { ContextModalProps } from "@mantine/modals";
-import { useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import type { InferRequestType } from "hono/client";
+import type { Category as ApiCategory } from "@/utils/api-types";
+import { readResponse, rpc } from "@/utils/client";
 
 import CategoryEditForm from "./CategoryEditForm";
 
@@ -27,8 +26,9 @@ export default function CategoryCreateModal<T extends boolean>({
 
   const { mutate: edit } = useMutation({
     mutationKey: ["post", "/categories"],
-    mutationFn: api.postCategories,
-    onMutate: async ({ body }) => {
+    mutationFn: (input: InferRequestType<typeof rpc.api.categories.$post>) =>
+      rpc.api.categories.$post(input).then(readResponse),
+    onMutate: async ({ json: body }) => {
       const previous = queryClient.getQueryData(queryKey);
 
       queryClient.setQueryData(queryKey, (old: Category[] | undefined) => {
@@ -68,7 +68,7 @@ export default function CategoryCreateModal<T extends boolean>({
     description?: string,
   ) => {
     edit({
-      body: {
+      json: {
         name,
         description,
         parentId,

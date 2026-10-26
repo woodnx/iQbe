@@ -1,6 +1,6 @@
-import { api } from "@/utils/api";
-import { ApiClientError } from "@/utils/client";
+import type { InferResponseType } from "hono/client";
 import store from "storejs";
+import { ApiClientError, readResponse, rpc } from "@/utils/client";
 
 export interface User {
   uid: string;
@@ -8,7 +8,7 @@ export interface User {
   nickname?: string;
 }
 
-type Session = Awaited<ReturnType<typeof api.postAuthLogin>>;
+type Session = InferResponseType<typeof rpc.api.auth.login.$post, 200>;
 function saveSession({ accessToken, refreshToken, user }: Session) {
   localStorage.setItem("refreshToken", refreshToken);
   localStorage.setItem("accessToken", accessToken);
@@ -19,7 +19,9 @@ function saveSession({ accessToken, refreshToken, user }: Session) {
 export async function loginWithUsername(username: string, password: string) {
   try {
     return saveSession(
-      await api.postAuthLogin({ body: { username, password } }),
+      await rpc.api.auth.login
+        .$post({ json: { username, password } })
+        .then(readResponse),
     );
   } catch (error) {
     if (
@@ -36,7 +38,9 @@ export async function loginOldUser(
 ) {
   try {
     return saveSession(
-      await api.postAuthRegister({ body: { username, email, password } }),
+      await rpc.api.auth.register
+        .$post({ json: { username, email, password } })
+        .then(readResponse),
     );
   } catch {
     return undefined;
@@ -49,7 +53,9 @@ export async function signupUser(
 ) {
   try {
     return saveSession(
-      await api.postAuthSignup({ body: { username, password, inviteCode } }),
+      await rpc.api.auth.signup
+        .$post({ json: { username, password, inviteCode } })
+        .then(readResponse),
     );
   } catch {
     return undefined;
@@ -59,9 +65,9 @@ export async function checkAuth() {
   const refreshToken = localStorage.getItem("refreshToken") || "";
   const uid = localStorage.getItem("uid") || "";
   try {
-    const { accessToken, user } = await api.postAuthToken({
-      body: { refreshToken, uid },
-    });
+    const { accessToken, user } = await rpc.api.auth.token
+      .$post({ json: { refreshToken, uid } })
+      .then(readResponse);
     localStorage.setItem("accessToken", accessToken);
     store.set("loginedUser", { ...user, accessToken, refreshToken });
     return user;
@@ -75,9 +81,9 @@ export async function getIdToken() {
   const uid = localStorage.getItem("uid");
   if (!refreshToken || refreshToken === "undefined" || !uid) return undefined;
   try {
-    const { accessToken, user } = await api.postAuthToken({
-      body: { refreshToken, uid },
-    });
+    const { accessToken, user } = await rpc.api.auth.token
+      .$post({ json: { refreshToken, uid } })
+      .then(readResponse);
     localStorage.setItem("accessToken", accessToken);
     store.set("loginedUser", { ...user, accessToken, refreshToken });
     return accessToken;

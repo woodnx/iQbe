@@ -1,5 +1,3 @@
-import { useMutation } from "@tanstack/react-query";
-import { api } from "@/utils/api";
 import {
   Button,
   Flex,
@@ -12,9 +10,12 @@ import {
 import { isEmail, isNotEmpty, matchesField, useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
 import { IconAlertTriangle } from "@tabler/icons-react";
+import { useMutation } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
+import type { InferRequestType } from "hono/client";
 import { useEffect, useState } from "react";
 import { signupUser } from "@/plugins/auth";
+import { readResponse, rpc } from "@/utils/client";
 import UsernameInput from "./UsernameInput";
 
 interface SubmitValue {
@@ -30,7 +31,9 @@ export function UserSignupModal() {
   const [available, setAvailable] = useState(false);
   const { mutate } = useMutation({
     mutationKey: ["post", "/auth/available"],
-    mutationFn: api.postAuthAvailable,
+    mutationFn: (
+      input: InferRequestType<typeof rpc.api.auth.available.$post>,
+    ) => rpc.api.auth.available.$post(input).then(readResponse),
     onMutate() {
       setAvailable(true);
     },
@@ -63,7 +66,7 @@ export function UserSignupModal() {
 
   useEffect(() => {
     mutate(
-      { body: { username: form.values.username } },
+      { json: { username: form.values.username } },
       {
         onSuccess({ available }) {
           setAvailable(!!available);

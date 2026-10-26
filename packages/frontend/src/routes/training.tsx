@@ -1,5 +1,3 @@
-import { useQuery } from "@tanstack/react-query";
-import { api } from "@/utils/api";
 import {
   Button,
   Card,
@@ -14,9 +12,11 @@ import {
 import { DatePicker } from "@mantine/dates";
 import { modals } from "@mantine/modals";
 import { IconHistory } from "@tabler/icons-react";
+import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import dayjs from "dayjs";
 import { useState } from "react";
+import { readResponse, rpc } from "@/utils/client";
 import { convertDates } from "@/utils/convertDates";
 
 export const Route = createFileRoute("/training")({
@@ -26,13 +26,19 @@ export const Route = createFileRoute("/training")({
 function RouteComponent() {
   const { data: workbooks } = useQuery({
     queryKey: ["get", "/workbooks"],
-    queryFn: ({ signal }) => api.getWorkbooks({}, signal),
+    queryFn: ({ signal }) =>
+      rpc.api.workbooks
+        .$get({}, { init: { signal: signal } })
+        .then(readResponse),
   });
   // const { data: histories } = $api.useQuery("get", "/histories/{since}/{until}");
   const histories =
     useQuery({
       queryKey: ["get", "/histories"],
-      queryFn: ({ signal }) => api.getHistories({}, signal),
+      queryFn: ({ signal }) =>
+        rpc.api.histories
+          .$get({}, { init: { signal: signal } })
+          .then(readResponse),
     }).data?.map((d) => dayjs(d).format("YYYY-MM-DD")) || [];
   const [dates, setDates] = useState<[Date | null, Date | null]>([null, null]);
   const navigate = useNavigate();

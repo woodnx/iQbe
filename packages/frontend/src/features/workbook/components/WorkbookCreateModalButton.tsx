@@ -1,11 +1,11 @@
-import type { Workbook as ApiWorkbook } from "@/utils/api-types";
-import { useMutation } from "@tanstack/react-query";
-import { api } from "@/utils/api";
 import { BoxProps, Button, Modal } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { IconPlus } from "@tabler/icons-react";
-import { useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import type { InferRequestType } from "hono/client";
 import { useRef } from "react";
+import type { Workbook as ApiWorkbook } from "@/utils/api-types";
+import { readResponse, rpc } from "@/utils/client";
 import {
   ALL_WORKBOOKS_QUERY_KEY,
   QuerySnapshot,
@@ -27,8 +27,9 @@ export default function WorkbookCreateModalButton({}: Props) {
   const tempWidRef = useRef<string | null>(null);
   const { mutateAsync } = useMutation({
     mutationKey: ["post", "/workbooks"],
-    mutationFn: api.postWorkbooks,
-    onMutate: async ({ body }) => {
+    mutationFn: (input: InferRequestType<typeof rpc.api.workbooks.$post>) =>
+      rpc.api.workbooks.$post(input).then(readResponse),
+    onMutate: async ({ json: body }) => {
       const tempWid = `tmp-${Date.now()}`;
       tempWidRef.current = tempWid;
 
@@ -107,7 +108,7 @@ export default function WorkbookCreateModalButton({}: Props) {
   const createWorkbook = async (name: string, published?: Date) => {
     try {
       await mutateAsync({
-        body: {
+        json: {
           name,
           published: published?.toISOString(),
         },
