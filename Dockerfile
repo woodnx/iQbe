@@ -37,7 +37,7 @@ RUN --mount=type=cache,id=pnpm-store,target=/pnpm/store \
 
 # build 用にダミーの.env ファイルを作成
 RUN mkdir -p .config && echo "JWT_SECRET_KEY=dummy" > .config/.env
-RUN pnpm run build
+RUN pnpm run build && rm -f .config/.env
 
 ############################
 # runtime stage (Prod)

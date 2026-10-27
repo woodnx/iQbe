@@ -29,6 +29,8 @@ export default class RefreshTokensInfra implements IRefreshTokensRepository {
         "uid",
       ])
       .where("users.uid", "=", uid)
+      .where("refresh_tokens.expired", "=", 0)
+      .where("refresh_tokens.expDate", ">", new Date())
       .orderBy("refresh_tokens.id desc")
       .executeTakeFirst();
 
@@ -37,6 +39,19 @@ export default class RefreshTokensInfra implements IRefreshTokensRepository {
     }
 
     return new RefreshToken(data.token, data.uid);
+  }
+
+  async revokeByUid(uid: string): Promise<void> {
+    const client = this.clientManager.getClient();
+    await client
+      .updateTable("refresh_tokens")
+      .set({ expired: 1 })
+      .where(
+        "user_id",
+        "in",
+        client.selectFrom("users").select("id").where("uid", "=", uid),
+      )
+      .execute();
   }
 
   async save(refreshToken: RefreshToken): Promise<void> {

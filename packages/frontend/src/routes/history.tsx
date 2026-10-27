@@ -58,6 +58,7 @@ function RouteComponent() {
         params: {
           query: {
             ...search,
+            history: true,
             judgements,
             since: dates[0],
             until: dates[1],
@@ -71,6 +72,7 @@ function RouteComponent() {
           {
             query: cleanQuery({
               ...search,
+              history: true,
               judgements,
               since: dates[0],
               until: dates[1],
@@ -88,6 +90,7 @@ function RouteComponent() {
         params: {
           query: {
             ...search,
+            history: true,
             judgements,
             since: dates[0],
             until: dates[1],
@@ -101,6 +104,7 @@ function RouteComponent() {
           {
             query: cleanQuery({
               ...search,
+              history: true,
               judgements,
               since: dates[0],
               until: dates[1],

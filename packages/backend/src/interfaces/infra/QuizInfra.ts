@@ -48,6 +48,10 @@ export default class QuizInfra implements IQuizRepository, IQuizQueryService {
         "workbooks.creator_id",
         "wb_creators.id",
       )
+      .leftJoin(this.latestHistory(userId), (join) => {
+        const matched = join.onRef("latest.quiz_id", "=", "quizzes.id");
+        return option.history ? matched : matched.on("latest.row_num", "=", 1);
+      })
       .where("quizzes.creator_id", "=", userId);
     const array = <T>(value: T | T[] | null | undefined): T[] =>
       value == null ? [] : [...new Set(Array.isArray(value) ? value : [value])];
@@ -108,7 +112,19 @@ export default class QuizInfra implements IQuizRepository, IQuizQueryService {
         ),
       );
     const judgements = array(option.judgements);
-    if (option.since != null || option.until != null || judgements.length) {
+    if (option.history) {
+      query = query.where("latest.quiz_id", "is not", null);
+      if (option.since != null)
+        query = query.where("latest.practiced", ">=", new Date(option.since));
+      if (option.until != null)
+        query = query.where("latest.practiced", "<=", new Date(option.until));
+      if (judgements.length)
+        query = query.where("latest.judgement", "in", judgements);
+    } else if (
+      option.since != null ||
+      option.until != null ||
+      judgements.length
+    ) {
       query = query.where((eb) => {
         let history = eb
           .selectFrom(this.latestHistory(userId))
@@ -175,31 +191,25 @@ export default class QuizInfra implements IQuizRepository, IQuizQueryService {
   async findMany(uid: string, option: findOption = {}): Promise<QuizDTO[]> {
     const client = this.clientManager.getClient();
     const { query: filtered, userId } = await this.filteredQuery(uid, option);
-    let query = filtered
-      .leftJoin(this.latestHistory(userId), (join) =>
-        join
-          .onRef("latest.quiz_id", "=", "quizzes.id")
-          .on("latest.row_num", "=", 1),
-      )
-      .select([
-        "quizzes.id as id",
-        "quizzes.qid as qid",
-        "quizzes.que as question",
-        "quizzes.ans as answer",
-        "quizzes.anoans as anotherAnswer",
-        "quizzes.category_id as categoryId",
-        "quizzes.total_crct_ans as right",
-        "creators.uid as creatorId",
-        "workbooks.id as workbookId",
-        "workbooks.wid as wid",
-        "workbooks.name as wbName",
-        "workbooks.date as wbDate",
-        "wb_creators.uid as wbCreatorId",
-        "latest.judgement as judgement",
-        sql<number>`COALESCE(quizzes.total_crct_ans, 0) + COALESCE(quizzes.total_through_ans, 0) + COALESCE(quizzes.total_wrng_ans, 0)`.as(
-          "total",
-        ),
-      ]);
+    let query = filtered.select([
+      "quizzes.id as id",
+      "quizzes.qid as qid",
+      "quizzes.que as question",
+      "quizzes.ans as answer",
+      "quizzes.anoans as anotherAnswer",
+      "quizzes.category_id as categoryId",
+      "quizzes.total_crct_ans as right",
+      "creators.uid as creatorId",
+      "workbooks.id as workbookId",
+      "workbooks.wid as wid",
+      "workbooks.name as wbName",
+      "workbooks.date as wbDate",
+      "wb_creators.uid as wbCreatorId",
+      "latest.judgement as judgement",
+      sql<number>`COALESCE(quizzes.total_crct_ans, 0) + COALESCE(quizzes.total_through_ans, 0) + COALESCE(quizzes.total_wrng_ans, 0)`.as(
+        "total",
+      ),
+    ]);
     // Tie each sort key to the quiz so query scan order cannot change the shuffle.
     if (option.seed != null)
       query = query.orderBy(sql`MD5(CONCAT(${option.seed}, ':', quizzes.qid))`);
@@ -213,7 +223,7 @@ export default class QuizInfra implements IQuizRepository, IQuizQueryService {
             .where("user_id", "=", userId),
         "desc",
       );
-    if (option.since != null || option.until != null)
+    if (option.history || option.since != null || option.until != null)
       query = query.orderBy("latest.practiced", "desc");
     if (option.mid)
       query = query.orderBy(
@@ -227,6 +237,7 @@ export default class QuizInfra implements IQuizRepository, IQuizQueryService {
             .where("mylists.user_id", "=", userId),
         "desc",
       );
+    if (option.history) query = query.orderBy("latest.row_num");
     const maxView = option.maxView ?? 100;
     const quizzes = await query
       .orderBy("quizzes.id", "desc")

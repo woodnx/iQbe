@@ -63,9 +63,14 @@ export default class AuthUseCase {
     if (!checked) throw new ApiError().noUser();
 
     const accessToken = await new AccessToken(user);
-    const refreshToken = await this.refreshTokensRepostiory.findByUid(user.uid);
-
-    if (!refreshToken) throw new ApiError().noUser();
+    let refreshToken = await this.refreshTokensRepostiory.findByUid(user.uid);
+    if (!refreshToken) {
+      refreshToken = new RefreshToken(
+        new RefreshTokenService().generateToken(),
+        user.uid,
+      );
+      await this.refreshTokensRepostiory.save(refreshToken);
+    }
 
     return {
       user: {

@@ -25,6 +25,7 @@ const judgement = z
 >;
 
 const filterShape = {
+  history: queryBoolean.nullish(),
   wids: z
     .union([
       z.array(z.string().min(1).max(20)).max(100),

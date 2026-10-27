@@ -104,7 +104,7 @@ export default class CategoryController {
   delete() {
     return async (c: ApiContext<typeof deleteCategoriesId>) => {
       const param = c.req.valid("param");
-      if (c.get("user").isSuperUser) throw new ApiError().accessDenied();
+      if (!c.get("user").isSuperUser) throw new ApiError().accessDenied();
 
       const { id } = param;
 

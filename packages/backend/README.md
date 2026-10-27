@@ -93,3 +93,10 @@ pnpm exec env-cmd -f .config/.env pnpm --filter backend exec prisma migrate depl
 ```
 
 移行SQL自身も全IDの検査を行い、不整合があればインデックスDDLを実行する前に停止します。この検査用プロシージャの作成・削除権限が必要です。失敗時は原因を修正してPrismaの失敗した移行を解消し、再適用してください。既存データへの移行適用は、実装・テストとは別の作業です。
+
+## 認証の運用
+
+- `JWT_SECRET_KEY` はランダムな32バイト以上の値を設定してください。未設定・短い値・前後に空白がある値ではサーバーは起動しません。生成例: `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`。
+- Dockerイメージにはビルド用のダミー鍵を残しません。設定ファイルがない場合、entrypoint がランダムな鍵を生成します。既存の設定ファイルは更新されないため、古い `dummy` や短い鍵は運用側で差し替えてください。鍵を変更すると既存のアクセストークンは無効になります。
+- リフレッシュトークンは有効期限と失効状態を検証します。パスワード再設定時には、そのユーザーの既存リフレッシュトークンを同じトランザクション内で失効させます。発行済みのアクセストークンは期限まで有効です。
+- セキュリティのDB回帰テストは、一時MySQLコンテナを利用する `API_MYSQL_TESTS=1 pnpm --filter backend run test --runInBand --testPathPatterns=security` で実行できます。

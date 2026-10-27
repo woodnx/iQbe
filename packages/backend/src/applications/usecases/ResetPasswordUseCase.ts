@@ -6,6 +6,7 @@ import AuthService from "@/domains/Auth/AuthService.js";
 import ResetPassword from "@/domains/ResetPassword/index.js";
 import IResetPasswordRepository from "@/domains/ResetPassword/ResetPasswordRepository.js";
 import ResetPasswordService from "@/domains/ResetPassword/ResetPasswordService.js";
+import IRefreshTokensRepository from "@/domains/RefreshToken/IRefreshTokenRepository.js";
 import IUserRepository from "@/domains/User/IUserRepository.js";
 import dayjs from "@/plugins/day.js";
 
@@ -16,6 +17,7 @@ export default class ResetPasswordUseCase {
     private resetPasswordService: ResetPasswordService,
     private resetPasswordRepository: IResetPasswordRepository,
     private userRepository: IUserRepository,
+    private refreshTokensRepository: IRefreshTokensRepository,
   ) {}
 
   async requestResetPassword(username: string, email: string) {
@@ -68,6 +70,7 @@ export default class ResetPasswordUseCase {
       resetPassword.use();
 
       await this.userRepository.update(user);
+      await this.refreshTokensRepository.revokeByUid(uid);
       await this.resetPasswordRepository.update(resetPassword);
 
       return;

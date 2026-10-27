@@ -426,6 +426,9 @@ importers:
       typescript:
         specifier: ^5.9.3
         version: 5.9.3
+      vitest:
+        specifier: ^5.0.5
+        version: 5.0.5(@types/node@20.19.43)(vite@8.3.5(@types/node@20.19.43)(esbuild@0.28.1)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.31))(terser@5.51.2)(tsx@4.22.4)(yaml@2.9.0))
 
   packages/frontend:
     dependencies:
@@ -498,6 +501,9 @@ importers:
       swr:
         specifier: ^2.4.2
         version: 2.4.2(react@18.3.1)
+      vitest:
+        specifier: ^5.0.5
+        version: 5.0.5(@types/node@20.19.43)(vite@8.3.5(@types/node@20.19.43)(esbuild@0.28.1)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.31))(terser@5.51.2)(tsx@4.22.4)(yaml@2.9.0))
       zod:
         specifier: ^4.6.6
         version: 4.6.7

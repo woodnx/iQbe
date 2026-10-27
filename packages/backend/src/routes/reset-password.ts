@@ -9,6 +9,7 @@ import { postResetPassword } from "@/interfaces/controllers/ResetPassword/schema
 import KyselyClientManager from "@/interfaces/infra/kysely/KyselyClientManager.js";
 import KyselyTransactionManager from "@/interfaces/infra/kysely/KyselyTransactionManager.js";
 import ResetPasswordInfra from "@/interfaces/infra/ResetPasswordInfra.js";
+import RefreshTokensInfra from "@/interfaces/infra/RefreshTokensInfra.js";
 import UserInfra from "@/interfaces/infra/UserInfra.js";
 
 const kyselyClientManager = new KyselyClientManager();
@@ -19,6 +20,7 @@ const resetPasswordController = new ResetPasswordController(
     new ResetPasswordService(),
     new ResetPasswordInfra(kyselyClientManager),
     new UserInfra(kyselyClientManager),
+    new RefreshTokensInfra(kyselyClientManager),
   ),
 );
 

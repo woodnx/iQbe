@@ -1,5 +1,5 @@
-import { createHash } from "node:crypto";
 import { execFileSync } from "node:child_process";
+import { createHash } from "node:crypto";
 import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
@@ -285,6 +285,33 @@ integration("MySQL API integration", () => {
         (q) => q.qid,
       ),
     ).toEqual(["q2"]);
+  });
+
+  it("lists and counts each attempt with its own period and judgement", async () => {
+    const option = {
+      history: true,
+      since: t(20).getTime(),
+      until: t(22).getTime(),
+    };
+    const attempts = await quizzes.findMany("owner", option);
+    expect(attempts.map((q) => [q.qid, q.judgement])).toEqual([
+      ["q2", 0],
+      ["q1", 1],
+      ["q2", 1],
+      ["q1", 0],
+    ]);
+    expect(await quizzes.count("owner", option)).toBe(4);
+    expect(
+      await quizzes.findMany("owner", { ...option, maxView: 1, page: 4 }),
+    ).toEqual([attempts[3]]);
+    const filtered = { ...option, until: t(20).getTime(), judgements: [0] };
+    expect(
+      (await quizzes.findMany("owner", filtered)).map((q) => [
+        q.qid,
+        q.judgement,
+      ]),
+    ).toEqual([["q1", 0]]);
+    expect(await quizzes.count("owner", filtered)).toBe(1);
   });
 
   it.each([0, 12345])(

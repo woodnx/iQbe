@@ -21,7 +21,11 @@ const mocks = vi.hoisted(() => ({
     onSelectJudgement: (value: import("@/types").Judgement[]) => void;
     onChangeDates: (dates: string[]) => void;
   },
-  list: {} as { page: number; perPage: number },
+  list: {} as {
+    page: number;
+    perPage: number;
+    quizzes?: { qid: string; judgement: number }[];
+  },
 }));
 let client: QueryClient;
 let unsubscribe: Array<() => void>;
@@ -107,7 +111,19 @@ const renderRoute = () =>
     ),
   );
 
-describe("latest quiz history", () => {
+describe("quiz attempt history", () => {
+  it("passes repeated attempts and their individual judgements to the list", async () => {
+    const attempts = [
+      { qid: "same-quiz", judgement: 1 },
+      { qid: "same-quiz", judgement: 0 },
+    ];
+    mocks.getQuizzes.mockImplementation(async () => Response.json(attempts));
+    renderRoute();
+    await vi.waitFor(() => {
+      renderRoute();
+      expect(mocks.list.quizzes).toEqual(attempts);
+    });
+  });
   it("forwards identical ISO period and named judgement filters to list and count", async () => {
     renderRoute();
     await vi.waitFor(() => {
@@ -117,6 +133,7 @@ describe("latest quiz history", () => {
     const listInput = mocks.getQuizzes.mock.calls[0][0];
     expect(listInput).toEqual(mocks.getQuizzesSize.mock.calls[0][0]);
     expect(listInput.query).toMatchObject({
+      history: true,
       judgements: ["wrong"],
       tags: ["a"],
       since: mocks.search.since,

@@ -83,6 +83,7 @@ export type WorkbookResponseDTO = WorkbookDTO;
 export type WorkbooksResponseDTO = WorkbookDTO[];
 export type QuizResponseDTO = QuizDTO;
 export interface QuizFilter {
+  history?: boolean | null;
   page?: number | null;
   maxView?: number | null;
   seed?: number | null;
