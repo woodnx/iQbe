@@ -46,6 +46,7 @@ export default function PracticeSceneChanger({
   );
   const [startTrigger, setStartTrigger] = useState(startImmediately);
   const [filtering, filter] = useDisclosure(false);
+  const openFilter = filter.open;
   const [_, result] = useDisclosure(false);
   const router = useRouter();
   const queryClient = useQueryClient();
@@ -101,9 +102,8 @@ export default function PracticeSceneChanger({
   const delay = useTimer(500, 100, () => setScene("quizzing"));
 
   useEffect(() => {
-    if (!startImmediately) filter.open();
-    return () => setScene(startImmediately ? "ready" : "preparation");
-  }, [startImmediately, filter]);
+    if (!startImmediately) openFilter();
+  }, [startImmediately, openFilter]);
 
   const toFilter = (
     wids?: string | string[],
