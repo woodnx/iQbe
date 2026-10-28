@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useAllUserRanking } from "@/hooks/useUserRanking";
+import { Period } from "@/plugins/dayjs";
 import {
   Card,
   Center,
@@ -9,10 +10,6 @@ import {
   Text,
   Title,
 } from "@mantine/core";
-import { Period } from "@/plugins/dayjs";
-import { useAllUserRanking } from "@/hooks/useUserRanking";
-import ActivityRank from "./ActivityRank";
-import ActivitySelectRange from "./ActivitySelectRange";
 import {
   IconCircleNumber1,
   IconCircleNumber2,
@@ -21,6 +18,9 @@ import {
   IconCircleNumber5,
   IconCircleNumber6,
 } from "@tabler/icons-react";
+import { useState } from "react";
+import ActivityRank from "./ActivityRank";
+import ActivitySelectRange from "./ActivitySelectRange";
 
 export default function ActivityUserRanking() {
   const [period, setPeriod] = useState<Period>("day");
@@ -61,7 +61,7 @@ export default function ActivityUserRanking() {
       </Group>
       <Divider my="sm" />
       <Paper mih={300}>
-        {!!allUserRanking ? (
+        {allUserRanking ? (
           Item
         ) : (
           <Center h={300}>

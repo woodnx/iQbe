@@ -1,13 +1,13 @@
+import { Period } from "@/plugins/dayjs";
 import { Button, Menu } from "@mantine/core";
 import { IconChevronDown } from "@tabler/icons-react";
-import { Period } from "@/plugins/dayjs";
 
 interface Props {
   period: Period;
   onClick: (period: Period) => void;
 }
 
-export default function ({ period, onClick }: Props) {
+export default function ActivitySelectRange({ period, onClick }: Props) {
   const items: Period[] = ["day", "week", "month"];
 
   return (

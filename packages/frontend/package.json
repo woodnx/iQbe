@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "@mantine/carousel": "^9.7.4",
+    "@mantine/charts": "^9.7.4",
     "@mantine/core": "^9.7.4",
     "@mantine/dates": "^9.7.4",
     "@mantine/dropzone": "^9.7.4",

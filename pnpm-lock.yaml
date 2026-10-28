@@ -411,6 +411,9 @@ importers:
       '@mantine/carousel':
         specifier: ^9.7.4
         version: 9.7.4(@mantine/core@9.7.4(@mantine/hooks@9.7.4(react@19.3.1))(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1))(@mantine/hooks@9.7.4(react@19.3.1))(embla-carousel-react@8.6.0(react@19.3.1))(embla-carousel@8.6.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
+      '@mantine/charts':
+        specifier: ^9.7.4
+        version: 9.7.4(@mantine/core@9.7.4(@mantine/hooks@9.7.4(react@19.3.1))(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1))(@mantine/hooks@9.7.4(react@19.3.1))(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(recharts@3.10.1(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react-is@16.13.1)(react@19.3.1)(redux@5.0.1))
       '@mantine/core':
         specifier: ^9.7.4
         version: 9.7.4(@mantine/hooks@9.7.4(react@19.3.1))(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
@@ -1304,6 +1307,15 @@ packages:
       embla-carousel-react: '>=8.0.0'
       react: ^19.2.0
       react-dom: ^19.2.0
+
+  '@mantine/charts@9.7.4':
+    resolution: {integrity: sha512-liMa0KIxcbE7goA0YqslEj9Ir8NVBV2158vW11J8g20+yrYe6fAqFu0nrtFMqN0Jm72wU0DMqCqZcrsKlWf0DQ==}
+    peerDependencies:
+      '@mantine/core': 9.7.4
+      '@mantine/hooks': 9.7.4
+      react: ^19.2.0
+      react-dom: ^19.2.0
+      recharts: '>=3.2.1'
 
   '@mantine/core@9.7.4':
     resolution: {integrity: sha512-c7aTGELNn74CxG9i5/tq9BHGh0lKdKmGGz+9iDF+gR7Ipt4U1TMM286lAmLpRrKL2bR+UEaN4blZ8UJmOuGJ4Q==}
@@ -6181,6 +6193,14 @@ snapshots:
       embla-carousel-react: 8.6.0(react@19.3.1)
       react: 19.3.1
       react-dom: 19.3.1(react@19.3.1)
+
+  '@mantine/charts@9.7.4(@mantine/core@9.7.4(@mantine/hooks@9.7.4(react@19.3.1))(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1))(@mantine/hooks@9.7.4(react@19.3.1))(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(recharts@3.10.1(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react-is@16.13.1)(react@19.3.1)(redux@5.0.1))':
+    dependencies:
+      '@mantine/core': 9.7.4(@mantine/hooks@9.7.4(react@19.3.1))(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
+      '@mantine/hooks': 9.7.4(react@19.3.1)
+      react: 19.3.1
+      react-dom: 19.3.1(react@19.3.1)
+      recharts: 3.10.1(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react-is@16.13.1)(react@19.3.1)(redux@5.0.1)
 
   '@mantine/core@9.7.4(@mantine/hooks@9.7.4(react@19.3.1))(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)':
     dependencies:
