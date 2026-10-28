@@ -1,16 +1,16 @@
-import React, { useState } from "react";
 import {
   Box,
   BoxProps,
   Collapse,
+  Group,
+  rem,
+  ScrollArea,
   Text,
   ThemeIcon,
   UnstyledButton,
-  rem,
-  ScrollArea,
-  Group,
 } from "@mantine/core";
 import { IconChevronRight } from "@tabler/icons-react";
+import React, { useState } from "react";
 import classes from "./styles/NavbarLink.module.css";
 
 type NavbarLinkProps = {
@@ -51,7 +51,7 @@ function Link({ label, link, onClick, isActive, ...others }: LinkProps) {
   );
 }
 
-export default function ({
+export default function NavbarLink({
   icon: Icon,
   label,
   link,
@@ -64,11 +64,11 @@ export default function ({
   ...others
 }: NavbarLinkProps) {
   const [opened, setOpened] = useState(isActive);
-  const activeNestedLink = !!activeLink ? activeLink.split(".")[1] : undefined;
+  const activeNestedLink = activeLink ? activeLink.split(".")[1] : undefined;
 
   const to = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.preventDefault();
-    if (!!links) {
+    if (links) {
       setOpened((v) => !v);
       onOpen();
     }
@@ -112,7 +112,7 @@ export default function ({
         </Group>
       </UnstyledButton>
       {links ? (
-        <Collapse in={opened}>
+        <Collapse expanded={opened}>
           <ScrollArea.Autosize mah={200}>
             {(links || []).map((l, idx) => (
               <Link

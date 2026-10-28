@@ -64,7 +64,7 @@ export default function QuizCard({
           registerdMylists={quiz.registerdMylist || []}
         />
         <Group>
-          {!!quiz.workbook ? (
+          {quiz.workbook ? (
             <QuizWorkbookBadge workbook={quiz.workbook} />
           ) : null}
           <QuizDetailsMenu quiz={quiz} />

@@ -1,9 +1,3 @@
-import { Group, Loader, Overlay, Text } from "@mantine/core";
-import { useDisclosure } from "@mantine/hooks";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useRouter, useSearch } from "@tanstack/react-router";
-import type { InferRequestType } from "hono/client";
-import { useEffect, useState } from "react";
 import FilteringModal from "@/features/filtering/components/FilteringModal";
 import FilteringModalButton from "@/features/filtering/components/FilteringModalButton";
 import PracticeQuitModal from "@/features/practice/components/PracticeQuitModal";
@@ -19,6 +13,12 @@ import {
   restoreQuerySnapshot,
   takeQuerySnapshot,
 } from "@/utils/queryCache";
+import { Group, Loader, Overlay, Text } from "@mantine/core";
+import { useDisclosure } from "@mantine/hooks";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useRouter, useSearch } from "@tanstack/react-router";
+import type { InferRequestType } from "hono/client";
+import { useEffect, useState } from "react";
 
 type Quiz = ApiQuiz;
 export type Scene = "preparation" | "ready" | "quizzing" | "result";
@@ -31,7 +31,7 @@ interface Props {
   onFilter?: () => void;
 }
 
-export default function ({
+export default function PracticeSceneChanger({
   quizzes,
   size,
   shuffledList,
@@ -95,7 +95,7 @@ export default function ({
     },
   });
   const [rightList, setRightList] = useState<string[]>([]);
-  const quiz = !!quizzes ? quizzes[shuffledList[nowNumber]] : null;
+  const quiz = quizzes ? quizzes[shuffledList[nowNumber]] : null;
   const maxQuizSize = quizzes?.length || 0;
 
   const delay = useTimer(500, 100, () => setScene("quizzing"));
@@ -103,7 +103,7 @@ export default function ({
   useEffect(() => {
     if (!startImmediately) filter.open();
     return () => setScene(startImmediately ? "ready" : "preparation");
-  }, []);
+  }, [startImmediately, filter]);
 
   const toFilter = (
     wids?: string | string[],
@@ -151,7 +151,7 @@ export default function ({
 
     if (judgement == 1) {
       const addId = quiz.qid;
-      !!addId ? setRightList([...rightList, addId]) : null;
+      setRightList([...rightList, addId]);
     }
   };
 
@@ -208,7 +208,7 @@ export default function ({
             to: "/practice",
             search: (old) => ({
               ...old,
-              page: !!old?.page ? old.page + 1 : 0,
+              page: old?.page ? old.page + 1 : 0,
             }),
             replace: true,
           });

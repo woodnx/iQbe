@@ -36,43 +36,61 @@ type Props = ComponentProps<typeof Stack> &
 
 export default function QuizControllBar(props: Props) {
   const {
-    variant,
     total,
     buttons,
     activePage,
     maxView,
     header,
     setPage,
-    ...others
+    ...variantProps
   } = props;
 
+  let stackProps: ComponentProps<typeof Stack>;
+  let historyFilters: ReactNode;
+
+  if (variantProps.variant === "history") {
+    const {
+      variant: _variant,
+      judgements,
+      right,
+      wrong,
+      throgh,
+      onSelectJudgement,
+      dates,
+      onChangeDates,
+      ...others
+    } = variantProps;
+    stackProps = others;
+    historyFilters = (
+      <>
+        <Center>
+          <HistorySelectJudgement
+            judgements={judgements}
+            right={right}
+            wrong={wrong}
+            throgh={throgh}
+            onSelect={onSelectJudgement}
+          />
+        </Center>
+        <Center mb="xs">
+          <HistoryDateRange dates={dates} onChangeDates={onChangeDates} />
+        </Center>
+      </>
+    );
+  } else {
+    const { variant: _variant, ...others } = variantProps;
+    stackProps = others;
+  }
+
   return (
-    <Stack {...others}>
+    <Stack {...stackProps}>
       {header}
       <Group justify="space-between">
         <div>{buttons}</div>
         <Text ta="right">総問題数: {total}</Text>
       </Group>
       <Stack gap={1}>
-        {variant == "history" && (
-          <>
-            <Center>
-              <HistorySelectJudgement
-                judgements={props.judgements}
-                right={props.right}
-                wrong={props.wrong}
-                throgh={props.throgh}
-                onSelect={props.onSelectJudgement}
-              />
-            </Center>
-            <Center mb="xs">
-              <HistoryDateRange
-                dates={props.dates}
-                onChangeDates={props.onChangeDates}
-              />
-            </Center>
-          </>
-        )}
+        {historyFilters}
         <Center>
           <QuizPagination
             page={activePage}

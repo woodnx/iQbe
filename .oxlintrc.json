@@ -1,6 +1,11 @@
 {
   "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["typescript", "unicorn", "oxc", "react"],
+  "plugins": [
+    "typescript",
+    "unicorn",
+    "oxc",
+    "react"
+  ],
   "ignorePatterns": [
     "**/dist/**",
     "packages/frontend/src/routeTree.gen.ts",
@@ -12,8 +17,12 @@
   },
   "overrides": [
     {
-      "files": ["packages/frontend/src/**/*.{ts,tsx}"],
-      "env": { "browser": true },
+      "files": [
+        "packages/frontend/src/**/*.{ts,tsx}"
+      ],
+      "env": {
+        "browser": true
+      },
       "rules": {
         "react/rules-of-hooks": "error",
         "react/exhaustive-deps": "warn",
@@ -21,8 +30,21 @@
       }
     },
     {
-      "files": ["packages/backend/**/*.ts", "scripts/**/*.mjs"],
-      "env": { "node": true }
+      "files": [
+        "packages/backend/**/*.ts",
+        "scripts/**/*.mjs"
+      ],
+      "env": {
+        "node": true
+      }
+    },
+    {
+      "files": [
+        "packages/frontend/src/routes/**/*.tsx"
+      ],
+      "rules": {
+        "react/only-export-components": "off"
+      }
     }
   ]
 }

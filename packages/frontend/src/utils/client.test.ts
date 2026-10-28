@@ -15,22 +15,28 @@ import {
 } from "./queryCache";
 
 vi.mock("storejs", () => ({ default: { set: vi.fn() } }));
+
 let fetchMock: ReturnType<typeof vi.fn<typeof fetch>>;
 let storage: Map<string, string>;
+
 beforeEach(() => {
   storage = new Map([
     ["accessToken", "old-token"],
     ["refreshToken", "refresh-token"],
     ["uid", "user"],
   ]);
+
   vi.stubGlobal("localStorage", {
     getItem: (key: string) => storage.get(key) ?? null,
     setItem: (key: string, value: string) => storage.set(key, value),
   });
+
   fetchMock = vi.fn<typeof fetch>();
   vi.stubGlobal("fetch", fetchMock);
 });
+
 afterEach(() => vi.unstubAllGlobals());
+
 const problem = (title: string, status = 401) =>
   Response.json(
     { title, type: "about:blank", status, detail: "Request failed" },

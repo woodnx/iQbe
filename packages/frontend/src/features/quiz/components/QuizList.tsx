@@ -1,6 +1,6 @@
 import type { Quiz as ApiQuiz } from "@/utils/api-types";
-import QuizCard from "./QuizCard";
 import { Center, Loader } from "@mantine/core";
+import QuizCard from "./QuizCard";
 
 type Quiz = ApiQuiz;
 
@@ -21,7 +21,7 @@ export default function QuizList({
 }: QuizListProps) {
   return (
     <>
-      {!!quizzes ? (
+      {quizzes ? (
         <>
           {quizzes.map((quiz, idx) => (
             <QuizCard

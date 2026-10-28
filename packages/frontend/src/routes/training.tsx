@@ -1,3 +1,5 @@
+import { readResponse, rpc } from "@/utils/client";
+import { convertDates } from "@/utils/convertDates";
 import {
   Button,
   Card,
@@ -16,8 +18,6 @@ import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import dayjs from "dayjs";
 import { useState } from "react";
-import { readResponse, rpc } from "@/utils/client";
-import { convertDates } from "@/utils/convertDates";
 
 export const Route = createFileRoute("/training")({
   component: RouteComponent,
@@ -31,6 +31,7 @@ function RouteComponent() {
         .$get({}, { init: { signal: signal } })
         .then(readResponse),
   });
+
   // const { data: histories } = $api.useQuery("get", "/histories/{since}/{until}");
   const histories =
     useQuery({
@@ -40,7 +41,11 @@ function RouteComponent() {
           .$get({}, { init: { signal: signal } })
           .then(readResponse),
     }).data?.map((d) => dayjs(d).format("YYYY-MM-DD")) || [];
-  const [dates, setDates] = useState<[Date | null, Date | null]>([null, null]);
+
+  const [dates, setDates] = useState<[string | null, string | null]>([
+    null,
+    null,
+  ]);
   const navigate = useNavigate();
   const maxWorkbook = 5;
   const isWorkbooksExist = workbooks && workbooks.length > 0;
@@ -255,7 +260,6 @@ function RouteComponent() {
                   search: () => ({
                     since: d[0],
                     until: d[1],
-                    judgements: ["wrong", "right", "through"],
                   }),
                 });
               }}

@@ -1,7 +1,3 @@
-import { Group } from "@mantine/core";
-import { useQuery } from "@tanstack/react-query";
-import { createFileRoute, useRouter, useSearch } from "@tanstack/react-router";
-import { useState } from "react";
 import FilteringModalButton from "@/features/filtering/components/FilteringModalButton";
 import QuizControllBar from "@/features/quiz/components/QuizControllBar";
 import QuizHiddenAnswerButton from "@/features/quiz/components/QuizHiddenAnswerButton";
@@ -12,6 +8,10 @@ import { useHistories } from "@/hooks/useHistories";
 import dayjs from "@/plugins/dayjs";
 import { Judgement } from "@/types";
 import { cleanQuery, readResponse, rpc } from "@/utils/client";
+import { Group } from "@mantine/core";
+import { useQuery } from "@tanstack/react-query";
+import { createFileRoute, useRouter, useSearch } from "@tanstack/react-router";
+import { useState } from "react";
 import { quizSearchSchema } from "./_schemas/quizSearch";
 
 export const Route = createFileRoute("/history")({
@@ -46,9 +46,9 @@ function RouteComponent() {
       .toISOString(),
   ]);
   const { histories } = useHistories(dates[0], dates[1]);
-  const right = !!histories ? Number(histories.right) : 0;
-  const wrong = !!histories ? Number(histories.wrong) : 0;
-  const throgh = !!histories ? Number(histories.through) : 0;
+  const right = histories ? Number(histories.right) : 0;
+  const wrong = histories ? Number(histories.wrong) : 0;
+  const throgh = histories ? Number(histories.through) : 0;
 
   const { data: quizzes } = useQuery({
     queryKey: [

@@ -1,6 +1,6 @@
 import dayjs from "@/plugins/dayjs";
 
-export type DateRangeValue = [Date | null, Date | null];
+export type DateRangeValue = [Date | string | null, Date | string | null];
 
 export const convertDates = (dates: DateRangeValue) => {
   if (dates[1] != null) {

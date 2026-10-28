@@ -1,3 +1,9 @@
+import { useIsMobile } from "@/contexts/isMobile";
+import UserInfoMenu from "@/features/user/components/UserInfoMenu";
+import useHeaderHeight from "@/hooks/useHeaderHeight";
+import Logo from "@/shared/components/Logo";
+import NavbarLink from "@/shared/components/NavbarLink";
+import { readResponse, rpc } from "@/utils/client";
 import {
   ActionIcon,
   AppShell,
@@ -23,13 +29,7 @@ import {
 } from "@tabler/icons-react";
 import { useQuery } from "@tanstack/react-query";
 import { Outlet, useNavigate, useRouterState } from "@tanstack/react-router";
-import { useLayoutEffect, useState } from "react";
-import { useIsMobile } from "@/contexts/isMobile";
-import UserInfoMenu from "@/features/user/components/UserInfoMenu";
-import useHeaderHeight from "@/hooks/useHeaderHeight";
-import Logo from "@/shared/components/Logo";
-import NavbarLink from "@/shared/components/NavbarLink";
-import { readResponse, rpc } from "@/utils/client";
+import { Fragment, useLayoutEffect, useState } from "react";
 import { checkAuth } from "../plugins/auth";
 
 const checkPathname = (pathname: string) => {
@@ -150,7 +150,7 @@ export default function DefaultLayout() {
     return () => {
       ignore = true;
     };
-  }, []);
+  }, [navigate]);
 
   const Navbar = () => (
     <AppShell.Navbar h="100%">
@@ -158,12 +158,11 @@ export default function DefaultLayout() {
         <Group justify="space-between">
           <Logo horizonal width={100} mb="xs" />
         </Group>
-        {mockdata.map((i, idx) => (
-          <>
-            {i.setDivider && <Divider />}
+        {mockdata.map(({ setDivider, ...i }, idx) => (
+          <Fragment key={i.link}>
+            {setDivider && <Divider />}
             <NavbarLink
               {...i}
-              key={idx}
               isActive={activeIdx == idx}
               activeLink={activeLink}
               onNavigate={(link, linksIdx) => {
@@ -177,7 +176,7 @@ export default function DefaultLayout() {
               }}
               my={5}
             />
-          </>
+          </Fragment>
         ))}
       </AppShell.Section>
       <AppShell.Section p="md">
