@@ -3,13 +3,13 @@ import { createHash } from "node:crypto";
 import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
-import { jest } from "@jest/globals";
 import type { StartedMySqlContainer } from "@testcontainers/mysql";
 import { createMiddleware } from "hono/factory";
 import type { AppEnv } from "./http/context.js";
 
 const integration =
   process.env.API_MYSQL_TESTS === "1" ? describe : describe.skip;
+
 integration("MySQL API integration", () => {
   let container: StartedMySqlContainer;
   let db: typeof import("./database.js").db;
@@ -98,7 +98,9 @@ integration("MySQL API integration", () => {
     });
   }, 120000);
 
-  afterEach(() => jest.restoreAllMocks());
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
   afterAll(async () => {
     if (db) await db.destroy();
     if (container) await container.stop();
@@ -604,7 +606,7 @@ integration("MySQL API integration", () => {
         { user_id: 1, quiz_id: 1, practiced: midnight, judgement: 0 },
       ])
       .execute();
-    const spy = jest.spyOn(db.getExecutor(), "executeQuery");
+    const spy = vi.spyOn(db.getExecutor(), "executeQuery");
     const result = await new Analysis().status(1, "2026-10-27", "day");
     expect(spy).toHaveBeenCalledTimes(1);
     expect(result).toHaveLength(7);
@@ -618,7 +620,7 @@ integration("MySQL API integration", () => {
   });
 
   it("fetches categories once per list request and terminates on a category cycle", async () => {
-    const spy = jest.spyOn(db.getExecutor(), "executeQuery");
+    const spy = vi.spyOn(db.getExecutor(), "executeQuery");
     await quizzes.findMany("owner");
     expect(
       spy.mock.calls.filter(([query]) => /from `categories`/.test(query.sql)),
@@ -634,8 +636,8 @@ integration("MySQL API integration", () => {
   });
 
   it("returns structured 500 errors for analysis database failures", async () => {
-    jest.spyOn(console, "error").mockImplementation(() => {});
-    jest.spyOn(db, "selectFrom").mockImplementation(() => {
+    vi.spyOn(console, "error").mockImplementation(() => {});
+    vi.spyOn(db, "selectFrom").mockImplementation(() => {
       throw new Error("unavailable");
     });
     const response = await app.request("/api/analysis/ranking/all/day");
@@ -839,7 +841,7 @@ integration("MySQL API integration", () => {
         let rows = 0;
         const executor = db.getExecutor();
         const execute = executor.executeQuery.bind(executor);
-        const spy = jest
+        const spy = vi
           .spyOn(executor, "executeQuery")
           .mockImplementation(async (...args) => {
             const result = await execute(...args);

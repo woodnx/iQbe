@@ -5,5 +5,5 @@ export default interface IWorkbookRepository {
   findManyByUid(uid: string): Promise<Workbook[]>;
   save(workbook: Workbook): Promise<void>;
   update(workbook: Workbook): Promise<void>;
-  delete(wid: string): Promise<void>;
+  delete(wid: string, uid: string): Promise<boolean>;
 }

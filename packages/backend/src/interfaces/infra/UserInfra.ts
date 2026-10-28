@@ -166,6 +166,24 @@ export default class UserInfra implements IUsersRepository {
     return !!data;
   }
 
+  async lockRegistration(): Promise<void> {
+    const client = this.clientManager.getClient();
+    if (!client.isTransaction)
+      throw new Error("Registration lock requires a transaction");
+    // Also initializes the row for schemas created with prisma db push.
+    await client
+      .insertInto("registration_lock")
+      .values({ id: 1 })
+      .onDuplicateKeyUpdate({ id: 1 })
+      .execute();
+    await client
+      .selectFrom("registration_lock")
+      .select("id")
+      .where("id", "=", 1)
+      .forUpdate()
+      .executeTakeFirstOrThrow();
+  }
+
   async save(user: User): Promise<void> {
     const client = this.clientManager.getClient();
 

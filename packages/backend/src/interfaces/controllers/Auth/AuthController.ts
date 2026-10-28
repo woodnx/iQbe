@@ -4,6 +4,7 @@ import type { ApiContext } from "@/http/context.js";
 import {
   postAuthAvailable,
   postAuthLogin,
+  postAuthLogout,
   postAuthRegister,
   postAuthSignup,
   postAuthToken,
@@ -93,6 +94,14 @@ export default class AuthController {
         },
         200,
       );
+    };
+  }
+
+  logout() {
+    return async (c: ApiContext<typeof postAuthLogout>) => {
+      const { uid, refreshToken } = c.req.valid("json");
+      await this.authUseCase.logout(uid, refreshToken);
+      return c.body(null, 204);
     };
   }
 

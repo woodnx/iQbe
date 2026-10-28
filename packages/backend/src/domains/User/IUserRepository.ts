@@ -7,6 +7,7 @@ export default interface IUserRepository {
   findUserIdByEmail(email: string): Promise<number | null>;
   findLastUserId(): Promise<number | null>;
   existAnyUsers(): Promise<boolean>;
+  lockRegistration(): Promise<void>;
   save(user: User): Promise<void>;
   update(user: User): Promise<void>;
 }

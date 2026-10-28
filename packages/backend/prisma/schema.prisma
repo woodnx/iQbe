@@ -329,3 +329,7 @@ model workbooks {
 
   @@index([level_id], map: "level_id")
 }
+
+model registration_lock {
+  id Int @id
+}

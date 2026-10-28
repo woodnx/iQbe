@@ -6,6 +6,7 @@ import AuthController from "@/interfaces/controllers/Auth/AuthController.js";
 import {
   postAuthAvailable,
   postAuthLogin,
+  postAuthLogout,
   postAuthRegister,
   postAuthSignup,
   postAuthToken,
@@ -33,6 +34,11 @@ const router = new Hono<AppEnv>()
     "/signup",
     validate("json", postAuthSignup.json),
     authController.signup(),
+  )
+  .post(
+    "/logout",
+    validate("json", postAuthLogout.json),
+    authController.logout(),
   )
   .post("/token", validate("json", postAuthToken.json), authController.token())
   .post(

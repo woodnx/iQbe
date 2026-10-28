@@ -1,3 +1,4 @@
+import { notifications } from "@mantine/notifications";
 import type { InferResponseType } from "hono/client";
 import store from "storejs";
 import { ApiClientError, readResponse, rpc } from "@/utils/client";
@@ -91,7 +92,23 @@ export async function getIdToken() {
     return undefined;
   }
 }
-export function logoutUser() {
+export async function logoutUser() {
+  const uid = localStorage.getItem("uid");
+  const refreshToken = localStorage.getItem("refreshToken");
+  if (uid && refreshToken) {
+    try {
+      await rpc.api.auth.logout
+        .$post({ json: { uid, refreshToken } })
+        .then(readResponse);
+    } catch {
+      notifications.show({
+        color: "red",
+        message:
+          "ログアウトできませんでした。接続を確認して再度お試しください。",
+      });
+      return;
+    }
+  }
   localStorage.setItem("refreshToken", "");
   localStorage.setItem("accessToken", "");
   localStorage.setItem("uid", "");

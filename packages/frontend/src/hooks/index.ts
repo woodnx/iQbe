@@ -25,11 +25,11 @@ export const useInput = (
   return [props, resetValue];
 };
 
-export { useTypewriter, useInterval, useTimer };
+export { useInterval, useTimer, useTypewriter };
 
 export const useAnimationFrame = (callback = () => {}) => {
-  const reqIdRef = useRef<number>();
-
+  const reqIdRef = useRef<number | undefined>(undefined);
+  
   const loop = useCallback(() => {
     reqIdRef.current = requestAnimationFrame(loop);
     callback();

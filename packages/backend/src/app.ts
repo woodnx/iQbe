@@ -7,6 +7,7 @@ import server from "./allowed-server.json" with { type: "json" };
 import { ApiError } from "./http/ApiError.js";
 import type { AppEnv } from "./http/context.js";
 import { errorHandler } from "./middleware/error.js";
+import { authRateLimit } from "./middleware/authRateLimit.js";
 import verifyAuthToken from "./middleware/verifyAuthToken.js";
 import analysis from "./routes/analysis.js";
 import auth from "./routes/auth.js";
@@ -49,6 +50,7 @@ export function createApp(
         headers: response.headers,
       });
   });
+  app.use("/api/auth/*", authRateLimit());
   app.use(
     "/api/*",
     bodyLimit({

@@ -1,0 +1,14 @@
+{
+  "$schema": "./node_modules/oxfmt/configuration_schema.json",
+  "useTabs": false,
+  "tabWidth": 2,
+  "printWidth": 80,
+  "endOfLine": "lf",
+  "singleQuote": false,
+  "semi": true,
+  "ignorePatterns": [
+    "**/dist/**",
+    "packages/frontend/src/routeTree.gen.ts",
+    "packages/backend/src/db/types.ts"
+  ]
+}

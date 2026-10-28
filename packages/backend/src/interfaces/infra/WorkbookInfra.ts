@@ -195,9 +195,17 @@ export default class WorkbookInfra implements IWorkbookRepository {
       .execute();
   }
 
-  async delete(wid: string): Promise<void> {
+  async delete(wid: string, uid: string): Promise<boolean> {
     const client = this.clientManager.getClient();
-
-    await client.deleteFrom("workbooks").where("wid", "=", wid).execute();
+    const result = await client
+      .deleteFrom("workbooks")
+      .where("wid", "=", wid)
+      .where(
+        "creator_id",
+        "in",
+        client.selectFrom("users").select("id").where("uid", "=", uid),
+      )
+      .executeTakeFirst();
+    return result.numDeletedRows > 0n;
   }
 }

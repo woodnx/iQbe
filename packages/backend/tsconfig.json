@@ -6,9 +6,14 @@
     "rootDir": "./src",
     "isolatedModules": true,
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": [
+        "./src/*"
+      ]
     },
-    "types": ["node", "jest"],
+    "types": [
+      "node",
+      "vitest/globals"
+    ],
     "resolveJsonModule": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
@@ -20,10 +25,12 @@
     "skipLibCheck": true,
     "declaration": true
   },
-  "include": ["src", "src/types"],
+  "include": [
+    "src",
+    "src/types"
+  ],
   "tsc-alias": {
     "resolveFullPaths": true,
     "resolveFullExtension": ".js"
-  },
-  "exclude": ["src/**/*.test.ts"]
+  }
 }

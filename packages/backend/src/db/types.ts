@@ -144,6 +144,7 @@ export type workbooks = {
     creator_id: number;
 };
 export type DB = {
+    registration_lock: { id: number };
     categories: categories;
     favorites: favorites;
     histories: histories;

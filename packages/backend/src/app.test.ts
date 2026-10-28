@@ -1,7 +1,6 @@
 import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
-import { jest } from "@jest/globals";
 import { hc } from "hono/client";
 import { createMiddleware } from "hono/factory";
 import jwt from "jsonwebtoken";
@@ -17,6 +16,7 @@ const user: AuthUser = {
   iat: 0,
   exp: 9999999999,
 };
+
 const authenticate = createMiddleware<AppEnv>(async (c, next) => {
   c.set("user", user);
   await next();
@@ -45,7 +45,10 @@ beforeAll(async () => {
     publicRoot: path.join(temporary, "public"),
   });
 });
-afterEach(() => jest.restoreAllMocks());
+
+afterEach(() => {
+  vi.restoreAllMocks();
+});
 afterAll(async () => {
   await db.destroy();
   await fs.rm(temporary, { recursive: true, force: true });
@@ -132,9 +135,9 @@ describe("HTTP routing and authentication", () => {
         permission: "SUPER_USER",
       }),
     };
-    jest
-      .spyOn(db, "selectFrom")
-      .mockReturnValue(query as unknown as ReturnType<typeof db.selectFrom>);
+    vi.spyOn(db, "selectFrom").mockReturnValue(
+      query as unknown as ReturnType<typeof db.selectFrom>,
+    );
     const token = jwt.sign({ uid: user.uid }, process.env.JWT_SECRET_KEY!);
     const response = await createApp({
       webRoot: path.join(temporary, "web"),
@@ -144,8 +147,8 @@ describe("HTTP routing and authentication", () => {
     expect(Array.isArray(await response.json())).toBe(true);
   });
   it("forwards database failures to the error handler instead of hanging", async () => {
-    jest.spyOn(console, "error").mockImplementation(() => {});
-    jest.spyOn(db, "selectFrom").mockImplementation(() => {
+    vi.spyOn(console, "error").mockImplementation(() => {});
+    vi.spyOn(db, "selectFrom").mockImplementation(() => {
       throw new Error("database unavailable");
     });
     const token = jwt.sign({ uid: user.uid }, process.env.JWT_SECRET_KEY!);
@@ -212,9 +215,13 @@ describe("validation and Hono RPC", () => {
     ).toBe(400);
   });
   it("converts named judgements and ISO dates for list and count filters", async () => {
-    const { default: QuizInfra } = await import("./interfaces/infra/QuizInfra.js");
-    const find = jest.spyOn(QuizInfra.prototype, "findMany").mockResolvedValue([]);
-    const count = jest.spyOn(QuizInfra.prototype, "count").mockResolvedValue(0);
+    const { default: QuizInfra } = await import(
+      "./interfaces/infra/QuizInfra.js"
+    );
+    const find = vi
+      .spyOn(QuizInfra.prototype, "findMany")
+      .mockResolvedValue([]);
+    const count = vi.spyOn(QuizInfra.prototype, "count").mockResolvedValue(0);
     for (const path of ["/api/quizzes", "/api/quizzes/size"]) {
       const params = new URLSearchParams({
         since: "2026-10-25T00:00:00+09:00",
@@ -231,35 +238,54 @@ describe("validation and Hono RPC", () => {
     });
     expect(find).toHaveBeenCalledWith(user.uid, filters);
     expect(count).toHaveBeenCalledWith(user.uid, filters);
-    expect((await app.request("/api/quizzes?since=2026-02-30")).status).toBe(400);
-    expect((await app.request("/api/quizzes?since=2026-10-26&until=2026-10-25")).status).toBe(400);
-    expect((await app.request("/api/quizzes?judgements=unknown")).status).toBe(400);
-    expect((await app.request("/api/quizzes?judgements=wrong")).status).toBe(200);
-    expect((await app.request("/api/quizzes?since=2026-10-26")).status).toBe(200);
-    expect((await app.request("/api/quizzes?since=0&until=1")).status).toBe(200);
+    expect((await app.request("/api/quizzes?since=2026-02-30")).status).toBe(
+      400,
+    );
+    expect(
+      (await app.request("/api/quizzes?since=2026-10-26&until=2026-10-25"))
+        .status,
+    ).toBe(400);
+    expect((await app.request("/api/quizzes?judgements=unknown")).status).toBe(
+      400,
+    );
+    expect((await app.request("/api/quizzes?judgements=wrong")).status).toBe(
+      200,
+    );
+    expect((await app.request("/api/quizzes?since=2026-10-26")).status).toBe(
+      200,
+    );
+    expect((await app.request("/api/quizzes?since=0&until=1")).status).toBe(
+      200,
+    );
   });
   it("accepts ISO dates from the history components for history totals", async () => {
-    const { default: JudgementInfra } = await import("./interfaces/infra/JudgementInfra.js");
+    const { default: JudgementInfra } = await import(
+      "./interfaces/infra/JudgementInfra.js"
+    );
     const { default: Judgement } = await import("./domains/Judgement/index.js");
-    const find = jest.spyOn(JudgementInfra.prototype, "findByUidAndDate")
+    const find = vi
+      .spyOn(JudgementInfra.prototype, "findByUidAndDate")
       .mockResolvedValue(new Judgement(1, 2, 3));
     for (const [since, until] of [
       ["2026-10-26T00:00:00.000Z", "2026-10-26T23:59:59.999Z"],
       ["1792972800000", "1793059199999"],
     ]) {
-      const response = await app.request(`/api/histories/${encodeURIComponent(since)}/${encodeURIComponent(until)}`);
+      const response = await app.request(
+        `/api/histories/${encodeURIComponent(since)}/${encodeURIComponent(until)}`,
+      );
       expect(response.status).toBe(200);
       expect(await response.json()).toEqual({ right: 1, wrong: 2, through: 3 });
     }
     expect(find).toHaveBeenCalledWith(user.uid, [
-      new Date("2026-10-26T00:00:00.000Z"), new Date("2026-10-26T23:59:59.999Z"),
+      new Date("2026-10-26T00:00:00.000Z"),
+      new Date("2026-10-26T23:59:59.999Z"),
     ]);
   });
   it("forwards all count filters including scalar judgement zero", async () => {
     const { default: QuizInfra } = await import(
       "./interfaces/infra/QuizInfra.js"
     );
-    const count = jest.spyOn(QuizInfra.prototype, "count").mockResolvedValue(1);
+    const count = vi.spyOn(QuizInfra.prototype, "count").mockResolvedValue(1);
     const response = await app.request(
       "/api/quizzes/size?tags=a&categories=2&judgements=0&tagMatchAll=true&crctAnsRatio=0&crctAnsRatio=100",
     );
@@ -279,7 +305,7 @@ describe("validation and Hono RPC", () => {
     const { default: QuizInfra } = await import(
       "./interfaces/infra/QuizInfra.js"
     );
-    const find = jest
+    const find = vi
       .spyOn(QuizInfra.prototype, "findMany")
       .mockResolvedValue([]);
     const response = await app.request(
@@ -308,7 +334,7 @@ describe("validation and Hono RPC", () => {
     const { default: QuizInfra } = await import(
       "./interfaces/infra/QuizInfra.js"
     );
-    const find = jest
+    const find = vi
       .spyOn(QuizInfra.prototype, "findMany")
       .mockResolvedValue([]);
     await app.request("/api/quizzes");
@@ -322,11 +348,12 @@ describe("validation and Hono RPC", () => {
       }),
     );
   });
+
   it("accepts typed RPC JSON and returns the existing empty creation response", async () => {
     const { AddQuizUseCase } = await import(
       "./applications/usecases/Quiz/AddQuizUseCase.js"
     );
-    const add = jest
+    const add = vi
       .spyOn(AddQuizUseCase.prototype, "execute")
       .mockResolvedValue({
         qid: "q",
@@ -337,10 +364,12 @@ describe("validation and Hono RPC", () => {
         right: 0,
         isFavorite: false,
       });
+
     const client = hc<AppType>("http://localhost", {
       fetch: (input: RequestInfo | URL, init?: RequestInit) =>
         app.request(input, init),
     });
+
     const response = await client.api.quizzes.$post({
       json: {
         question: "Question",
@@ -361,6 +390,7 @@ describe("validation and Hono RPC", () => {
       }),
     );
   });
+
   it("rejects malformed JSON and JSON bodies over 5 MB", async () => {
     const invalid = await app.request("/api/quizzes", {
       method: "POST",
@@ -426,8 +456,8 @@ describe("file uploads and static delivery", () => {
       new Date(),
       new Date(),
     );
-    jest.spyOn(UserInfra.prototype, "findByUid").mockResolvedValue(profile);
-    jest.spyOn(UserInfra.prototype, "update").mockResolvedValue(undefined);
+    vi.spyOn(UserInfra.prototype, "findByUid").mockResolvedValue(profile);
+    vi.spyOn(UserInfra.prototype, "update").mockResolvedValue(undefined);
     const form = new FormData();
     const bytes = new Uint8Array([137, 80, 78, 71]);
     form.append("file", new File([bytes], "image.png", { type: "image/png" }));
@@ -497,27 +527,28 @@ describe("successful API contracts", () => {
     );
     const { default: Workbook } = await import("./domains/Workbook/index.js");
     const records = new Map<string, InstanceType<typeof Workbook>>();
-    jest
-      .spyOn(WorkbookInfra.prototype, "save")
-      .mockImplementation(async (workbook) => {
+    vi.spyOn(WorkbookInfra.prototype, "save").mockImplementation(
+      async (workbook) => {
         records.set(workbook.wid, workbook);
-      });
-    const find = jest
+      },
+    );
+    const find = vi
       .spyOn(WorkbookInfra.prototype, "findByWid")
       .mockImplementation(async (wid) => records.get(wid) ?? null);
-    jest
-      .spyOn(WorkbookInfra.prototype, "findManyByUid")
-      .mockImplementation(async () => [...records.values()]);
-    jest
-      .spyOn(WorkbookInfra.prototype, "update")
-      .mockImplementation(async (workbook) => {
+    vi.spyOn(WorkbookInfra.prototype, "findManyByUid").mockImplementation(
+      async () => [...records.values()],
+    );
+    vi.spyOn(WorkbookInfra.prototype, "update").mockImplementation(
+      async (workbook) => {
         records.set(workbook.wid, workbook);
-      });
-    jest
-      .spyOn(WorkbookInfra.prototype, "delete")
-      .mockImplementation(async (wid) => {
-        records.delete(wid);
-      });
+      },
+    );
+    vi.spyOn(WorkbookInfra.prototype, "delete").mockImplementation(
+      async (wid, uid) => {
+        if (records.get(wid)?.creatorUid !== uid) return false;
+        return records.delete(wid);
+      },
+    );
     const created = await jsonRequest("/api/workbooks", {
       name: "Book",
       published: "2025-01-01T00:00:00.000Z",
@@ -567,13 +598,14 @@ describe("successful API contracts", () => {
       accessToken: "access",
       refreshToken: "refresh",
     };
-    jest.spyOn(AuthUseCase.prototype, "loginUser").mockResolvedValue(data);
-    jest.spyOn(AuthUseCase.prototype, "signupUser").mockResolvedValue(data);
-    jest.spyOn(AuthUseCase.prototype, "registerUser").mockResolvedValue(data);
-    jest
-      .spyOn(AuthUseCase.prototype, "getToken")
-      .mockResolvedValue({ accessToken: "access", user: userData });
-    jest.spyOn(AuthUseCase.prototype, "available").mockResolvedValue(true);
+    vi.spyOn(AuthUseCase.prototype, "loginUser").mockResolvedValue(data);
+    vi.spyOn(AuthUseCase.prototype, "signupUser").mockResolvedValue(data);
+    vi.spyOn(AuthUseCase.prototype, "registerUser").mockResolvedValue(data);
+    vi.spyOn(AuthUseCase.prototype, "getToken").mockResolvedValue({
+      accessToken: "access",
+      user: userData,
+    });
+    vi.spyOn(AuthUseCase.prototype, "available").mockResolvedValue(true);
     for (const endpoint of ["login", "signup", "register"]) {
       const response = await jsonRequest(`/api/auth/${endpoint}`, {
         username: "tester",
@@ -601,7 +633,7 @@ describe("successful API contracts", () => {
     const { UpdateCategoryUseCase } = await import(
       "./applications/usecases/Category/UpdateCategoryUseCase.js"
     );
-    const update = jest
+    const update = vi
       .spyOn(UpdateCategoryUseCase.prototype, "execute")
       .mockResolvedValue(undefined);
     const response = await jsonRequest(
@@ -627,21 +659,23 @@ describe("successful API contracts", () => {
     const { default: RegisterUseCase } = await import(
       "./applications/usecases/RegisterUseCase.js"
     );
-    const practice = jest
+    const practice = vi
       .spyOn(PracticeUseCase.prototype, "addPractice")
       .mockResolvedValue(undefined);
-    jest
-      .spyOn(FavoriteUseCase.prototype, "addFavorite")
-      .mockResolvedValue(undefined);
-    jest
-      .spyOn(FavoriteUseCase.prototype, "removeFavorite")
-      .mockResolvedValue(undefined);
-    jest
-      .spyOn(RegisterUseCase.prototype, "registerQuizToMylist")
-      .mockResolvedValue(undefined);
-    jest
-      .spyOn(RegisterUseCase.prototype, "unregisterQuizFromMylist")
-      .mockResolvedValue(undefined);
+    vi.spyOn(FavoriteUseCase.prototype, "addFavorite").mockResolvedValue(
+      undefined,
+    );
+    vi.spyOn(FavoriteUseCase.prototype, "removeFavorite").mockResolvedValue(
+      undefined,
+    );
+    vi.spyOn(
+      RegisterUseCase.prototype,
+      "registerQuizToMylist",
+    ).mockResolvedValue(undefined);
+    vi.spyOn(
+      RegisterUseCase.prototype,
+      "unregisterQuizFromMylist",
+    ).mockResolvedValue(undefined);
     for (const [url, body, status] of [
       ["/api/practice", { qid: "q", judgement: 0, pressedWord: 0 }, 200],
       ["/api/like", { qid: "q" }, 201],

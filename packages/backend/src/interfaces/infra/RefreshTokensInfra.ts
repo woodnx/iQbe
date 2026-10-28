@@ -41,6 +41,20 @@ export default class RefreshTokensInfra implements IRefreshTokensRepository {
     return new RefreshToken(data.token, data.uid);
   }
 
+  async revokeToken(uid: string, token: string): Promise<void> {
+    const client = this.clientManager.getClient();
+    await client
+      .updateTable("refresh_tokens")
+      .set({ expired: 1 })
+      .where(
+        "user_id",
+        "in",
+        client.selectFrom("users").select("id").where("uid", "=", uid),
+      )
+      .where("token", "=", sql<Buffer>`UNHEX(REPLACE(${token}, '-', ''))`)
+      .execute();
+  }
+
   async revokeByUid(uid: string): Promise<void> {
     const client = this.clientManager.getClient();
     await client

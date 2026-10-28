@@ -59,7 +59,7 @@ export default class ResetPasswordUseCase {
 
       this.resetPasswordService.available(resetPassword, uid);
 
-      const passwd = this.authService.generateHashedPassword(newPassword);
+      const passwd = await this.authService.generateHashedPassword(newPassword);
       const user = await this.userRepository.findByUid(uid);
 
       if (!user) {

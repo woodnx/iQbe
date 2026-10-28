@@ -60,6 +60,7 @@ export default class InviteCodeInfra implements IInviteCodeRepository {
       .selectFrom("invite_codes")
       .select(["id", "code", "used", "created", "updated"])
       .where("code", "=", code)
+      .forUpdate()
       .executeTakeFirst();
 
     if (!data) {

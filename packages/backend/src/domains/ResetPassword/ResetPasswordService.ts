@@ -10,8 +10,6 @@ export default class ResetPasswordService {
   available(resetPassword: ResetPassword, uid: string) {
     const now = dayjs();
 
-    console.log(resetPassword);
-
     if (now.isAfter(resetPassword.exp) || resetPassword.used) {
       throw new ApiError().invalidParams();
     } else if (resetPassword.requestedUid != uid) {

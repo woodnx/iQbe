@@ -25,7 +25,7 @@
         "mike-co.import-sorter",
         "github.vscode-github-actions",
         "42Crunch.vscode-openapi",
-        "biomejs.biome",
+        "oxc.oxc-vscode",
         "vitest.explorer",
         "Orta.vscode-jest"
       ]
