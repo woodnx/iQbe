@@ -1,8 +1,8 @@
 import ICategoryQueryService, {
   CategoryDTO,
-} from "@/applications/queryservices/ICategoryQueryService";
-import Category from "@/domains/Category";
-import ICategoryRepository from "@/domains/Category/ICategoryRepository";
+} from "@/applications/queryservices/ICategoryQueryService.js";
+import Category from "@/domains/Category/index.js";
+import ICategoryRepository from "@/domains/Category/ICategoryRepository.js";
 
 export class InMemoryCategoryInfra
   implements ICategoryRepository, ICategoryQueryService

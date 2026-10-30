@@ -1,7 +1,7 @@
-import History from ".";
-import IQuizRepository from "../Quiz/IQuizRepository";
-import IUserRepository from "../User/IUserRepository";
-import IHistoryRepository from "./IHistoryRepository";
+import IQuizRepository from "../Quiz/IQuizRepository.js";
+import IUserRepository from "../User/IUserRepository.js";
+import History from "./index.js";
+import IHistoryRepository from "./IHistoryRepository.js";
 
 export default class HistoryService {
   constructor(
@@ -25,7 +25,13 @@ export default class HistoryService {
       throw new Error("no find user or quiz");
     }
 
-    const history = new History(quiz, user, pressedWordPosition, judgement);
+    const history = new History(
+      quiz,
+      user,
+      pressedWordPosition,
+      judgement,
+      new Date(),
+    );
     await this.historyRepository.add(history);
   }
 }

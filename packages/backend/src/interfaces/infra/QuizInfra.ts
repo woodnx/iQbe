@@ -1,413 +1,491 @@
-import { components } from "api/schema";
-import dayjs from "dayjs";
 import { Expression, SqlBool, sql } from "kysely";
-
 import IQuizQueryService, {
   countOption,
   findOption,
-} from "@/applications/queryservices/IQuizQueryService";
-import Quiz from "@/domains/Quiz";
-import IQuizRepository from "@/domains/Quiz/IQuizRepository";
-import CategoryInfra from "./CategoryInfra";
-import KyselyClientManager from "./kysely/KyselyClientManager";
+} from "@/applications/queryservices/IQuizQueryService.js";
+import IQuizRepository from "@/domains/Quiz/IQuizRepository.js";
+import Quiz from "@/domains/Quiz/index.js";
+import { ApiError } from "@/http/ApiError.js";
+import type { QuizDTO as ApiQuizDTO } from "@/types/dto.js";
+import CategoryInfra from "./CategoryInfra.js";
+import KyselyClientManager from "./kysely/KyselyClientManager.js";
 
-type QuizDTO = components["schemas"]["Quiz"];
+type QuizDTO = ApiQuizDTO;
 
 export default class QuizInfra implements IQuizRepository, IQuizQueryService {
   constructor(
     private clientManager: KyselyClientManager,
-    private categoryInfra: CategoryInfra
+    private categoryInfra: CategoryInfra,
   ) {}
 
-  private async addTagToQuiz(qid: string, tagLabel: string) {
-    const client = this.clientManager.getClient();
-
-    const tagId = await client
-      .selectFrom("tags")
-      .select(["id"])
-      .where("label", "=", tagLabel)
-      .executeTakeFirstOrThrow()
-      .then((tag) => tag.id);
-
-    const quizId = await client
-      .selectFrom("quizzes")
-      .select(["id"])
-      .where("qid", "=", qid)
-      .executeTakeFirstOrThrow()
-      .then((quiz) => quiz.id);
-
-    await client
-      .insertInto("tagging")
-      .values({
-        tag_id: tagId,
-        quiz_id: quizId,
-        registered: new Date(),
-      })
-      .execute();
+  private latestHistory(userId: number) {
+    return this.clientManager
+      .getClient()
+      .selectFrom("histories")
+      .select(["quiz_id", "judgement", "practiced"])
+      .select(
+        sql<number>`ROW_NUMBER() OVER (PARTITION BY quiz_id ORDER BY practiced DESC)`.as(
+          "row_num",
+        ),
+      )
+      .where("user_id", "=", userId)
+      .as("latest");
   }
 
-  private async removeTagFromQuiz(qid: string, tagLabel: string) {
+  private async filteredQuery(uid: string, option: countOption) {
     const client = this.clientManager.getClient();
-
-    const tagId = await client
-      .selectFrom("tags")
-      .select(["id"])
-      .where("label", "=", tagLabel)
-      .executeTakeFirstOrThrow()
-      .then((tag) => tag.id);
-
-    const quizId = await client
+    const { id: userId } = await client
+      .selectFrom("users")
+      .select("id")
+      .where("uid", "=", uid)
+      .executeTakeFirstOrThrow();
+    let query = client
       .selectFrom("quizzes")
-      .select(["id"])
-      .where("qid", "=", qid)
-      .executeTakeFirstOrThrow()
-      .then((quiz) => quiz.id);
-
-    await client
-      .deleteFrom("tagging")
-      .where(({ and, eb }) =>
-        and([eb("tag_id", "=", tagId), eb("quiz_id", "=", quizId)])
+      .innerJoin("users as creators", "creators.id", "quizzes.creator_id")
+      .leftJoin("workbooks", "quizzes.workbook_id", "workbooks.id")
+      .leftJoin(
+        "users as wb_creators",
+        "workbooks.creator_id",
+        "wb_creators.id",
       )
-      .execute();
+      .leftJoin(this.latestHistory(userId), (join) => {
+        const matched = join.onRef("latest.quiz_id", "=", "quizzes.id");
+        return option.history ? matched : matched.on("latest.row_num", "=", 1);
+      })
+      .where("quizzes.creator_id", "=", userId);
+    const array = <T>(value: T | T[] | null | undefined): T[] =>
+      value == null ? [] : [...new Set(Array.isArray(value) ? value : [value])];
+    const wids = array(option.wids);
+    if (wids.length) query = query.where("workbooks.wid", "in", wids);
+    const categories = array(option.categories);
+    if (categories.length)
+      query = query.where("quizzes.category_id", "in", categories);
+    if (option.keyword) {
+      const target = option.keywordOption ?? 1;
+      query = query.where((eb) => {
+        const matches: Expression<SqlBool>[] = [];
+        if (target !== 3)
+          matches.push(eb("quizzes.que", "like", `%${option.keyword}%`));
+        if (target !== 2)
+          matches.push(eb("quizzes.ans", "like", `%${option.keyword}%`));
+        return eb.or(matches);
+      });
+    }
+    const tags = array(option.tags);
+    if (tags.length) {
+      // EXISTS keeps one outer row per quiz, even with multiple matching tags.
+      for (const labels of option.tagMatchAll
+        ? tags.map((label) => [label])
+        : [tags]) {
+        query = query.where((eb) =>
+          eb.exists(
+            eb
+              .selectFrom("tagging")
+              .innerJoin("tags", "tags.id", "tagging.tag_id")
+              .select("tagging.quiz_id")
+              .whereRef("tagging.quiz_id", "=", "quizzes.id")
+              .where("tags.label", "in", labels),
+          ),
+        );
+      }
+    }
+    if (option.isFavorite)
+      query = query.where((eb) =>
+        eb.exists(
+          eb
+            .selectFrom("favorites")
+            .select("quiz_id")
+            .whereRef("favorites.quiz_id", "=", "quizzes.id")
+            .where("favorites.user_id", "=", userId),
+        ),
+      );
+    if (option.mid)
+      query = query.where((eb) =>
+        eb.exists(
+          eb
+            .selectFrom("mylists_quizzes")
+            .innerJoin("mylists", "mylists.id", "mylists_quizzes.mylist_id")
+            .select("quiz_id")
+            .whereRef("mylists_quizzes.quiz_id", "=", "quizzes.id")
+            .where("mylists.mid", "=", option.mid!)
+            .where("mylists.user_id", "=", userId),
+        ),
+      );
+    const judgements = array(option.judgements);
+    if (option.history) {
+      query = query.where("latest.quiz_id", "is not", null);
+      if (option.since != null)
+        query = query.where("latest.practiced", ">=", new Date(option.since));
+      if (option.until != null)
+        query = query.where("latest.practiced", "<=", new Date(option.until));
+      if (judgements.length)
+        query = query.where("latest.judgement", "in", judgements);
+    } else if (
+      option.since != null ||
+      option.until != null ||
+      judgements.length
+    ) {
+      query = query.where((eb) => {
+        let history = eb
+          .selectFrom(this.latestHistory(userId))
+          .select("latest.quiz_id")
+          .whereRef("latest.quiz_id", "=", "quizzes.id")
+          .where("latest.row_num", "=", 1);
+        if (option.since != null)
+          history = history.where(
+            "latest.practiced",
+            ">=",
+            new Date(option.since),
+          );
+        if (option.until != null)
+          history = history.where(
+            "latest.practiced",
+            "<=",
+            new Date(option.until),
+          );
+        if (judgements.length) {
+          const answered = judgements.filter((value) => value !== 3);
+          history = answered.length
+            ? history.where("latest.judgement", "in", answered)
+            : history.where(sql<boolean>`false`);
+        }
+        const matches: Expression<SqlBool>[] = [eb.exists(history)];
+        if (
+          judgements.includes(3) &&
+          option.since == null &&
+          option.until == null
+        ) {
+          matches.push(
+            eb.not(
+              eb.exists(
+                eb
+                  .selectFrom("histories")
+                  .select("quiz_id")
+                  .whereRef("histories.quiz_id", "=", "quizzes.id")
+                  .where("histories.user_id", "=", userId),
+              ),
+            ),
+          );
+        }
+        return eb.or(matches);
+      });
+    }
+    if (option.crctAnsRatio) {
+      const total = sql<number>`COALESCE(quizzes.total_crct_ans, 0) + COALESCE(quizzes.total_wrng_ans, 0) + COALESCE(quizzes.total_through_ans, 0)`;
+      query = query
+        .where(total, ">", 0)
+        .where(
+          sql<number>`100.0 * COALESCE(quizzes.total_crct_ans, 0) / NULLIF((${total}), 0)`,
+          ">=",
+          option.crctAnsRatio[0],
+        )
+        .where(
+          sql<number>`100.0 * COALESCE(quizzes.total_crct_ans, 0) / NULLIF((${total}), 0)`,
+          "<=",
+          option.crctAnsRatio[1],
+        );
+    }
+    return { query, userId };
   }
 
   async findMany(uid: string, option: findOption = {}): Promise<QuizDTO[]> {
+    return this.fetchQuizzes(uid, option);
+  }
+
+  async findByQids(uid: string, qids: string[]): Promise<QuizDTO[]> {
+    const uniqueQids = [...new Set(qids)];
+    if (uniqueQids.length === 0) return [];
+
+    const quizzes = await this.fetchQuizzes(
+      uid,
+      { maxView: uniqueQids.length },
+      uniqueQids,
+    );
+    const byQid = new Map(quizzes.map((quiz) => [quiz.qid, quiz]));
+    // Preserve the saved order, omitting missing or inaccessible quizzes.
+    return uniqueQids.flatMap((qid) => {
+      const quiz = byQid.get(qid);
+      return quiz ? [quiz] : [];
+    });
+  }
+
+  private async fetchQuizzes(
+    uid: string,
+    option: findOption,
+    qids?: string[],
+  ): Promise<QuizDTO[]> {
     const client = this.clientManager.getClient();
-
-    const userId = await client
-      .selectFrom("users")
-      .select("id")
-      .where("uid", "=", uid)
-      .executeTakeFirstOrThrow()
-      .then((u) => u.id);
-
-    let query = client
-      .selectFrom("quizzes")
-      .leftJoin("workbooks", "quizzes.workbook_id", "workbooks.id")
-      .leftJoin("levels", "workbooks.level_id", "levels.id")
-      .innerJoin("users", "users.id", "quizzes.creator_id")
-      .select(({ fn }) => [
-        "quizzes.id as id",
-        "quizzes.qid as qid",
-        "quizzes.que as question",
-        "quizzes.ans as answer",
-        "quizzes.anoans as anotherAnswer",
-        "workbooks.wid as wid",
-        "users.uid as creatorId",
-        "quizzes.category_id as categoryId",
-        "quizzes.total_crct_ans as right",
-        sql<number>`total_crct_ans + total_through_ans + total_wrng_ans`.as(
-          "total"
-        ),
-        fn.countAll<number>().over().as("size"),
-      ])
-      .where("quizzes.creator_id", "=", userId);
-
-    if (!!option.wids && option.wids.length)
-      if (Array.isArray(option.wids))
-        query = query.where("workbooks.wid", "in", option.wids);
-      else query = query.where("workbooks.wid", "=", option.wids);
-    if (!!option.seed) query = query.orderBy(sql`RAND(${option.seed})`);
-    if (!!option.keyword && !!option.keywordOption) {
-      query = query.where((eb) => {
-        const keyword = option.keyword || "";
-        const ors: Expression<SqlBool>[] = []
-
-        if (option.keywordOption !== 3) {
-          ors.push(eb("quizzes.que", "like", `%${keyword}%`))
-        }
-        
-        if (option.keywordOption !== 2) {
-          ors.push(eb("quizzes.ans", "like", `%${keyword}%`))
-        }
-
-        return eb.or(ors)
-      })
-    }
-    if (!!option.categories) {
-      if (Array.isArray(option.categories) && option.categories.length)
-        query = query.where("quizzes.category_id", "in", option.categories);
-      else query = query.where("quizzes.category_id", "=", option.categories);
-    }
-    if (!!option.tags) {
-      if (Array.isArray(option.tags) && option.tags.length) {
-        if (option.tagMatchAll) {
-          query = query
-            .innerJoin("tagging", "tagging.quiz_id", "quizzes.id")
-            .innerJoin("tags", "tagging.tag_id", "tags.id")
-            .where("tags.label", "in", option.tags)
-            .groupBy("quizzes.id")
-            .having(
-              ({ fn }) => fn.count("tags.label"),
-              "=",
-              option.tags.length
-            );
-        } else {
-          query = query
-            .innerJoin("tagging", "tagging.quiz_id", "quizzes.id")
-            .innerJoin("tags", "tagging.tag_id", "tags.id")
-            .where("tags.label", "in", option.tags);
-        }
-      } else {
-        query = query
-          .innerJoin("tagging", "tagging.quiz_id", "quizzes.id")
-          .innerJoin("tags", "tagging.tag_id", "tags.id")
-          .where("tags.label", "=", option.tags);
-      }
-    }
-    // if (!!crctAnsRatio) {
-    //   query = query.where(sql`quiz.total_crct_ans / (quiz.total_crct_ans + quiz.total_wrng_ans + quiz.total_through_ans) * 100 BETWEEN ${crctAnsRatio[0]} AND ${crctAnsRatio[1]}`)
-    // }
-
-    if (option.isFavorite) {
-      query = query
-        .innerJoin("favorites", "favorites.quiz_id", "quizzes.id")
-        .select("favorites.registered")
-        .where("favorites.user_id", "=", userId)
-        .orderBy("favorites.registered desc");
-    } else if (!!option.since && !!option.until) {
-      const since = dayjs(option.since).toDate();
-      const until = dayjs(option.until).toDate();
-
-      query = query
-        .innerJoin("histories", "histories.quiz_id", "quizzes.id")
-        .select([
-          "histories.judgement as judgement",
-          "histories.practiced as practiced",
-        ])
-        .where("histories.user_id", "=", userId)
-        .where(({ eb, and, between }) =>
-          !!option.judgements
-            ? and([
-                eb("histories.judgement", "in", option.judgements),
-                between("histories.practiced", since, until),
-              ])
-            : between("histories.practiced", since, until)
-        )
-        .orderBy("histories.practiced desc");
-    } else if (!!option.mid) {
-      query = query
-        .innerJoin("mylists_quizzes", "mylists_quizzes.quiz_id", "quizzes.id")
-        .innerJoin("mylists", "mylists.id", "mylists_quizzes.mylist_id")
-        .select("mylists_quizzes.registered")
-        .where("mylists.mid", "=", option.mid)
-        .where("mylists.user_id", "=", userId)
-        .orderBy("mylists_quizzes.registered desc");
-    }
-
-    const maxView = option.maxView || 100;
-    const page = option.page || 1;
-
-    // execute
+    const { query: filtered, userId } = await this.filteredQuery(uid, option);
+    let query = filtered.select([
+      "quizzes.id as id",
+      "quizzes.qid as qid",
+      "quizzes.que as question",
+      "quizzes.ans as answer",
+      "quizzes.anoans as anotherAnswer",
+      "quizzes.category_id as categoryId",
+      "quizzes.total_crct_ans as right",
+      "creators.uid as creatorId",
+      "workbooks.id as workbookId",
+      "workbooks.wid as wid",
+      "workbooks.name as wbName",
+      "workbooks.date as wbDate",
+      "wb_creators.uid as wbCreatorId",
+      "latest.judgement as judgement",
+      sql<number>`COALESCE(quizzes.total_crct_ans, 0) + COALESCE(quizzes.total_through_ans, 0) + COALESCE(quizzes.total_wrng_ans, 0)`.as(
+        "total",
+      ),
+    ]);
+    if (qids) query = query.where("quizzes.qid", "in", qids);
+    // Tie each sort key to the quiz so query scan order cannot change the shuffle.
+    if (option.seed != null)
+      query = query.orderBy(sql`MD5(CONCAT(${option.seed}, ':', quizzes.qid))`);
+    if (option.isFavorite)
+      query = query.orderBy(
+        (eb) =>
+          eb
+            .selectFrom("favorites")
+            .select("registered")
+            .whereRef("favorites.quiz_id", "=", "quizzes.id")
+            .where("user_id", "=", userId),
+        "desc",
+      );
+    if (option.history || option.since != null || option.until != null)
+      query = query.orderBy("latest.practiced", "desc");
+    if (option.mid)
+      query = query.orderBy(
+        (eb) =>
+          eb
+            .selectFrom("mylists_quizzes")
+            .innerJoin("mylists", "mylists.id", "mylists_quizzes.mylist_id")
+            .select("registered")
+            .whereRef("mylists_quizzes.quiz_id", "=", "quizzes.id")
+            .where("mylists.mid", "=", option.mid!)
+            .where("mylists.user_id", "=", userId),
+        "desc",
+      );
+    if (option.history) query = query.orderBy("latest.row_num");
+    const maxView = option.maxView ?? 100;
     const quizzes = await query
+      .orderBy("quizzes.id", "desc")
       .limit(maxView)
-      .offset(maxView * (page - 1))
-      .distinct()
+      .offset(maxView * ((option.page ?? 1) - 1))
       .execute();
 
-    return Promise.all(
-      quizzes.map(async (q) => {
-        const { id: quizId, ...quiz } = q;
+    if (quizzes.length === 0) return [];
 
-        const [
-          category,
-          workbook,
-          isFavorite,
-          registerdMylist,
-          tags,
-          visibleUser,
-          judgement,
-        ] = await Promise.all([
-          quiz.categoryId
-            ? this.categoryInfra.findChainById(quiz.categoryId)
-            : [],
+    const quizIds = quizzes.map((q) => q.id);
+    const categoryIds = [
+      ...new Set(quizzes.map((q) => q.categoryId).filter(Boolean)),
+    ] as number[];
+    const allMylists = await client
+      .selectFrom("mylists_quizzes")
+      .innerJoin("mylists", "mylists_quizzes.mylist_id", "mylists.id")
+      .select([
+        "mylists_quizzes.quiz_id",
+        "mylists.id as mylist_id",
+        "mylists.mid",
+        "mylists.name",
+        "mylists.created",
+      ])
+      .where("mylists.user_id", "=", userId)
+      .where("mylists_quizzes.quiz_id", "in", quizIds)
+      .execute();
+    const mylistIds = [...new Set(allMylists.map((m) => m.mylist_id))];
 
-          client
-            .selectFrom("workbooks")
-            .innerJoin("users", "workbooks.creator_id", "users.id")
-            .select(["wid", "date", "name", "users.uid as creatorId"])
-            .where("wid", "=", quiz.wid)
-            .executeTakeFirst(),
+    const workbookIds = [
+      ...new Set(
+        quizzes
+          .map((q) => q.workbookId)
+          .filter((id): id is number => id !== null),
+      ),
+    ];
 
-          client
-            .selectFrom("favorites")
-            .select("quiz_id")
-            .where(({ eb, and }) =>
-              and([eb("user_id", "=", userId), eb("quiz_id", "=", quizId)])
-            )
-            .executeTakeFirst(),
+    const [allTags, allFavorites, allVisibleUsers, mylistStats, workbookStats] =
+      await Promise.all([
+        // タグ一括取得
+        client
+          .selectFrom("tagging")
+          .innerJoin("tags", "tagging.tag_id", "tags.id")
+          .select([
+            "tagging.quiz_id",
+            "tags.label",
+            "tags.created",
+            "tags.modified",
+          ])
+          .where("tagging.quiz_id", "in", quizIds)
+          .execute(),
 
-          client
-            .selectFrom("mylists_quizzes")
-            .innerJoin("mylists", "mylists_quizzes.mylist_id", "mylists.id")
-            .select([
-              "mylists.mid as mid",
-              "mylists.name as name",
-              "mylists.created as created",
-            ])
-            .where(({ eb, and }) =>
-              and([
-                eb("mylists.user_id", "=", userId),
-                eb("mylists_quizzes.quiz_id", "=", quizId),
+        // お気に入り状況一括取得
+        client
+          .selectFrom("favorites")
+          .select("quiz_id")
+          .where("user_id", "=", userId)
+          .where("quiz_id", "in", quizIds)
+          .execute(),
+
+        // 公開範囲設定の有無を一括取得
+        client
+          .selectFrom("quiz_visible_users")
+          .select("quiz_id")
+          .where("quiz_id", "in", quizIds)
+          .execute(),
+
+        mylistIds.length > 0
+          ? client
+              .selectFrom("mylists_quizzes")
+              .leftJoin("histories", (join) =>
+                join
+                  .onRef("histories.quiz_id", "=", "mylists_quizzes.quiz_id")
+                  .on("histories.user_id", "=", userId),
+              )
+              .select(({ fn }) => [
+                "mylists_quizzes.mylist_id",
+                fn
+                  .count<number>("mylists_quizzes.quiz_id")
+                  .distinct()
+                  .as("total"),
+                sql<number>`COALESCE(SUM(CASE WHEN histories.judgement = 1 THEN 1 ELSE 0 END), 0)`.as(
+                  "corrects",
+                ),
+                sql<number>`COALESCE(SUM(CASE WHEN histories.judgement = 0 THEN 1 ELSE 0 END), 0)`.as(
+                  "wrongs",
+                ),
+                sql<number>`COALESCE(SUM(CASE WHEN histories.judgement = 2 THEN 1 ELSE 0 END), 0)`.as(
+                  "ignored",
+                ),
+                fn.max("histories.practiced").as("lastPracticed"),
               ])
-            )
-            .execute(),
+              .where("mylists_quizzes.mylist_id", "in", mylistIds)
+              .groupBy("mylists_quizzes.mylist_id")
+              .execute()
+          : Promise.resolve([]),
 
-          client
-            .selectFrom("tagging")
-            .innerJoin("tags", "tagging.tag_id", "tags.id")
-            .select([
-              "tags.label as label",
-              "tags.created as created",
-              "tags.modified as modified",
-            ])
-            .where("tagging.quiz_id", "=", quizId)
-            .execute(),
+        workbookIds.length > 0
+          ? client
+              .selectFrom("quizzes")
+              .leftJoin("histories", (join) =>
+                join
+                  .onRef("histories.quiz_id", "=", "quizzes.id")
+                  .on("histories.user_id", "=", userId),
+              )
+              .select(({ fn }) => [
+                "quizzes.workbook_id",
+                fn.count<number>("quizzes.id").distinct().as("total"),
+                sql<number>`COALESCE(SUM(CASE WHEN histories.judgement = 1 THEN 1 ELSE 0 END), 0)`.as(
+                  "corrects",
+                ),
+                sql<number>`COALESCE(SUM(CASE WHEN histories.judgement = 0 THEN 1 ELSE 0 END), 0)`.as(
+                  "wrongs",
+                ),
+                sql<number>`COALESCE(SUM(CASE WHEN histories.judgement = 2 THEN 1 ELSE 0 END), 0)`.as(
+                  "ignored",
+                ),
+                fn.max("histories.practiced").as("lastPracticed"),
+              ])
+              .where("quizzes.workbook_id", "in", workbookIds)
+              .groupBy("quizzes.workbook_id")
+              .execute()
+          : Promise.resolve([]),
+      ]);
 
-          client
-            .selectFrom("quiz_visible_users")
-            .innerJoin("users", "users.id", "quiz_visible_users.user_id")
-            .select(["uid"])
-            .where(({ eb, and }) => and([eb("quiz_id", "=", quizId)]))
-            .executeTakeFirst(),
-
-          client
-            .selectFrom("histories")
-            .select(["histories.judgement"])
-            .where(({ eb, and }) => and([eb("quiz_id", "=", quizId)]))
-            .executeTakeFirst(),
-        ]);
-
-        return {
-          qid: quiz.qid,
-          question: quiz.question,
-          answer: quiz.answer,
-          anotherAnswer: quiz.anotherAnswer,
-          creatorId: quiz.creatorId,
-          isPublic: !visibleUser,
-          isFavorite: !!isFavorite,
-          right: quiz.right || 0,
-          total: quiz.total || 0,
-          registerdMylist,
-          tags,
-          workbook,
-          judgement: judgement?.judgement,
-          category: category?.map((c) => ({
-            id: c.id,
-            name: c.name,
-            parentId: c.parentId,
-            description: c.description,
-            disabled: c.disabled,
-          })),
-        };
-      })
+    const categories = await this.categoryInfra.findChainsByIds(categoryIds);
+    const groupByQuiz = <T extends { quiz_id: number }>(rows: T[]) => {
+      const grouped = new Map<number, T[]>();
+      for (const row of rows) {
+        const group = grouped.get(row.quiz_id) ?? [];
+        group.push(row);
+        grouped.set(row.quiz_id, group);
+      }
+      return grouped;
+    };
+    const tagsByQuiz = groupByQuiz(allTags);
+    const mylistsByQuiz = groupByQuiz(allMylists);
+    const favoriteIds = new Set(allFavorites.map((row) => row.quiz_id));
+    const restrictedIds = new Set(allVisibleUsers.map((row) => row.quiz_id));
+    const mylistStatsM = new Map(
+      mylistStats.map((stat) => [stat.mylist_id, stat]),
     );
+    const workbookStatsM = new Map(
+      workbookStats.flatMap((stat) =>
+        stat.workbook_id === null ? [] : ([[stat.workbook_id, stat]] as const),
+      ),
+    );
+
+    return quizzes.map((q) => {
+      const targetWorkbookId = q.workbookId;
+      const workbookStats =
+        targetWorkbookId === null
+          ? undefined
+          : workbookStatsM.get(targetWorkbookId);
+
+      return {
+        qid: q.qid,
+        question: q.question,
+        answer: q.answer,
+        anotherAnswer: q.anotherAnswer,
+        creatorId: q.creatorId,
+        isPublic: !restrictedIds.has(q.id),
+        isFavorite: favoriteIds.has(q.id),
+        right: q.right || 0,
+        total: q.total || 0,
+        workbook: q.wid
+          ? {
+              wid: q.wid,
+              name: q.wbName || "",
+              date: q.wbDate,
+              creatorId: q.wbCreatorId || "",
+              total: Number(workbookStats?.total || 0),
+              corrects: Number(workbookStats?.corrects || 0),
+              wrongs: Number(workbookStats?.wrongs || 0),
+              ignored: Number(workbookStats?.ignored || 0),
+              lastPracticedAt: workbookStats?.lastPracticed
+                ? new Date(workbookStats.lastPracticed)
+                : null,
+            }
+          : null,
+        tags: (tagsByQuiz.get(q.id) ?? []).map((t) => ({
+          label: t.label,
+          created: t.created,
+          modified: t.modified,
+        })),
+        registerdMylist: (mylistsByQuiz.get(q.id) ?? []).map((m) => {
+          const stats = mylistStatsM.get(m.mylist_id);
+          return {
+            mid: m.mid,
+            name: m.name,
+            created: m.created,
+            total: Number(stats?.total || 0),
+            corrects: Number(stats?.corrects || 0),
+            wrongs: Number(stats?.wrongs || 0),
+            ignored: Number(stats?.ignored || 0),
+            lastPracticed: stats?.lastPracticed
+              ? new Date(stats.lastPracticed)
+              : null,
+          };
+        }),
+        judgement: q.judgement ?? undefined,
+        category:
+          q.categoryId == null ? [] : (categories.get(q.categoryId) ?? []),
+      };
+    });
   }
 
   async count(uid: string, option: countOption = {}): Promise<number> {
-    const client = this.clientManager.getClient();
+    const { query } = await this.filteredQuery(uid, option);
+    const result = await query
+      .select(({ fn }) => fn.countAll<number>().as("size"))
+      .executeTakeFirstOrThrow();
+    return Number(result.size);
+  }
 
-    const userId = await client
-      .selectFrom("users")
-      .select("id")
-      .where("uid", "=", uid)
-      .executeTakeFirstOrThrow()
-      .then((u) => u.id);
-
-    let query = client
+  async findQidById(id: number): Promise<string | null> {
+    const row = await this.clientManager
+      .getClient()
       .selectFrom("quizzes")
-      .leftJoin("workbooks", "quizzes.workbook_id", "workbooks.id")
-      .leftJoin("levels", "workbooks.level_id", "levels.id")
-      .innerJoin("users", "users.id", "quizzes.creator_id")
-      .leftJoin(
-        "quiz_visible_users",
-        "quiz_visible_users.quiz_id",
-        "quizzes.id"
-      )
-      .select(({ fn }) => [fn.countAll<number>().over().as("size")])
-      .where(({ eb, or }) =>
-        or([
-          eb("quiz_visible_users.user_id", "is", null),
-          eb("quiz_visible_users.user_id", "=", userId),
-        ])
-      );
-
-    if (!!option.wids && option.wids.length)
-      if (Array.isArray(option.wids))
-        query = query.where("workbooks.wid", "in", option.wids);
-      else query = query.where("workbooks.wid", "=", option.wids);
-    if (!!option.keyword && !!option.keywordOption) {
-      if (option.keywordOption === 1) {
-        query = query.where((eb) =>
-          eb.or([
-            eb("quizzes.que", "like", `%${option.keyword}%`),
-            eb("quizzes.ans", "like", `%${option.keyword}%`),
-          ])
-        );
-      } else if (option.keywordOption === 2) {
-        query = query.where("quizzes.que", "like", `%${option.keyword}%`);
-      } else {
-        query = query.where("quizzes.ans", "like", `%${option.keyword}%`);
-      }
-    }
-    if (!!option.categories) {
-      if (Array.isArray(option.categories) && option.categories.length)
-        query = query.where("quizzes.category_id", "in", option.categories);
-      else query = query.where("quizzes.category_id", "=", option.categories);
-    }
-    if (!!option.tags) {
-      if (Array.isArray(option.tags) && option.tags.length) {
-        query = query
-          .innerJoin("tagging", "tagging.quiz_id", "quizzes.id")
-          .innerJoin("tags", "tagging.tag_id", "tags.id")
-          .where("tags.label", "in", option.tags);
-      } else {
-        query = query
-          .innerJoin("tagging", "tagging.quiz_id", "quizzes.id")
-          .innerJoin("tags", "tagging.tag_id", "tags.id")
-          .where("tags.label", "=", option.tags);
-      }
-    }
-    // if (!!crctAnsRatio) {
-    //   query = query.where(sql`quiz.total_crct_ans / (quiz.total_crct_ans + quiz.total_wrng_ans + quiz.total_through_ans) * 100 BETWEEN ${crctAnsRatio[0]} AND ${crctAnsRatio[1]}`)
-    // }
-
-    if (option.isFavorite) {
-      query = query
-        .innerJoin("favorites", "favorites.quiz_id", "quizzes.id")
-        .where("favorites.user_id", "=", userId);
-    } else if (!!option.since && !!option.until) {
-      const since = dayjs(option.since).toDate();
-      const until = dayjs(option.until).toDate();
-
-      query = query
-        .innerJoin("histories", "histories.quiz_id", "quizzes.id")
-        .select([
-          "histories.judgement as judgement",
-          "histories.practiced as practiced",
-        ])
-        .where("histories.user_id", "=", userId)
-        .where(({ eb, and, between }) =>
-          !!option.judgements
-            ? and([
-                eb("histories.judgement", "in", option.judgements),
-                between("histories.practiced", since, until),
-              ])
-            : between("histories.practiced", since, until)
-        )
-        .orderBy("histories.practiced desc");
-    } else if (!!option.mid) {
-      query = query
-        .innerJoin("mylists_quizzes", "mylists_quizzes.quiz_id", "quizzes.id")
-        .innerJoin("mylists", "mylists.id", "mylists_quizzes.mylist_id")
-        .where("mylists.mid", "=", option.mid)
-        .where("mylists.user_id", "=", userId)
-        .orderBy("mylists_quizzes.registered desc");
-    }
-
-    const quizzes = await query.execute();
-
-    return !!quizzes.length ? quizzes[0].size : 0;
+      .select("qid")
+      .where("id", "=", id)
+      .executeTakeFirst();
+    return row?.qid ?? null;
   }
 
   async findByQid(qid: string): Promise<Quiz | null> {
@@ -430,119 +508,63 @@ export default class QuizInfra implements IQuizRepository, IQuizQueryService {
         "quizzes.sub_category_id as subCategoryId",
         "quizzes.total_crct_ans as right",
         sql<number>`total_crct_ans + total_through_ans + total_wrng_ans`.as(
-          "total"
+          "total",
         ),
       ])
       .where("quizzes.qid", "=", qid)
-      .executeTakeFirstOrThrow();
+      .executeTakeFirst();
 
-    const [tags] = await Promise.all([
-      client
-        .selectFrom("tagging")
-        .innerJoin("tags", "tagging.tag_id", "tags.id")
-        .select("tags.label as label")
-        .where("tagging.quiz_id", "=", quiz.quizId)
-        .execute()
-        .then((tags) => tags.map((t) => t.label)),
-    ]);
+    if (!quiz) return null;
 
     return Quiz.reconstruct(
       quiz.qid,
       quiz.question,
       quiz.answer,
-      tags,
       quiz.total,
       quiz.right || 0,
       quiz.creatorUid,
-      quiz.anotherAnswer,
       quiz.wid,
-      quiz.categoryId
+      quiz.anotherAnswer,
+      quiz.categoryId,
     );
   }
 
-  async findByTagLabel(tagLabel: string): Promise<Quiz[]> {
+  private async resolveReferences(quiz: Quiz) {
     const client = this.clientManager.getClient();
-
-    const quizIds = await client
-      .selectFrom("tagging")
-      .innerJoin("tags", "tags.id", "tagging.tag_id")
-      .select("tagging.quiz_id")
-      .where("tags.label", "=", tagLabel)
-      .execute()
-      .then((quidIds) => quidIds.map((q) => q.quiz_id));
-
-    const quizzes = await Promise.all(
-      quizIds.map(async (quizId) => {
-        const quiz = await client
-          .selectFrom("quizzes")
-          .leftJoin("workbooks", "quizzes.workbook_id", "workbooks.id")
-          .leftJoin("levels", "workbooks.level_id", "levels.id")
-          .innerJoin("users", "users.id", "quizzes.creator_id")
-          .select([
-            "quizzes.id as quizId",
-            "quizzes.qid as qid",
-            "quizzes.que as question",
-            "quizzes.ans as answer",
-            "quizzes.anoans as anotherAnswer",
-            "workbooks.wid as wid",
-            "users.uid as creatorUid",
-            "quizzes.category_id as categoryId",
-            "quizzes.sub_category_id as subCategoryId",
-            "quizzes.total_crct_ans as right",
-            sql<number>`total_crct_ans + total_through_ans + total_wrng_ans`.as(
-              "total"
-            ),
-          ])
-          .where("quizzes.id", "=", quizId)
-          .executeTakeFirstOrThrow();
-
-        const [tags] = await Promise.all([
-          client
-            .selectFrom("tagging")
-            .innerJoin("tags", "tagging.tag_id", "tags.id")
-            .select("tags.label as label")
-            .where("tagging.quiz_id", "=", quiz.quizId)
-            .execute()
-            .then((tags) => tags.map((t) => t.label)),
-        ]);
-
-        return Quiz.reconstruct(
-          quiz.qid,
-          quiz.question,
-          quiz.answer,
-          tags,
-          quiz.total,
-          quiz.right || 0,
-          quiz.creatorUid,
-          quiz.anotherAnswer,
-          quiz.wid,
-          quiz.categoryId
-        );
-      })
-    );
-
-    return quizzes;
+    const user = await client
+      .selectFrom("users")
+      .select("id")
+      .where("uid", "=", quiz.creatorUid)
+      .executeTakeFirstOrThrow();
+    const [workbook, category] = await Promise.all([
+      quiz.wid == null
+        ? undefined
+        : client
+            .selectFrom("workbooks")
+            .select("id")
+            .where("wid", "=", quiz.wid)
+            .where("creator_id", "=", user.id)
+            .executeTakeFirst(),
+      quiz.categoryId == null
+        ? undefined
+        : client
+            .selectFrom("categories")
+            .select("id")
+            .where("id", "=", quiz.categoryId)
+            .executeTakeFirst(),
+    ]);
+    if (
+      (quiz.wid != null && !workbook) ||
+      (quiz.categoryId != null && !category)
+    )
+      throw new ApiError().invalidParams("Unknown workbook or category.");
+    return { workbookId: workbook?.id ?? null, userId: user.id };
   }
 
   async save(quiz: Quiz): Promise<void> {
     const client = this.clientManager.getClient();
 
-    const [workbookId, userId] = await Promise.all([
-      client
-        .selectFrom("workbooks")
-        .select("id")
-        .where("wid", "=", quiz.wid)
-        .executeTakeFirst()
-        .then((w) => w?.id),
-
-      client
-        .selectFrom("users")
-        .select("id")
-        .where("uid", "=", quiz.creatorUid)
-        .executeTakeFirstOrThrow()
-        .then((u) => u.id),
-    ]);
-
+    const { workbookId, userId } = await this.resolveReferences(quiz);
     await client
       .insertInto("quizzes")
       .values({
@@ -550,68 +572,17 @@ export default class QuizInfra implements IQuizRepository, IQuizQueryService {
         que: quiz.question,
         ans: quiz.answer,
         anoans: quiz.anotherAnswer,
-        workbook_id: workbookId || null,
+        workbook_id: workbookId,
         creator_id: userId,
         category_id: quiz.categoryId,
       })
       .execute();
-
-    const quizId = await client
-      .selectFrom("quizzes")
-      .select("id")
-      .where("qid", "=", quiz.qid)
-      .executeTakeFirstOrThrow()
-      .then((quiz) => quiz.id);
-
-    // タグをクイズに付与
-    const tagIds = await Promise.all(
-      quiz.tagLabels.map(async (label) => {
-        return await client
-          .selectFrom("tags")
-          .select("id")
-          .where("label", "=", label)
-          .executeTakeFirstOrThrow()
-          .then((tag) => tag.id);
-      })
-    );
-
-    await Promise.all(
-      tagIds.map(async (id) =>
-        client
-          .insertInto("tagging")
-          .values({
-            tag_id: id,
-            quiz_id: quizId,
-            registered: new Date(),
-          })
-          .execute()
-      )
-    );
   }
 
-  async update(
-    quiz: Quiz,
-    tagsToAdd: string[],
-    tagsToRemove: string[]
-  ): Promise<void> {
+  async update(quiz: Quiz): Promise<void> {
     const client = this.clientManager.getClient();
 
-    const [workbookId, userId] = await Promise.all([
-      client
-        .selectFrom("workbooks")
-        .select("id")
-        .where("wid", "=", quiz.wid)
-        .executeTakeFirst()
-        .then((w) => w?.id),
-
-      client
-        .selectFrom("users")
-        .select("id")
-        .where("uid", "=", quiz.creatorUid)
-        .executeTakeFirstOrThrow()
-        .then((u) => u.id),
-    ]);
-
+    const { workbookId, userId } = await this.resolveReferences(quiz);
     await client
       .updateTable("quizzes")
       .set({
@@ -624,22 +595,10 @@ export default class QuizInfra implements IQuizRepository, IQuizQueryService {
       })
       .where("qid", "=", quiz.qid)
       .executeTakeFirstOrThrow();
-
-    for (const tag of tagsToAdd) {
-      await this.addTagToQuiz(quiz.qid, tag);
-    }
-    for (const tag of tagsToRemove) {
-      await this.removeTagFromQuiz(quiz.qid, tag);
-    }
   }
 
   async delete(quiz: Quiz): Promise<void> {
     const client = this.clientManager.getClient();
-
-    for (const tag of quiz.tagLabels) {
-      await this.removeTagFromQuiz(quiz.qid, tag);
-    }
-
     await client.deleteFrom("quizzes").where("qid", "=", quiz.qid).execute();
   }
 }

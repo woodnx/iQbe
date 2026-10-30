@@ -1,7 +1,7 @@
-import { ApiError } from "api";
+import { ApiError } from "@/http/ApiError.js";
 
-import InviteCode from "./";
-import IInviteCodeRepository from "./IInviteCodeRepository";
+import InviteCode from "./index.js";
+import IInviteCodeRepository from "./IInviteCodeRepository.js";
 
 export default class InviteCodeService {
   constructor(private inviteCodeRepository: IInviteCodeRepository) {}

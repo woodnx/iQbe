@@ -23,17 +23,14 @@ export const useTimer = (
   const [done, setDone] = useState(false);
 
   const counterTick = useCallback(() => {
-    setTime((prevTime) => {
-      const newTime = prevTime - interval;
-      if (newTime <= 0) {
-        setCounting(false);
-        setDone(false);
-        afterCallback();
-        return 0;
-      }
-      return newTime;
-    });
-  }, [counting, afterCallback]);
+    const newTime = Math.max(0, time - interval);
+    setTime(newTime);
+    if (newTime <= 0) {
+      setCounting(false);
+      setDone(false);
+      afterCallback();
+    }
+  }, [time, interval, afterCallback]);
 
   useInterval(counterTick, counting && time > 0 ? interval : null);
 

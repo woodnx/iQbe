@@ -1,7 +1,7 @@
 import { container, Lifecycle } from "tsyringe";
-import KyselyClientManager from "./interfaces/infra/kysely/KyselyClientManager";
-import { EventEmitterDomainEventPublisher } from "./interfaces/infra/DomainEvent/EventEmitterDomainEventPublisher";
-import { EventEmitterDomainEventSubscriber } from "./interfaces/infra/DomainEvent/EventEmitterDomainEventSubscriber";
+import { EventEmitterDomainEventPublisher } from "./interfaces/infra/DomainEvent/EventEmitterDomainEventPublisher.js";
+import { EventEmitterDomainEventSubscriber } from "./interfaces/infra/DomainEvent/EventEmitterDomainEventSubscriber.js";
+import KyselyClientManager from "./interfaces/infra/kysely/KyselyClientManager.js";
 
 container.register(
   "IDataAccessClientManager",

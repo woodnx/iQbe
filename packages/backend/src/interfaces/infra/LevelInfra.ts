@@ -1,6 +1,6 @@
-import Level from "@/domains/Level";
-import ILevelRepository from "@/domains/Level/ILevelRepository";
-import KyselyClientManager from "./kysely/KyselyClientManager";
+import Level from "@/domains/Level/index.js";
+import ILevelRepository from "@/domains/Level/ILevelRepository.js";
+import KyselyClientManager from "./kysely/KyselyClientManager.js";
 
 export default class LevelInfra implements ILevelRepository {
   constructor(private clientManager: KyselyClientManager) {}

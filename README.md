@@ -1,6 +1,6 @@
 <div align="center">
   <img src="./assets/iqbe.png" alt="iQbe logo" width="100" align="middle"/>
-  <img src="./assets/iqbe-name.png" alt="iQbe logo" width="100" align="middle"/>	
+  <img src="./assets/iqbe-name.png" alt="iQbe logo" width="100" align="middle"/>
 </div>
 
 <div align="center">
@@ -35,4 +35,8 @@ This software uses following OSS.
 - Routing System: [React Router](https://reactrouter.com/en/main)
 - UI Framework: [Mantine](https://v6.mantine.dev/)
 - Icons: [Tabler Icons](https://tablericons.com/)
-- Server: [Express](https://expressjs.com/)
+- Server: [Hono](https://hono.dev/)
+
+## API development
+
+The backend Hono routes define the API contract. The frontend uses `hc<AppType>` from `hono/client` and infers request and JSON response types from `backend/rpc`. Run `pnpm typecheck` to build backend declarations and check the frontend; `pnpm dev` builds them initially and updates them while watching. `pnpm build` builds the backend before the frontend and assembles the static site. No schema generation step is needed.

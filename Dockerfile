@@ -12,7 +12,6 @@ RUN corepack enable && corepack prepare pnpm@10.18.3 --activate
 
 # 依存解決に必要なファイルだけ先にコピー
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
-COPY packages/api/package.json packages/api/package.json
 COPY packages/backend/package.json packages/backend/package.json
 COPY packages/frontend/package.json packages/frontend/package.json
 
@@ -38,7 +37,7 @@ RUN --mount=type=cache,id=pnpm-store,target=/pnpm/store \
 
 # build 用にダミーの.env ファイルを作成
 RUN mkdir -p .config && echo "JWT_SECRET_KEY=dummy" > .config/.env
-RUN pnpm run build
+RUN pnpm run build && rm -f .config/.env
 
 ############################
 # runtime stage (Prod)

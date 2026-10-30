@@ -3,6 +3,13 @@ import psTree from "ps-tree";
 
 const pids = [];
 
+const initialBuild = spawnSync(
+  "pnpm",
+  ["--filter", "./packages/backend", "run", "build"],
+  { stdio: "inherit" },
+);
+if (initialBuild.status !== 0) process.exit(initialBuild.status ?? 1);
+
 // spawnSync('pnpm', [ 'run', 'clean' ], { stdio: 'inherit' });
 
 const backProc = spawn("pnpm", [

@@ -1,5 +1,5 @@
-import Tag from "@/domains/Tag";
-import ITagRepository from "@/domains/Tag/ITagRepository";
+import Tag from "@/domains/Tag/index.js";
+import ITagRepository from "@/domains/Tag/ITagRepository.js";
 
 export class InMemoryTagInfra implements ITagRepository {
   public DB: {

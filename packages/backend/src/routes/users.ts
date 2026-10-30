@@ -1,5 +1,5 @@
-import express, { Router } from "express";
+import { Hono } from "hono";
+import type { AppEnv } from "@/http/context.js";
 
-const router: Router = express.Router();
-
-module.exports = router;
+const router = new Hono<AppEnv>();
+export default router;

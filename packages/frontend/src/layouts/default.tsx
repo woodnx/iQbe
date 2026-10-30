@@ -1,8 +1,15 @@
+import { useIsMobile } from "@/contexts/isMobile";
+import UserInfoMenu from "@/features/user/components/UserInfoMenu";
+import useHeaderHeight from "@/hooks/useHeaderHeight";
+import Logo from "@/shared/components/Logo";
+import NavbarLink from "@/shared/components/NavbarLink";
+import { readResponse, rpc } from "@/utils/client";
 import {
   ActionIcon,
   AppShell,
   Center,
   Container,
+  Divider,
   Drawer,
   Group,
   Loader,
@@ -10,9 +17,8 @@ import {
 import { useDisclosure } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
 import {
-  IconActivity,
-  IconBook,
   IconBooks,
+  IconDashboard,
   IconHistory,
   IconHome,
   IconMenu2,
@@ -21,22 +27,15 @@ import {
   IconSearch,
   IconStar,
 } from "@tabler/icons-react";
+import { useQuery } from "@tanstack/react-query";
 import { Outlet, useNavigate, useRouterState } from "@tanstack/react-router";
-import { useLayoutEffect, useState } from "react";
-import NavbarLink from "@/components/NavbarLink";
-import UserInfoMenu from "@/components/UserInfoMenu";
-import { useIsMobile } from "@/contexts/isMobile";
-import useHeaderHeight from "@/hooks/useHeaderHeight";
-import { useWorkbooks } from "@/hooks/useWorkbooks";
-
-import Logo from "../components/Logo";
-import { useMylists } from "../hooks/useMylists";
+import { Fragment, useLayoutEffect, useState } from "react";
 import { checkAuth } from "../plugins/auth";
 
 const checkPathname = (pathname: string) => {
   if (pathname === "/") return "/";
-  else if (pathname === "/search") return "/search";
-  else if (pathname === "/practice") return "/practice";
+  else if (pathname === "/library") return "/library";
+  else if (pathname === "/training") return "/training";
   else if (pathname === "/favorite") return "/favorite";
   else if (pathname === "/history") return "/history";
   else if (pathname === "/setting") return "/setting";
@@ -54,42 +53,62 @@ export default function DefaultLayout() {
   const { pathname } = useRouterState({
     select: (state) => state.location,
   });
-  const { mylists } = useMylists(!loading);
-  const { workbooks } = useWorkbooks(false, !loading);
   const isMobile = useIsMobile();
   const { headerHeight } = useHeaderHeight();
 
-  const mockMylists = mylists?.map((m) => ({
-    label: m.name,
-    link: `${m.mid}`,
-  }));
-
-  const mockWorkbooks = workbooks?.map((w) => ({
-    label: w.name,
-    link: `${w.wid}`,
-  }));
+  const { data: workbooks } = useQuery({
+    queryKey: ["get", "/workbooks"],
+    queryFn: ({ signal }) =>
+      rpc.api.workbooks
+        .$get({}, { init: { signal: signal } })
+        .then(readResponse),
+  });
+  const { data: mylists } = useQuery({
+    queryKey: ["get", "/mylists"],
+    queryFn: ({ signal }) =>
+      rpc.api.mylists.$get({}, { init: { signal: signal } }).then(readResponse),
+  });
 
   const mockdata = [
     {
-      label: "アクティビティ",
-      icon: IconActivity,
+      label: "ダッシュボード",
+      icon: IconDashboard,
       link: "/",
-    },
-    {
-      label: "問題集",
-      icon: IconBook,
-      link: "/workbook",
-      links: mockWorkbooks,
     },
     {
       label: "演習",
       icon: IconSchool,
-      link: "/practice",
+      link: "/training",
     },
     {
       label: "作問",
       icon: IconPencil,
       link: "/create",
+    },
+    {
+      setDivider: true,
+      label: "問題集",
+      icon: IconBooks,
+      isTab: true,
+      link: "/workbook",
+      links: [
+        ...(workbooks?.map((w) => ({
+          label: w.name,
+          link: `${w.wid}`,
+        })) || []),
+      ],
+    },
+    {
+      label: "マイリスト",
+      icon: IconBooks,
+      isTab: true,
+      link: "/mylist",
+      links: [
+        ...(mylists?.map((m) => ({
+          label: m.name,
+          link: `${m.mid}`,
+        })) || []),
+      ],
     },
     {
       label: "お気に入り",
@@ -100,13 +119,6 @@ export default function DefaultLayout() {
       label: "履歴",
       icon: IconHistory,
       link: "/history",
-    },
-    {
-      label: "マイリスト",
-      icon: IconBooks,
-      link: "/mylist",
-      isTab: true,
-      links: [...(mockMylists || [])],
     },
   ];
 
@@ -138,7 +150,7 @@ export default function DefaultLayout() {
     return () => {
       ignore = true;
     };
-  }, []);
+  }, [navigate]);
 
   const Navbar = () => (
     <AppShell.Navbar h="100%">
@@ -146,23 +158,25 @@ export default function DefaultLayout() {
         <Group justify="space-between">
           <Logo horizonal width={100} mb="xs" />
         </Group>
-        {mockdata.map((i, idx) => (
-          <NavbarLink
-            {...i}
-            key={idx}
-            isActive={activeIdx == idx}
-            activeLink={activeLink}
-            onNavigate={(link, linksIdx) => {
-              navigate({ to: link });
-              setActiveLink(
-                linksIdx !== undefined
-                  ? `${activeIdx}.${linksIdx}`
-                  : `${activeIdx}`,
-              );
-              close();
-            }}
-            my={5}
-          />
+        {mockdata.map(({ setDivider, ...i }, idx) => (
+          <Fragment key={i.link}>
+            {setDivider && <Divider />}
+            <NavbarLink
+              {...i}
+              isActive={activeIdx == idx}
+              activeLink={activeLink}
+              onNavigate={(link, linksIdx) => {
+                navigate({ to: link });
+                setActiveLink(
+                  linksIdx !== undefined
+                    ? `${activeIdx}.${linksIdx}`
+                    : `${activeIdx}`,
+                );
+                close();
+              }}
+              my={5}
+            />
+          </Fragment>
         ))}
       </AppShell.Section>
       <AppShell.Section p="md">
@@ -265,7 +279,7 @@ export default function DefaultLayout() {
           <Footer />
 
           <AppShell.Main>
-            <Container size="lg" px={0}>
+            <Container size="md" px={0}>
               <Outlet />
             </Container>
           </AppShell.Main>

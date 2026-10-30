@@ -1,88 +1,65 @@
-import express from "express";
-
-import { db } from "@/database";
-import MylistService from "@/domains/Mylist/MylistService";
-import MylistController from "@/interfaces/controllers/MylistController";
-import KyselyClientManager from "@/interfaces/infra/kysely/KyselyClientManager";
-import MylistInfra from "@/interfaces/infra/MylistInfra";
-import dayjs from "@/plugins/day";
+import { Hono } from "hono";
+import RegisterUseCase from "@/applications/usecases/RegisterUseCase.js";
+import MylistService from "@/domains/Mylist/MylistService.js";
+import { ApiError } from "@/http/ApiError.js";
+import type { AppEnv } from "@/http/context.js";
+import { validate } from "@/http/validate.js";
+import MylistController from "@/interfaces/controllers/Mylist/MylistController.js";
+import {
+  deleteMylists,
+  deleteMylistsQuiz,
+  postMylists,
+  putMylists,
+  putMylistsQuiz,
+} from "@/interfaces/controllers/Mylist/schema.js";
+import CategoryInfra from "@/interfaces/infra/CategoryInfra.js";
+import KyselyClientManager from "@/interfaces/infra/kysely/KyselyClientManager.js";
+import MylistInfra from "@/interfaces/infra/MylistInfra.js";
+import QuizInfra from "@/interfaces/infra/QuizInfra.js";
+import RegisteredQuizInfra from "@/interfaces/infra/ResisteredQuizInfra.js";
 
 const clientManager = new KyselyClientManager();
 const mylistInfra = new MylistInfra(clientManager);
 
 const mylistController = new MylistController(mylistInfra, new MylistService());
 
-const router = express.Router();
+const quizInfra = new QuizInfra(
+  clientManager,
+  new CategoryInfra(clientManager),
+);
+const registration = new RegisterUseCase(
+  mylistInfra,
+  quizInfra,
+  new RegisteredQuizInfra(clientManager),
+);
 
-router.get("/", mylistController.get());
-router.post("/", mylistController.post());
-router.put("/", mylistController.put());
-router.delete("/", mylistController.delete());
+async function resolveQid(quizId: number): Promise<string> {
+  const qid = await quizInfra.findQidById(quizId);
+  if (qid == null) throw new ApiError().notFound("Quiz not found.");
+  return qid;
+}
 
-router.put("/quiz", async (req, res) => {
-  const quiz_id = req.body.quizId;
-  const mid = req.body.mid;
-  const registered = dayjs().format("YYYY-MM-DD HH:mm:ss");
-
-  if (!quiz_id || !mid) {
-    res.status(400).send("Undefined quiz id or mylist id");
-    return;
-  }
-
-  try {
-    const inserts = await db.transaction().execute(async (trx) => {
-      const mylist_id = (
-        await trx
-          .selectFrom("mylists")
-          .select("id")
-          .where("mid", "=", mid)
-          .executeTakeFirstOrThrow()
-      ).id;
-
-      const data = {
-        quiz_id,
-        mylist_id,
-        registered,
-      };
-
-      return await trx.insertInto("mylists_quizzes").values(data).execute();
-    });
-
-    const message = `${inserts.length} new quizzes saved into mylist (mylist: ${mid})`;
-    res.status(201).send(message);
-  } catch (e) {
-    res.status(400).send("An Error Occurd");
-    console.error(e);
-  }
-});
-
-router.delete("/quiz", async (req, res) => {
-  const quizId = req.body.quizId;
-  const mid = req.body.mid;
-
-  try {
-    await db.transaction().execute(async (trx) => {
-      const mylsitId = (
-        await trx
-          .selectFrom("mylists")
-          .select("id")
-          .where("mid", "=", mid)
-          .executeTakeFirstOrThrow()
-      )?.id;
-
-      const deletes = await trx
-        .deleteFrom("mylists_quizzes")
-        .where(({ and, eb }) =>
-          and([eb("mylist_id", "=", mylsitId), eb("quiz_id", "=", quizId)]),
-        )
-        .executeTakeFirst();
-    });
-
-    res.status(204).send();
-  } catch (e) {
-    res.status(400).send("An Error Occured");
-    console.error(e);
-  }
-});
-
-module.exports = router;
+const router = new Hono<AppEnv>()
+  .get("/", mylistController.get())
+  .post("/", validate("json", postMylists.json), mylistController.post())
+  .put("/", validate("json", putMylists.json), mylistController.put())
+  .delete("/", validate("json", deleteMylists.json), mylistController.delete())
+  .put("/quiz", validate("json", putMylistsQuiz.json), async (c) => {
+    const { quizId, mid } = c.req.valid("json");
+    await registration.registerQuizToMylist(
+      await resolveQid(quizId),
+      mid,
+      c.get("user").uid,
+    );
+    return c.text(`1 new quizzes saved into mylist (mylist: ${mid})`, 201);
+  })
+  .delete("/quiz", validate("json", deleteMylistsQuiz.json), async (c) => {
+    const { quizId, mid } = c.req.valid("json");
+    await registration.unregisterQuizFromMylist(
+      await resolveQid(quizId),
+      mid,
+      c.get("user").uid,
+    );
+    return c.body(null, 204);
+  });
+export default router;

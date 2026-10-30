@@ -1,7 +1,7 @@
-import ResetPassword from "@/domains/ResetPassword";
-import IResetPasswordRepository from "@/domains/ResetPassword/ResetPasswordRepository";
-import KyselyClientManager from "./kysely/KyselyClientManager";
-import nodemailer from "@/plugins/nodemailer";
+import ResetPassword from "@/domains/ResetPassword/index.js";
+import IResetPasswordRepository from "@/domains/ResetPassword/ResetPasswordRepository.js";
+import KyselyClientManager from "./kysely/KyselyClientManager.js";
+import nodemailer from "@/plugins/nodemailer.js";
 
 export default class ResetPasswordInfra implements IResetPasswordRepository {
   constructor(private clientManager: KyselyClientManager) {}

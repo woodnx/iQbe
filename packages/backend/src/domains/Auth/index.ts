@@ -1,6 +1,6 @@
-import AccessToken from "../AccessToken";
-import RefreshToken from "../RefreshToken";
-import User from "../User";
+import AccessToken from "../AccessToken/index.js";
+import RefreshToken from "../RefreshToken/index.js";
+import User from "../User/index.js";
 
 export default class Auth {
   constructor(

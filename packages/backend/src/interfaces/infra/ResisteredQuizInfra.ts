@@ -1,6 +1,6 @@
-import RegisteredQuiz from "@/domains/RegisteredQuiz";
-import IRegisteredQuizRepository from "@/domains/RegisteredQuiz/IResiteredQuizRepository";
-import KyselyClientManager from "./kysely/KyselyClientManager";
+import IRegisteredQuizRepository from "@/domains/RegisteredQuiz/IResiteredQuizRepository.js";
+import RegisteredQuiz from "@/domains/RegisteredQuiz/index.js";
+import KyselyClientManager from "./kysely/KyselyClientManager.js";
 
 export default class RegisteredQuizInfra implements IRegisteredQuizRepository {
   constructor(private clientManager: KyselyClientManager) {}
@@ -26,7 +26,7 @@ export default class RegisteredQuizInfra implements IRegisteredQuizRepository {
         .then((mylist) => mylist.id),
     ]);
 
-    client
+    await client
       .insertInto("mylists_quizzes")
       .values({
         quiz_id: quizId,
@@ -38,8 +38,6 @@ export default class RegisteredQuizInfra implements IRegisteredQuizRepository {
 
   async delete(registeredQuiz: RegisteredQuiz): Promise<void> {
     const client = this.clientManager.getClient();
-
-    const now = new Date();
 
     const [quizId, mylistId] = await Promise.all([
       client
@@ -57,7 +55,7 @@ export default class RegisteredQuizInfra implements IRegisteredQuizRepository {
         .then((mylist) => mylist.id),
     ]);
 
-    client
+    await client
       .deleteFrom("mylists_quizzes")
       .where(({ eb, and }) =>
         and([eb("quiz_id", "=", quizId), eb("mylist_id", "=", mylistId)]),

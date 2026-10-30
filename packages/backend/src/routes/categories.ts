@@ -1,16 +1,26 @@
-import express from "express";
-
-import { AddCategoryPresetUseCase } from "@/applications/usecases/AddCategoryPresetUseCase";
-import { CreateCategoryUseCase } from "@/applications/usecases/CreateCategoryUseCase";
-import { DeleteCategoryUseCase } from "@/applications/usecases/DeleteCategoryUseCase";
-import { GetCategoriesUseCase } from "@/applications/usecases/GetCategoriesUseCase";
-import { GetCategoryChainUseCase } from "@/applications/usecases/GetCategoryChainUseCase";
-import { GetCategoryPresetListUseCase } from "@/applications/usecases/GetCategoryPresetListUseCase";
-import { UpdateCategoryUseCase } from "@/applications/usecases/UpdateCategoryUseCase";
-import CategoryController from "@/interfaces/controllers/CategoryController";
-import CategoryInfra from "@/interfaces/infra/CategoryInfra";
-import KyselyClientManager from "@/interfaces/infra/kysely/KyselyClientManager";
-import KyselyTransactionManager from "@/interfaces/infra/kysely/KyselyTransactionManager";
+import { Hono } from "hono";
+import { AddCategoryPresetUseCase } from "@/applications/usecases/Category/AddCategoryPresetUseCase.js";
+import { CreateCategoryUseCase } from "@/applications/usecases/Category/CreateCategoryUseCase.js";
+import { DeleteCategoryUseCase } from "@/applications/usecases/Category/DeleteCategoryUseCase.js";
+import { GetCategoriesUseCase } from "@/applications/usecases/Category/GetCategoriesUseCase.js";
+import { GetCategoryChainUseCase } from "@/applications/usecases/Category/GetCategoryChainUseCase.js";
+import { GetCategoryPresetListUseCase } from "@/applications/usecases/Category/GetCategoryPresetListUseCase.js";
+import { UpdateCategoryUseCase } from "@/applications/usecases/Category/UpdateCategoryUseCase.js";
+import type { AppEnv } from "@/http/context.js";
+import { validate } from "@/http/validate.js";
+import CategoryController from "@/interfaces/controllers/Category/CategoryController.js";
+import {
+  deleteCategoriesId,
+  getCategories,
+  getCategoriesId,
+  getCategoriesPreset,
+  postCategories,
+  postCategoriesPreset,
+  putCategoriesId,
+} from "@/interfaces/controllers/Category/schema.js";
+import CategoryInfra from "@/interfaces/infra/CategoryInfra.js";
+import KyselyClientManager from "@/interfaces/infra/kysely/KyselyClientManager.js";
+import KyselyTransactionManager from "@/interfaces/infra/kysely/KyselyTransactionManager.js";
 
 const clientManager = new KyselyClientManager();
 const categoryInfra = new CategoryInfra(clientManager);
@@ -26,15 +36,29 @@ const categoryController = new CategoryController(
   new AddCategoryPresetUseCase(transactionManager, categoryInfra),
 );
 
-const router = express.Router();
-
-router.get("/", categoryController.get());
-router.post("/", categoryController.post());
-router.get("/:id", categoryController.getFromId());
-router.put("/:id", categoryController.put());
-router.delete("/:id", categoryController.delete());
-
-router.get("/preset", categoryController.getPreset());
-router.post("/preset", categoryController.addFromPreset());
-
-module.exports = router;
+const router = new Hono<AppEnv>()
+  .get("/", categoryController.get())
+  .post("/", validate("json", postCategories.json), categoryController.post())
+  .get("/preset", categoryController.getPreset())
+  .post(
+    "/preset",
+    validate("json", postCategoriesPreset.json),
+    categoryController.addFromPreset(),
+  )
+  .get(
+    "/:id",
+    validate("param", getCategoriesId.param),
+    categoryController.getFromId(),
+  )
+  .put(
+    "/:id",
+    validate("param", putCategoriesId.param),
+    validate("json", putCategoriesId.json),
+    categoryController.put(),
+  )
+  .delete(
+    "/:id",
+    validate("param", deleteCategoriesId.param),
+    categoryController.delete(),
+  );
+export default router;

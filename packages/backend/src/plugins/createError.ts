@@ -1,6 +1,6 @@
-import { components } from "api/schema";
+import type { ErrorSchemaDTO as ApiErrorSchemaDTO } from "@/types/dto.js";
 
-type Error = components["schemas"]["Error"];
+type Error = ApiErrorSchemaDTO;
 
 export const createError = {
   invalidParams: (detail?: string): Error => {

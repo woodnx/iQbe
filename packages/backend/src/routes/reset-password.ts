@@ -1,12 +1,16 @@
-import express from "express";
-import ResetPasswordController from "@/interfaces/controllers/ResetPasswordController";
-import ResetPasswordUseCase from "@/applications/usecases/ResetPasswordUseCase";
-import KyselyClientManager from "@/interfaces/infra/kysely/KyselyClientManager";
-import KyselyTransactionManager from "@/interfaces/infra/kysely/KyselyTransactionManager";
-import AuthService from "@/domains/Auth/AuthService";
-import ResetPasswordService from "@/domains/ResetPassword/ResetPasswordService";
-import ResetPasswordInfra from "@/interfaces/infra/ResetPasswordInfra";
-import UserInfra from "@/interfaces/infra/UserInfra";
+import { Hono } from "hono";
+import ResetPasswordUseCase from "@/applications/usecases/ResetPasswordUseCase.js";
+import AuthService from "@/domains/Auth/AuthService.js";
+import ResetPasswordService from "@/domains/ResetPassword/ResetPasswordService.js";
+import type { AppEnv } from "@/http/context.js";
+import { validate } from "@/http/validate.js";
+import ResetPasswordController from "@/interfaces/controllers/ResetPassword/ResetPasswordController.js";
+import { postResetPassword } from "@/interfaces/controllers/ResetPassword/schema.js";
+import KyselyClientManager from "@/interfaces/infra/kysely/KyselyClientManager.js";
+import KyselyTransactionManager from "@/interfaces/infra/kysely/KyselyTransactionManager.js";
+import ResetPasswordInfra from "@/interfaces/infra/ResetPasswordInfra.js";
+import RefreshTokensInfra from "@/interfaces/infra/RefreshTokensInfra.js";
+import UserInfra from "@/interfaces/infra/UserInfra.js";
 
 const kyselyClientManager = new KyselyClientManager();
 const resetPasswordController = new ResetPasswordController(
@@ -16,11 +20,13 @@ const resetPasswordController = new ResetPasswordController(
     new ResetPasswordService(),
     new ResetPasswordInfra(kyselyClientManager),
     new UserInfra(kyselyClientManager),
+    new RefreshTokensInfra(kyselyClientManager),
   ),
 );
 
-const router = express.Router();
-
-router.post("/", resetPasswordController.reset());
-
-module.exports = router;
+const router = new Hono<AppEnv>().post(
+  "/",
+  validate("json", postResetPassword.json),
+  resetPasswordController.reset(),
+);
+export default router;

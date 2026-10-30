@@ -1,12 +1,15 @@
-import { components, paths } from "api/schema";
+import type {
+  QuizDTO as ApiQuizDTO,
+  QuizFilter as ApiQuizFilter,
+} from "@/types/dto.js";
 
-type QuizDTO = components["schemas"]["Quiz"];
+type QuizDTO = ApiQuizDTO;
 
-export type findOption = paths["/quizzes"]["get"]["parameters"]["query"] & {};
-export type countOption =
-  paths["/quizzes/size"]["get"]["parameters"]["query"] & {};
+export type findOption = ApiQuizFilter & {};
+export type countOption = ApiQuizFilter & {};
 
 export default interface IQuizQueryService {
   findMany(uid: string, option?: findOption): Promise<QuizDTO[]>;
+  findByQids(uid: string, qids: string[]): Promise<QuizDTO[]>;
   count(uid: string, option?: countOption): Promise<number>;
 }

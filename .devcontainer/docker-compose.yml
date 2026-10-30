@@ -1,24 +1,32 @@
-version: '3.8'
+version: "3.8"
 
 services:
   app:
-    build: 
+    build:
       context: .
       dockerfile: Dockerfile
+    container_name: iqbe-dev
     command: sleep infinity
-    network_mode: service:db
+    depends_on:
+      - db
     volumes:
       - ../:/iQbe:cached
-    
+      - /var/run/docker.sock:/var/run/docker.sock
+    env_file:
+      - dev.env
+    environment:
+      - TESTCONTAINERS_HOST_OVERRIDE=host.docker.internal
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
   db:
     image: mysql:9.1
-    container_name: iqbe-db
+    container_name: iqbe-db-dev
     restart: unless-stopped
     volumes:
       - mysql-data:/var/lib/mysql
       - ../db/conf.d:/etc/mysql/conf.d
     env_file:
       - dev.env
-    
+
 volumes:
   mysql-data:

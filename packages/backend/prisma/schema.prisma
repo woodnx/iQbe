@@ -61,6 +61,8 @@ model histories {
 
   @@id([user_id, quiz_id, practiced])
   @@index([quiz_id], map: "quiz_id")
+  @@index([user_id, practiced], map: "histories_user_practiced_idx")
+  @@index([practiced, user_id], map: "histories_practiced_user_idx")
 }
 
 model invite_codes {
@@ -94,7 +96,7 @@ model mylists {
   name            String            @default("") @db.VarChar(128)
   created         DateTime          @db.DateTime(0)
   attr            Int
-  mid             String            @default("") @db.VarChar(20)
+  mid             String            @unique @default("") @db.VarChar(20)
   users           users             @relation(fields: [user_id], references: [id], onUpdate: Restrict, map: "mylists_ibfk_1")
   mylists_quizzes mylists_quizzes[]
 
@@ -163,7 +165,7 @@ model quiz_visible_users {
 
 model quizzes {
   id                 BigInt               @id @default(autoincrement()) @db.UnsignedBigInt
-  qid                String               @db.VarChar(64) @default("")
+  qid                String               @unique @db.VarChar(64) @default("")
   workbook_id        Int?
   que                String               @db.VarChar(2048)
   ans                String               @db.VarChar(256)
@@ -320,10 +322,14 @@ model workbooks {
   name       String    @db.VarChar(255) @default("")
   date       DateTime? @db.DateTime(0)
   level_id   Int?
-  wid        String    @db.VarChar(20)
+  wid        String    @unique @db.VarChar(20)
   creator_id BigInt    @db.UnsignedBigInt
   levels     levels?   @relation(fields: [level_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "workbooks_ibfk_1")
   users      users?    @relation(fields: [creator_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
   @@index([level_id], map: "level_id")
+}
+
+model registration_lock {
+  id Int @id
 }

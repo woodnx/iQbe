@@ -1,47 +1,31 @@
-import type { Request, Response, NextFunction } from "express";
-import { ApiError } from "api";
-import { JsonWebTokenError, TokenExpiredError } from "jsonwebtoken";
+import { createMiddleware } from "hono/factory";
+import jwt from "jsonwebtoken";
+import { db } from "@/database.js";
+import { ApiError } from "@/http/ApiError.js";
+import type { AppEnv } from "@/http/context.js";
+import { verifyAccessToken } from "@/plugins/jsonwebtoken.js";
 
-import { db } from "@/database";
-import { createError } from "@/plugins/createError";
-import { verifyAccessToken } from "@/plugins/jsonwebtoken";
-
-// ユーザ認証ミドルウェア
-export default async function (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) {
-  // パスしたIDトークンを取得
-  const idToken = req.headers.authorization;
-
-  if (!idToken) {
-    return next(createError.noToken());
-  }
-
+export default createMiddleware<AppEnv>(async (c, next) => {
+  const token = c.req.header("authorization");
+  if (!token) throw new ApiError().noToken();
   try {
-    // idTokenを検証
-    const { uid, exp, iat } = await verifyAccessToken(idToken);
-
+    const { uid, exp, iat } = await verifyAccessToken(token);
     const user = await db
       .selectFrom("users")
       .select(["id as userId", "uid", "username", "permission"])
       .where("uid", "=", uid)
-      .executeTakeFirstOrThrow();
-
-    req.user = {
+      .executeTakeFirst();
+    if (!user) throw new ApiError().invalidToken();
+    c.set("user", {
       ...user,
       exp,
       iat,
-      isSuperUser: user.permission == "SUPER_USER",
-    };
-
-    next();
+      isSuperUser: user.permission === "SUPER_USER",
+    });
   } catch (e) {
-    if (e instanceof TokenExpiredError) {
-      next(new ApiError().expiredToken());
-    } else if (e instanceof JsonWebTokenError) {
-      next(new ApiError().invalidToken());
-    }
+    if (e instanceof jwt.TokenExpiredError) throw new ApiError().expiredToken();
+    if (e instanceof jwt.JsonWebTokenError) throw new ApiError().invalidToken();
+    throw e;
   }
-}
+  await next();
+});

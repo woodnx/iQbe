@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import {
   Button,
   Center,
@@ -8,9 +7,10 @@ import {
   Title,
 } from "@mantine/core";
 import { isNotEmpty, matchesField, useForm } from "@mantine/form";
-import axios from "@/plugins/axios";
-import { useSetRequestResetPassword } from "@/contexts/requestResetPassword";
 import { useNavigate, useSearch } from "@tanstack/react-router";
+import { useEffect } from "react";
+import { useSetRequestResetPassword } from "@/contexts/requestResetPassword";
+import { readResponse, rpc } from "@/utils/client";
 
 interface SubmitValue {
   username: string;
@@ -39,14 +39,17 @@ export default function ResetPassword() {
   });
 
   const submit = async (v: SubmitValue) => {
-    const message = await axios
-      .post("/reset-password", {
-        token,
-        newPassword: v.newPassword,
+    if (!token) return;
+    const message = await rpc.api["reset-password"]
+      .$post({
+        json: {
+          token,
+          newPassword: v.newPassword,
+        },
       })
-      .then((res) => res.data);
+      .then(readResponse);
 
-    if (message == "succeed reset password") {
+    if (message == "succeed resetting your password") {
       localStorage.setItem("uid", "");
       localStorage.setItem("accessToken", "");
       localStorage.setItem("refreshToken", "");

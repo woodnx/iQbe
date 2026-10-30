@@ -1,5 +1,5 @@
-import Workbook from "@/domains/Workbook";
-import IWorkbookRepository from "@/domains/Workbook/IWorkbookRepository";
+import Workbook from "@/domains/Workbook/index.js";
+import IWorkbookRepository from "@/domains/Workbook/IWorkbookRepository.js";
 
 export class InMemoryWorkbookInfra implements IWorkbookRepository {
   public DB: {
@@ -28,7 +28,9 @@ export class InMemoryWorkbookInfra implements IWorkbookRepository {
     this.DB[workbook.wid] = workbook;
   }
 
-  async delete(wid: string): Promise<void> {
+  async delete(wid: string, uid: string): Promise<boolean> {
+    if (this.DB[wid]?.creatorUid !== uid) return false;
     delete this.DB[wid];
+    return true;
   }
 }

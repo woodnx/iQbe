@@ -1,9 +1,20 @@
-import Tag from "@/domains/Tag";
-import ITagRepository from "@/domains/Tag/ITagRepository";
-import KyselyClientManager from "./kysely/KyselyClientManager";
+import ITagRepository from "@/domains/Tag/ITagRepository.js";
+import Tag from "@/domains/Tag/index.js";
+import KyselyClientManager from "./kysely/KyselyClientManager.js";
 
 export default class TagInfra implements ITagRepository {
   constructor(private clientManager: KyselyClientManager) {}
+
+  private async countTagUsage(tagId: number): Promise<number> {
+    const client = this.clientManager.getClient();
+
+    return client
+      .selectFrom("tagging")
+      .select(({ fn }) => [fn.count("tag_id").as("count")])
+      .where("tag_id", "=", tagId)
+      .executeTakeFirst()
+      .then((result) => (!!result ? Number(result.count) : 0));
+  }
 
   async findByLabel(label: string): Promise<Tag | null> {
     const client = this.clientManager.getClient();
@@ -16,12 +27,7 @@ export default class TagInfra implements ITagRepository {
 
     if (!tag) return null;
 
-    const usageCount = await client
-      .selectFrom("tagging")
-      .select(({ fn }) => [fn.count("tag_id").as("count")])
-      .where("tag_id", "=", tag.id)
-      .executeTakeFirst()
-      .then((result) => (!!result ? Number(result.count) : 0));
+    const usageCount = await this.countTagUsage(tag.id);
 
     return Tag.reconstruct(tag.id, tag.label, tag.created, usageCount);
   }
@@ -39,12 +45,7 @@ export default class TagInfra implements ITagRepository {
 
     return Promise.all(
       tags.map(async (tag) => {
-        const usageCount = await client
-          .selectFrom("tagging")
-          .select(({ fn }) => [fn.count("tag_id").as("count")])
-          .where("tag_id", "=", tag.id)
-          .executeTakeFirst()
-          .then((result) => (!!result ? Number(result.count) : 0));
+        const usageCount = await this.countTagUsage(tag.id);
 
         return Tag.reconstruct(tag.id, tag.label, tag.created, usageCount);
       }),
@@ -70,6 +71,21 @@ export default class TagInfra implements ITagRepository {
   async delete(label: string): Promise<void> {
     const client = this.clientManager.getClient();
 
-    await client.deleteFrom("tags").where("label", "=", label).execute();
+    // Usage is derived from tagging in MySQL; do not remove a label still
+    // referenced by another quiz after this quiz has detached it.
+    await client
+      .deleteFrom("tags")
+      .where("label", "=", label)
+      .where((eb) =>
+        eb.not(
+          eb.exists(
+            eb
+              .selectFrom("tagging")
+              .select("tag_id")
+              .whereRef("tagging.tag_id", "=", "tags.id"),
+          ),
+        ),
+      )
+      .execute();
   }
 }

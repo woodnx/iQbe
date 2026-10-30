@@ -1,4 +1,4 @@
-import InviteCode from ".";
+import InviteCode from "./index.js";
 
 export default interface IInviteCodeRepository {
   findMany(query?: { status?: number; sort?: string }): Promise<InviteCode[]>;

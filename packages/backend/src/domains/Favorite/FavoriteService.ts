@@ -1,7 +1,7 @@
-import Favorite from ".";
-import IQuizRepository from "../Quiz/IQuizRepository";
-import IUserRepository from "../User/IUserRepository";
-import IFavoriteRepository from "./IFavoriteRepository";
+import Favorite from "./index.js";
+import IQuizRepository from "../Quiz/IQuizRepository.js";
+import IUserRepository from "../User/IUserRepository.js";
+import IFavoriteRepository from "./IFavoriteRepository.js";
 
 export default class FavoriteService {
   constructor(

@@ -1,14 +1,21 @@
-import express from "express";
-
-import AuthUseCase from "@/applications/usecases/AuthUseCase";
-import InviteCodeInfra from "@/interfaces/infra/InviteCodeInfra";
-import KyselyClientManager from "@/interfaces/infra/kysely/KyselyClientManager";
-import KyselyTransactionManager from "@/interfaces/infra/kysely/KyselyTransactionManager";
-import RefreshTokensInfra from "@/interfaces/infra/RefreshTokensInfra";
-import UserInfra from "@/interfaces/infra/UserInfra";
-import AuthController from "@/interfaces/controllers/AuthController";
-
-const router = express.Router();
+import { Hono } from "hono";
+import AuthUseCase from "@/applications/usecases/AuthUseCase.js";
+import type { AppEnv } from "@/http/context.js";
+import { validate } from "@/http/validate.js";
+import AuthController from "@/interfaces/controllers/Auth/AuthController.js";
+import {
+  postAuthAvailable,
+  postAuthLogin,
+  postAuthLogout,
+  postAuthRegister,
+  postAuthSignup,
+  postAuthToken,
+} from "@/interfaces/controllers/Auth/schema.js";
+import InviteCodeInfra from "@/interfaces/infra/InviteCodeInfra.js";
+import KyselyClientManager from "@/interfaces/infra/kysely/KyselyClientManager.js";
+import KyselyTransactionManager from "@/interfaces/infra/kysely/KyselyTransactionManager.js";
+import RefreshTokensInfra from "@/interfaces/infra/RefreshTokensInfra.js";
+import UserInfra from "@/interfaces/infra/UserInfra.js";
 
 const clientManager = new KyselyClientManager();
 
@@ -21,10 +28,27 @@ const authController = new AuthController(
   ),
 );
 
-router.post("/login", authController.login());
-router.post("/signup", authController.signup());
-router.post("/token", authController.token());
-router.post("/register", authController.register());
-router.post("/available", authController.available());
-
-module.exports = router;
+const router = new Hono<AppEnv>()
+  .post("/login", validate("json", postAuthLogin.json), authController.login())
+  .post(
+    "/signup",
+    validate("json", postAuthSignup.json),
+    authController.signup(),
+  )
+  .post(
+    "/logout",
+    validate("json", postAuthLogout.json),
+    authController.logout(),
+  )
+  .post("/token", validate("json", postAuthToken.json), authController.token())
+  .post(
+    "/register",
+    validate("json", postAuthRegister.json),
+    authController.register(),
+  )
+  .post(
+    "/available",
+    validate("json", postAuthAvailable.json),
+    authController.available(),
+  );
+export default router;

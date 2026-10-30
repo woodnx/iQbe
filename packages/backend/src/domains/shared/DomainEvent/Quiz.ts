@@ -1,5 +1,6 @@
-import Quiz from "@/domains/Quiz";
-import { DomainEvent } from ".";
+import Quiz from "@/domains/Quiz/index.js";
+import { QuizAttachedTags } from "@/domains/QuizAttachedTags/index.js";
+import { DomainEvent } from "./index.js";
 
 export type QuizDomainEventBody = {
   qid: string;
@@ -23,7 +24,10 @@ export const QUIZ_EVENT_NAME = {
 } as const;
 
 export class QuizDomainEventFactory {
-  constructor(private quiz: Quiz) {}
+  constructor(
+    private quiz: Quiz,
+    private attachedTags: QuizAttachedTags,
+  ) {}
 
   public createEvent(
     eventName: (typeof QUIZ_EVENT_NAME)[keyof typeof QUIZ_EVENT_NAME],
@@ -38,7 +42,7 @@ export class QuizDomainEventFactory {
       answer: this.quiz.answer,
       anotherAnswer: this.quiz.anotherAnswer,
       wid: this.quiz.wid,
-      tags: this.quiz.tagLabels,
+      tags: this.attachedTags.tagLabels,
       category: this.quiz.categoryId,
       creatorId: this.quiz.creatorUid,
       right: this.quiz.right,

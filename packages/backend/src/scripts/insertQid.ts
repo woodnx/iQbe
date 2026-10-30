@@ -1,5 +1,5 @@
-import { db } from "@/database";
-import QuizService from "@/domains/Quiz/QuizService";
+import { db } from "@/database.js";
+import QuizService from "@/domains/Quiz/QuizService.js";
 
 const quizService = new QuizService();
 

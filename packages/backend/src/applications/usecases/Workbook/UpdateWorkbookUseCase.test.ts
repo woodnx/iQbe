@@ -1,0 +1,38 @@
+import Workbook from "@/domains/Workbook/index.js";
+import { InMemoryWorkbookInfra } from "@/interfaces/infra/InMemory/WorkbookInfra.js";
+import { UpdateWorkbookUseCase } from "./UpdateWorkbookUseCase.js";
+
+describe("UpdateWorkbookUseCase", () => {
+  it("問題集を更新できる", async () => {
+    const workbookRepository = new InMemoryWorkbookInfra();
+    const useCase = new UpdateWorkbookUseCase(workbookRepository);
+
+    await workbookRepository.save(
+      new Workbook(
+        "w1",
+        "Before",
+        null,
+        "user-a",
+        null,
+        null,
+        0,
+        0,
+        0,
+        0,
+        null,
+      ),
+    );
+
+    const result = await useCase.execute({
+      uid: "user-a",
+      wid: "w1",
+      name: "After",
+      date: "2024-03-03T00:00:00.000Z",
+    });
+
+    const stored = await workbookRepository.findByWid("w1", "user-a");
+
+    expect(stored?.name).toBe(result.name);
+    expect(stored?.date).toBe(result.date);
+  });
+});

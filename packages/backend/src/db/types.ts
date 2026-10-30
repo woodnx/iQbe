@@ -99,6 +99,9 @@ export type refresh_tokens = {
     expDate: Timestamp;
     expired: Generated<number>;
 };
+export type registration_lock = {
+    id: number;
+};
 export type SequelizeMeta = {
     name: string;
 };
@@ -158,6 +161,7 @@ export type DB = {
     quizzes: quizzes;
     quizzes_categories: quizzes_categories;
     refresh_tokens: refresh_tokens;
+    registration_lock: registration_lock;
     SequelizeMeta: SequelizeMeta;
     sub_categories: sub_categories;
     tagging: tagging;

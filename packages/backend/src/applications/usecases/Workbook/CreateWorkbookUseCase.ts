@@ -1,0 +1,56 @@
+import type { WorkbookResponseDTO as ApiWorkbookResponseDTO } from "@/types/dto.js";
+
+import Workbook from "@/domains/Workbook/index.js";
+import IWorkbookRepository from "@/domains/Workbook/IWorkbookRepository.js";
+import WorkbookService from "@/domains/Workbook/WorkbookService.js";
+
+import { normalizeWorkbookDate, WorkbookDateInput } from "./WorkbookMapper.js";
+
+type WorkbookDTO = ApiWorkbookResponseDTO;
+
+export type CreateWorkbookUseCaseCommand = {
+  uid: string;
+  name: string;
+  date: WorkbookDateInput;
+};
+
+export class CreateWorkbookUseCase {
+  constructor(
+    private workbookRepository: IWorkbookRepository,
+    private workbookService: WorkbookService,
+  ) {}
+
+  async execute(command: CreateWorkbookUseCaseCommand): Promise<WorkbookDTO> {
+    const wid = this.workbookService.generateWid();
+    const normalizedDate = normalizeWorkbookDate(command.date);
+    const workbook = new Workbook(
+      wid,
+      command.name,
+      normalizedDate,
+      command.uid,
+      null,
+      null,
+      0,
+      0,
+      0,
+      0,
+      null,
+    );
+
+    await this.workbookRepository.save(workbook);
+
+    return {
+      wid,
+      name: command.name,
+      date: normalizedDate || null,
+      creatorId: command.uid,
+      levelId: null,
+      color: null,
+      total: workbook.total,
+      corrects: workbook.corrects,
+      wrongs: workbook.wrongs,
+      ignored: workbook.ignored,
+      lastPracticedAt: workbook.lastPracticedAt,
+    };
+  }
+}
