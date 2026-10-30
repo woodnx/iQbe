@@ -1,6 +1,6 @@
+import { useIsMobile } from "@/contexts/isMobile";
 import type { Workbook as ApiWorkbook } from "@/utils/api-types";
 import { Badge, BadgeProps } from "@mantine/core";
-import { useIsMobile } from "@/contexts/isMobile";
 
 type Workbook = ApiWorkbook;
 
@@ -9,19 +9,15 @@ interface Props extends BadgeProps {
   transformUpper?: boolean;
 }
 
-export function QuizWorkbookBadge({
-  workbook,
-  transformUpper,
-  ...other
-}: Props) {
+export function QuizWorkbookBadge({ workbook, ...other }: Props) {
   const isMobile = useIsMobile();
 
   return (
     <Badge
-      variant="dot"
+      color="gray"
       radius="sm"
       size={isMobile ? "md" : "lg"}
-      style={{ textTransform: "none", backgroundColor: "#fff" }}
+      style={{ textTransform: "none" }}
       {...other}
     >
       <div>

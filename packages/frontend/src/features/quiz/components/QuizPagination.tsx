@@ -1,5 +1,5 @@
-import { Pagination } from "@mantine/core";
 import { useIsMobile } from "@/contexts/isMobile";
+import { Pagination } from "@mantine/core";
 
 interface QuizPaginationProps {
   page: number;
@@ -18,6 +18,7 @@ export default function QuizPagination({
       total={total}
       value={page}
       onChange={setPage}
+      color="dark"
       withEdges
       size={isMobile ? "sm" : "md"}
     />
