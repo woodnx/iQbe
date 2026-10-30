@@ -152,7 +152,7 @@ export default function DefaultLayout() {
     };
   }, [navigate]);
 
-  const Navbar = () => (
+  const navbar = (
     <AppShell.Navbar h="100%">
       <AppShell.Section grow p="md">
         <Group justify="space-between">
@@ -185,7 +185,7 @@ export default function DefaultLayout() {
     </AppShell.Navbar>
   );
 
-  const Footer = () => (
+  const footer = (
     <AppShell.Footer withBorder={false}>
       <Group p="sm" justify="space-between" align="center">
         <ActionIcon
@@ -269,14 +269,14 @@ export default function DefaultLayout() {
               pos="absolute"
             >
               <Drawer.Body p={0} m={0}>
-                <Navbar />
+                {navbar}
               </Drawer.Body>
             </Drawer>
           ) : (
-            <Navbar />
+            navbar
           )}
 
-          <Footer />
+          {footer}
 
           <AppShell.Main>
             <Container size="md" px={0}>
