@@ -5,6 +5,7 @@ import { PracticeQuizController } from "@/features/practice/components/PracticeQ
 import { PracticeQuizIntro } from "@/features/practice/components/PracticeQuizIntro";
 import PracticeResultModal from "@/features/practice/components/PracticeResultModal";
 import { useTimer } from "@/hooks";
+import { db } from "@/plugins/db";
 import type { Quiz as ApiQuiz } from "@/utils/api-types";
 import { readResponse, rpc } from "@/utils/client";
 import {
@@ -15,6 +16,7 @@ import {
 } from "@/utils/queryCache";
 import { Group, Loader, Overlay, Text } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
+import { notifications } from "@mantine/notifications";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter, useSearch } from "@tanstack/react-router";
 import type { InferRequestType } from "hono/client";
@@ -28,7 +30,10 @@ interface Props {
   size: number;
   shuffledList: number[];
   isTransfer?: boolean;
+  initialIndex: number;
+  resumeId?: number;
   onFilter?: () => void;
+  onJudge?: () => void;
 }
 
 export default function PracticeSceneChanger({
@@ -36,13 +41,20 @@ export default function PracticeSceneChanger({
   size,
   shuffledList,
   isTransfer = false,
+  initialIndex,
+  resumeId,
   onFilter = () => {},
 }: Props) {
   const search = useSearch({ from: "/practice" });
-  const startImmediately = isTransfer || search.seed != null;
-  const [nowNumber, setNowNumber] = useState(0);
+  const startImmediately =
+    resumeId !== undefined || isTransfer || search.seed != null;
+  const [nowNumber, setNowNumber] = useState(initialIndex);
   const [scene, setScene] = useState<Scene>(
-    startImmediately ? "ready" : "preparation",
+    initialIndex >= (quizzes?.length ?? Infinity)
+      ? "result"
+      : startImmediately
+        ? "ready"
+        : "preparation",
   );
   const [startTrigger, setStartTrigger] = useState(startImmediately);
   const [filtering, filter] = useDisclosure(false);
@@ -155,14 +167,34 @@ export default function PracticeSceneChanger({
     }
   };
 
-  const judgeQuiz = (judgement: number, pressedWord: number) => {
+  const judgeQuiz = async (judgement: number, pressedWord: number) => {
     record(judgement, pressedWord);
+    const nextNumber = nowNumber + 1;
 
-    if (nowNumber >= maxQuizSize - 1) {
-      setScene("result");
-    } else {
-      setNowNumber(nowNumber + 1);
-      setScene("ready");
+    try {
+      if (resumeId !== undefined) {
+        await db.practiceSessions.update(resumeId, {
+          currentIndex: nextNumber,
+          updatedAt: new Date(),
+        });
+        await queryClient.invalidateQueries({
+          queryKey: ["practiceSession", resumeId],
+        });
+      }
+
+      if (nowNumber >= maxQuizSize - 1) {
+        setScene("result");
+      } else {
+        setNowNumber(nextNumber);
+        setScene("ready");
+      }
+    } catch (error) {
+      console.error("進行状態の保存に失敗しました", error);
+      notifications.show({
+        title: "保存に失敗しました",
+        message: "演習の進行状態を保存できませんでした。",
+        color: "red",
+      });
     }
   };
 

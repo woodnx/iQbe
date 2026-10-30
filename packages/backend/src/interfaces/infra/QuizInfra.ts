@@ -189,6 +189,31 @@ export default class QuizInfra implements IQuizRepository, IQuizQueryService {
   }
 
   async findMany(uid: string, option: findOption = {}): Promise<QuizDTO[]> {
+    return this.fetchQuizzes(uid, option);
+  }
+
+  async findByQids(uid: string, qids: string[]): Promise<QuizDTO[]> {
+    const uniqueQids = [...new Set(qids)];
+    if (uniqueQids.length === 0) return [];
+
+    const quizzes = await this.fetchQuizzes(
+      uid,
+      { maxView: uniqueQids.length },
+      uniqueQids,
+    );
+    const byQid = new Map(quizzes.map((quiz) => [quiz.qid, quiz]));
+    // Preserve the saved order, omitting missing or inaccessible quizzes.
+    return uniqueQids.flatMap((qid) => {
+      const quiz = byQid.get(qid);
+      return quiz ? [quiz] : [];
+    });
+  }
+
+  private async fetchQuizzes(
+    uid: string,
+    option: findOption,
+    qids?: string[],
+  ): Promise<QuizDTO[]> {
     const client = this.clientManager.getClient();
     const { query: filtered, userId } = await this.filteredQuery(uid, option);
     let query = filtered.select([
@@ -210,6 +235,7 @@ export default class QuizInfra implements IQuizRepository, IQuizQueryService {
         "total",
       ),
     ]);
+    if (qids) query = query.where("quizzes.qid", "in", qids);
     // Tie each sort key to the quiz so query scan order cannot change the shuffle.
     if (option.seed != null)
       query = query.orderBy(sql`MD5(CONCAT(${option.seed}, ':', quizzes.qid))`);

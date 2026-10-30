@@ -70,6 +70,17 @@ export const getQuizzes = {
 
 export const postQuizzes = { json: quizContentSchema };
 
+export const getQuizzesByIds = {
+  query: z.strictObject({
+    qids: z
+      .union([
+        z.string().min(1).max(64),
+        z.array(z.string().min(1).max(64)).min(1).max(100),
+      ])
+      .transform((value) => (Array.isArray(value) ? value : [value])),
+  }),
+};
+
 export const putQuizzesQid = {
   param: z.object({ qid: z.string().min(1).max(64) }),
   json: quizContentSchema,

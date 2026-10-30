@@ -406,6 +406,84 @@ describe("validation and Hono RPC", () => {
   });
 });
 
+describe("quiz lookup by IDs", () => {
+  it("accepts typed RPC arrays and returns the existing quiz response shape", async () => {
+    const { default: QuizInfra } =
+      await import("./interfaces/infra/QuizInfra.js");
+    const quizzes = ["second", "first"].map((qid) => ({
+      qid,
+      question: "Question",
+      answer: "Answer",
+      creatorId: user.uid,
+      total: 2,
+      right: 1,
+      isFavorite: false,
+      judgement: 1,
+    }));
+    const find = vi
+      .spyOn(QuizInfra.prototype, "findByQids")
+      .mockResolvedValue(quizzes);
+    const client = hc<AppType>("http://localhost", {
+      fetch: (input: RequestInfo | URL, init?: RequestInit) =>
+        app.request(input, init),
+    });
+    const response = await client.api.quizzes["by-ids"].$get({
+      query: { qids: ["second", "first"] },
+    });
+
+    expect(response.status).toBe(200);
+    expect(await response.json()).toEqual(quizzes);
+    expect(find).toHaveBeenCalledWith(user.uid, ["second", "first"]);
+  });
+
+  it("accepts one or 100 IDs and returns an empty array when none are found", async () => {
+    const { default: QuizInfra } =
+      await import("./interfaces/infra/QuizInfra.js");
+    const find = vi
+      .spyOn(QuizInfra.prototype, "findByQids")
+      .mockResolvedValue([]);
+    for (const qids of [
+      ["missing"],
+      Array.from({ length: 100 }, (_, i) => `q${i}`),
+    ]) {
+      const params = new URLSearchParams(qids.map((qid) => ["qids", qid]));
+      const response = await app.request(`/api/quizzes/by-ids?${params}`);
+      expect(response.status).toBe(200);
+      expect(await response.json()).toEqual([]);
+      expect(find).toHaveBeenLastCalledWith(user.uid, qids);
+    }
+  });
+
+  it.each([
+    "",
+    "qids=",
+    "qids=q1&qids=",
+    `qids=${"q".repeat(65)}`,
+    new URLSearchParams(
+      Array.from({ length: 101 }, (_, i) => ["qids", `q${i}`]),
+    ).toString(),
+    ...[
+      "judgements=unanswered",
+      "keyword=question",
+      "seed=123",
+      "page=1",
+      "maxView=100",
+      "wids=book",
+      "history=true",
+      "uid=another-user",
+    ].map((filter) => `qids=q1&${filter}`),
+  ])("rejects invalid IDs or mixed search conditions: %s", async (query) => {
+    const { default: QuizInfra } =
+      await import("./interfaces/infra/QuizInfra.js");
+    const find = vi
+      .spyOn(QuizInfra.prototype, "findByQids")
+      .mockResolvedValue([]);
+    const response = await app.request(`/api/quizzes/by-ids?${query}`);
+    expect(response.status).toBe(400);
+    expect(find).not.toHaveBeenCalled();
+  });
+});
+
 describe("file uploads and static delivery", () => {
   it("parses CSV multipart files and rejects missing files", async () => {
     const form = new FormData();

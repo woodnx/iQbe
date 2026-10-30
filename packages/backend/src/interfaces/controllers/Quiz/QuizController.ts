@@ -8,6 +8,7 @@ import type { ApiContext } from "@/http/context.js";
 import {
   deleteQuizzesQid,
   getQuizzes,
+  getQuizzesByIds,
   getQuizzesSize,
   postQuizzes,
   postQuizzesMultiple,
@@ -37,6 +38,17 @@ export default class QuizController {
               ? query.judgements
               : [query.judgements],
       });
+      return c.json(quizzes, 200);
+    };
+  }
+
+  getByIds() {
+    return async (c: ApiContext<typeof getQuizzesByIds>) => {
+      const { qids } = c.req.valid("query");
+      const quizzes = await this.quizQueryService.findByQids(
+        c.get("user").uid,
+        qids,
+      );
       return c.json(quizzes, 200);
     };
   }

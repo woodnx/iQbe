@@ -9,6 +9,7 @@ import QuizController from "@/interfaces/controllers/Quiz/QuizController.js";
 import {
   deleteQuizzesQid,
   getQuizzes,
+  getQuizzesByIds,
   getQuizzesSize,
   postQuizzes,
   postQuizzesMultiple,
@@ -63,6 +64,11 @@ const quizController = new QuizController(
 
 const router = new Hono<AppEnv>()
   .get("/", validate("query", getQuizzes.query), quizController.get())
+  .get(
+    "/by-ids",
+    validate("query", getQuizzesByIds.query),
+    quizController.getByIds(),
+  )
   .get("/size", validate("query", getQuizzesSize.query), quizController.size())
   .post("/", validate("json", postQuizzes.json), quizController.post())
   .post(

@@ -1,0 +1,10 @@
+.delayedLoader {
+  visibility: hidden;
+  animation: revealLoader 0s linear 150ms forwards;
+}
+
+@keyframes revealLoader {
+  to {
+    visibility: visible;
+  }
+}

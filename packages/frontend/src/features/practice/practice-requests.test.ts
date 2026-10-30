@@ -13,6 +13,7 @@ import PracticeSceneChanger from "./components/PracticeSceneChanger";
 
 const mocks = vi.hoisted(() => ({
   save: vi.fn(),
+  updateSession: vi.fn(),
   mylists: vi.fn(),
   judge: undefined as
     | undefined
@@ -20,6 +21,10 @@ const mocks = vi.hoisted(() => ({
 }));
 let client: QueryClient;
 let subscriptions: Array<() => void>;
+
+vi.mock("@/plugins/db", () => ({
+  db: { practiceSessions: { update: mocks.updateSession } },
+}));
 
 vi.mock("@/utils/client", () => ({
   readResponse: (response: Response) => response.json(),
@@ -89,6 +94,7 @@ vi.mock("./components/PracticeQuizController", () => ({
 beforeEach(() => {
   client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   subscriptions = [];
+  mocks.updateSession.mockReset().mockResolvedValue(1);
   mocks.save.mockReset().mockResolvedValue(Response.json({}));
   mocks.mylists.mockReset().mockImplementation(async () => Response.json([]));
 });
@@ -121,6 +127,8 @@ it.each([false, true])(
         quizzes,
         size: 1,
         shuffledList: [0],
+        initialIndex: 0,
+        resumeId: 42,
       }),
     );
     mocks.judge!(1, 5);
@@ -129,6 +137,10 @@ it.each([false, true])(
         json: { qid: "q1", judgement: 1, pressedWord: 5 },
       });
       expect(client.isMutating()).toBe(0);
+    });
+    expect(mocks.updateSession).toHaveBeenCalledWith(42, {
+      currentIndex: 1,
+      updatedAt: expect.any(Date),
     });
     expect(fetchQuizzes).toHaveBeenCalledTimes(1);
     expect(client.getQueryState(queryKey)?.isInvalidated).toBe(true);

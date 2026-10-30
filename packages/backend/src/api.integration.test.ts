@@ -289,6 +289,32 @@ integration("MySQL API integration", () => {
     ).toEqual(["q2"]);
   });
 
+  it("looks up owned quizzes in requested order with the same details as search", async () => {
+    const all = await quizzes.findMany("owner");
+    const params = new URLSearchParams(
+      ["q1", "q4", "q3", "missing", "q1", "q2"].map((qid) => ["qids", qid]),
+    );
+    const response = await app.request(`/api/quizzes/by-ids?${params}`);
+    expect(response.status).toBe(200);
+    expect(await response.json()).toEqual(
+      JSON.parse(
+        JSON.stringify(
+          ["q1", "q3", "q2"].map((qid) => all.find((q) => q.qid === qid)),
+        ),
+      ),
+    );
+
+    const unavailable = await app.request(
+      "/api/quizzes/by-ids?qids=q4&qids=missing",
+    );
+    expect(unavailable.status).toBe(200);
+    expect(await unavailable.json()).toEqual([]);
+    expect(await quizzes.findByQids("other", ["q1", "q4"])).toEqual([
+      expect.objectContaining({ qid: "q4", creatorId: "other" }),
+    ]);
+    expect(await quizzes.findByQids("owner", [])).toEqual([]);
+  });
+
   it("lists and counts each attempt with its own period and judgement", async () => {
     const option = {
       history: true,

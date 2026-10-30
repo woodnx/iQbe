@@ -1,3 +1,4 @@
+import { ContinueTrainingCard } from "@/features/training/components/ContinueTrainingCard";
 import { readResponse, rpc } from "@/utils/client";
 import { convertDates } from "@/utils/convertDates";
 import {
@@ -49,32 +50,12 @@ function RouteComponent() {
   const navigate = useNavigate();
   const maxWorkbook = 5;
   const isWorkbooksExist = workbooks && workbooks.length > 0;
-  const brokenTraining = null;
 
   return (
     <Grid>
       <Grid.Col span={12}>
         <Stack>
-          <Card padding="lg" radius="lg">
-            <div>
-              <Text fw={700} size="xl">
-                前回の続き
-              </Text>
-              <Text c="dimmed" size="sm" mt="xs">
-                {brokenTraining || "中断した演習はありません"}
-              </Text>
-              <Button
-                color="green"
-                fullWidth
-                mt="md"
-                radius="md"
-                variant="filled"
-                disabled={!brokenTraining}
-              >
-                演習を再開
-              </Button>
-            </div>
-          </Card>
+          <ContinueTrainingCard />
         </Stack>
       </Grid.Col>
 

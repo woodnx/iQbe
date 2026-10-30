@@ -10,5 +10,6 @@ export type countOption = ApiQuizFilter & {};
 
 export default interface IQuizQueryService {
   findMany(uid: string, option?: findOption): Promise<QuizDTO[]>;
+  findByQids(uid: string, qids: string[]): Promise<QuizDTO[]>;
   count(uid: string, option?: countOption): Promise<number>;
 }
