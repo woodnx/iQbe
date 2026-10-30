@@ -1,8 +1,15 @@
+import { useIsMobile } from "@/contexts/isMobile";
+import UserInfoMenu from "@/features/user/components/UserInfoMenu";
+import useHeaderHeight from "@/hooks/useHeaderHeight";
+import Logo from "@/shared/components/Logo";
+import NavbarLink from "@/shared/components/NavbarLink";
+import { readResponse, rpc } from "@/utils/client";
 import {
   ActionIcon,
   AppShell,
   Center,
   Container,
+  Divider,
   Drawer,
   Group,
   Loader,
@@ -12,19 +19,17 @@ import { notifications } from "@mantine/notifications";
 import {
   IconBooks,
   IconDashboard,
+  IconHistory,
   IconHome,
   IconMenu2,
   IconPencil,
   IconSchool,
   IconSearch,
+  IconStar,
 } from "@tabler/icons-react";
+import { useQuery } from "@tanstack/react-query";
 import { Outlet, useNavigate, useRouterState } from "@tanstack/react-router";
-import { useLayoutEffect, useState } from "react";
-import { useIsMobile } from "@/contexts/isMobile";
-import UserInfoMenu from "@/features/user/components/UserInfoMenu";
-import useHeaderHeight from "@/hooks/useHeaderHeight";
-import Logo from "@/shared/components/Logo";
-import NavbarLink from "@/shared/components/NavbarLink";
+import { Fragment, useLayoutEffect, useState } from "react";
 import { checkAuth } from "../plugins/auth";
 
 const checkPathname = (pathname: string) => {
@@ -51,13 +56,25 @@ export default function DefaultLayout() {
   const isMobile = useIsMobile();
   const { headerHeight } = useHeaderHeight();
 
+  const { data: workbooks } = useQuery({
+    queryKey: ["get", "/workbooks"],
+    queryFn: ({ signal }) =>
+      rpc.api.workbooks
+        .$get({}, { init: { signal: signal } })
+        .then(readResponse),
+  });
+  const { data: mylists } = useQuery({
+    queryKey: ["get", "/mylists"],
+    queryFn: ({ signal }) =>
+      rpc.api.mylists.$get({}, { init: { signal: signal } }).then(readResponse),
+  });
+
   const mockdata = [
     {
       label: "ダッシュボード",
       icon: IconDashboard,
       link: "/",
     },
-
     {
       label: "演習",
       icon: IconSchool,
@@ -69,9 +86,39 @@ export default function DefaultLayout() {
       link: "/create",
     },
     {
-      label: "ライブラリ",
+      setDivider: true,
+      label: "問題集",
       icon: IconBooks,
-      link: "/library",
+      isTab: true,
+      link: "/workbook",
+      links: [
+        ...(workbooks?.map((w) => ({
+          label: w.name,
+          link: `${w.wid}`,
+        })) || []),
+      ],
+    },
+    {
+      label: "マイリスト",
+      icon: IconBooks,
+      isTab: true,
+      link: "/mylist",
+      links: [
+        ...(mylists?.map((m) => ({
+          label: m.name,
+          link: `${m.mid}`,
+        })) || []),
+      ],
+    },
+    {
+      label: "お気に入り",
+      icon: IconStar,
+      link: "/favorite",
+    },
+    {
+      label: "履歴",
+      icon: IconHistory,
+      link: "/history",
     },
   ];
 
@@ -103,7 +150,7 @@ export default function DefaultLayout() {
     return () => {
       ignore = true;
     };
-  }, []);
+  }, [navigate]);
 
   const Navbar = () => (
     <AppShell.Navbar h="100%">
@@ -111,23 +158,25 @@ export default function DefaultLayout() {
         <Group justify="space-between">
           <Logo horizonal width={100} mb="xs" />
         </Group>
-        {mockdata.map((i, idx) => (
-          <NavbarLink
-            {...i}
-            key={idx}
-            isActive={activeIdx == idx}
-            activeLink={activeLink}
-            onNavigate={(link, linksIdx) => {
-              navigate({ to: link });
-              setActiveLink(
-                linksIdx !== undefined
-                  ? `${activeIdx}.${linksIdx}`
-                  : `${activeIdx}`,
-              );
-              close();
-            }}
-            my={5}
-          />
+        {mockdata.map(({ setDivider, ...i }, idx) => (
+          <Fragment key={i.link}>
+            {setDivider && <Divider />}
+            <NavbarLink
+              {...i}
+              isActive={activeIdx == idx}
+              activeLink={activeLink}
+              onNavigate={(link, linksIdx) => {
+                navigate({ to: link });
+                setActiveLink(
+                  linksIdx !== undefined
+                    ? `${activeIdx}.${linksIdx}`
+                    : `${activeIdx}`,
+                );
+                close();
+              }}
+              my={5}
+            />
+          </Fragment>
         ))}
       </AppShell.Section>
       <AppShell.Section p="md">

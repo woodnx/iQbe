@@ -1,6 +1,6 @@
-import WorkbookService from "@/domains/Workbook/WorkbookService";
-import { InMemoryWorkbookInfra } from "@/interfaces/infra/InMemory/WorkbookInfra";
-import { CreateWorkbookUseCase } from "./CreateWorkbookUseCase";
+import WorkbookService from "@/domains/Workbook/WorkbookService.js";
+import { InMemoryWorkbookInfra } from "@/interfaces/infra/InMemory/WorkbookInfra.js";
+import { CreateWorkbookUseCase } from "./CreateWorkbookUseCase.js";
 
 describe("CreateWorkbookUseCase", () => {
   it("問題集を作成できる", async () => {

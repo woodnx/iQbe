@@ -1,4 +1,5 @@
 import { Group } from "@mantine/core";
+import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, useRouter, useSearch } from "@tanstack/react-router";
 import { useState } from "react";
 import FilteringModalButton from "@/features/filtering/components/FilteringModalButton";
@@ -7,7 +8,7 @@ import QuizHiddenAnswerButton from "@/features/quiz/components/QuizHiddenAnswerB
 import QuizList from "@/features/quiz/components/QuizList";
 import QuizShuffleButton from "@/features/quiz/components/QuizShuffleButton";
 import QuizTransfarButton from "@/features/quiz/components/QuizTransfarButton";
-import { $api } from "@/utils/client";
+import { cleanQuery, readResponse, rpc } from "@/utils/client";
 import { quizSearchSchema } from "./_schemas/quizSearch";
 
 export const Route = createFileRoute("/search")({
@@ -20,11 +21,31 @@ function RouteComponent() {
   const search = useSearch({ from: "/search" });
   const [activePage, setPage] = useState(1);
   const [isHidden, setIsHidden] = useState(false);
-  const { data: quizzes } = $api.useQuery("get", "/quizzes", {
-    params: { query: search },
+  const { data: quizzes } = useQuery({
+    queryKey: [
+      "get",
+      "/quizzes",
+      {
+        params: { query: search },
+      },
+    ],
+    queryFn: ({ signal }) =>
+      rpc.api.quizzes
+        .$get({ query: cleanQuery(search) }, { init: { signal: signal } })
+        .then(readResponse),
   });
-  const { data: quizzesSize } = $api.useQuery("get", "/quizzes/size", {
-    params: { query: search },
+  const { data: quizzesSize } = useQuery({
+    queryKey: [
+      "get",
+      "/quizzes/size",
+      {
+        params: { query: search },
+      },
+    ],
+    queryFn: ({ signal }) =>
+      rpc.api.quizzes.size
+        .$get({ query: cleanQuery(search) }, { init: { signal: signal } })
+        .then(readResponse),
   });
   const size =
     !!quizzes && !!quizzes.length && !!quizzesSize ? quizzesSize.size : 0;

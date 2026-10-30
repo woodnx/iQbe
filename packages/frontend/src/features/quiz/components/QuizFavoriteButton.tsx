@@ -1,9 +1,10 @@
 import { ActionIcon } from "@mantine/core";
 import { IconStar, IconStarFilled } from "@tabler/icons-react";
-import { useQueryClient } from "@tanstack/react-query";
-import { components } from "api/schema";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import type { InferRequestType } from "hono/client";
 import { useState } from "react";
-import { $api } from "@/utils/client";
+import type { Quiz as ApiQuiz } from "@/utils/api-types";
+import { readResponse, rpc } from "@/utils/client";
 import {
   QUIZ_SIZES_QUERY_KEY,
   QUIZZES_QUERY_KEY,
@@ -18,7 +19,7 @@ interface QuizFavoriteButtonProps {
   qid: string;
 }
 
-type Quiz = components["schemas"]["Quiz"];
+type Quiz = ApiQuiz;
 
 export default function QuizFavoriteButton({
   isFavorite: innerIsFavorite,
@@ -26,8 +27,11 @@ export default function QuizFavoriteButton({
 }: QuizFavoriteButtonProps) {
   const [isFavorite, setFavorite] = useState(innerIsFavorite);
   const queryClient = useQueryClient();
-  const { mutate: like } = $api.useMutation("post", "/like", {
-    onMutate: async ({ body }) => {
+  const { mutate: like } = useMutation({
+    mutationKey: ["post", "/like"],
+    mutationFn: (input: InferRequestType<typeof rpc.api.like.$post>) =>
+      rpc.api.like.$post(input).then(readResponse),
+    onMutate: async ({ json: body }) => {
       await queryClient.cancelQueries({ queryKey: QUIZZES_QUERY_KEY });
       const previousQuizzes = takeQuerySnapshot<Quiz[]>(
         queryClient,
@@ -62,8 +66,11 @@ export default function QuizFavoriteButton({
       queryClient.invalidateQueries({ queryKey: QUIZ_SIZES_QUERY_KEY });
     },
   });
-  const { mutate: unlike } = $api.useMutation("post", "/unlike", {
-    onMutate: async ({ body }) => {
+  const { mutate: unlike } = useMutation({
+    mutationKey: ["post", "/unlike"],
+    mutationFn: (input: InferRequestType<typeof rpc.api.unlike.$post>) =>
+      rpc.api.unlike.$post(input).then(readResponse),
+    onMutate: async ({ json: body }) => {
       await queryClient.cancelQueries({ queryKey: QUIZZES_QUERY_KEY });
       await queryClient.cancelQueries({ queryKey: QUIZ_SIZES_QUERY_KEY });
       const previousQuizzes = takeQuerySnapshot<Quiz[]>(
@@ -116,13 +123,13 @@ export default function QuizFavoriteButton({
   const addFavoriteList = async () => {
     if (isFavorite) {
       unlike({
-        body: {
+        json: {
           qid,
         },
       });
     } else {
       like({
-        body: {
+        json: {
           qid,
         },
       });

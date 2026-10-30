@@ -1,7 +1,7 @@
-import IQuizRepository from "../Quiz/IQuizRepository";
-import IUserRepository from "../User/IUserRepository";
-import History from ".";
-import IHistoryRepository from "./IHistoryRepository";
+import IQuizRepository from "../Quiz/IQuizRepository.js";
+import IUserRepository from "../User/IUserRepository.js";
+import History from "./index.js";
+import IHistoryRepository from "./IHistoryRepository.js";
 
 export default class HistoryService {
   constructor(

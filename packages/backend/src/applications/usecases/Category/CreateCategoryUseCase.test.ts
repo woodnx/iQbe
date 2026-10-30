@@ -1,5 +1,5 @@
-import { InMemoryCategoryInfra } from "@/interfaces/infra/InMemory/CategoryInfra";
-import { CreateCategoryUseCase } from "./CreateCategoryUseCase";
+import { InMemoryCategoryInfra } from "@/interfaces/infra/InMemory/CategoryInfra.js";
+import { CreateCategoryUseCase } from "./CreateCategoryUseCase.js";
 
 describe("CreateCategoryUseCase", () => {
   it("カテゴリを作成できる", async () => {

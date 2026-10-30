@@ -1,9 +1,9 @@
-import { InMemoryQuizAttachedTagsInfra } from "@/interfaces/infra/InMemory/QuizAttachedTagsInfra";
-import { InMemoryQuizInfra } from "@/interfaces/infra/InMemory/QuizInfra";
-import { InMemoryTagInfra } from "@/interfaces/infra/InMemory/TagInfra";
-import { MockTransactionManager } from "../../shared/MockTransactionManager";
-import { AddQuizUseCase } from "./AddQuizUseCase";
-import { EditQuizUseCase } from "./EditQuizUseCase";
+import { InMemoryQuizAttachedTagsInfra } from "@/interfaces/infra/InMemory/QuizAttachedTagsInfra.js";
+import { InMemoryQuizInfra } from "@/interfaces/infra/InMemory/QuizInfra.js";
+import { InMemoryTagInfra } from "@/interfaces/infra/InMemory/TagInfra.js";
+import { MockTransactionManager } from "../../shared/MockTransactionManager.js";
+import { AddQuizUseCase } from "./AddQuizUseCase.js";
+import { EditQuizUseCase } from "./EditQuizUseCase.js";
 
 describe("EditQuizUseCase", () => {
   it("クイズが正常に編集できる", async () => {

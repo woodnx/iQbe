@@ -1,6 +1,6 @@
 import jwt, { Secret, SignOptions } from "jsonwebtoken";
 
-import ValueObject from "../shared/ValueObject";
+import ValueObject from "../shared/ValueObject.js";
 
 interface AccessTokenValue {
   uid: string;

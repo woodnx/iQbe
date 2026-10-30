@@ -1,4 +1,4 @@
-import { components } from "api/schema";
+import type { Workbook as ApiWorkbook } from "@/utils/api-types";
 
 import { Stack, TextInput } from "@mantine/core";
 
@@ -6,7 +6,7 @@ import WorkbookCard from "./WorkbookCard";
 import { useState } from "react";
 
 interface WorkbookSearchProps {
-  workbooks: components["schemas"]["Workbook"][];
+  workbooks: ApiWorkbook[];
 }
 
 export default function WorkbookSearch({ workbooks }: WorkbookSearchProps) {

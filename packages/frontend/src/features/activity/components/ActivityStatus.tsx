@@ -1,12 +1,14 @@
-import { useState } from "react";
-import { Card, Center, Divider, Group, Loader, Title } from "@mantine/core";
-import { useElementSize } from "@mantine/hooks";
-import { Bar, BarChart, LabelList, Tooltip, XAxis, YAxis } from "recharts";
 import useUserStatus from "@/hooks/useUserStatus";
 import dayjs, { Period } from "@/plugins/dayjs";
+import { BarChart } from "@mantine/charts";
+import { Card, Center, Divider, Group, Loader, Title } from "@mantine/core";
+import { useElementSize } from "@mantine/hooks";
+import { useNavigate } from "@tanstack/react-router";
+import { useState } from "react";
 import ActivitySelectRange from "./ActivitySelectRange";
 
-export default function () {
+export default function ActivityStatus() {
+  const navigate = useNavigate();
   const now = dayjs().format();
   const { ref, width } = useElementSize();
   const [period, setPeriod] = useState<Period>("day");
@@ -20,44 +22,50 @@ export default function () {
           <ActivitySelectRange period={period} onClick={setPeriod} />
         </Group>
         <Divider my="sm" />
-        {!!userStatus ? (
+        {userStatus ? (
           <BarChart
-            width={width}
-            height={300}
+            w={width - 20}
+            h={300}
             data={userStatus}
-            margin={{
-              top: 20,
-              left: -30,
-            }}
-          >
-            <XAxis
-              dataKey="label"
-              interval={0}
-              angle={-30}
-              dx={-10}
-              dy={5}
-              tick={{
+            type="stacked"
+            dataKey="label"
+            xAxisProps={{
+              interval: 0,
+              angle: -30,
+              dx: -10,
+              dy: 10,
+              tick: {
                 fontSize: 12,
                 fill: "#000",
-              }}
-            />
-            <YAxis
-              tick={{
-                fontSize: 14,
-                fill: "#000",
-              }}
-            />
-            <Tooltip />
-            <Bar dataKey="right" stackId="a" fill="#FF6B6B" />
-            <Bar dataKey="wrong" stackId="a" fill="#339AF0" />
-            <Bar dataKey="through" stackId="a" fill="#ADB5BD">
-              <LabelList
-                dataKey="total"
-                position="top"
-                formatter={(v: string) => `${v}問`}
-              />
-            </Bar>
-          </BarChart>
+              },
+            }}
+            accessibilityLayer={false}
+            series={[
+              { name: "right", label: "正解", color: "red.6" },
+              { name: "wrong", label: "不正解", color: "blue.6" },
+              { name: "through", label: "スルー", color: "gray.6" },
+            ]}
+            barChartProps={{
+              onClick: ({ activeTooltipIndex, isTooltipActive }) => {
+                if (!isTooltipActive || activeTooltipIndex == null) return;
+
+                const index = Number(activeTooltipIndex);
+                if (!Number.isInteger(index)) return;
+
+                const status = userStatus[index];
+                if (!status) return;
+
+                void navigate({
+                  to: "/history",
+                  search: {
+                    since: dayjs(status.start).toISOString(),
+                    until: dayjs(status.end).toISOString(),
+                  },
+                });
+              },
+              style: { cursor: "pointer" },
+            }}
+          />
         ) : (
           <Center h={300}>
             <Loader variant="dots" />

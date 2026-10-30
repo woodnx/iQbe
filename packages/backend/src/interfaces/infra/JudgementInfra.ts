@@ -1,6 +1,6 @@
-import Judgement from "@/domains/Judgement";
-import IJudgementRepository from "@/domains/Judgement/IJudgementRepository";
-import KyselyClientManager from "./kysely/KyselyClientManager";
+import Judgement from "@/domains/Judgement/index.js";
+import IJudgementRepository from "@/domains/Judgement/IJudgementRepository.js";
+import KyselyClientManager from "./kysely/KyselyClientManager.js";
 
 export default class JudgementInfra implements IJudgementRepository {
   constructor(private clientManager: KyselyClientManager) {}

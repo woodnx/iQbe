@@ -1,7 +1,7 @@
-import { IDomainEventSubscriber } from "@/applications/shared/DomainEvent/IDomainEventSubscriber";
-import { DomainEvent } from "@/domains/shared/DomainEvent";
+import { IDomainEventSubscriber } from "@/applications/shared/DomainEvent/IDomainEventSubscriber.js";
+import { DomainEvent } from "@/domains/shared/DomainEvent/index.js";
 import { container } from "tsyringe";
-import EventEmitterClient from "./EventEmmiterClient";
+import EventEmitterClient from "./EventEmmiterClient.js";
 
 export class EventEmitterDomainEventSubscriber
   implements IDomainEventSubscriber

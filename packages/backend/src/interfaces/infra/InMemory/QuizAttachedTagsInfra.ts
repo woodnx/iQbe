@@ -1,5 +1,5 @@
-import { QuizAttachedTags } from "@/domains/QuizAttachedTags";
-import { IQuizAttachedTagsRepository } from "@/domains/QuizAttachedTags/IQuizAttachedTagsRepository";
+import { QuizAttachedTags } from "@/domains/QuizAttachedTags/index.js";
+import { IQuizAttachedTagsRepository } from "@/domains/QuizAttachedTags/IQuizAttachedTagsRepository.js";
 
 export class InMemoryQuizAttachedTagsInfra
   implements IQuizAttachedTagsRepository

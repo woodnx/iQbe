@@ -1,5 +1,5 @@
-import Category from "@/domains/Category";
-import ICategoryRepository from "@/domains/Category/ICategoryRepository";
+import Category from "@/domains/Category/index.js";
+import ICategoryRepository from "@/domains/Category/ICategoryRepository.js";
 
 export type CreateCategoryUseCaseCommand = {
   name: string;

@@ -1,5 +1,5 @@
-import { db } from "@/database";
-import MylistService from "@/domains/Mylist/MylistService";
+import { db } from "@/database.js";
+import MylistService from "@/domains/Mylist/MylistService.js";
 
 const mylistService = new MylistService();
 

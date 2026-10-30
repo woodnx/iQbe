@@ -30,6 +30,12 @@ export default function QuizSearchInput(props: TextInputProps) {
                       to: "/search",
                       search: {
                         ...v,
+                        judgements:
+                          v.judgements == null
+                            ? undefined
+                            : Array.isArray(v.judgements)
+                              ? v.judgements
+                              : [v.judgements],
                         page: 1,
                       },
                     });

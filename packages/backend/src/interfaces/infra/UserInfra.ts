@@ -1,6 +1,6 @@
-import User from "@/domains/User";
-import IUsersRepository from "@/domains/User/IUserRepository";
-import KyselyClientManager from "./kysely/KyselyClientManager";
+import IUsersRepository from "@/domains/User/IUserRepository.js";
+import User from "@/domains/User/index.js";
+import KyselyClientManager from "./kysely/KyselyClientManager.js";
 
 export default class UserInfra implements IUsersRepository {
   constructor(private clientManager: KyselyClientManager) {}
@@ -26,7 +26,6 @@ export default class UserInfra implements IUsersRepository {
       .where("uid", "=", uid)
       .executeTakeFirst();
 
-    console.log(data)
     if (!data) {
       return null;
     }
@@ -165,6 +164,24 @@ export default class UserInfra implements IUsersRepository {
       .then((d) => d?.count);
 
     return !!data;
+  }
+
+  async lockRegistration(): Promise<void> {
+    const client = this.clientManager.getClient();
+    if (!client.isTransaction)
+      throw new Error("Registration lock requires a transaction");
+    // Also initializes the row for schemas created with prisma db push.
+    await client
+      .insertInto("registration_lock")
+      .values({ id: 1 })
+      .onDuplicateKeyUpdate({ id: 1 })
+      .execute();
+    await client
+      .selectFrom("registration_lock")
+      .select("id")
+      .where("id", "=", 1)
+      .forUpdate()
+      .executeTakeFirstOrThrow();
   }
 
   async save(user: User): Promise<void> {

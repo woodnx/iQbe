@@ -1,25 +1,26 @@
-import { ApiError } from "api";
-import { components } from "api/schema";
+import type {
+  AuthResponseDTO as ApiAuthResponseDTO,
+  AuthResponseWithRefreshTokenDTO as ApiAuthResponseWithRefreshTokenDTO,
+} from "@/types/dto.js";
+import { ApiError } from "@/http/ApiError.js";
 
-import AccessToken from "@/domains/AccessToken";
-import AuthService from "@/domains/Auth/AuthService";
-import InviteCode from "@/domains/InviteCode";
-import IInviteCodeRepository from "@/domains/InviteCode/IInviteCodeRepository";
-import InviteCodeService from "@/domains/InviteCode/InviteCodeService";
-import RefreshToken from "@/domains/RefreshToken";
-import IRefreshTokenRepository from "@/domains/RefreshToken/IRefreshTokenRepository";
-import RefreshTokenService from "@/domains/RefreshToken/RefreshTokenService";
-import User from "@/domains/User";
-import IUserRepository from "@/domains/User/IUserRepository";
-import UserService from "@/domains/User/UserService";
-import dayjs, { format } from "@/plugins/day";
+import AccessToken from "@/domains/AccessToken/index.js";
+import AuthService from "@/domains/Auth/AuthService.js";
+import IInviteCodeRepository from "@/domains/InviteCode/IInviteCodeRepository.js";
+import InviteCodeService from "@/domains/InviteCode/InviteCodeService.js";
+import InviteCode from "@/domains/InviteCode/index.js";
+import IRefreshTokenRepository from "@/domains/RefreshToken/IRefreshTokenRepository.js";
+import RefreshToken from "@/domains/RefreshToken/index.js";
+import RefreshTokenService from "@/domains/RefreshToken/RefreshTokenService.js";
+import IUserRepository from "@/domains/User/IUserRepository.js";
+import User from "@/domains/User/index.js";
+import UserService from "@/domains/User/UserService.js";
+import dayjs, { format } from "@/plugins/day.js";
 
-import ITransactionManager from "../shared/ITransactionManager";
+import ITransactionManager from "../shared/ITransactionManager.js";
 
-type TokenDTO =
-  components["responses"]["AuthResponse"]["content"]["application/json"];
-type AuthDTO =
-  components["responses"]["AuthResponseWithRefreshToken"]["content"]["application/json"];
+type TokenDTO = ApiAuthResponseDTO;
+type AuthDTO = ApiAuthResponseWithRefreshTokenDTO;
 
 export default class AuthUseCase {
   constructor(
@@ -57,14 +58,19 @@ export default class AuthUseCase {
       }
     }
 
-    const checked = authService.checkPassword(password, user.passwd);
+    const checked = await authService.checkPassword(password, user.passwd);
 
     if (!checked) throw new ApiError().noUser();
 
     const accessToken = await new AccessToken(user);
-    const refreshToken = await this.refreshTokensRepostiory.findByUid(user.uid);
-
-    if (!refreshToken) throw new ApiError().noUser();
+    let refreshToken = await this.refreshTokensRepostiory.findByUid(user.uid);
+    if (!refreshToken) {
+      refreshToken = new RefreshToken(
+        new RefreshTokenService().generateToken(),
+        user.uid,
+      );
+      await this.refreshTokensRepostiory.save(refreshToken);
+    }
 
     return {
       user: {
@@ -94,21 +100,20 @@ export default class AuthUseCase {
     const inviteCodeService = new InviteCodeService(this.inviteCodeRepository);
 
     const uid = userService.generateUid();
-    const passwd = authService.generateHashedPassword(password);
     const created = dayjs().toDate();
 
-    const user = new User(uid, passwd, username, email, created, created);
+    let user!: User;
     const refreshToken = new RefreshToken(
       refreshTokenService.generateToken(),
       uid,
     );
-    const accessToken = new AccessToken(user);
 
     const requiredInviteCode =
       process.env.REQUIRE_INVITE_CODE !== "false" ? true : false;
-    const isFirstUser = await userService.checkFirstStart();
 
     await this.transactionManager.begin(async () => {
+      await this.userRepository.lockRegistration();
+      const isFirstUser = await userService.checkFirstStart();
       if (requiredInviteCode && !isFirstUser) {
         if (!inviteCode || !inviteCode.trim()) {
           throw new ApiError({
@@ -137,6 +142,8 @@ export default class AuthUseCase {
         await this.inviteCodeRepository.update(code);
       }
 
+      const passwd = await authService.generateHashedPassword(password);
+      user = new User(uid, passwd, username, email, created, created);
       if (isFirstUser) {
         user.reconstruct(
           uid,
@@ -166,97 +173,7 @@ export default class AuthUseCase {
         photoURL: user.photoUrl,
       },
       refreshToken: refreshToken.token,
-      accessToken: accessToken.toToken(),
-    };
-  }
-
-  async signupFirstUser(
-    username: string,
-    password: string,
-    email: string,
-    inviteCode?: string,
-  ): Promise<AuthDTO> {
-    const authService = new AuthService();
-    const userService = new UserService(this.userRepository);
-    const refreshTokenService = new RefreshTokenService();
-    const inviteCodeService = new InviteCodeService(this.inviteCodeRepository);
-
-    const requiredInviteCode =
-      process.env.REQUIRE_INVITE_CODE !== "false" ? true : false;
-    const isFirstUser = await userService.checkFirstStart();
-
-    if (!isFirstUser)
-      throw new ApiError({
-        title: "NOT_FIRST_USER",
-        detail: "This instance is not first start",
-        type: "about:blank",
-        status: 401,
-      });
-
-    const uid = userService.generateUid();
-    const passwd = authService.generateHashedPassword(password);
-    const created = dayjs().toDate();
-
-    const user = new User(
-      uid,
-      passwd,
-      username,
-      email,
-      created,
-      created,
-      undefined,
-      "SUPER_USER",
-    );
-    const refreshToken = new RefreshToken(
-      refreshTokenService.generateToken(),
-      uid,
-    );
-    const accessToken = new AccessToken(user);
-
-    await this.transactionManager.begin(async () => {
-      if (requiredInviteCode) {
-        if (!inviteCode || !inviteCode.trim())
-          throw new ApiError({
-            title: "NO_INVITE_CODE",
-            type: "about:blank",
-            status: 401,
-            detail:
-              "This server is required invite code. Please set invite code.",
-          });
-
-        const code = InviteCode.create(inviteCode);
-        const available = await inviteCodeService.checkAvailable(code);
-
-        // エラー処理
-        if (!available)
-          throw new ApiError({
-            title: "USED_INVITE_CODE",
-            type: "about:blank",
-            status: 401,
-            detail: "This invite code is used. Please set another invite code.",
-          });
-
-        code.markUsed();
-        await this.inviteCodeRepository.update(code);
-      }
-
-      await this.userRepository.save(user);
-      await this.refreshTokensRepostiory.save(refreshToken);
-    });
-
-    return {
-      user: {
-        uid: user.uid,
-        username: user.username,
-        email: user.email,
-        nickname: user.nickname,
-        modified: format(user.modified),
-        created: format(user.created),
-        permission: user.permission,
-        photoURL: user.photoUrl,
-      },
-      refreshToken: refreshToken.token,
-      accessToken: accessToken.toToken(),
+      accessToken: new AccessToken(user).toToken(),
     };
   }
 
@@ -328,7 +245,7 @@ export default class AuthUseCase {
     if (!userId) throw new ApiError().noUser();
 
     const uid = userService.generateUid();
-    const passwd = authService.generateHashedPassword(password);
+    const passwd = await authService.generateHashedPassword(password);
 
     user.reconstruct(uid, passwd, username, email, user.created, user.modified);
 
@@ -356,6 +273,10 @@ export default class AuthUseCase {
       refreshToken: refreshToken.token,
       accessToken: accessToken.toToken(),
     };
+  }
+
+  async logout(uid: string, refreshToken: string): Promise<void> {
+    await this.refreshTokensRepostiory.revokeToken(uid, refreshToken);
   }
 
   async available(username: string): Promise<boolean> {

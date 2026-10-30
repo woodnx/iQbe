@@ -1,4 +1,4 @@
-import { $api } from "@/utils/client";
+import { cleanQuery, readResponse, rpc } from "@/utils/client";
 import {
   ComboboxItem,
   Group,
@@ -8,9 +8,9 @@ import {
   Text,
   Title,
 } from "@mantine/core";
-
-import InviteCodeCreateModal from "./InviteCodeCreateModal";
+import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
+import InviteCodeCreateModal from "./InviteCodeCreateModal";
 
 export interface InviteCodeSettingProps {}
 
@@ -18,17 +18,35 @@ export default function InviteCodeSetting() {
   const [status, setStatus] = useState<ComboboxItem>();
   const [sort, setSort] = useState<ComboboxItem>();
   console.log(status, sort);
-  const { data: inviteCodes } = $api.useQuery("get", "/invite-code", {
-    params: {
-      query: {
-        status: status && Number(status.value),
-        sort: sort?.value,
+  const { data: inviteCodes } = useQuery({
+    queryKey: [
+      "get",
+      "/invite-code",
+      {
+        params: {
+          query: {
+            status: status && Number(status.value),
+            sort: sort?.value,
+          },
+        },
       },
-    },
+    ],
+    queryFn: ({ signal }) =>
+      rpc.api["invite-code"]
+        .$get(
+          {
+            query: cleanQuery({
+              status: status && Number(status.value),
+              sort: sort?.value,
+            }),
+          },
+          { init: { signal: signal } },
+        )
+        .then(readResponse),
   });
 
-  const contents = inviteCodes?.map((inviteCode) => (
-    <Paper bg="gray.1" mb="sm" p="sm">
+  const contents = inviteCodes?.map((inviteCode, i) => (
+    <Paper bg="gray.1" mb="sm" p="sm" key={i}>
       <Group justify="space-between">
         {inviteCode.code}
         {inviteCode.status == 0 ? (
@@ -58,7 +76,7 @@ export default function InviteCodeSetting() {
             { value: "1", label: "使用済み" },
           ]}
           value={status?.value}
-          onChange={(_value, option) => setStatus(option)}
+          onChange={(_value, option) => setStatus(option ?? undefined)}
         />
         <Select
           label="ソート"
@@ -67,7 +85,7 @@ export default function InviteCodeSetting() {
             { value: "desc", label: "作成日時（降順）" },
           ]}
           value={sort?.value}
-          onChange={(_value, option) => setSort(option)}
+          onChange={(_value, option) => setSort(option ?? undefined)}
         />
       </Group>
       <ScrollArea h={250}>{contents}</ScrollArea>

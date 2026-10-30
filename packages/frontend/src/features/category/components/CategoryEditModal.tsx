@@ -1,10 +1,9 @@
-import { components } from "api/schema";
-
-import { $api } from "@/utils/client";
 import { ContextModalProps } from "@mantine/modals";
-
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import type { InferRequestType } from "hono/client";
+import type { Category as ApiCategory } from "@/utils/api-types";
+import { readResponse, rpc } from "@/utils/client";
 import CategoryEditForm from "./CategoryEditForm";
-import { useQueryClient } from "@tanstack/react-query";
 
 export interface CategoryEditModalInnerProps<T extends boolean> {
   name: string;
@@ -15,7 +14,7 @@ export interface CategoryEditModalInnerProps<T extends boolean> {
   id: number;
 }
 
-type Category = components["schemas"]["Category"];
+type Category = ApiCategory;
 
 export default function CategoryEditModal<T extends boolean>({
   context,
@@ -24,10 +23,14 @@ export default function CategoryEditModal<T extends boolean>({
 }: ContextModalProps<CategoryEditModalInnerProps<T>>) {
   const { id, ...formProps } = innerProps;
   const queryClient = useQueryClient();
-  const queryKey = ["get", "/categories", undefined];
+  const queryKey = ["get", "/categories"];
 
-  const { mutate: edit } = $api.useMutation("put", "/categories/{id}", {
-    onMutate: async ({ body }) => {
+  const { mutate: edit } = useMutation({
+    mutationKey: ["put", "/categories/{id}"],
+    mutationFn: (
+      input: InferRequestType<(typeof rpc.api.categories)[":id"]["$put"]>,
+    ) => rpc.api.categories[":id"].$put(input).then(readResponse),
+    onMutate: async ({ json: body }) => {
       const previous = queryClient.getQueryData(queryKey);
 
       queryClient.setQueryData(queryKey, (old: Category[] | undefined) => {
@@ -64,14 +67,12 @@ export default function CategoryEditModal<T extends boolean>({
 
   const submit = (name: string, disabled: boolean, description?: string) => {
     edit({
-      body: {
+      json: {
         name,
         description,
         disabled,
       },
-      params: {
-        path: { id },
-      },
+      param: { id },
     });
 
     context.closeModal(modalId);

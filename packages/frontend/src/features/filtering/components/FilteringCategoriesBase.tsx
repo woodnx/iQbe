@@ -1,3 +1,7 @@
+import type {
+  Category as ApiCategory,
+  SubCategory as ApiSubCategory,
+} from "@/utils/api-types";
 import {
   BoxProps,
   CheckIcon,
@@ -9,10 +13,8 @@ import {
   Text,
   useCombobox,
 } from "@mantine/core";
-import { components } from "api/schema";
 
-type CategoryBase = components["schemas"]["Category"] &
-  components["schemas"]["SubCategory"];
+type CategoryBase = ApiCategory & ApiSubCategory;
 
 interface FilteringCategoriesBaseProps extends BoxProps {
   data?: CategoryBase[];

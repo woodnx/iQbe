@@ -1,4 +1,4 @@
-import ICategoryRepository from "@/domains/Category/ICategoryRepository";
+import ICategoryRepository from "@/domains/Category/ICategoryRepository.js";
 
 export type UpdateCategoryUseCaseCommand = {
   id: number;

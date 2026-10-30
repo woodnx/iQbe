@@ -1,12 +1,12 @@
+import type { Quiz as ApiQuiz } from "@/utils/api-types";
 import { BoxProps, Button, Card, Flex, Group, Text } from "@mantine/core";
-import { components } from "api/schema";
 import { useState } from "react";
 import QuizDetailsMenu from "./QuizDetailesMenu";
 import QuizFavoriteButton from "./QuizFavoriteButton";
 import QuizMylistButton from "./QuizMylistButton";
 import { QuizWorkbookBadge } from "./QuizWorkbookBadge";
 
-type Quiz = components["schemas"]["Quiz"];
+type Quiz = ApiQuiz;
 
 interface Props extends BoxProps {
   index: number;
@@ -64,7 +64,7 @@ export default function QuizCard({
           registerdMylists={quiz.registerdMylist || []}
         />
         <Group>
-          {!!quiz.workbook ? (
+          {quiz.workbook ? (
             <QuizWorkbookBadge workbook={quiz.workbook} />
           ) : null}
           <QuizDetailsMenu quiz={quiz} />

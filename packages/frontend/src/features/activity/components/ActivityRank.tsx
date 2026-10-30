@@ -15,7 +15,7 @@ const defineColor = (rank: number) => {
   else return "#343A40";
 };
 
-export default function ({ rank, icon, name, count }: Props) {
+export default function ActivityRank({ rank, icon, name, count }: Props) {
   const Icon = icon;
 
   return (

@@ -1,6 +1,6 @@
-import Category from "@/domains/Category";
-import { InMemoryCategoryInfra } from "@/interfaces/infra/InMemory/CategoryInfra";
-import { GetCategoriesUseCase } from "./GetCategoriesUseCase";
+import Category from "@/domains/Category/index.js";
+import { InMemoryCategoryInfra } from "@/interfaces/infra/InMemory/CategoryInfra.js";
+import { GetCategoriesUseCase } from "./GetCategoriesUseCase.js";
 
 describe("GetCategoriesUseCase", () => {
   it("カテゴリ一覧とサブカテゴリを取得できる", async () => {

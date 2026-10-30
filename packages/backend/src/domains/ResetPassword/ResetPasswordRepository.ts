@@ -1,4 +1,4 @@
-import ResetPassword from ".";
+import ResetPassword from "./index.js";
 
 export default interface IResetPasswordRepository {
   findByToken(token: string): Promise<ResetPassword | null>;

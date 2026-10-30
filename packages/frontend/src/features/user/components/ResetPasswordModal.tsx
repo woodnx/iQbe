@@ -1,7 +1,7 @@
-import axios from "@/plugins/axios";
 import { Alert, Button, TextInput } from "@mantine/core";
 import { isNotEmpty, useForm } from "@mantine/form";
 import { IconAlertCircle } from "@tabler/icons-react";
+import { readResponse, rpc } from "@/utils/client";
 
 interface SubmitValue {
   username: string;
@@ -25,12 +25,14 @@ export default function ResetPasswordModal({ onSubmit }: Props) {
   });
 
   const submit = async (v: SubmitValue) => {
-    await axios
-      .post("/request-reset-password", {
-        email: v.email,
-        username: v.username,
+    await rpc.api["request-reset-password"]
+      .$post({
+        json: {
+          email: v.email,
+          username: v.username,
+        },
       })
-      .then((res) => res.data);
+      .then(readResponse);
     onSubmit();
   };
 

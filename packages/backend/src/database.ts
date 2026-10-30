@@ -1,6 +1,6 @@
 import { Kysely, MysqlDialect } from "kysely";
 import { createPool } from "mysql2";
-import { DB } from "./db/types";
+import { DB } from "./db/types.js";
 
 const databaseUrl = process.env.DATABASE_URL;
 if (!databaseUrl) {

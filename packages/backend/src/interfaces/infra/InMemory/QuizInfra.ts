@@ -1,5 +1,5 @@
-import Quiz from "@/domains/Quiz";
-import IQuizRepository from "@/domains/Quiz/IQuizRepository";
+import Quiz from "@/domains/Quiz/index.js";
+import IQuizRepository from "@/domains/Quiz/IQuizRepository.js";
 
 export class InMemoryQuizInfra implements IQuizRepository {
   public DB: {

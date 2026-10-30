@@ -1,12 +1,12 @@
-import { components } from "api/schema";
-
-import { $api } from "@/utils/client";
 import { Button, Group, Text } from "@mantine/core";
 import { ContextModalProps } from "@mantine/modals";
 import { IconTrash } from "@tabler/icons-react";
-import { useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import type { InferRequestType } from "hono/client";
+import type { Category as ApiCategory } from "@/utils/api-types";
+import { readResponse, rpc } from "@/utils/client";
 
-type Category = components["schemas"]["Category"];
+type Category = ApiCategory;
 
 export interface CategoryCreateModalInnerProps<T extends boolean> {
   id: number;
@@ -21,9 +21,13 @@ const CategoryDeleteModal = <T extends boolean>({
 }: ContextModalProps<CategoryCreateModalInnerProps<T>>) => {
   const { id, ...formProps } = innerProps;
   const queryClient = useQueryClient();
-  const queryKey = ["get", "/categories", undefined];
+  const queryKey = ["get", "/categories"];
 
-  const { mutate } = $api.useMutation("delete", "/categories/{id}", {
+  const { mutate } = useMutation({
+    mutationKey: ["delete", "/categories/{id}"],
+    mutationFn: (
+      input: InferRequestType<(typeof rpc.api.categories)[":id"]["$delete"]>,
+    ) => rpc.api.categories[":id"].$delete(input).then(readResponse),
     onMutate: () => {
       const previous = queryClient.getQueryData(queryKey);
 
@@ -58,11 +62,7 @@ const CategoryDeleteModal = <T extends boolean>({
   });
 
   const submit = () => {
-    mutate({
-      params: {
-        path: { id },
-      },
-    });
+    mutate({ param: { id } });
 
     context.closeModal(modalId);
   };

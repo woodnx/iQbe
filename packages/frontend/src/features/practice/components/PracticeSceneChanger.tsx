@@ -1,9 +1,3 @@
-import { Group, Loader, Overlay, Text } from "@mantine/core";
-import { useDisclosure } from "@mantine/hooks";
-import { useQueryClient } from "@tanstack/react-query";
-import { useRouter, useSearch } from "@tanstack/react-router";
-import { components } from "api/schema";
-import { useEffect, useState } from "react";
 import FilteringModal from "@/features/filtering/components/FilteringModal";
 import FilteringModalButton from "@/features/filtering/components/FilteringModalButton";
 import PracticeQuitModal from "@/features/practice/components/PracticeQuitModal";
@@ -11,15 +5,24 @@ import { PracticeQuizController } from "@/features/practice/components/PracticeQ
 import { PracticeQuizIntro } from "@/features/practice/components/PracticeQuizIntro";
 import PracticeResultModal from "@/features/practice/components/PracticeResultModal";
 import { useTimer } from "@/hooks";
-import { $api } from "@/utils/client";
+import { db } from "@/plugins/db";
+import type { Quiz as ApiQuiz } from "@/utils/api-types";
+import { readResponse, rpc } from "@/utils/client";
 import {
   QUIZZES_QUERY_KEY,
   QuerySnapshot,
   restoreQuerySnapshot,
   takeQuerySnapshot,
 } from "@/utils/queryCache";
+import { Group, Loader, Overlay, Text } from "@mantine/core";
+import { useDisclosure } from "@mantine/hooks";
+import { notifications } from "@mantine/notifications";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useRouter, useSearch } from "@tanstack/react-router";
+import type { InferRequestType } from "hono/client";
+import { useEffect, useState } from "react";
 
-type Quiz = components["schemas"]["Quiz"];
+type Quiz = ApiQuiz;
 export type Scene = "preparation" | "ready" | "quizzing" | "result";
 
 interface Props {
@@ -27,28 +30,43 @@ interface Props {
   size: number;
   shuffledList: number[];
   isTransfer?: boolean;
+  initialIndex: number;
+  resumeId?: number;
   onFilter?: () => void;
+  onJudge?: () => void;
 }
 
-export default function ({
+export default function PracticeSceneChanger({
   quizzes,
   size,
   shuffledList,
   isTransfer = false,
+  initialIndex,
+  resumeId,
   onFilter = () => {},
 }: Props) {
-  const [nowNumber, setNowNumber] = useState(0);
+  const search = useSearch({ from: "/practice" });
+  const startImmediately =
+    resumeId !== undefined || isTransfer || search.seed != null;
+  const [nowNumber, setNowNumber] = useState(initialIndex);
   const [scene, setScene] = useState<Scene>(
-    isTransfer ? "ready" : "preparation",
+    initialIndex >= (quizzes?.length ?? Infinity)
+      ? "result"
+      : startImmediately
+        ? "ready"
+        : "preparation",
   );
-  const [startTrigger, setStartTrigger] = useState(isTransfer);
+  const [startTrigger, setStartTrigger] = useState(startImmediately);
   const [filtering, filter] = useDisclosure(false);
+  const openFilter = filter.open;
   const [_, result] = useDisclosure(false);
   const router = useRouter();
-  const search = useSearch({ from: "/practice" });
   const queryClient = useQueryClient();
-  const { mutate } = $api.useMutation("post", "/practice", {
-    onMutate: async ({ body }) => {
+  const { mutate } = useMutation({
+    mutationKey: ["post", "/practice"],
+    mutationFn: (input: InferRequestType<typeof rpc.api.practice.$post>) =>
+      rpc.api.practice.$post(input).then(readResponse),
+    onMutate: async ({ json: body }) => {
       await queryClient.cancelQueries({ queryKey: QUIZZES_QUERY_KEY });
       const previousQuizzes = takeQuerySnapshot<Quiz[]>(
         queryClient,
@@ -82,19 +100,22 @@ export default function ({
       restoreQuerySnapshot(queryClient, rollback.previousQuizzes);
     },
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: QUIZZES_QUERY_KEY });
+      // Keep the current practice list stable; refresh it on the next visit.
+      queryClient.invalidateQueries({
+        queryKey: QUIZZES_QUERY_KEY,
+        refetchType: "none",
+      });
     },
   });
   const [rightList, setRightList] = useState<string[]>([]);
-  const quiz = !!quizzes ? quizzes[shuffledList[nowNumber]] : null;
+  const quiz = quizzes ? quizzes[shuffledList[nowNumber]] : null;
   const maxQuizSize = quizzes?.length || 0;
 
   const delay = useTimer(500, 100, () => setScene("quizzing"));
 
   useEffect(() => {
-    if (!isTransfer) filter.open();
-    return () => setScene(isTransfer ? "ready" : "preparation");
-  }, []);
+    if (!startImmediately) openFilter();
+  }, [startImmediately, openFilter]);
 
   const toFilter = (
     wids?: string | string[],
@@ -105,7 +126,7 @@ export default function ({
     tagMatchAll?: boolean,
     maxView?: number,
   ) => {
-    const seed = Math.floor(Math.random() * 100000);
+    const seed = search.seed ?? Math.floor(Math.random() * 100000);
     router.navigate({
       to: "/practice",
       search: (old) => ({
@@ -133,7 +154,7 @@ export default function ({
     if (!quiz) return;
 
     mutate({
-      body: {
+      json: {
         qid: quiz?.qid,
         judgement,
         pressedWord,
@@ -142,18 +163,38 @@ export default function ({
 
     if (judgement == 1) {
       const addId = quiz.qid;
-      !!addId ? setRightList([...rightList, addId]) : null;
+      setRightList([...rightList, addId]);
     }
   };
 
-  const judgeQuiz = (judgement: number, pressedWord: number) => {
+  const judgeQuiz = async (judgement: number, pressedWord: number) => {
     record(judgement, pressedWord);
+    const nextNumber = nowNumber + 1;
 
-    if (nowNumber >= maxQuizSize - 1) {
-      setScene("result");
-    } else {
-      setNowNumber(nowNumber + 1);
-      setScene("ready");
+    try {
+      if (resumeId !== undefined) {
+        await db.practiceSessions.update(resumeId, {
+          currentIndex: nextNumber,
+          updatedAt: new Date(),
+        });
+        await queryClient.invalidateQueries({
+          queryKey: ["practiceSession", resumeId],
+        });
+      }
+
+      if (nowNumber >= maxQuizSize - 1) {
+        setScene("result");
+      } else {
+        setNowNumber(nextNumber);
+        setScene("ready");
+      }
+    } catch (error) {
+      console.error("進行状態の保存に失敗しました", error);
+      notifications.show({
+        title: "保存に失敗しました",
+        message: "演習の進行状態を保存できませんでした。",
+        color: "red",
+      });
     }
   };
 
@@ -199,7 +240,7 @@ export default function ({
             to: "/practice",
             search: (old) => ({
               ...old,
-              page: !!old?.page ? old.page + 1 : 0,
+              page: old?.page ? old.page + 1 : 0,
             }),
             replace: true,
           });

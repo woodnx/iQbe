@@ -17,8 +17,6 @@ services:
     restart: always
     env_file:
       - .config/.env
-    ports:
-      - "3306:3306"
     volumes:
       - iqbe-data:/var/lib/mysql
       - ./db/conf.d:/etc/mysql/conf.d

@@ -1,17 +1,27 @@
-import express from "express";
-
-import { AddQuizUseCase } from "@/applications/usecases/Quiz/AddQuizUseCase";
-import { DeleteQuizUseCase } from "@/applications/usecases/Quiz/DeleteQuizUseCase";
-import { EditQuizUseCase } from "@/applications/usecases/Quiz/EditQuizUseCase";
-import QuizController from "@/interfaces/controllers/QuizController";
-import CategoryInfra from "@/interfaces/infra/CategoryInfra";
-import KyselyClientManager from "@/interfaces/infra/kysely/KyselyClientManager";
-import KyselyTransactionManager from "@/interfaces/infra/kysely/KyselyTransactionManager";
-import { QuizAssignedTagsInfra } from "@/interfaces/infra/QuizAssignedTags";
-import QuizInfra from "@/interfaces/infra/QuizInfra";
-import TagInfra from "@/interfaces/infra/TagInfra";
-
-const router = express.Router();
+import { Hono } from "hono";
+import { AddQuizUseCase } from "@/applications/usecases/Quiz/AddQuizUseCase.js";
+import { AddQuizzesUseCase } from "@/applications/usecases/Quiz/AddQuizzesUseCase.js";
+import { DeleteQuizUseCase } from "@/applications/usecases/Quiz/DeleteQuizUseCase.js";
+import { EditQuizUseCase } from "@/applications/usecases/Quiz/EditQuizUseCase.js";
+import type { AppEnv } from "@/http/context.js";
+import { validate } from "@/http/validate.js";
+import QuizController from "@/interfaces/controllers/Quiz/QuizController.js";
+import {
+  deleteQuizzesQid,
+  getQuizzes,
+  getQuizzesByIds,
+  getQuizzesSize,
+  postQuizzes,
+  postQuizzesMultiple,
+  putQuizzesQid,
+} from "@/interfaces/controllers/Quiz/schema.js";
+import CategoryInfra from "@/interfaces/infra/CategoryInfra.js";
+import KyselyClientManager from "@/interfaces/infra/kysely/KyselyClientManager.js";
+import KyselyTransactionManager from "@/interfaces/infra/kysely/KyselyTransactionManager.js";
+import { QuizAssignedTagsInfra } from "@/interfaces/infra/QuizAssignedTags.js";
+import QuizBulkInfra from "@/interfaces/infra/QuizBulkInfra.js";
+import QuizInfra from "@/interfaces/infra/QuizInfra.js";
+import TagInfra from "@/interfaces/infra/TagInfra.js";
 
 const kyselyClientManager = new KyselyClientManager();
 const kyselyTransactionManager = new KyselyTransactionManager(
@@ -46,16 +56,35 @@ const quizController = new QuizController(
   addQuizUseCase,
   editQuizUseCase,
   deleteQuizUseCase,
+  new AddQuizzesUseCase(
+    kyselyTransactionManager,
+    new QuizBulkInfra(kyselyClientManager),
+  ),
 );
 
-router.get("/", quizController.get());
-router.get("/size", quizController.size());
-
-router.post("/", quizController.post());
-router.post("/multiple", quizController.multiplePost());
-
-router.put("/:qid", quizController.put());
-
-router.delete("/:qid", quizController.delete());
-
-module.exports = router;
+const router = new Hono<AppEnv>()
+  .get("/", validate("query", getQuizzes.query), quizController.get())
+  .get(
+    "/by-ids",
+    validate("query", getQuizzesByIds.query),
+    quizController.getByIds(),
+  )
+  .get("/size", validate("query", getQuizzesSize.query), quizController.size())
+  .post("/", validate("json", postQuizzes.json), quizController.post())
+  .post(
+    "/multiple",
+    validate("json", postQuizzesMultiple.json),
+    quizController.multiplePost(),
+  )
+  .put(
+    "/:qid",
+    validate("param", putQuizzesQid.param),
+    validate("json", putQuizzesQid.json),
+    quizController.put(),
+  )
+  .delete(
+    "/:qid",
+    validate("param", deleteQuizzesQid.param),
+    quizController.delete(),
+  );
+export default router;

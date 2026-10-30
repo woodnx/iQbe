@@ -1,6 +1,6 @@
-import History from "@/domains/History";
-import IHistoryRepository from "@/domains/History/IHistoryRepository";
-import KyselyClientManager from "./kysely/KyselyClientManager";
+import History from "@/domains/History/index.js";
+import IHistoryRepository from "@/domains/History/IHistoryRepository.js";
+import KyselyClientManager from "./kysely/KyselyClientManager.js";
 
 export default class HistoryInfra implements IHistoryRepository {
   constructor(private clientManager: KyselyClientManager) {}

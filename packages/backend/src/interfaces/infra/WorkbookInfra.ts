@@ -1,8 +1,8 @@
-import { ApiError } from "api";
-import Workbook from "@/domains/Workbook";
-import IWorkbookRepository from "@/domains/Workbook/IWorkbookRepository";
-import dayjs, { format } from "@/plugins/day";
-import KyselyClientManager from "./kysely/KyselyClientManager";
+import { ApiError } from "@/http/ApiError.js";
+import Workbook from "@/domains/Workbook/index.js";
+import IWorkbookRepository from "@/domains/Workbook/IWorkbookRepository.js";
+import dayjs, { format } from "@/plugins/day.js";
+import KyselyClientManager from "./kysely/KyselyClientManager.js";
 
 export default class WorkbookInfra implements IWorkbookRepository {
   constructor(private clientManager: KyselyClientManager) {}
@@ -195,9 +195,17 @@ export default class WorkbookInfra implements IWorkbookRepository {
       .execute();
   }
 
-  async delete(wid: string): Promise<void> {
+  async delete(wid: string, uid: string): Promise<boolean> {
     const client = this.clientManager.getClient();
-
-    await client.deleteFrom("workbooks").where("wid", "=", wid).execute();
+    const result = await client
+      .deleteFrom("workbooks")
+      .where("wid", "=", wid)
+      .where(
+        "creator_id",
+        "in",
+        client.selectFrom("users").select("id").where("uid", "=", uid),
+      )
+      .executeTakeFirst();
+    return result.numDeletedRows > 0n;
   }
 }

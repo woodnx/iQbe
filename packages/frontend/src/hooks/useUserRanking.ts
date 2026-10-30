@@ -1,17 +1,36 @@
+import { useQuery } from "@tanstack/react-query";
 import { Period } from "@/plugins/dayjs";
-import { $api } from "@/utils/client";
+import { readJsonResponse, rpc } from "@/utils/client";
 
 export const useAllUserRanking = (period: Period) => {
   const {
     data: allUserRanking,
     error,
     isLoading,
-  } = $api.useQuery("get", "/analysis/ranking/all/{period}", {
-    params: {
-      path: {
-        period,
+  } = useQuery({
+    queryKey: [
+      "get",
+      "/analysis/ranking/all/{period}",
+      {
+        params: {
+          path: {
+            period,
+          },
+        },
       },
-    },
+    ],
+    queryFn: ({ signal }) =>
+      rpc.api.analysis.ranking.all[":period"]
+        .$get(
+          {
+            param: {
+              period,
+            },
+            query: {},
+          },
+          { init: { signal: signal } },
+        )
+        .then(readJsonResponse),
   });
 
   return {
@@ -26,12 +45,29 @@ export const usePersonalRank = (period: Period) => {
     data: personalRank,
     error,
     isLoading,
-  } = $api.useQuery("get", "/analysis/ranking/personal/{period}", {
-    params: {
-      path: {
-        period,
+  } = useQuery({
+    queryKey: [
+      "get",
+      "/analysis/ranking/personal/{period}",
+      {
+        params: {
+          path: {
+            period,
+          },
+        },
       },
-    },
+    ],
+    queryFn: ({ signal }) =>
+      rpc.api.analysis.ranking.personal[":period"]
+        .$get(
+          {
+            param: {
+              period,
+            },
+          },
+          { init: { signal: signal } },
+        )
+        .then(readJsonResponse),
   });
 
   return {

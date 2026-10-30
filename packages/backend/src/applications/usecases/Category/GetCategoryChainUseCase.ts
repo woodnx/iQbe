@@ -1,10 +1,10 @@
-import { components } from "api/schema";
+import type { CategoryDTO as ApiCategoryDTO } from "@/types/dto.js";
 
-import ICategoryRepository from "@/domains/Category/ICategoryRepository";
+import ICategoryRepository from "@/domains/Category/ICategoryRepository.js";
 
-import { toCategoryDTO } from "./CategoryMapper";
+import { toCategoryDTO } from "./CategoryMapper.js";
 
-type CategoryDTO = components["schemas"]["Category"];
+type CategoryDTO = ApiCategoryDTO;
 
 export type GetCategoryChainUseCaseCommand = {
   id: number;
@@ -13,7 +13,9 @@ export type GetCategoryChainUseCaseCommand = {
 export class GetCategoryChainUseCase {
   constructor(private categoryRepository: ICategoryRepository) {}
 
-  async execute(command: GetCategoryChainUseCaseCommand): Promise<CategoryDTO[]> {
+  async execute(
+    command: GetCategoryChainUseCaseCommand,
+  ): Promise<CategoryDTO[]> {
     const categories = await this.categoryRepository.findChainById(command.id);
 
     return categories.map((category) => toCategoryDTO(category));

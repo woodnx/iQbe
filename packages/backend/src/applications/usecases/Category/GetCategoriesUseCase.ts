@@ -1,8 +1,8 @@
-import { components } from "api/schema";
+import type { CategoryDTO as ApiCategoryDTO } from "@/types/dto.js";
 
-import ICategoryQueryService from "@/applications/queryservices/ICategoryQueryService";
+import ICategoryQueryService from "@/applications/queryservices/ICategoryQueryService.js";
 
-type CategoryDTO = components["schemas"]["Category"];
+type CategoryDTO = ApiCategoryDTO;
 
 export class GetCategoriesUseCase {
   constructor(private categoryQueryService: ICategoryQueryService) {}

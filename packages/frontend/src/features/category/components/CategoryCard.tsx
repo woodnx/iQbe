@@ -7,12 +7,12 @@ import {
   Group,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
+import { modals } from "@mantine/modals";
 import { IconChevronDown, IconChevronUp } from "@tabler/icons-react";
 import CategoryBaseCard from "./CategoryBaseCard";
 import CategoryCreateModalButton from "./CategoryCreateModalButton";
-import { modals } from "@mantine/modals";
-import CategorySubCard from "./CategorySubCard";
 import CategoryEditMenu from "./CategoryEditMenu";
+import CategorySubCard from "./CategorySubCard";
 
 interface CategoryCardProps extends BoxProps {
   id: number;
@@ -27,6 +27,9 @@ interface CategoryCardProps extends BoxProps {
   }[];
 }
 
+const IconChevron = ({ opened }: { opened: boolean }) =>
+  opened ? <IconChevronUp /> : <IconChevronDown />;
+
 export default function CategoryCard({
   id,
   name,
@@ -36,7 +39,6 @@ export default function CategoryCard({
   ...other
 }: CategoryCardProps) {
   const [opened, { toggle }] = useDisclosure(false);
-  const IconChevron = () => (opened ? <IconChevronUp /> : <IconChevronDown />);
 
   const editModal = () =>
     modals.openContextModal({
@@ -78,11 +80,11 @@ export default function CategoryCard({
         <Group wrap="nowrap">
           <CategoryEditMenu onEdit={editModal} onDelete={deleteModal} />
           <ActionIcon onClick={toggle} variant="transparent" color="gray">
-            <IconChevron />
+            <IconChevron opened={opened} />
           </ActionIcon>
         </Group>
       </Group>
-      <Collapse in={opened}>
+      <Collapse expanded={opened}>
         <Divider mt="md" />
         {sub?.map((s) => (
           <CategorySubCard

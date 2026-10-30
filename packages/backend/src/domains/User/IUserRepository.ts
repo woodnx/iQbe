@@ -1,4 +1,4 @@
-import User from ".";
+import User from "./index.js";
 
 export default interface IUserRepository {
   findByUid(uid: string): Promise<User | null>;
@@ -7,6 +7,7 @@ export default interface IUserRepository {
   findUserIdByEmail(email: string): Promise<number | null>;
   findLastUserId(): Promise<number | null>;
   existAnyUsers(): Promise<boolean>;
+  lockRegistration(): Promise<void>;
   save(user: User): Promise<void>;
   update(user: User): Promise<void>;
 }

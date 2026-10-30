@@ -1,4 +1,4 @@
-import { DomainEvent } from ".";
+import { DomainEvent } from "./index.js";
 
 export abstract class DomainEventStorable {
   private domainEvents: DomainEvent[] = [];

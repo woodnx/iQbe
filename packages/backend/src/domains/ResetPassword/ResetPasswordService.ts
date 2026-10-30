@@ -1,16 +1,14 @@
-import { ApiError } from "api";
+import { ApiError } from "@/http/ApiError.js";
 
-import dayjs from "@/plugins/day";
+import dayjs from "@/plugins/day.js";
 
-import ResetPassword from "./";
+import ResetPassword from "./index.js";
 
 export default class ResetPasswordService {
   constructor() {}
 
   available(resetPassword: ResetPassword, uid: string) {
     const now = dayjs();
-
-    console.log(resetPassword);
 
     if (now.isAfter(resetPassword.exp) || resetPassword.used) {
       throw new ApiError().invalidParams();

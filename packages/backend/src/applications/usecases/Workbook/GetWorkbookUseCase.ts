@@ -1,11 +1,11 @@
-import { ApiError } from "api";
-import { components } from "api/schema";
+import type { WorkbookResponseDTO as ApiWorkbookResponseDTO } from "@/types/dto.js";
+import { ApiError } from "@/http/ApiError.js";
 
-import IWorkbookRepository from "@/domains/Workbook/IWorkbookRepository";
+import IWorkbookRepository from "@/domains/Workbook/IWorkbookRepository.js";
 
-import { toWorkbookDTO } from "./WorkbookMapper";
+import { toWorkbookDTO } from "./WorkbookMapper.js";
 
-type WorkbookDTO = components["responses"]["WorkbookResponse"]["content"]["application/json"];
+type WorkbookDTO = ApiWorkbookResponseDTO;
 
 export type GetWorkbookUseCaseCommand = {
   uid: string;

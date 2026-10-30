@@ -1,6 +1,6 @@
-import useSWR from "swr";
 import { BoxProps, Checkbox, Group } from "@mantine/core";
-import { fetcher } from "@/fetchers";
+import { useQuery } from "@tanstack/react-query";
+import { readResponse, rpc } from "@/utils/client";
 
 interface FilteringLevelProps extends BoxProps {
   value: string[] | undefined;
@@ -18,7 +18,11 @@ export default function FilteringLevel({
   onChange,
   ...others
 }: FilteringLevelProps) {
-  const { data: levels } = useSWR<Level[]>("/levels", fetcher);
+  const { data: levels } = useQuery({
+    queryKey: ["get", "/levels"],
+    queryFn: ({ signal }) =>
+      rpc.api.levels.$get({}, { init: { signal: signal } }).then(readResponse),
+  });
 
   return (
     <Checkbox.Group

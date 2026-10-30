@@ -1,6 +1,6 @@
-import { components } from "api/schema";
+import type { CategoryDTO as ApiCategoryDTO } from "@/types/dto.js";
 
-export type CategoryDTO = components["schemas"]["Category"];
+export type CategoryDTO = ApiCategoryDTO;
 
 export default interface ICategoryQueryService {
   available(): Promise<CategoryDTO[]>;

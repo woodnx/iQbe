@@ -1,6 +1,6 @@
-import Workbook from "@/domains/Workbook";
-import { InMemoryWorkbookInfra } from "@/interfaces/infra/InMemory/WorkbookInfra";
-import { GetAllWorkbooksUseCase } from "./GetAllWorkbooksUseCase";
+import Workbook from "@/domains/Workbook/index.js";
+import { InMemoryWorkbookInfra } from "@/interfaces/infra/InMemory/WorkbookInfra.js";
+import { GetAllWorkbooksUseCase } from "./GetAllWorkbooksUseCase.js";
 
 describe("GetAllWorkbooksUseCase", () => {
   it("uidの問題集一覧を取得できる", async () => {

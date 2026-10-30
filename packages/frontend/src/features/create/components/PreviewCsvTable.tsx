@@ -1,5 +1,5 @@
 import { ScrollArea, Table } from "@mantine/core";
-import { Element } from "./CreateDashboard";
+import { Element } from "@/routes/create";
 
 interface Props {
   elements: Element[];

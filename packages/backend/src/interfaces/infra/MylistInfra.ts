@@ -1,7 +1,7 @@
-import Mylist from "@/domains/Mylist";
-import IMylistRepository from "@/domains/Mylist/IMylistRepository";
-import dayjs from "@/plugins/day";
-import KyselyClientManager from "./kysely/KyselyClientManager";
+import Mylist from "@/domains/Mylist/index.js";
+import IMylistRepository from "@/domains/Mylist/IMylistRepository.js";
+import dayjs from "@/plugins/day.js";
+import KyselyClientManager from "./kysely/KyselyClientManager.js";
 
 export default class MylistInfra implements IMylistRepository {
   constructor(private clientManager: KyselyClientManager) {}

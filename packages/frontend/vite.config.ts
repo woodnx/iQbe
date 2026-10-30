@@ -1,13 +1,13 @@
+import { tanstackRouter } from "@tanstack/router-plugin/vite";
 import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
 import { VitePWA } from "vite-plugin-pwa";
-import myManifest from "./manifest.json";
 
 // https://vitejs.dev/config/
 export default defineConfig({
   resolve: {
     alias: {
-      "@/": `${__dirname}/src/`,
+      "@/": `${import.meta.dirname}/src/`,
     },
   },
   server: {
@@ -21,6 +21,10 @@ export default defineConfig({
     },
   },
   plugins: [
+    tanstackRouter({
+      target: "react",
+      autoCodeSplitting: true,
+    }),
     react(),
     VitePWA({
       includeAssets: [
@@ -32,7 +36,6 @@ export default defineConfig({
       devOptions: {
         enabled: true,
       },
-      manifest: myManifest,
     }),
   ],
 });

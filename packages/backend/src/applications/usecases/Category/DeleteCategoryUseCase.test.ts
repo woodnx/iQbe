@@ -1,6 +1,6 @@
-import Category from "@/domains/Category";
-import { InMemoryCategoryInfra } from "@/interfaces/infra/InMemory/CategoryInfra";
-import { DeleteCategoryUseCase } from "./DeleteCategoryUseCase";
+import Category from "@/domains/Category/index.js";
+import { InMemoryCategoryInfra } from "@/interfaces/infra/InMemory/CategoryInfra.js";
+import { DeleteCategoryUseCase } from "./DeleteCategoryUseCase.js";
 
 describe("DeleteCategoryUseCase", () => {
   it("カテゴリを削除できる", async () => {

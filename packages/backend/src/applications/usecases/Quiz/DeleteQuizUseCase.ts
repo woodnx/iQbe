@@ -1,13 +1,14 @@
-import { ApiError } from "api";
-import IQuizRepository from "@/domains/Quiz/IQuizRepository";
-import { QuizAttachedTags } from "@/domains/QuizAttachedTags";
-import { IQuizAttachedTagsRepository } from "@/domains/QuizAttachedTags/IQuizAttachedTagsRepository";
-import { QuizAttachedTagsService } from "@/domains/QuizAttachedTags/QuizAttachedTagsService";
-import ITagRepository from "@/domains/Tag/ITagRepository";
-import ITransactionManager from "../../shared/ITransactionManager";
+import IQuizRepository from "@/domains/Quiz/IQuizRepository.js";
+import { IQuizAttachedTagsRepository } from "@/domains/QuizAttachedTags/IQuizAttachedTagsRepository.js";
+import { QuizAttachedTags } from "@/domains/QuizAttachedTags/index.js";
+import { QuizAttachedTagsService } from "@/domains/QuizAttachedTags/QuizAttachedTagsService.js";
+import ITagRepository from "@/domains/Tag/ITagRepository.js";
+import { ApiError } from "@/http/ApiError.js";
+import ITransactionManager from "../../shared/ITransactionManager.js";
 
 export type DeleteQuizUseCaseCommand = {
   qid: string;
+  uid: string;
 };
 
 export class DeleteQuizUseCase {
@@ -29,9 +30,11 @@ export class DeleteQuizUseCase {
       throw new ApiError({
         title: "NO_QUIZ",
         detail: "This qid is not available id",
-        status: 400,
+        status: 404,
         type: "about:blank",
       });
+
+    if (!quiz.isEditable(command.uid)) throw new ApiError().accessDenied();
 
     const assignedTags = QuizAttachedTags.create(quiz.qid, []);
 

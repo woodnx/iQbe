@@ -1,6 +1,6 @@
-import Category from "@/domains/Category";
-import { InMemoryCategoryInfra } from "@/interfaces/infra/InMemory/CategoryInfra";
-import { GetCategoryChainUseCase } from "./GetCategoryChainUseCase";
+import Category from "@/domains/Category/index.js";
+import { InMemoryCategoryInfra } from "@/interfaces/infra/InMemory/CategoryInfra.js";
+import { GetCategoryChainUseCase } from "./GetCategoryChainUseCase.js";
 
 describe("GetCategoryChainUseCase", () => {
   it("カテゴリの親子チェーンを取得できる", async () => {

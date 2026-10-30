@@ -1,8 +1,30 @@
-import Workbook from "@/domains/Workbook";
-import { InMemoryWorkbookInfra } from "@/interfaces/infra/InMemory/WorkbookInfra";
-import { DeleteWorkbookUseCase } from "./DeleteWorkbookUseCase";
+import Workbook from "@/domains/Workbook/index.js";
+import { InMemoryWorkbookInfra } from "@/interfaces/infra/InMemory/WorkbookInfra.js";
+import { DeleteWorkbookUseCase } from "./DeleteWorkbookUseCase.js";
 
 describe("DeleteWorkbookUseCase", () => {
+  it("rejects deleting another user's workbook", async () => {
+    const repo = new InMemoryWorkbookInfra();
+    await repo.save(
+      new Workbook(
+        "private",
+        "Owned",
+        null,
+        "owner",
+        null,
+        null,
+        0,
+        0,
+        0,
+        0,
+        null,
+      ),
+    );
+    await expect(
+      new DeleteWorkbookUseCase(repo).execute({ uid: "other", wid: "private" }),
+    ).rejects.toThrow();
+    expect(await repo.findByWid("private", "owner")).not.toBeNull();
+  });
   it("問題集を削除して一覧を返せる", async () => {
     const workbookRepository = new InMemoryWorkbookInfra();
     const useCase = new DeleteWorkbookUseCase(workbookRepository);

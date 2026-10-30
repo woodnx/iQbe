@@ -1,6 +1,3 @@
-import { useState } from "react";
-
-import { $api } from "@/utils/client";
 import {
   Badge,
   BoxProps,
@@ -14,6 +11,9 @@ import {
   useCombobox,
 } from "@mantine/core";
 import { IconTag } from "@tabler/icons-react";
+import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
+import { cleanQuery, readResponse, rpc } from "@/utils/client";
 
 interface FilteringTagsProps extends BoxProps {
   value?: string[] | undefined;
@@ -30,12 +30,29 @@ export default function FilteringTags({
   ...others
 }: FilteringTagsProps) {
   const [search, setSearch] = useState("");
-  const { data: tags } = $api.useQuery("get", "/tags", {
-    params: {
-      query: {
-        q: search,
+  const { data: tags } = useQuery({
+    queryKey: [
+      "get",
+      "/tags",
+      {
+        params: {
+          query: {
+            q: search,
+          },
+        },
       },
-    },
+    ],
+    queryFn: ({ signal }) =>
+      rpc.api.tags
+        .$get(
+          {
+            query: cleanQuery({
+              q: search,
+            }),
+          },
+          { init: { signal: signal } },
+        )
+        .then(readResponse),
   });
 
   const combobox = useCombobox({

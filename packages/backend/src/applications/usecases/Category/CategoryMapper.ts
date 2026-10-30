@@ -1,10 +1,13 @@
-import { components } from "api/schema";
+import type {
+  CategoryDTO as ApiCategoryDTO,
+  SubCategoryDTO as ApiSubCategoryDTO,
+} from "@/types/dto.js";
 
-import Category from "@/domains/Category";
+import Category from "@/domains/Category/index.js";
 
-type CategoryDTO = components["schemas"]["Category"];
+type CategoryDTO = ApiCategoryDTO;
 
-type SubCategoryDTO = components["schemas"]["SubCategory"];
+type SubCategoryDTO = ApiSubCategoryDTO;
 
 export const toCategoryDTO = (category: Category): CategoryDTO => ({
   id: category.id,

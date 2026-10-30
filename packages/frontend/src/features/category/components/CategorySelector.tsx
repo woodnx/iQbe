@@ -1,12 +1,12 @@
-import { components } from "api/schema";
-import { useState } from "react";
-
-import { $api } from "@/utils/client";
 import { BoxProps, Group } from "@mantine/core";
+import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
+import type { Category as ApiCategory } from "@/utils/api-types";
+import { readResponse, rpc } from "@/utils/client";
 
 import CategorySelectorBase from "./CategorySelectorBase";
 
-type Category = components["schemas"]["Category"];
+type Category = ApiCategory;
 
 interface CategorySelectorProps extends BoxProps {
   value?: Category[];
@@ -27,7 +27,13 @@ export default function CategorySelector({
     value && value.length > 1 ? value[1] : undefined,
   );
 
-  const { data: categories } = $api.useQuery("get", "/categories");
+  const { data: categories } = useQuery({
+    queryKey: ["get", "/categories"],
+    queryFn: ({ signal }) =>
+      rpc.api.categories
+        .$get({}, { init: { signal: signal } })
+        .then(readResponse),
+  });
   const subCategories =
     categories?.find((c) => c.id == category?.id)?.sub || [];
 

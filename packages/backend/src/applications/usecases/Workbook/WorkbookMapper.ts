@@ -1,10 +1,12 @@
-import { components } from "api/schema";
+import type {
+  WorkbookDTO as ApiWorkbookDTO,
+  WorkbooksResponseDTO as ApiWorkbooksResponseDTO,
+} from "@/types/dto.js";
 
-import Workbook from "@/domains/Workbook";
+import Workbook from "@/domains/Workbook/index.js";
 
-type WorkbookDTO = components["schemas"]["Workbook"];
-export type WorkbooksDTO =
-  components["responses"]["WorkbooksResponse"]["content"]["application/json"];
+type WorkbookDTO = ApiWorkbookDTO;
+export type WorkbooksDTO = ApiWorkbooksResponseDTO;
 
 export type WorkbookDateInput = Date | string | null;
 

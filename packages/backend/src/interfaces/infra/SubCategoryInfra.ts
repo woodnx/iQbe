@@ -1,6 +1,6 @@
-import SubCategory from "@/domains/SubCategory";
-import SubCategoryRepository from "@/domains/SubCategory/SubCategoryRepository";
-import KyselyClientManager from "./kysely/KyselyClientManager";
+import SubCategory from "@/domains/SubCategory/index.js";
+import SubCategoryRepository from "@/domains/SubCategory/SubCategoryRepository.js";
+import KyselyClientManager from "./kysely/KyselyClientManager.js";
 
 export default class SubCategoryInfra implements SubCategoryRepository {
   constructor(private clientManager: KyselyClientManager) {}

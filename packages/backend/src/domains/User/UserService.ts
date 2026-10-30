@@ -1,4 +1,4 @@
-import IUsersRepository from "./IUserRepository";
+import IUsersRepository from "./IUserRepository.js";
 import { uid } from "uid/secure";
 
 export default class UserService {

@@ -1,3 +1,6 @@
+import { ContinueTrainingCard } from "@/features/training/components/ContinueTrainingCard";
+import { readResponse, rpc } from "@/utils/client";
+import { convertDates } from "@/utils/convertDates";
 import {
   Button,
   Card,
@@ -12,53 +15,47 @@ import {
 import { DatePicker } from "@mantine/dates";
 import { modals } from "@mantine/modals";
 import { IconHistory } from "@tabler/icons-react";
+import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import dayjs from "dayjs";
 import { useState } from "react";
-import { $api } from "@/utils/client";
-import { convertDates } from "@/utils/convertDates";
 
 export const Route = createFileRoute("/training")({
   component: RouteComponent,
 });
 
 function RouteComponent() {
-  const { data: workbooks } = $api.useQuery("get", "/workbooks");
+  const { data: workbooks } = useQuery({
+    queryKey: ["get", "/workbooks"],
+    queryFn: ({ signal }) =>
+      rpc.api.workbooks
+        .$get({}, { init: { signal: signal } })
+        .then(readResponse),
+  });
+
   // const { data: histories } = $api.useQuery("get", "/histories/{since}/{until}");
   const histories =
-    $api
-      .useQuery("get", "/histories")
-      .data?.map((d) => dayjs(d).format("YYYY-MM-DD")) || [];
-  const [dates, setDates] = useState<[Date | null, Date | null]>([null, null]);
+    useQuery({
+      queryKey: ["get", "/histories"],
+      queryFn: ({ signal }) =>
+        rpc.api.histories
+          .$get({}, { init: { signal: signal } })
+          .then(readResponse),
+    }).data?.map((d) => dayjs(d).format("YYYY-MM-DD")) || [];
+
+  const [dates, setDates] = useState<[string | null, string | null]>([
+    null,
+    null,
+  ]);
   const navigate = useNavigate();
   const maxWorkbook = 5;
   const isWorkbooksExist = workbooks && workbooks.length > 0;
-  const brokenTraining = null;
 
   return (
     <Grid>
       <Grid.Col span={12}>
         <Stack>
-          <Card padding="lg" radius="lg">
-            <div>
-              <Text fw={700} size="xl">
-                前回の続き
-              </Text>
-              <Text c="dimmed" size="sm" mt="xs">
-                {brokenTraining || "中断した演習はありません"}
-              </Text>
-              <Button
-                color="green"
-                fullWidth
-                mt="md"
-                radius="md"
-                variant="filled"
-                disabled={!brokenTraining}
-              >
-                演習を再開
-              </Button>
-            </div>
-          </Card>
+          <ContinueTrainingCard />
         </Stack>
       </Grid.Col>
 
@@ -244,7 +241,6 @@ function RouteComponent() {
                   search: () => ({
                     since: d[0],
                     until: d[1],
-                    judgements: [0, 1, 2],
                   }),
                 });
               }}

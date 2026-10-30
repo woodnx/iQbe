@@ -28,24 +28,24 @@ export default function HistorySelectJudgement({
         label="正答"
         color="red"
         count={right}
-        isSelect={judgements.includes(1)}
+        isSelect={judgements.includes("right")}
         divide
-        onClick={() => setJudgements(1)}
+        onClick={() => setJudgements("right")}
       />
       <HistorySelectButton
         label="誤答"
         color="blue"
         count={wrong}
-        isSelect={judgements.includes(0)}
+        isSelect={judgements.includes("wrong")}
         divide
-        onClick={() => setJudgements(0)}
+        onClick={() => setJudgements("wrong")}
       />
       <HistorySelectButton
         label="スルー"
         color="gray"
         count={throgh}
-        isSelect={judgements.includes(2)}
-        onClick={() => setJudgements(2)}
+        isSelect={judgements.includes("through")}
+        onClick={() => setJudgements("through")}
       />
     </>
   );

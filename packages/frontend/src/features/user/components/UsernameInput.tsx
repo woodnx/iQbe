@@ -9,12 +9,13 @@ import {
 import { useDebouncedCallback } from "@mantine/hooks";
 import { IconAlertCircle, IconCheck } from "@tabler/icons-react";
 import { useState } from "react";
-import { client } from "@/utils/client";
+import { readResponse, rpc } from "@/utils/client";
 
 function checkUsernameAvailable(username: string): Promise<boolean> {
-  return client
-    .POST("/auth/available", { body: { username } })
-    .then(({ data }) => !!data?.available);
+  return rpc.api.auth.available
+    .$post({ json: { username } })
+    .then(readResponse)
+    .then((data) => data.available);
 }
 
 export interface UsernameInputProps extends TextInputProps {
@@ -32,8 +33,13 @@ export default function UsernameInput({
 
   const handleCheck = useDebouncedCallback(async (username: string) => {
     setLoading(true);
-    setAvailable(await checkUsernameAvailable(username));
-    setLoading(false);
+    try {
+      setAvailable(await checkUsernameAvailable(username));
+    } catch {
+      setAvailable(false);
+    } finally {
+      setLoading(false);
+    }
   }, 1000);
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {

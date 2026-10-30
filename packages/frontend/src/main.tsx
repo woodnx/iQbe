@@ -1,10 +1,13 @@
+import "@mantine/carousel/styles.css";
+import "@mantine/charts/styles.css";
 import "@mantine/core/styles.css";
 import "@mantine/dates/styles.css";
-import "@mantine/notifications/styles.css";
-import "@mantine/carousel/styles.css";
 import "@mantine/dropzone/styles.css";
+import "@mantine/notifications/styles.css";
 import "dayjs/locale/ja";
 
+import { IsMobileProvider } from "@/contexts/isMobile";
+import { RequestResetPasswordProvider } from "@/contexts/requestResetPassword";
 import { MantineProvider } from "@mantine/core";
 import { DatesProvider } from "@mantine/dates";
 import { ModalsProvider } from "@mantine/modals";
@@ -13,8 +16,6 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { RouterProvider } from "@tanstack/react-router";
 import React from "react";
 import ReactDOM from "react-dom/client";
-import { IsMobileProvider } from "@/contexts/isMobile";
-import { RequestResetPasswordProvider } from "@/contexts/requestResetPassword";
 
 import CategoryCreateModal from "@/features/category/components/CategoryCreateModal";
 import CategoryDeleteModal from "@/features/category/components/CategoryDeleteModal";
@@ -66,9 +67,7 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
         <IsMobileProvider>
           <RequestResetPasswordProvider>
             <ModalsProvider modals={modals}>
-              <DatesProvider
-                settings={{ locale: "ja", firstDayOfWeek: 0, timezone: "JST" }}
-              >
+              <DatesProvider settings={{ locale: "ja", firstDayOfWeek: 0 }}>
                 <Notifications position="top-right" />
                 <RouterProvider router={router} />
               </DatesProvider>

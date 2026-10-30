@@ -1,8 +1,8 @@
-import { useState } from "react";
-
-import { $api } from "@/utils/client";
 import { Alert, Button, Group, RadioGroup, Stack } from "@mantine/core";
 import { IconAlertTriangle } from "@tabler/icons-react";
+import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
+import { readResponse, rpc } from "@/utils/client";
 
 import CategoryPresetRadioCard from "./CategoryPresetRadioCard";
 
@@ -14,7 +14,13 @@ const CategoryPresetModal = ({
   onSave = () => {},
 }: CategoryPresetModalProps) => {
   const [value, setValue] = useState<string | null>(null);
-  const { data: presets } = $api.useQuery("get", "/categories/preset");
+  const { data: presets } = useQuery({
+    queryKey: ["get", "/categories/preset"],
+    queryFn: ({ signal }) =>
+      rpc.api.categories.preset
+        .$get({}, { init: { signal: signal } })
+        .then(readResponse),
+  });
 
   const cards = presets?.map((item) => (
     <CategoryPresetRadioCard

@@ -1,10 +1,11 @@
 import { BoxProps } from "@mantine/core";
 import { ContextModalProps } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
-import { useQueryClient } from "@tanstack/react-query";
-import { components } from "api/schema";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import type { InferRequestType } from "hono/client";
 import { useRef } from "react";
-import { $api } from "@/utils/client";
+import type { Mylist as ApiMylist, Quiz as ApiQuiz } from "@/utils/api-types";
+import { readResponse, rpc } from "@/utils/client";
 import {
   MYLISTS_QUERY_KEY,
   QUIZZES_QUERY_KEY,
@@ -18,8 +19,8 @@ interface MylistCreateModalInnerProps extends BoxProps {
   qid: string;
 }
 
-type Mylist = components["schemas"]["Mylist"];
-type Quiz = components["schemas"]["Quiz"];
+type Mylist = ApiMylist;
+type Quiz = ApiQuiz;
 
 export default function MylistCreateModal({
   context,
@@ -31,8 +32,11 @@ export default function MylistCreateModal({
   const previousMylistsRef = useRef<QuerySnapshot<Mylist[]>>([]);
   const previousQuizzesRef = useRef<QuerySnapshot<Quiz[]>>([]);
   const tempMidRef = useRef<string | null>(null);
-  const { mutate: addMylist } = $api.useMutation("post", "/mylists", {
-    onMutate: async ({ body }) => {
+  const { mutate: addMylist } = useMutation({
+    mutationKey: ["post", "/mylists"],
+    mutationFn: (input: InferRequestType<typeof rpc.api.mylists.$post>) =>
+      rpc.api.mylists.$post(input).then(readResponse),
+    onMutate: async ({ json: body }) => {
       await queryClient.cancelQueries({ queryKey: MYLISTS_QUERY_KEY });
       const previousMylists = takeQuerySnapshot<Mylist[]>(
         queryClient,
@@ -45,7 +49,12 @@ export default function MylistCreateModal({
       const optimisticMylist: Mylist = {
         mid: tempMid,
         name: body.listName,
-        created: new Date(),
+        created: new Date().toISOString(),
+        total: 0,
+        corrects: 0,
+        wrongs: 0,
+        ignored: 0,
+        lastPracticedAt: null,
       };
 
       queryClient.setQueriesData<Mylist[] | undefined>(
@@ -72,8 +81,11 @@ export default function MylistCreateModal({
       queryClient.invalidateQueries({ queryKey: MYLISTS_QUERY_KEY });
     },
   });
-  const { mutate: addQuizToMylist } = $api.useMutation("post", "/register", {
-    onMutate: async ({ body }) => {
+  const { mutate: addQuizToMylist } = useMutation({
+    mutationKey: ["post", "/register"],
+    mutationFn: (input: InferRequestType<typeof rpc.api.register.$post>) =>
+      rpc.api.register.$post(input).then(readResponse),
+    onMutate: async ({ json: body }) => {
       await queryClient.cancelQueries({ queryKey: QUIZZES_QUERY_KEY });
       const previousQuizzes = takeQuerySnapshot<Quiz[]>(
         queryClient,
@@ -82,13 +94,18 @@ export default function MylistCreateModal({
       previousQuizzesRef.current = previousQuizzes;
 
       const mylist = queryClient
-        .getQueryData<Mylist[]>(["get", "/mylists", undefined])
+        .getQueryData<Mylist[]>(["get", "/mylists"])
         ?.find((list) => list.mid === body.mid);
 
       const optimisticMylist: Mylist = mylist || {
         mid: body.mid,
         name: "",
-        created: new Date(),
+        created: new Date().toISOString(),
+        total: 0,
+        corrects: 0,
+        wrongs: 0,
+        ignored: 0,
+        lastPracticedAt: null,
       };
 
       queryClient.setQueriesData<Quiz[] | undefined>(
@@ -122,14 +139,14 @@ export default function MylistCreateModal({
   const toCreate = async (mylistname: string) => {
     addMylist(
       {
-        body: {
+        json: {
           listName: mylistname,
         },
       },
       {
         onSuccess: (createdMylist) => {
           addQuizToMylist({
-            body: {
+            json: {
               qid,
               mid: createdMylist.mid,
             },

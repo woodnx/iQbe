@@ -1,9 +1,13 @@
-import express from "express";
-import HistoryController from "@/interfaces/controllers/HistoryController";
-import JudgementController from "@/interfaces/controllers/JudgementController";
-import HistoryInfra from "@/interfaces/infra/HistoryInfra";
-import JudgementInfra from "@/interfaces/infra/JudgementInfra";
-import KyselyClientManager from "@/interfaces/infra/kysely/KyselyClientManager";
+import { Hono } from "hono";
+import type { AppEnv } from "@/http/context.js";
+import { validate } from "@/http/validate.js";
+import HistoryController from "@/interfaces/controllers/History/HistoryController.js";
+import { getHistories } from "@/interfaces/controllers/History/schema.js";
+import JudgementController from "@/interfaces/controllers/Judgement/JudgementController.js";
+import { getHistoriesSinceUntil } from "@/interfaces/controllers/Judgement/schema.js";
+import HistoryInfra from "@/interfaces/infra/HistoryInfra.js";
+import JudgementInfra from "@/interfaces/infra/JudgementInfra.js";
+import KyselyClientManager from "@/interfaces/infra/kysely/KyselyClientManager.js";
 
 const kyselyClientManager = new KyselyClientManager();
 const historyController = new HistoryController(
@@ -13,9 +17,11 @@ const judgementController = new JudgementController(
   new JudgementInfra(kyselyClientManager),
 );
 
-const router = express.Router();
-
-router.get("/", historyController.get());
-router.get("/:since/:until", judgementController.get());
-
-module.exports = router;
+const router = new Hono<AppEnv>()
+  .get("/", historyController.get())
+  .get(
+    "/:since/:until",
+    validate("param", getHistoriesSinceUntil.param),
+    judgementController.get(),
+  );
+export default router;

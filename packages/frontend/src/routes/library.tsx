@@ -10,18 +10,29 @@ import {
 } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { IconBook2, IconList, IconStar } from "@tabler/icons-react";
+import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { LibraryItem } from "@/features/library/components/LibraryItem";
-import { $api } from "@/utils/client";
+import { readResponse, rpc } from "@/utils/client";
 
 export const Route = createFileRoute("/library")({
   component: RouteComponent,
 });
 
 function RouteComponent() {
-  const { data: workbooks } = $api.useQuery("get", "/workbooks");
-  const { data: mylists } = $api.useQuery("get", "/mylists");
+  const { data: workbooks } = useQuery({
+    queryKey: ["get", "/workbooks"],
+    queryFn: ({ signal }) =>
+      rpc.api.workbooks
+        .$get({}, { init: { signal: signal } })
+        .then(readResponse),
+  });
+  const { data: mylists } = useQuery({
+    queryKey: ["get", "/mylists"],
+    queryFn: ({ signal }) =>
+      rpc.api.mylists.$get({}, { init: { signal: signal } }).then(readResponse),
+  });
   const [search, setSearch] = useState("");
   const displayedWorkbooks = (workbooks || []).filter((w) =>
     w.name.toLowerCase().includes(search.toLowerCase().trim()),

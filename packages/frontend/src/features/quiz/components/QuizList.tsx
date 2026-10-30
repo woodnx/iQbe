@@ -1,8 +1,8 @@
-import QuizCard from "./QuizCard";
+import type { Quiz as ApiQuiz } from "@/utils/api-types";
 import { Center, Loader } from "@mantine/core";
-import { components } from "api/schema";
+import QuizCard from "./QuizCard";
 
-type Quiz = components["schemas"]["Quiz"];
+type Quiz = ApiQuiz;
 
 interface QuizListProps {
   quizzes?: Quiz[];
@@ -21,7 +21,7 @@ export default function QuizList({
 }: QuizListProps) {
   return (
     <>
-      {!!quizzes ? (
+      {quizzes ? (
         <>
           {quizzes.map((quiz, idx) => (
             <QuizCard

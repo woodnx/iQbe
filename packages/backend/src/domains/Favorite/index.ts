@@ -1,5 +1,5 @@
-import Quiz from "../Quiz";
-import User from "../User";
+import Quiz from "../Quiz/index.js";
+import User from "../User/index.js";
 
 export default class Favorite {
   constructor(

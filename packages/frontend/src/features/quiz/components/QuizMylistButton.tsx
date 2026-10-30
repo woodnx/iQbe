@@ -2,11 +2,12 @@ import { ActionIcon, Button, Checkbox, Divider, Menu } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
 import { IconPlaylistAdd, IconPlus } from "@tabler/icons-react";
-import { useQueryClient } from "@tanstack/react-query";
-import { components } from "api/schema";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import type { InferRequestType } from "hono/client";
 import { ComponentProps, useState } from "react";
 import { useIsMobile } from "@/contexts/isMobile";
-import { $api } from "@/utils/client";
+import type { Mylist as ApiMylist, Quiz as ApiQuiz } from "@/utils/api-types";
+import { readResponse, rpc } from "@/utils/client";
 import {
   QUIZZES_QUERY_KEY,
   QuerySnapshot,
@@ -17,8 +18,8 @@ import {
 
 import classes from "./styles/QuizMylistButton.module.css";
 
-type Mylist = components["schemas"]["Mylist"];
-type Quiz = components["schemas"]["Quiz"];
+type Mylist = ApiMylist;
+type Quiz = ApiQuiz;
 
 interface Props extends ComponentProps<typeof Button> {
   qid: string;
@@ -26,14 +27,23 @@ interface Props extends ComponentProps<typeof Button> {
 }
 
 export default function QuizMylistButton({ qid, registerdMylists }: Props) {
-  const { data: mylists } = $api.useQuery("get", "/mylists");
+  const { data: mylists } = useQuery({
+    queryKey: ["get", "/mylists"],
+    // This button mounts for every practice question. Reuse the cached lists.
+    refetchOnMount: false,
+    queryFn: ({ signal }) =>
+      rpc.api.mylists.$get({}, { init: { signal: signal } }).then(readResponse),
+  });
   const [selectedMids, setSelectedMids] = useState(
     registerdMylists.map((mylist) => mylist.mid),
   );
   const queryClient = useQueryClient();
   const isMobile = useIsMobile();
-  const { mutate: addQuizToMylist } = $api.useMutation("post", "/register", {
-    onMutate: async ({ body }) => {
+  const { mutate: addQuizToMylist } = useMutation({
+    mutationKey: ["post", "/register"],
+    mutationFn: (input: InferRequestType<typeof rpc.api.register.$post>) =>
+      rpc.api.register.$post(input).then(readResponse),
+    onMutate: async ({ json: body }) => {
       await queryClient.cancelQueries({ queryKey: QUIZZES_QUERY_KEY });
       const previousQuizzes = takeQuerySnapshot<Quiz[]>(
         queryClient,
@@ -50,7 +60,12 @@ export default function QuizMylistButton({ qid, registerdMylists }: Props) {
         ({
           mid: body.mid,
           name: "",
-          created: new Date(),
+          created: new Date().toISOString(),
+          total: 0,
+          corrects: 0,
+          wrongs: 0,
+          ignored: 0,
+          lastPracticedAt: null,
         } as Mylist);
 
       queryClient.setQueriesData<Quiz[] | undefined>(
@@ -99,89 +114,88 @@ export default function QuizMylistButton({ qid, registerdMylists }: Props) {
       queryClient.invalidateQueries({ queryKey: QUIZZES_QUERY_KEY });
     },
   });
-  const { mutate: deleteQuizFromMylist } = $api.useMutation(
-    "post",
-    "/unregister",
-    {
-      onMutate: async ({ body }) => {
-        await queryClient.cancelQueries({ queryKey: QUIZZES_QUERY_KEY });
-        const previousQuizzes = takeQuerySnapshot<Quiz[]>(
-          queryClient,
-          QUIZZES_QUERY_KEY,
-        );
-        const previousSelectedMids = selectedMids;
+  const { mutate: deleteQuizFromMylist } = useMutation({
+    mutationKey: ["post", "/unregister"],
+    mutationFn: (input: InferRequestType<typeof rpc.api.unregister.$post>) =>
+      rpc.api.unregister.$post(input).then(readResponse),
+    onMutate: async ({ json: body }) => {
+      await queryClient.cancelQueries({ queryKey: QUIZZES_QUERY_KEY });
+      const previousQuizzes = takeQuerySnapshot<Quiz[]>(
+        queryClient,
+        QUIZZES_QUERY_KEY,
+      );
+      const previousSelectedMids = selectedMids;
 
-        setSelectedMids((prev) => prev.filter((mid) => mid !== body.mid));
+      setSelectedMids((prev) => prev.filter((mid) => mid !== body.mid));
 
-        previousQuizzes.forEach(([key, data]) => {
-          const query = (key[2] as { params?: { query?: { mid?: string } } })
-            ?.params?.query;
-          const nextData =
-            query?.mid === body.mid
-              ? data?.filter((quiz) => quiz.qid !== body.qid)
-              : data?.map((quiz) =>
-                  quiz.qid === body.qid
-                    ? {
-                        ...quiz,
-                        registerdMylist: quiz.registerdMylist?.filter(
-                          (mylist) => mylist.mid !== body.mid,
-                        ),
-                      }
-                    : quiz,
-                );
+      previousQuizzes.forEach(([key, data]) => {
+        const query = (key[2] as { params?: { query?: { mid?: string } } })
+          ?.params?.query;
+        const nextData =
+          query?.mid === body.mid
+            ? data?.filter((quiz) => quiz.qid !== body.qid)
+            : data?.map((quiz) =>
+                quiz.qid === body.qid
+                  ? {
+                      ...quiz,
+                      registerdMylist: quiz.registerdMylist?.filter(
+                        (mylist) => mylist.mid !== body.mid,
+                      ),
+                    }
+                  : quiz,
+              );
 
-          queryClient.setQueryData<Quiz[] | undefined>(key, nextData);
+        queryClient.setQueryData<Quiz[] | undefined>(key, nextData);
 
-          if (data && nextData && data.length !== nextData.length) {
-            updateRelatedQuizSize(
-              queryClient,
-              key,
-              nextData.length - data.length,
-            );
-          }
-        });
+        if (data && nextData && data.length !== nextData.length) {
+          updateRelatedQuizSize(
+            queryClient,
+            key,
+            nextData.length - data.length,
+          );
+        }
+      });
 
-        return { previousQuizzes, previousSelectedMids };
-      },
-      onSuccess: () => {
-        notifications.show({
-          title: "マイリストから削除",
-          message: "マイリストからクイズを削除しました",
-        });
-      },
-      onError: (_, __, context) => {
-        const rollback = context as
-          | {
-              previousQuizzes: QuerySnapshot<Quiz[]>;
-              previousSelectedMids: string[];
-            }
-          | undefined;
-        if (!rollback) return;
-        restoreQuerySnapshot(queryClient, rollback.previousQuizzes);
-        setSelectedMids(rollback.previousSelectedMids);
-        notifications.show({
-          title: "何らかの障害が発生しました",
-          message: "何度も続く場合はサポート担当に問い合わせてください",
-          color: "red",
-        });
-      },
-      onSettled: () => {
-        queryClient.invalidateQueries({ queryKey: QUIZZES_QUERY_KEY });
-      },
+      return { previousQuizzes, previousSelectedMids };
     },
-  );
+    onSuccess: () => {
+      notifications.show({
+        title: "マイリストから削除",
+        message: "マイリストからクイズを削除しました",
+      });
+    },
+    onError: (_, __, context) => {
+      const rollback = context as
+        | {
+            previousQuizzes: QuerySnapshot<Quiz[]>;
+            previousSelectedMids: string[];
+          }
+        | undefined;
+      if (!rollback) return;
+      restoreQuerySnapshot(queryClient, rollback.previousQuizzes);
+      setSelectedMids(rollback.previousSelectedMids);
+      notifications.show({
+        title: "何らかの障害が発生しました",
+        message: "何度も続く場合はサポート担当に問い合わせてください",
+        color: "red",
+      });
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: QUIZZES_QUERY_KEY });
+    },
+  });
 
   const saveToList = async (mid: string) => {
     if (!selectedMids.includes(mid)) {
       addQuizToMylist({
-        body: {
+        json: {
           qid,
           mid,
         },
       });
     } else {
       deleteQuizFromMylist({
-        body: {
+        json: {
           qid,
           mid,
         },

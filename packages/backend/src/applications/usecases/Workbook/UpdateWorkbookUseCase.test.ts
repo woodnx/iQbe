@@ -1,6 +1,6 @@
-import Workbook from "@/domains/Workbook";
-import { InMemoryWorkbookInfra } from "@/interfaces/infra/InMemory/WorkbookInfra";
-import { UpdateWorkbookUseCase } from "./UpdateWorkbookUseCase";
+import Workbook from "@/domains/Workbook/index.js";
+import { InMemoryWorkbookInfra } from "@/interfaces/infra/InMemory/WorkbookInfra.js";
+import { UpdateWorkbookUseCase } from "./UpdateWorkbookUseCase.js";
 
 describe("UpdateWorkbookUseCase", () => {
   it("問題集を更新できる", async () => {

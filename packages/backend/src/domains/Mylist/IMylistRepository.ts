@@ -1,4 +1,4 @@
-import Mylist from ".";
+import Mylist from "./index.js";
 
 export default interface IMylistRepository {
   findByMid(mid: string, uid: string): Promise<Mylist | null>;

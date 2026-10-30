@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { savedQuizDate, savedJudgements } from "./quizFilters";
 
 export const QuerySchema = z.object({
   page: z.coerce.number().int().positive().nullable().optional(),
@@ -15,21 +16,18 @@ export const QuerySchema = z.object({
 
   crctAnsRatio: z.preprocess(
     (v) => (typeof v === "string" ? v.split(",").map(Number) : v),
-    z.array(z.number()).nullable().optional()
+    z.array(z.number()).nullable().optional(),
   ),
 
-  since: z.coerce.number().nullable().optional(),
-  until: z.coerce.number().nullable().optional(),
+  since: savedQuizDate,
+  until: savedQuizDate,
 
-  judgements: z
-    .union([z.coerce.number(), z.array(z.coerce.number())])
-    .nullable()
-    .optional(),
+  judgements: savedJudgements,
 
   mid: z.string().nullable().optional(),
   isFavorite: z.preprocess(
     (v) => (v === "true" ? true : v === "false" ? false : v),
-    z.boolean().nullable().optional()
+    z.boolean().nullable().optional(),
   ),
 
   tags: z
@@ -39,7 +37,7 @@ export const QuerySchema = z.object({
 
   tagMatchAll: z.preprocess(
     (v) => (v === "true" ? true : v === "false" ? false : v),
-    z.boolean().nullable().optional()
+    z.boolean().nullable().optional(),
   ),
 
   categories: z

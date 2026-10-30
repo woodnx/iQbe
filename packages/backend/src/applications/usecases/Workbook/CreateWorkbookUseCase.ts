@@ -1,13 +1,12 @@
-import { components } from "api/schema";
+import type { WorkbookResponseDTO as ApiWorkbookResponseDTO } from "@/types/dto.js";
 
-import Workbook from "@/domains/Workbook";
-import IWorkbookRepository from "@/domains/Workbook/IWorkbookRepository";
-import WorkbookService from "@/domains/Workbook/WorkbookService";
+import Workbook from "@/domains/Workbook/index.js";
+import IWorkbookRepository from "@/domains/Workbook/IWorkbookRepository.js";
+import WorkbookService from "@/domains/Workbook/WorkbookService.js";
 
-import { normalizeWorkbookDate, WorkbookDateInput } from "./WorkbookMapper";
+import { normalizeWorkbookDate, WorkbookDateInput } from "./WorkbookMapper.js";
 
-type WorkbookDTO =
-  components["responses"]["WorkbookResponse"]["content"]["application/json"];
+type WorkbookDTO = ApiWorkbookResponseDTO;
 
 export type CreateWorkbookUseCaseCommand = {
   uid: string;

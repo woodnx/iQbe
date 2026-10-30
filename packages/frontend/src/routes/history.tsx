@@ -1,6 +1,3 @@
-import { Group } from "@mantine/core";
-import { createFileRoute, useRouter, useSearch } from "@tanstack/react-router";
-import { useState } from "react";
 import FilteringModalButton from "@/features/filtering/components/FilteringModalButton";
 import QuizControllBar from "@/features/quiz/components/QuizControllBar";
 import QuizHiddenAnswerButton from "@/features/quiz/components/QuizHiddenAnswerButton";
@@ -10,20 +7,19 @@ import QuizTransfarButton from "@/features/quiz/components/QuizTransfarButton";
 import { useHistories } from "@/hooks/useHistories";
 import dayjs from "@/plugins/dayjs";
 import { Judgement } from "@/types";
-import { $api } from "@/utils/client";
-import { convertJudgements } from "@/utils/convertJudgement";
+import { cleanQuery, readResponse, rpc } from "@/utils/client";
+import { Group } from "@mantine/core";
+import { useQuery } from "@tanstack/react-query";
+import { createFileRoute, useRouter, useSearch } from "@tanstack/react-router";
+import { useState } from "react";
 import { quizSearchSchema } from "./_schemas/quizSearch";
 
 export const Route = createFileRoute("/history")({
   validateSearch: quizSearchSchema.transform((value) => {
     const since =
-      typeof value.since === "number" && !Number.isNaN(value.since)
-        ? value.since
-        : dayjs().startOf("day").valueOf();
+      value.since != null ? value.since : dayjs().startOf("day").toISOString();
     const until =
-      typeof value.until === "number" && !Number.isNaN(value.until)
-        ? value.until
-        : dayjs().endOf("day").valueOf();
+      value.until != null ? value.until : dayjs().endOf("day").toISOString();
     return {
       ...value,
       since,
@@ -36,46 +32,89 @@ export const Route = createFileRoute("/history")({
 function RouteComponent() {
   const router = useRouter();
   const search = useSearch({ from: "/history" });
-  const [activePage, setPage] = useState(1);
+  const [activePage, setPage] = useState(search.page ?? 1);
   const [isHidden, setIsHidden] = useState(false);
   const [judgements, setJudgements] = useState<Judgement[]>(
-    convertJudgements(search.judgements || []),
+    search.judgements || [],
   );
-  const [dates, setDates] = useState<number[]>([
+  const [dates, setDates] = useState<string[]>([
     dayjs(search.since || undefined)
       .startOf("day")
-      .valueOf(),
+      .toISOString(),
     dayjs(search.until || undefined)
       .endOf("day")
-      .valueOf(),
+      .toISOString(),
   ]);
   const { histories } = useHistories(dates[0], dates[1]);
-  const right = !!histories ? Number(histories.right) : 0;
-  const wrong = !!histories ? Number(histories.wrong) : 0;
-  const throgh = !!histories ? Number(histories.through) : 0;
+  const right = histories ? Number(histories.right) : 0;
+  const wrong = histories ? Number(histories.wrong) : 0;
+  const throgh = histories ? Number(histories.through) : 0;
 
-  const { data: quizzes } = $api.useQuery("get", "/quizzes", {
-    params: {
-      query: {
-        ...search,
-        judgements,
-        since: dates[0],
-        until: dates[1],
+  const { data: quizzes } = useQuery({
+    queryKey: [
+      "get",
+      "/quizzes",
+      {
+        params: {
+          query: {
+            ...search,
+            history: true,
+            judgements,
+            since: dates[0],
+            until: dates[1],
+          },
+        },
       },
-    },
+    ],
+    queryFn: ({ signal }) =>
+      rpc.api.quizzes
+        .$get(
+          {
+            query: cleanQuery({
+              ...search,
+              history: true,
+              judgements,
+              since: dates[0],
+              until: dates[1],
+            }),
+          },
+          { init: { signal: signal } },
+        )
+        .then(readResponse),
   });
-  const { data: quizzesSize } = $api.useQuery("get", "/quizzes/size", {
-    params: {
-      query: {
-        ...search,
-        judgements,
-        since: dates[0],
-        until: dates[1],
+  const { data: quizzesSize } = useQuery({
+    queryKey: [
+      "get",
+      "/quizzes/size",
+      {
+        params: {
+          query: {
+            ...search,
+            history: true,
+            judgements,
+            since: dates[0],
+            until: dates[1],
+          },
+        },
       },
-    },
+    ],
+    queryFn: ({ signal }) =>
+      rpc.api.quizzes.size
+        .$get(
+          {
+            query: cleanQuery({
+              ...search,
+              history: true,
+              judgements,
+              since: dates[0],
+              until: dates[1],
+            }),
+          },
+          { init: { signal: signal } },
+        )
+        .then(readResponse),
   });
-  const size =
-    !!quizzes && !!quizzes.length && !!quizzesSize ? quizzesSize.size : 0;
+  const size = quizzesSize?.size ?? 0;
 
   const toFilter = (
     workbooks?: string | string[],
@@ -88,7 +127,7 @@ function RouteComponent() {
   ) => {
     setPage(1);
     router.navigate({
-      to: "/search",
+      to: "/history",
       search: (old) => ({
         ...old,
         page: 1,
@@ -150,6 +189,7 @@ function RouteComponent() {
   };
 
   const changeJudgement = (judgements: Judgement[]) => {
+    setPage(1);
     setJudgements(judgements);
     router.navigate({
       to: "/history",
@@ -164,7 +204,8 @@ function RouteComponent() {
     });
   };
 
-  const changeDates = (dates: number[]) => {
+  const changeDates = (dates: string[]) => {
+    setPage(1);
     setDates(dates);
     router.navigate({
       to: "/history",
@@ -213,7 +254,7 @@ function RouteComponent() {
       <QuizList
         quizzes={quizzes}
         page={activePage}
-        perPage={activePage}
+        perPage={search.maxView ?? 100}
         isHidden={isHidden}
         coloring
       />

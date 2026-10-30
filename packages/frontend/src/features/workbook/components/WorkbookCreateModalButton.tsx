@@ -1,10 +1,11 @@
 import { BoxProps, Button, Modal } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { IconPlus } from "@tabler/icons-react";
-import { useQueryClient } from "@tanstack/react-query";
-import { components } from "api/schema";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import type { InferRequestType } from "hono/client";
 import { useRef } from "react";
-import { $api } from "@/utils/client";
+import type { Workbook as ApiWorkbook } from "@/utils/api-types";
+import { readResponse, rpc } from "@/utils/client";
 import {
   ALL_WORKBOOKS_QUERY_KEY,
   QuerySnapshot,
@@ -14,7 +15,7 @@ import {
 } from "@/utils/queryCache";
 import WorkbookCreateForm from "./WorkbookCreateForm";
 
-type Workbook = components["schemas"]["Workbook"];
+type Workbook = ApiWorkbook;
 
 interface Props extends BoxProps {}
 
@@ -24,8 +25,11 @@ export default function WorkbookCreateModalButton({}: Props) {
   const previousWorkbooksRef = useRef<QuerySnapshot<Workbook[]>>([]);
   const previousAllWorkbooksRef = useRef<QuerySnapshot<Workbook[]>>([]);
   const tempWidRef = useRef<string | null>(null);
-  const { mutateAsync } = $api.useMutation("post", "/workbooks", {
-    onMutate: async ({ body }) => {
+  const { mutateAsync } = useMutation({
+    mutationKey: ["post", "/workbooks"],
+    mutationFn: (input: InferRequestType<typeof rpc.api.workbooks.$post>) =>
+      rpc.api.workbooks.$post(input).then(readResponse),
+    onMutate: async ({ json: body }) => {
       const tempWid = `tmp-${Date.now()}`;
       tempWidRef.current = tempWid;
 
@@ -50,6 +54,10 @@ export default function WorkbookCreateModalButton({}: Props) {
         name: body.name,
         date: body.published ?? null,
         creatorId: "",
+        total: 0,
+        corrects: 0,
+        wrongs: 0,
+        ignored: 0,
       };
 
       previousWorkbooks.forEach(([key, data]) => {
@@ -100,9 +108,9 @@ export default function WorkbookCreateModalButton({}: Props) {
   const createWorkbook = async (name: string, published?: Date) => {
     try {
       await mutateAsync({
-        body: {
+        json: {
           name,
-          published,
+          published: published?.toISOString(),
         },
       });
     } catch (e) {

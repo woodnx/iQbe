@@ -1,12 +1,13 @@
 import { Tabs } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
-import { useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import { paths } from "api/schema";
+import type { InferRequestType } from "hono/client";
 import { useRef } from "react";
 import CsvFileImporter from "@/features/create/components/CsvFileImporter";
 import QuizEditForm from "@/features/quiz/components/QuizEditForm";
-import { $api } from "@/utils/client";
+import type { QuizInput as ApiQuizInput } from "@/utils/api-types";
+import { readResponse, rpc } from "@/utils/client";
 import {
   QUIZ_SIZES_QUERY_KEY,
   QUIZZES_QUERY_KEY,
@@ -15,8 +16,7 @@ import {
   takeQuerySnapshot,
 } from "@/utils/queryCache";
 
-type QuizEditSubmitValues =
-  paths["/quizzes"]["post"]["requestBody"]["content"]["application/json"];
+type QuizEditSubmitValues = ApiQuizInput;
 
 export interface Element {
   question: string;
@@ -31,7 +31,10 @@ export const Route = createFileRoute("/create")({
 function RouteComponent() {
   const queryClient = useQueryClient();
   const previousQuizSizesRef = useRef<QuerySnapshot<{ size: number }>>([]);
-  const { mutate } = $api.useMutation("post", "/quizzes", {
+  const { mutate } = useMutation({
+    mutationKey: ["post", "/quizzes"],
+    mutationFn: (input: InferRequestType<typeof rpc.api.quizzes.$post>) =>
+      rpc.api.quizzes.$post(input).then(readResponse),
     onMutate: async () => {
       await queryClient.cancelQueries({ queryKey: QUIZ_SIZES_QUERY_KEY });
 
@@ -42,8 +45,7 @@ function RouteComponent() {
       previousQuizSizesRef.current = previousQuizSizes;
 
       previousQuizSizes.forEach(([key, data]) => {
-        queryClient.setQueryData<{ size: number } | undefined>(
-          key,
+        queryClient.setQueryData<{ size: number } | undefined>(key, () =>
           data ? { ...data, size: data.size + 1 } : data,
         );
       });
@@ -76,7 +78,7 @@ function RouteComponent() {
     wid,
   }: QuizEditSubmitValues) => {
     mutate({
-      body: {
+      json: {
         question,
         answer,
         category,

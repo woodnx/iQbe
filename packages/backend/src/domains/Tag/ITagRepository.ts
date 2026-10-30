@@ -1,4 +1,4 @@
-import Tag from ".";
+import Tag from "./index.js";
 
 export default interface ITagRepository {
   findByLabel(label: string): Promise<Tag | null>;

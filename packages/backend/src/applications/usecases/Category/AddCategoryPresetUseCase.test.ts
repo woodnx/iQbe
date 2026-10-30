@@ -1,6 +1,6 @@
-import { InMemoryCategoryInfra } from "@/interfaces/infra/InMemory/CategoryInfra";
-import { MockTransactionManager } from "../../shared/MockTransactionManager";
-import { AddCategoryPresetUseCase } from "./AddCategoryPresetUseCase";
+import { InMemoryCategoryInfra } from "@/interfaces/infra/InMemory/CategoryInfra.js";
+import { MockTransactionManager } from "../../shared/MockTransactionManager.js";
+import { AddCategoryPresetUseCase } from "./AddCategoryPresetUseCase.js";
 
 describe("AddCategoryPresetUseCase", () => {
   it("プリセットカテゴリを追加できる", async () => {

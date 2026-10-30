@@ -1,21 +1,22 @@
-import { Kysely, Transaction } from "kysely";
-
-import { db } from "@/database";
-import { DB } from "@/db/types";
-import IDataAccessClientManager from "@/interfaces/infra/shared/IDataAccessClientManager";
-
-type Client = Kysely<DB> | Transaction<DB>;
+import { AsyncLocalStorage } from "node:async_hooks";
+import type { Kysely, Transaction } from "kysely";
+import { db } from "@/database.js";
+import type { DB } from "@/db/types.js";
+import type IDataAccessClientManager from "../shared/IDataAccessClientManager.js";
 
 export default class KyselyClientManager
-  implements IDataAccessClientManager<Client>
+  implements IDataAccessClientManager<Kysely<DB> | Transaction<DB>>
 {
-  private client: Client = db;
+  private readonly storage = new AsyncLocalStorage<Transaction<DB>>();
 
-  setClient(client: Client): void {
-    this.client = client;
+  getClient(): Kysely<DB> | Transaction<DB> {
+    return this.storage.getStore() ?? db;
   }
 
-  getClient(): Client {
-    return this.client;
+  withTransaction<T>(
+    trx: Transaction<DB>,
+    callback: () => Promise<T>,
+  ): Promise<T> {
+    return this.storage.run(trx, callback);
   }
 }

@@ -1,4 +1,4 @@
-import Category from ".";
+import Category from "./index.js";
 
 export default interface ICategoryRepository {
   getAll(): Promise<Category[]>;

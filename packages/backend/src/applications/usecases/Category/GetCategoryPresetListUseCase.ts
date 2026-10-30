@@ -1,4 +1,4 @@
-import preset from "@/db/categories/preset.json";
+import preset from "@/db/categories/preset.json" with { type: "json" };
 
 export type CategoryPresetItem = {
   name: string;

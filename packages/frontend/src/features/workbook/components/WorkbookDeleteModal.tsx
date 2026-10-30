@@ -2,9 +2,10 @@ import { Button, Group, Text } from "@mantine/core";
 import { ContextModalProps } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
 import { IconTrash } from "@tabler/icons-react";
-import { useQueryClient } from "@tanstack/react-query";
-import { components } from "api/schema";
-import { $api } from "@/utils/client";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import type { InferRequestType } from "hono/client";
+import type { Workbook as ApiWorkbook } from "@/utils/api-types";
+import { readResponse, rpc } from "@/utils/client";
 import {
   ALL_WORKBOOKS_QUERY_KEY,
   QuerySnapshot,
@@ -13,7 +14,7 @@ import {
   WORKBOOKS_QUERY_KEY,
 } from "@/utils/queryCache";
 
-type Workbook = components["schemas"]["Workbook"];
+type Workbook = ApiWorkbook;
 
 export interface WorkbookDeleteModalInnerProps {
   wid: string;
@@ -26,8 +27,12 @@ const WorkbookDeleteModal = ({
 }: ContextModalProps<WorkbookDeleteModalInnerProps>) => {
   const { wid } = innerProps;
   const queryClient = useQueryClient();
-  const { mutate } = $api.useMutation("delete", "/workbooks/{wid}", {
-    onMutate: async ({ params }) => {
+  const { mutate } = useMutation({
+    mutationKey: ["delete", "/workbooks/{wid}"],
+    mutationFn: (
+      input: InferRequestType<(typeof rpc.api.workbooks)[":wid"]["$delete"]>,
+    ) => rpc.api.workbooks[":wid"].$delete(input).then(readResponse),
+    onMutate: async ({ param: params }) => {
       await queryClient.cancelQueries({ queryKey: WORKBOOKS_QUERY_KEY });
       await queryClient.cancelQueries({ queryKey: ALL_WORKBOOKS_QUERY_KEY });
 
@@ -40,7 +45,7 @@ const WorkbookDeleteModal = ({
         ALL_WORKBOOKS_QUERY_KEY,
       );
 
-      const targetWid = params.path.wid;
+      const targetWid = params.wid;
       const removeWorkbook = (data?: Workbook[]) => {
         if (!data) return data;
         return data.filter((workbook) => workbook.wid !== targetWid);
@@ -78,10 +83,8 @@ const WorkbookDeleteModal = ({
   const submit = () => {
     mutate(
       {
-        params: {
-          path: {
-            wid,
-          },
+        param: {
+          wid,
         },
       },
       {

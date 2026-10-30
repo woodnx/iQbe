@@ -1,9 +1,9 @@
+import type { User as ApiUser } from "@/utils/api-types";
 import store from "storejs";
-import { components } from "api/schema";
 
 type AccessToken = { accessToken: string };
 type RefreshToken = { refreshToken: string };
-type User = components["schemas"]["User"] & AccessToken & RefreshToken;
+type User = ApiUser & AccessToken & RefreshToken;
 
 export const useLoginedUser = () => {
   const data: User = store.get("loginedUser");

@@ -1,8 +1,9 @@
 import { BoxProps } from "@mantine/core";
 import { ContextModalProps } from "@mantine/modals";
-import { useQueryClient } from "@tanstack/react-query";
-import { components } from "api/schema";
-import { $api } from "@/utils/client";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import type { InferRequestType } from "hono/client";
+import type { Workbook as ApiWorkbook } from "@/utils/api-types";
+import { readResponse, rpc } from "@/utils/client";
 import {
   ALL_WORKBOOKS_QUERY_KEY,
   QuerySnapshot,
@@ -16,10 +17,10 @@ import WorkbookCreateForm from "./WorkbookCreateForm";
 interface WorkbookEditModalInnerProps extends BoxProps {
   wid: string;
   name: string;
-  date?: Date;
+  date?: string;
 }
 
-type Workbook = components["schemas"]["Workbook"];
+type Workbook = ApiWorkbook;
 
 export default function WorkbookEditModal({
   context,
@@ -28,8 +29,12 @@ export default function WorkbookEditModal({
 }: ContextModalProps<WorkbookEditModalInnerProps>) {
   const { wid, name, date } = innerProps;
   const queryClient = useQueryClient();
-  const { mutate } = $api.useMutation("put", "/workbooks/{wid}", {
-    onMutate: async ({ body, params }) => {
+  const { mutate } = useMutation({
+    mutationKey: ["put", "/workbooks/{wid}"],
+    mutationFn: (
+      input: InferRequestType<(typeof rpc.api.workbooks)[":wid"]["$put"]>,
+    ) => rpc.api.workbooks[":wid"].$put(input).then(readResponse),
+    onMutate: async ({ json: body, param: params }) => {
       await queryClient.cancelQueries({ queryKey: WORKBOOKS_QUERY_KEY });
       await queryClient.cancelQueries({ queryKey: ALL_WORKBOOKS_QUERY_KEY });
 
@@ -42,7 +47,7 @@ export default function WorkbookEditModal({
         ALL_WORKBOOKS_QUERY_KEY,
       );
 
-      const targetWid = params.path.wid;
+      const targetWid = params.wid;
       const patchWorkbook = (data?: Workbook[]) => {
         if (!data) return data;
         return data.map((workbook) =>
@@ -86,14 +91,12 @@ export default function WorkbookEditModal({
 
   const toEdit = async (name: string, published?: Date) => {
     mutate({
-      body: {
+      json: {
         name,
-        published,
+        published: published?.toISOString(),
       },
-      params: {
-        path: {
-          wid,
-        },
+      param: {
+        wid,
       },
     });
     context.closeModal(id);
@@ -102,7 +105,7 @@ export default function WorkbookEditModal({
   return (
     <WorkbookCreateForm
       name={name}
-      date={date}
+      date={date ? new Date(date) : undefined}
       onSubmit={toEdit}
       onClose={() => context.closeModal(id)}
     />

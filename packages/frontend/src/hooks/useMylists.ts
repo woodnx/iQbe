@@ -1,18 +1,19 @@
-import { $api } from "@/utils/client";
+import { useQuery } from "@tanstack/react-query";
+import { readResponse, rpc } from "@/utils/client";
 
 export const useMylists = (shouldFetch = true) => {
   const {
     data: mylists,
     error,
     isLoading,
-  } = $api.useQuery(
-    "get",
-    "/mylists",
-    {},
-    {
+  } = useQuery({
+    queryKey: ["get", "/mylists", {}],
+    queryFn: ({ signal }) =>
+      rpc.api.mylists.$get({}, { init: { signal: signal } }).then(readResponse),
+    ...{
       enabled: shouldFetch,
     },
-  );
+  });
 
   return {
     mylists,

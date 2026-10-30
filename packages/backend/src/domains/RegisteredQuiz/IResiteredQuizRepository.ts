@@ -1,4 +1,4 @@
-import RegisteredQuiz from ".";
+import RegisteredQuiz from "./index.js";
 
 export default interface IRegisteredQuizRepository {
   insert(registeredQuiz: RegisteredQuiz): Promise<void>;

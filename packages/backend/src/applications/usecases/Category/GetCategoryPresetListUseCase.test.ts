@@ -1,4 +1,4 @@
-import { GetCategoryPresetListUseCase } from "./GetCategoryPresetListUseCase";
+import { GetCategoryPresetListUseCase } from "./GetCategoryPresetListUseCase.js";
 
 describe("GetCategoryPresetListUseCase", () => {
   it("プリセットの一覧を取得できる", () => {

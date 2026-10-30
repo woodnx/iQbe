@@ -1,14 +1,15 @@
 import { Button, Card, CardProps, Grid, Group, Textarea } from "@mantine/core";
 import { isNotEmpty, useForm } from "@mantine/form";
-import { components, paths } from "api/schema";
-
 import CategorySelector from "@/features/category/components/CategorySelector";
 import TagInput from "@/features/tag/components/TagInput";
 import WorkbookCreateAndSelector from "@/features/workbook/components/WorkbookCreateAndSelector";
+import type {
+  Category as ApiCategory,
+  QuizInput as ApiQuizInput,
+} from "@/utils/api-types";
 
-type QuizEditSubmitValues =
-  paths["/quizzes"]["post"]["requestBody"]["content"]["application/json"];
-type Category = components["schemas"]["Category"];
+type QuizEditSubmitValues = ApiQuizInput;
+type Category = ApiCategory;
 
 interface QuizEditFormProps extends CardProps {
   question: string;

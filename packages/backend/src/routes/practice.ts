@@ -1,14 +1,15 @@
-import express from "express";
+import { Hono } from "hono";
+import PracticeUseCase from "@/applications/usecases/PracticeUseCase.js";
+import type { AppEnv } from "@/http/context.js";
+import { validate } from "@/http/validate.js";
+import PracticeController from "@/interfaces/controllers/Practice/PracticeController.js";
+import { postPractice } from "@/interfaces/controllers/Practice/schema.js";
+import CategoryInfra from "@/interfaces/infra/CategoryInfra.js";
+import HistoryInfra from "@/interfaces/infra/HistoryInfra.js";
+import KyselyClientManager from "@/interfaces/infra/kysely/KyselyClientManager.js";
+import QuizInfra from "@/interfaces/infra/QuizInfra.js";
+import UserInfra from "@/interfaces/infra/UserInfra.js";
 
-import PracticeUseCase from "@/applications/usecases/PracticeUseCase";
-import QuizInfra from "@/interfaces/infra/QuizInfra";
-import UserInfra from "@/interfaces/infra/UserInfra";
-import KyselyClientManager from "@/interfaces/infra/kysely/KyselyClientManager";
-import HistoryInfra from "@/interfaces/infra/HistoryInfra";
-import PracticeController from "@/interfaces/controllers/PracticeController";
-import CategoryInfra from "@/interfaces/infra/CategoryInfra";
-
-const router = express.Router();
 const kyselyClientManager = new KyselyClientManager();
 const practiceUseCase = new PracticeUseCase(
   new UserInfra(kyselyClientManager),
@@ -17,6 +18,9 @@ const practiceUseCase = new PracticeUseCase(
 );
 const practiceController = new PracticeController(practiceUseCase);
 
-router.post("/", practiceController.practice());
-
-module.exports = router;
+const router = new Hono<AppEnv>().post(
+  "/",
+  validate("json", postPractice.json),
+  practiceController.practice(),
+);
+export default router;

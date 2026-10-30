@@ -1,6 +1,7 @@
 import { Button, Checkbox, Divider, Stack } from "@mantine/core";
 import { ContextModalProps } from "@mantine/modals";
 import { useState } from "react";
+import { judgementSchema, type Judgement } from "@/utils/quizFilters";
 
 export function PracticeSettingModal({
   context,
@@ -8,11 +9,15 @@ export function PracticeSettingModal({
   innerProps,
 }: ContextModalProps<{
   isContainNA?: boolean;
-  onTrain: (judgements: number[]) => void;
+  onTrain: (judgements: Judgement[]) => void;
 }>) {
   const isContainNA =
     innerProps.isContainNA == undefined ? true : innerProps.isContainNA;
-  const [judgements, setJudgements] = useState(["0", "1", "2", "3"]);
+  const [judgements, setJudgements] = useState<Judgement[]>(
+    isContainNA
+      ? ["wrong", "right", "through", "unanswered"]
+      : ["wrong", "right", "through"],
+  );
   const [isShuffle, setIsShuffle] = useState(true);
   return (
     <>
@@ -20,28 +25,35 @@ export function PracticeSettingModal({
         label="問題の種類"
         defaultValue={judgements}
         value={judgements}
-        onChange={setJudgements}
+        onChange={(values) =>
+          setJudgements(values.map((value) => judgementSchema.parse(value)))
+        }
       >
         <Stack mt="xs">
           <Checkbox
             defaultChecked
             label="正答した問題"
             color="green"
-            value="1"
+            value="right"
           />
-          <Checkbox defaultChecked label="誤答した問題" color="red" value="0" />
+          <Checkbox
+            defaultChecked
+            label="誤答した問題"
+            color="red"
+            value="wrong"
+          />
           <Checkbox
             defaultChecked
             label="スルーした問題"
             color="gray"
-            value="2"
+            value="through"
           />
           {isContainNA && (
             <Checkbox
               defaultChecked
               label="未回答の問題"
               color="black"
-              value="3"
+              value="unanswered"
             />
           )}
         </Stack>
@@ -60,7 +72,7 @@ export function PracticeSettingModal({
         variant="filled"
         fullWidth
         onClick={() => {
-          innerProps.onTrain(judgements.map((j) => Number(j)));
+          innerProps.onTrain(judgements);
           context.closeModal(id);
         }}
       >

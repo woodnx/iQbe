@@ -1,8 +1,13 @@
 import { ContextModalProps } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
-import { useQueryClient } from "@tanstack/react-query";
-import { components, paths } from "api/schema";
-import { $api } from "@/utils/client";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import type { InferRequestType } from "hono/client";
+import type {
+  Category as ApiCategory,
+  Quiz as ApiQuiz,
+  QuizInput as ApiQuizInput,
+} from "@/utils/api-types";
+import { readResponse, rpc } from "@/utils/client";
 import {
   QUIZZES_QUERY_KEY,
   QuerySnapshot,
@@ -12,10 +17,9 @@ import {
 
 import QuizEditForm from "./QuizEditForm";
 
-type QuizEditSubmitValues =
-  paths["/quizzes"]["post"]["requestBody"]["content"]["application/json"];
-type Category = components["schemas"]["Category"];
-type Quiz = components["schemas"]["Quiz"];
+type QuizEditSubmitValues = ApiQuizInput;
+type Category = ApiCategory;
+type Quiz = ApiQuiz;
 
 interface Props {
   qid: string;
@@ -33,18 +37,23 @@ export default function ({
 }: ContextModalProps<Props>) {
   const { qid, ...formProps } = innerProps;
   const queryClient = useQueryClient();
-  const { mutate } = $api.useMutation("put", "/quizzes/{qid}", {
-    onMutate: async ({ body, params }) => {
+  const { mutate } = useMutation({
+    mutationKey: ["put", "/quizzes/{qid}"],
+    mutationFn: (
+      input: InferRequestType<(typeof rpc.api.quizzes)[":qid"]["$put"]>,
+    ) => rpc.api.quizzes[":qid"].$put(input).then(readResponse),
+    onMutate: async ({ json: body, param: params }) => {
       await queryClient.cancelQueries({ queryKey: QUIZZES_QUERY_KEY });
-      const previousQuizzes = takeQuerySnapshot<
-        components["schemas"]["Quiz"][]
-      >(queryClient, QUIZZES_QUERY_KEY);
+      const previousQuizzes = takeQuerySnapshot<ApiQuiz[]>(
+        queryClient,
+        QUIZZES_QUERY_KEY,
+      );
 
-      queryClient.setQueriesData<components["schemas"]["Quiz"][] | undefined>(
+      queryClient.setQueriesData<ApiQuiz[] | undefined>(
         { queryKey: QUIZZES_QUERY_KEY },
         (data) =>
           data?.map((quiz) =>
-            quiz.qid === params.path.qid
+            quiz.qid === params.qid
               ? {
                   ...quiz,
                   question: body.question,
@@ -81,14 +90,14 @@ export default function ({
   }: QuizEditSubmitValues) => {
     mutate(
       {
-        body: {
+        json: {
           question,
           answer,
           category,
           tags,
           wid,
         },
-        params: { path: { qid } },
+        param: { qid },
       },
       {
         onSuccess: () => {
