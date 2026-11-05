@@ -31,7 +31,7 @@ export default class RefreshTokensInfra implements IRefreshTokensRepository {
       .where("users.uid", "=", uid)
       .where("refresh_tokens.expired", "=", 0)
       .where("refresh_tokens.expDate", ">", new Date())
-      .orderBy("refresh_tokens.id desc")
+      .orderBy("refresh_tokens.id", "desc")
       .executeTakeFirst();
 
     if (!data) {
