@@ -264,9 +264,18 @@ export default class QuizInfra implements IQuizRepository, IQuizQueryService {
         "desc",
       );
     if (option.history) query = query.orderBy("latest.row_num");
+    // Workbook lists follow insertion order; specialized sorts keep their tie-breaker.
+    const workbookOrder =
+      !!option.wids?.length &&
+      option.seed == null &&
+      !option.isFavorite &&
+      !option.history &&
+      option.since == null &&
+      option.until == null &&
+      !option.mid;
     const maxView = option.maxView ?? 100;
     const quizzes = await query
-      .orderBy("quizzes.id", "desc")
+      .orderBy("quizzes.id", workbookOrder ? "asc" : "desc")
       .limit(maxView)
       .offset(maxView * ((option.page ?? 1) - 1))
       .execute();

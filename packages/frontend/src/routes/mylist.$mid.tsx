@@ -1,17 +1,3 @@
-import { Card, Group, getGradient, Text, useMantineTheme } from "@mantine/core";
-import { modals } from "@mantine/modals";
-import { notifications } from "@mantine/notifications";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import {
-  createFileRoute,
-  useNavigate,
-  useParams,
-  useRouter,
-  useSearch,
-} from "@tanstack/react-router";
-import type { InferRequestType } from "hono/client";
-import { ReactNode, useRef, useState } from "react";
-import { z } from "zod";
 import FilteringModalButton from "@/features/filtering/components/FilteringModalButton";
 import MylistDeleteModal from "@/features/mylist/components/MylistDeleteModal";
 import MylistEditModalButton from "@/features/mylist/components/MylistEditModalButton";
@@ -25,12 +11,26 @@ import type { Mylist as ApiMylist, Quiz as ApiQuiz } from "@/utils/api-types";
 import { cleanQuery, readResponse, rpc } from "@/utils/client";
 import {
   MYLISTS_QUERY_KEY,
+  QuerySnapshot,
   QUIZ_SIZES_QUERY_KEY,
   QUIZZES_QUERY_KEY,
-  QuerySnapshot,
   restoreQuerySnapshot,
   takeQuerySnapshot,
 } from "@/utils/queryCache";
+import { Card, getGradient, Group, Text, useMantineTheme } from "@mantine/core";
+import { modals } from "@mantine/modals";
+import { notifications } from "@mantine/notifications";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  createFileRoute,
+  useNavigate,
+  useParams,
+  useRouter,
+  useSearch,
+} from "@tanstack/react-router";
+import type { InferRequestType } from "hono/client";
+import { ReactNode, useRef, useState } from "react";
+import { z } from "zod";
 import { quizSearchSchema } from "./_schemas/quizSearch";
 
 type Mylist = ApiMylist;
@@ -282,7 +282,7 @@ function RouteComponent() {
       withBorder
       style={{
         backgroundImage: getGradient(
-          { deg: 45, from: "indigo", to: "cyan" },
+          { deg: 45, from: "dark", to: "gray" },
           theme,
         ),
         color: `var(--mantine-color-white)`,

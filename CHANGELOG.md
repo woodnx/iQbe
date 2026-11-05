@@ -1,5 +1,21 @@
 # Changelog
 
+## [4.2.0](https://github.com/woodnx/iQbe/compare/v4.1.9...v4.2.0) (2026-10-30)
+
+
+### Features
+
+* `workbook`，`mylist`のリストを取得するときに practice の情報を追加 ([#289](https://github.com/woodnx/iQbe/issues/289)) ([159c61a](https://github.com/woodnx/iQbe/commit/159c61a63e9f84adb3d805213c0a8c006a0ad5b7)), closes [#281](https://github.com/woodnx/iQbe/issues/281)
+* **frontend:** change design ([#286](https://github.com/woodnx/iQbe/issues/286)) ([e6a1d76](https://github.com/woodnx/iQbe/commit/e6a1d76d5b62a2c93b9314ce65482bf394443504)), closes [#275](https://github.com/woodnx/iQbe/issues/275)
+* history 一覧 ([#292](https://github.com/woodnx/iQbe/issues/292)) ([fef1619](https://github.com/woodnx/iQbe/commit/fef1619b830ae827d61687a1c7963e97e9a33f67))
+
+
+### Bug Fixes
+
+* Increased debounce timing ([#274](https://github.com/woodnx/iQbe/issues/274)) ([76e6522](https://github.com/woodnx/iQbe/commit/76e6522b0bd654dc4abb7cde08c5577a7f2acf79)), closes [#273](https://github.com/woodnx/iQbe/issues/273)
+* pagenation が表示されない問題を修正 ([#288](https://github.com/woodnx/iQbe/issues/288)) ([881a941](https://github.com/woodnx/iQbe/commit/881a94172b9b84e353bef38ea78fe8bdb0cd1423))
+* すべての mutate に楽観的更新を追加 ([#271](https://github.com/woodnx/iQbe/issues/271)) ([91b0bda](https://github.com/woodnx/iQbe/commit/91b0bda8a2439fdc80189ce423d69fae3afe56a3))
+
 ## [4.1.9](https://github.com/woodnx/iQbe/compare/v4.1.8...v4.1.9) (2026-02-06)
 
 

@@ -5,8 +5,7 @@ import {
   IconPlaystationCircle,
   IconX,
 } from "@tabler/icons-react";
-import { useEffect, useState } from "react";
-// import { useTimer, useTypewriter } from "@/hooks";
+import { useState } from "react";
 import { PracticeQuizButton } from "./PracticeQuizButton";
 import { PracticeQuizInfo } from "./PracticeQuizInfo";
 import { Scene } from "./PracticeSceneChanger";
@@ -34,24 +33,21 @@ export function PracticeQuizController({
   scene,
   ignoreLimit,
   countLimit,
-  canTypewrite,
   onJudge,
   ...others
 }: Props) {
-  const [quizScene, setScene] = useState<QuizScene>("preparation");
+  const [quizScene, setScene] = useState<QuizScene>(
+    scene === "quizzing" ? "typewriting" : "preparation",
+  );
   const [pressedWord, setPressedWord] = useState(-1);
+  const [previousScene, setPreviousScene] = useState(scene);
 
-  useEffect(() => {
-    if (scene == "quizzing") {
+  if (scene !== previousScene) {
+    setPreviousScene(scene);
+    if (scene === "quizzing") {
       setScene("typewriting");
     }
-  }, [scene]);
-
-  useEffect(() => {
-    if (quizScene == "preparation") {
-      setPressedWord(-1);
-    }
-  }, [quizScene]);
+  }
 
   const pressed = () => {
     setScene("pressed");
@@ -60,6 +56,7 @@ export function PracticeQuizController({
   const judge = (judge: number) => {
     onJudge(judge, pressedWord);
     setScene("preparation");
+    setPressedWord(-1);
   };
 
   return (
@@ -78,6 +75,7 @@ export function PracticeQuizController({
       <PracticeQuizInfo
         qid={quiz.qid}
         answer={quiz.answer}
+        anotherAnswer={quiz.anotherAnswer || undefined}
         workbook={quiz.workbook || undefined}
         isFavorite={quiz.isFavorite}
         registeredMylist={quiz?.registerdMylist || []}

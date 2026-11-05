@@ -129,3 +129,13 @@ overrides:
   vitest@>=4.0.0 <4.1.0: '>=4.1.0'
   yaml@>=2.0.0 <2.8.3: '>=2.8.3'
   zod@<4.6.6: ^4.6.6
+
+skills:
+  dirs:
+    - .agents/skills
+
+permissions:
+  '@tanstack/react-router':
+    skills: true
+  '@tanstack/router-plugin':
+    skills: true

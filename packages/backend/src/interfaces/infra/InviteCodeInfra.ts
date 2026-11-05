@@ -19,10 +19,10 @@ export default class InviteCodeInfra implements IInviteCodeRepository {
       q = q.where("used", "=", query.status);
     }
     if (query?.sort == "asc") {
-      q = q.orderBy("created asc");
+      q = q.orderBy("created", "asc");
     }
     if (query?.sort == "desc") {
-      q = q.orderBy("created desc");
+      q = q.orderBy("created", "desc");
     }
 
     const data = await q.execute();

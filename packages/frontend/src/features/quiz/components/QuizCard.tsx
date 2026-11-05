@@ -35,11 +35,7 @@ export default function QuizCard({
       : undefined;
 
   const hiddenButton = (
-    <Button
-      size="compact-xs"
-      color="violet.4"
-      onClick={() => setInnerIsHidden(false)}
-    >
+    <Button size="xs" color="violet.4" onClick={() => setInnerIsHidden(false)}>
       解答を表示
     </Button>
   );
@@ -57,8 +53,13 @@ export default function QuizCard({
       <Text pt={10}>{quiz.question}</Text>
       <Text ta="right" pt={10}>
         {innerIsHidden ? hiddenButton : quiz.answer}
+        {!innerIsHidden && (
+          <Text pt={5} c="gray" fz="sm">
+            {quiz.anotherAnswer}
+          </Text>
+        )}
       </Text>
-      <Flex justify="space-between" align="center">
+      <Flex justify="space-between" align="center" pt={5}>
         <QuizMylistButton
           qid={quiz.qid}
           registerdMylists={quiz.registerdMylist || []}
