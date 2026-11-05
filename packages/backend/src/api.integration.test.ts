@@ -342,6 +342,26 @@ integration("MySQL API integration", () => {
     expect(await quizzes.count("owner", filtered)).toBe(1);
   });
 
+  it.each(["book", ["book"]])(
+    "lists workbook quizzes in registration order across pages: %j",
+    async (wids) => {
+      const expected = ["q1", "q2", "q3"];
+      expect(
+        (await quizzes.findMany("owner", { wids })).map((quiz) => quiz.qid),
+      ).toEqual(expected);
+      for (let page = 1; page <= expected.length; page++) {
+        expect(
+          (await quizzes.findMany("owner", { wids, maxView: 1, page })).map(
+            (quiz) => quiz.qid,
+          ),
+        ).toEqual([expected[page - 1]]);
+      }
+      expect(
+        (await quizzes.findMany("owner", { wids: [] })).map((quiz) => quiz.qid),
+      ).toEqual([...expected].reverse());
+    },
+  );
+
   it.each([0, 12345])(
     "keeps seeded quiz order stable across answers and pages (seed %s)",
     async (seed) => {
@@ -355,6 +375,7 @@ integration("MySQL API integration", () => {
           (q) => q.qid,
         );
       expect(await ids()).toEqual(expected);
+      expect(await ids({ wids: ["book"] })).toEqual(expected);
       await db
         .updateTable("quizzes")
         .set({ total_crct_ans: 10 })
