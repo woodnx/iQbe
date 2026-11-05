@@ -6,7 +6,6 @@ import {
   IconX,
 } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
-// import { useTimer, useTypewriter } from "@/hooks";
 import { PracticeQuizButton } from "./PracticeQuizButton";
 import { PracticeQuizInfo } from "./PracticeQuizInfo";
 import { Scene } from "./PracticeSceneChanger";
@@ -34,7 +33,6 @@ export function PracticeQuizController({
   scene,
   ignoreLimit,
   countLimit,
-  canTypewrite,
   onJudge,
   ...others
 }: Props) {
@@ -78,6 +76,7 @@ export function PracticeQuizController({
       <PracticeQuizInfo
         qid={quiz.qid}
         answer={quiz.answer}
+        anotherAnswer={quiz.anotherAnswer || undefined}
         workbook={quiz.workbook || undefined}
         isFavorite={quiz.isFavorite}
         registeredMylist={quiz?.registerdMylist || []}
