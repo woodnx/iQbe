@@ -1,5 +1,5 @@
 import { execFileSync } from "node:child_process";
-import { createHash } from "node:crypto";
+import { createHash, randomUUID } from "node:crypto";
 import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
@@ -211,6 +211,195 @@ integration("MySQL API integration", () => {
         [1, 2].map((quiz_id) => ({ mylist_id: 1, quiz_id, registered: t(1) })),
       )
       .execute();
+  });
+
+  const postPractice = (body: {
+    qid: string;
+    judgement: number;
+    pressedWord: number;
+    clientAttemptId: string;
+  }) =>
+    app.request("/api/practice", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify(body),
+    });
+
+  it("acknowledges sequential and concurrent retries without changing the saved answer", async () => {
+    const body = {
+      qid: "q1",
+      judgement: 1,
+      pressedWord: 0,
+      clientAttemptId: randomUUID(),
+    };
+    const first = await postPractice(body);
+    expect(first.status).toBe(200);
+    expect(await first.text()).toBe("");
+    const saved = await db
+      .selectFrom("histories")
+      .selectAll()
+      .where("client_attempt_id", "=", body.clientAttemptId)
+      .executeTakeFirstOrThrow();
+    expect(saved.pressed_word).toBe(0);
+    // A retry must retain the original timestamp, even long after the answer.
+    await db
+      .updateTable("histories")
+      .set({ practiced: t(1) })
+      .where("id", "=", saved.id)
+      .execute();
+    expect((await postPractice(body)).status).toBe(200);
+    const responses = await Promise.all(
+      Array.from({ length: 5 }, () => postPractice(body)),
+    );
+    expect(responses.map((r) => r.status)).toEqual([200, 200, 200, 200, 200]);
+    expect(
+      await db
+        .selectFrom("histories")
+        .selectAll()
+        .where("client_attempt_id", "=", body.clientAttemptId)
+        .execute(),
+    ).toEqual([{ ...saved, practiced: t(1) }]);
+  });
+
+  it("inserts only one answer when the first submissions race", async () => {
+    const body = {
+      qid: "q1",
+      judgement: 1,
+      pressedWord: 0,
+      clientAttemptId: randomUUID(),
+    };
+    const responses = await Promise.all(
+      Array.from({ length: 5 }, () => postPractice(body)),
+    );
+    expect(responses.map((r) => r.status)).toEqual([200, 200, 200, 200, 200]);
+    expect(
+      await db
+        .selectFrom("histories")
+        .selectAll()
+        .where("client_attempt_id", "=", body.clientAttemptId)
+        .execute(),
+    ).toHaveLength(1);
+  });
+
+  it.each([{ qid: "q2" }, { judgement: 0 }, { pressedWord: 1 }])(
+    "rejects conflicting retries without modifying the saved answer: %j",
+    async (change) => {
+      const body = {
+        qid: "q1",
+        judgement: 1,
+        pressedWord: 0,
+        clientAttemptId: randomUUID(),
+      };
+      expect((await postPractice(body)).status).toBe(200);
+      const saved = await db
+        .selectFrom("histories")
+        .selectAll()
+        .where("client_attempt_id", "=", body.clientAttemptId)
+        .execute();
+      const response = await postPractice({ ...body, ...change });
+      expect(response.status).toBe(409);
+      expect(await response.json()).toMatchObject({
+        code: "CLIENT_ATTEMPT_ID_CONFLICT",
+      });
+      expect(
+        await db
+          .selectFrom("histories")
+          .selectAll()
+          .where("client_attempt_id", "=", body.clientAttemptId)
+          .execute(),
+      ).toEqual(saved);
+    },
+  );
+
+  it("accepts one of two conflicting concurrent answers and rejects the other", async () => {
+    const body = {
+      qid: "q1",
+      judgement: 1,
+      pressedWord: 0,
+      clientAttemptId: randomUUID(),
+    };
+    const responses = await Promise.all([
+      postPractice(body),
+      postPractice({ ...body, judgement: 0 }),
+    ]);
+    expect(responses.map((r) => r.status).sort()).toEqual([200, 409]);
+    const saved = await db
+      .selectFrom("histories")
+      .selectAll()
+      .where("client_attempt_id", "=", body.clientAttemptId)
+      .execute();
+    expect(saved).toHaveLength(1);
+    expect(saved[0].judgement).toBe(responses[0].status === 200 ? 1 : 0);
+  });
+
+  it("scopes attempt IDs and replay lookup to the authenticated user", async () => {
+    const body = {
+      qid: "q1",
+      judgement: 1,
+      pressedWord: 0,
+      clientAttemptId: randomUUID(),
+    };
+    await db
+      .insertInto("histories")
+      .values({
+        user_id: 2,
+        quiz_id: 2,
+        judgement: 0,
+        pressed_word: 5,
+        practiced: t(1),
+        client_attempt_id: body.clientAttemptId,
+      })
+      .execute();
+    expect((await postPractice(body)).status).toBe(200);
+    expect((await postPractice(body)).status).toBe(200);
+    const saved = await db
+      .selectFrom("histories")
+      .select(["user_id", "quiz_id", "judgement"])
+      .where("client_attempt_id", "=", body.clientAttemptId)
+      .orderBy("user_id")
+      .execute();
+    expect(saved).toEqual([
+      { user_id: 1, quiz_id: 1, judgement: 1 },
+      { user_id: 2, quiz_id: 2, judgement: 0 },
+    ]);
+  });
+
+  it("saves distinct attempts in the same second and selects the last inserted answer", async () => {
+    const body = {
+      qid: "q1",
+      judgement: 1,
+      pressedWord: 0,
+      clientAttemptId: randomUUID(),
+    };
+    const later = { ...body, judgement: 0, clientAttemptId: randomUUID() };
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(new Date("2026-11-07T12:00:00Z"));
+    try {
+      expect((await postPractice(body)).status).toBe(200);
+      expect((await postPractice(later)).status).toBe(200);
+    } finally {
+      vi.useRealTimers();
+    }
+    const saved = await db
+      .selectFrom("histories")
+      .selectAll()
+      .where("client_attempt_id", "in", [
+        body.clientAttemptId,
+        later.clientAttemptId,
+      ])
+      .orderBy("id")
+      .execute();
+    expect(saved).toHaveLength(2);
+    expect(saved[0].practiced).toEqual(saved[1].practiced);
+    expect(saved.map((row) => row.judgement)).toEqual([1, 0]);
+    expect(
+      (await quizzes.findMany("owner")).find((q) => q.qid === "q1")?.judgement,
+    ).toBe(0);
+    const history = await quizzes.findMany("owner", { history: true });
+    expect(history.slice(0, 2).map((q) => [q.qid, q.judgement])).toEqual([
+      ["q1", 0],
+      ["q1", 1],
+    ]);
   });
 
   it("isolates interleaved transactions, reuses nested transactions, and restores context after failure", async () => {

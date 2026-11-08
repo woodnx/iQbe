@@ -25,6 +25,7 @@ interface Props extends BoxProps {
   ignoreLimit: number;
   countLimit: number;
   canTypewrite?: boolean;
+  disabled?: boolean;
   onJudge: (judgement: number, pressedWord: number) => void;
 }
 
@@ -34,6 +35,7 @@ export function PracticeQuizController({
   ignoreLimit,
   countLimit,
   onJudge,
+  disabled = false,
   ...others
 }: Props) {
   const [quizScene, setScene] = useState<QuizScene>(
@@ -50,10 +52,12 @@ export function PracticeQuizController({
   }
 
   const pressed = () => {
+    if (disabled) return;
     setScene("pressed");
   };
 
   const judge = (judge: number) => {
+    if (disabled) return;
     onJudge(judge, pressedWord);
     setScene("preparation");
     setPressedWord(-1);
@@ -88,7 +92,7 @@ export function PracticeQuizController({
           radius="md"
           color="red"
           onClick={() => judge(1)}
-          disabled={quizScene !== "judging" || pressedWord == -1}
+          disabled={disabled || quizScene !== "judging" || pressedWord == -1}
         >
           <IconPlaystationCircle />
         </Button>
@@ -98,7 +102,7 @@ export function PracticeQuizController({
           radius="md"
           color="gray"
           onClick={() => judge(2)}
-          disabled={quizScene !== "judging" || pressedWord >= 0}
+          disabled={disabled || quizScene !== "judging" || pressedWord >= 0}
         >
           <IconChevronsRight />
         </Button>
@@ -108,7 +112,7 @@ export function PracticeQuizController({
           radius="md"
           color="blue"
           onClick={() => judge(0)}
-          disabled={quizScene !== "judging" || pressedWord == -1}
+          disabled={disabled || quizScene !== "judging" || pressedWord == -1}
         >
           <IconX />
         </Button>
@@ -117,7 +121,9 @@ export function PracticeQuizController({
         <PracticeQuizButton
           w={280}
           onClick={pressed}
-          disabled={quizScene !== "typewriting" && quizScene !== "ignored"}
+          disabled={
+            disabled || (quizScene !== "typewriting" && quizScene !== "ignored")
+          }
         />
       </Center>
     </Card>

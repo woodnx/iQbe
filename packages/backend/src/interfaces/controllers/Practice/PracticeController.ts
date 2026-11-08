@@ -12,13 +12,19 @@ export default class PracticeController {
       const qid = body.qid;
       const judgement = body.judgement;
       const pressedWordPosition = body.pressedWord;
+      const clientAttemptId = body.clientAttemptId;
 
-      await this.practiceUseCase.addPractice(
+      const result = await this.practiceUseCase.addPractice(
         uid,
         qid,
         judgement,
         pressedWordPosition,
+        clientAttemptId,
       );
+
+      if (!result.ok) {
+        return c.json(result.error, 409);
+      }
 
       return c.body(null, 200);
     };

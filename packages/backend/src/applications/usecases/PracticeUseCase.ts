@@ -14,7 +14,8 @@ export default class PracticeUseCase {
     uid: string,
     qid: string,
     judgement: number,
-    pressedWordPosition?: number,
+    pressedWordPosition: number,
+    clientAttemptId: string,
   ) {
     const historyService = new HistoryService(
       this.userRepository,
@@ -22,6 +23,26 @@ export default class PracticeUseCase {
       this.historyRepository,
     );
 
-    return historyService.add(uid, qid, judgement, pressedWordPosition || null);
+    const accepted = await historyService.add(
+      uid,
+      qid,
+      judgement,
+      pressedWordPosition,
+      clientAttemptId,
+    );
+    if (!accepted) {
+      return {
+        ok: false as const,
+        error: {
+          code: "CLIENT_ATTEMPT_ID_CONFLICT",
+          message: "同じ clientAttemptId で異なる解答が登録されています",
+        },
+      };
+    }
+
+    return {
+      ok: true as const,
+      data: undefined,
+    };
   }
 }

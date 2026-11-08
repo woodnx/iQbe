@@ -408,8 +408,9 @@ describe("validation and Hono RPC", () => {
 
 describe("quiz lookup by IDs", () => {
   it("accepts typed RPC arrays and returns the existing quiz response shape", async () => {
-    const { default: QuizInfra } =
-      await import("./interfaces/infra/QuizInfra.js");
+    const { default: QuizInfra } = await import(
+      "./interfaces/infra/QuizInfra.js"
+    );
     const quizzes = ["second", "first"].map((qid) => ({
       qid,
       question: "Question",
@@ -437,8 +438,9 @@ describe("quiz lookup by IDs", () => {
   });
 
   it("accepts one or 100 IDs and returns an empty array when none are found", async () => {
-    const { default: QuizInfra } =
-      await import("./interfaces/infra/QuizInfra.js");
+    const { default: QuizInfra } = await import(
+      "./interfaces/infra/QuizInfra.js"
+    );
     const find = vi
       .spyOn(QuizInfra.prototype, "findByQids")
       .mockResolvedValue([]);
@@ -473,8 +475,9 @@ describe("quiz lookup by IDs", () => {
       "uid=another-user",
     ].map((filter) => `qids=q1&${filter}`),
   ])("rejects invalid IDs or mixed search conditions: %s", async (query) => {
-    const { default: QuizInfra } =
-      await import("./interfaces/infra/QuizInfra.js");
+    const { default: QuizInfra } = await import(
+      "./interfaces/infra/QuizInfra.js"
+    );
     const find = vi
       .spyOn(QuizInfra.prototype, "findByQids")
       .mockResolvedValue([]);
@@ -739,7 +742,7 @@ describe("successful API contracts", () => {
     );
     const practice = vi
       .spyOn(PracticeUseCase.prototype, "addPractice")
-      .mockResolvedValue(undefined);
+      .mockResolvedValue({ ok: true, data: undefined });
     vi.spyOn(FavoriteUseCase.prototype, "addFavorite").mockResolvedValue(
       undefined,
     );
@@ -755,7 +758,16 @@ describe("successful API contracts", () => {
       "unregisterQuizFromMylist",
     ).mockResolvedValue(undefined);
     for (const [url, body, status] of [
-      ["/api/practice", { qid: "q", judgement: 0, pressedWord: 0 }, 200],
+      [
+        "/api/practice",
+        {
+          qid: "q",
+          judgement: 0,
+          pressedWord: 0,
+          clientAttemptId: "c382ab80-f895-42a7-9c36-1bba967ef26f",
+        },
+        200,
+      ],
       ["/api/like", { qid: "q" }, 201],
       ["/api/unlike", { qid: "q" }, 201],
       ["/api/register", { qid: "q", mid: "m" }, 201],
@@ -765,6 +777,31 @@ describe("successful API contracts", () => {
       expect(response.status).toBe(status);
       expect(await response.text()).toBe("");
     }
-    expect(practice).toHaveBeenCalledWith(user.uid, "q", 0, 0);
+    expect(practice).toHaveBeenCalledWith(
+      user.uid,
+      "q",
+      0,
+      0,
+      "c382ab80-f895-42a7-9c36-1bba967ef26f",
+    );
   });
+});
+
+describe("practice attempt validation", () => {
+  it.each([undefined, "not-a-uuid"])(
+    "rejects invalid attempt ID %s before calling the use case",
+    async (clientAttemptId) => {
+      const { default: PracticeUseCase } =
+        await import("./applications/usecases/PracticeUseCase.js");
+      const practice = vi.spyOn(PracticeUseCase.prototype, "addPractice");
+      const response = await jsonRequest("/api/practice", {
+        qid: "q",
+        judgement: 1,
+        pressedWord: 0,
+        clientAttemptId,
+      });
+      expect(response.status).toBe(400);
+      expect(practice).not.toHaveBeenCalled();
+    },
+  );
 });

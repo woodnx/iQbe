@@ -4,6 +4,7 @@ import PracticeQuitModal from "@/features/practice/components/PracticeQuitModal"
 import { PracticeQuizController } from "@/features/practice/components/PracticeQuizController";
 import { PracticeQuizIntro } from "@/features/practice/components/PracticeQuizIntro";
 import PracticeResultModal from "@/features/practice/components/PracticeResultModal";
+import { PracticeSaveStatus } from "@/features/practice/components/PracticeSaveStatus";
 import { useTimer } from "@/hooks";
 import { db } from "@/plugins/db";
 import type { Quiz as ApiQuiz } from "@/utils/api-types";
@@ -20,7 +21,7 @@ import { notifications } from "@mantine/notifications";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter, useSearch } from "@tanstack/react-router";
 import type { InferRequestType } from "hono/client";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 type Quiz = ApiQuiz;
 export type Scene = "preparation" | "ready" | "quizzing" | "result";
@@ -49,6 +50,7 @@ export default function PracticeSceneChanger({
   const startImmediately =
     resumeId !== undefined || isTransfer || search.seed != null;
   const [nowNumber, setNowNumber] = useState(initialIndex);
+
   const [scene, setScene] = useState<Scene>(
     initialIndex >= (quizzes?.length ?? Infinity)
       ? "result"
@@ -61,8 +63,19 @@ export default function PracticeSceneChanger({
   const openFilter = filter.open;
   const [_, result] = useDisclosure(false);
   const router = useRouter();
+
+  const pendingAttempt = useRef<{
+    input: InferRequestType<typeof rpc.api.practice.$post>;
+    action: "next" | "quit";
+    nextNumber: number;
+    recorded: boolean;
+  } | null>(null);
+  const saving = useRef(false);
+  const [saveState, setSaveState] = useState<"idle" | "saving" | "failed">(
+    "idle",
+  );
   const queryClient = useQueryClient();
-  const { mutate } = useMutation({
+  const { mutateAsync } = useMutation({
     mutationKey: ["post", "/practice"],
     mutationFn: (input: InferRequestType<typeof rpc.api.practice.$post>) =>
       rpc.api.practice.$post(input).then(readResponse),
@@ -76,16 +89,16 @@ export default function PracticeSceneChanger({
       queryClient.setQueriesData<Quiz[] | undefined>(
         { queryKey: QUIZZES_QUERY_KEY },
         (data) =>
-          data?.map((quiz) =>
-            quiz.qid === body.qid
-              ? {
-                  ...quiz,
-                  total: quiz.total + 1,
-                  right: body.judgement === 1 ? quiz.right + 1 : quiz.right,
-                  judgement: body.judgement,
-                }
-              : quiz,
-          ),
+          data?.map((quiz) => {
+            if (quiz.qid === body.qid)
+              return {
+                ...quiz,
+                total: quiz.total + 1,
+                right: body.judgement === 1 ? quiz.right + 1 : quiz.right,
+                judgement: body.judgement,
+              };
+            else return quiz;
+          }),
       );
 
       return { previousQuizzes };
@@ -126,6 +139,7 @@ export default function PracticeSceneChanger({
     tagMatchAll?: boolean,
     maxView?: number,
   ) => {
+    if (pendingAttempt.current) return;
     const seed = search.seed ?? Math.floor(Math.random() * 100000);
     router.navigate({
       to: "/practice",
@@ -150,57 +164,77 @@ export default function PracticeSceneChanger({
     setScene("ready");
   };
 
-  const record = async (judgement: number, pressedWord: number) => {
-    if (!quiz) return;
-
-    mutate({
-      json: {
-        qid: quiz?.qid,
-        judgement,
-        pressedWord,
-      },
-    });
-
-    if (judgement == 1) {
-      const addId = quiz.qid;
-      setRightList([...rightList, addId]);
-    }
-  };
-
-  const judgeQuiz = async (judgement: number, pressedWord: number) => {
-    record(judgement, pressedWord);
-    const nextNumber = nowNumber + 1;
+  const savePendingAttempt = async () => {
+    const attempt = pendingAttempt.current;
+    // Guard synchronously, including clicks before React renders disabled controls.
+    if (!attempt || saving.current) return;
+    saving.current = true;
+    setSaveState("saving");
 
     try {
-      if (resumeId !== undefined) {
-        await db.practiceSessions.update(resumeId, {
-          currentIndex: nextNumber,
-          updatedAt: new Date(),
-        });
-        await queryClient.invalidateQueries({
-          queryKey: ["practiceSession", resumeId],
-        });
+      if (!attempt.recorded) {
+        await mutateAsync(attempt.input);
+        attempt.recorded = true;
+        if (attempt.input.json.judgement === 1) {
+          setRightList((previous) => [...previous, attempt.input.json.qid]);
+        }
       }
 
-      if (nowNumber >= maxQuizSize - 1) {
-        setScene("result");
+      if (attempt.action === "quit") {
+        await router.navigate({ to: "/" });
       } else {
-        setNowNumber(nextNumber);
-        setScene("ready");
+        if (resumeId !== undefined) {
+          await db.practiceSessions.update(resumeId, {
+            currentIndex: attempt.nextNumber,
+            updatedAt: new Date(),
+          });
+          await queryClient.invalidateQueries({
+            queryKey: ["practiceSession", resumeId],
+          });
+        }
+        if (attempt.nextNumber >= maxQuizSize) {
+          setScene("result");
+        } else {
+          setNowNumber(attempt.nextNumber);
+          setScene("ready");
+        }
       }
-    } catch (error) {
-      console.error("進行状態の保存に失敗しました", error);
+      pendingAttempt.current = null;
+      setSaveState("idle");
+    } catch {
+      setSaveState("failed");
       notifications.show({
         title: "保存に失敗しました",
-        message: "演習の進行状態を保存できませんでした。",
+        message: attempt.recorded
+          ? "解答は保存済みです。「もう一度保存する」で演習の進行を再開できます。"
+          : "解答の保存を確認できませんでした。「もう一度保存する」で同じ解答を再送できます。",
         color: "red",
       });
+    } finally {
+      saving.current = false;
     }
   };
 
-  const stopQuiz = async (judgement: number) => {
-    await record(judgement, -1);
-    router.navigate({ to: "/" });
+  const record = async (
+    judgement: number,
+    pressedWord: number,
+    action: "next" | "quit",
+  ) => {
+    if (!quiz || pendingAttempt.current) return;
+    pendingAttempt.current = {
+      input: {
+        json: {
+          qid: quiz.qid,
+          judgement,
+          pressedWord,
+          clientAttemptId: crypto.randomUUID(),
+        },
+      },
+      action,
+      nextNumber: nowNumber + 1,
+      recorded: false,
+    };
+    await savePendingAttempt();
   };
 
   return (
@@ -250,9 +284,16 @@ export default function PracticeSceneChanger({
         onTry={filter.open}
         onQuit={() => router.navigate({ to: "/" })}
       />
+      <PracticeSaveStatus state={saveState} onRetry={savePendingAttempt} />
       <Group justify="space-between">
-        <FilteringModalButton onSubmit={toFilter} />
-        <PracticeQuitModal onJudge={(j) => stopQuiz(j)} />
+        <FilteringModalButton
+          disabled={saveState !== "idle"}
+          onSubmit={toFilter}
+        />
+        <PracticeQuitModal
+          disabled={saveState !== "idle"}
+          onJudge={(j) => record(j, -1, "quit")}
+        />
       </Group>
       <Text ta="center">
         <Text span fz={38} fw={700}>
@@ -269,7 +310,8 @@ export default function PracticeSceneChanger({
           scene={scene}
           ignoreLimit={3000}
           countLimit={5000}
-          onJudge={(j, w) => judgeQuiz(j, w)}
+          disabled={saveState !== "idle"}
+          onJudge={(j, w) => record(j, w, "next")}
         />
       )}
     </>

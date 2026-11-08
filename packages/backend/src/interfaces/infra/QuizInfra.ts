@@ -22,9 +22,9 @@ export default class QuizInfra implements IQuizRepository, IQuizQueryService {
     return this.clientManager
       .getClient()
       .selectFrom("histories")
-      .select(["quiz_id", "judgement", "practiced"])
+      .select(["id", "quiz_id", "judgement", "practiced"])
       .select(
-        sql<number>`ROW_NUMBER() OVER (PARTITION BY quiz_id ORDER BY practiced DESC)`.as(
+        sql<number>`ROW_NUMBER() OVER (PARTITION BY quiz_id ORDER BY practiced DESC, id DESC)`.as(
           "row_num",
         ),
       )
@@ -250,7 +250,9 @@ export default class QuizInfra implements IQuizRepository, IQuizQueryService {
         "desc",
       );
     if (option.history || option.since != null || option.until != null)
-      query = query.orderBy("latest.practiced", "desc");
+      query = query
+        .orderBy("latest.practiced", "desc")
+        .orderBy("latest.id", "desc");
     if (option.mid)
       query = query.orderBy(
         (eb) =>
