@@ -1,10 +1,10 @@
-import ICsvImportRepository from "@/domains/CsvImport/ICsvImportRepository.js";
+import { ParseCsvUseCase } from "@/applications/usecases/Csv/ParseCsvUseCase.js";
 import { ApiError } from "@/http/ApiError.js";
 import type { ApiContext } from "@/http/context.js";
 import { postCsvParse } from "./schema.js";
 
 export default class CsvController {
-  constructor(private csvImportRepository: ICsvImportRepository) {}
+  constructor(private parseCsvUseCase: ParseCsvUseCase) {}
 
   parse() {
     return async (c: ApiContext<typeof postCsvParse>) => {
@@ -19,17 +19,11 @@ export default class CsvController {
         });
       }
 
-      const csv = await this.csvImportRepository.parseCsv(
+      const csv = await this.parseCsvUseCase.execute(
         Buffer.from(await file.arrayBuffer()),
       );
 
-      const sendCsv = csv.map((c) => ({
-        question: c.question,
-        answer: c.answer,
-        anotherAnswer: c.anotherAnswer,
-      }));
-
-      return c.json(sendCsv);
+      return c.json(csv);
     };
   }
 }

@@ -12,12 +12,17 @@ import { useIsMobile } from "@/contexts/isMobile";
 
 interface Props extends BoxProps {
   onJudge: (judgement: number) => void;
+  disabled?: boolean;
 }
 
-export default function PracticePauseModal({ onJudge }: Props) {
+export default function PracticePauseModal({
+  onJudge,
+  disabled = false,
+}: Props) {
   const [opened, { open, close }] = useDisclosure(false);
   const isMobile = useIsMobile();
   const judge = (judgement: number) => {
+    if (disabled) return;
     onJudge(judgement);
     close();
   };
@@ -25,6 +30,7 @@ export default function PracticePauseModal({ onJudge }: Props) {
   const defaultButton = (
     <Button
       variant="outline"
+      disabled={disabled}
       onClick={open}
       leftSection={<IconPlayerPauseFilled />}
       color="dark"
@@ -35,6 +41,7 @@ export default function PracticePauseModal({ onJudge }: Props) {
 
   const mobileButton = (
     <ActionIcon
+      disabled={disabled}
       onClick={open}
       size="lg"
       radius="xl"
@@ -54,13 +61,28 @@ export default function PracticePauseModal({ onJudge }: Props) {
       >
         <Space h={10} />
         <Stack gap="md" h={300}>
-          <Button size="lg" color="red" onClick={() => judge(1)}>
+          <Button
+            disabled={disabled}
+            size="lg"
+            color="red"
+            onClick={() => judge(1)}
+          >
             正解にしてやめる
           </Button>
-          <Button size="lg" color="gray" onClick={() => judge(2)}>
+          <Button
+            disabled={disabled}
+            size="lg"
+            color="gray"
+            onClick={() => judge(2)}
+          >
             スルーにしてやめる
           </Button>
-          <Button size="lg" color="blue" onClick={() => judge(0)}>
+          <Button
+            disabled={disabled}
+            size="lg"
+            color="blue"
+            onClick={() => judge(0)}
+          >
             誤答にしてやめる
           </Button>
           <Button size="lg" variant="outline" color="gray" onClick={close}>

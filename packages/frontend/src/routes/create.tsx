@@ -1,20 +1,20 @@
+import CsvFileImporter from "@/features/create/components/CsvFileImporter";
+import QuizEditForm from "@/features/quiz/components/QuizEditForm";
+import type { QuizInput as ApiQuizInput } from "@/utils/api-types";
+import { readResponse, rpc } from "@/utils/client";
+import {
+  QuerySnapshot,
+  QUIZ_SIZES_QUERY_KEY,
+  QUIZZES_QUERY_KEY,
+  restoreQuerySnapshot,
+  takeQuerySnapshot,
+} from "@/utils/queryCache";
 import { Tabs } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import type { InferRequestType } from "hono/client";
 import { useRef } from "react";
-import CsvFileImporter from "@/features/create/components/CsvFileImporter";
-import QuizEditForm from "@/features/quiz/components/QuizEditForm";
-import type { QuizInput as ApiQuizInput } from "@/utils/api-types";
-import { readResponse, rpc } from "@/utils/client";
-import {
-  QUIZ_SIZES_QUERY_KEY,
-  QUIZZES_QUERY_KEY,
-  QuerySnapshot,
-  restoreQuerySnapshot,
-  takeQuerySnapshot,
-} from "@/utils/queryCache";
 
 type QuizEditSubmitValues = ApiQuizInput;
 
@@ -22,6 +22,10 @@ export interface Element {
   question: string;
   answer: string;
   anotherAnswer?: string | null;
+  category?: number;
+  categoryName?: string;
+  subCategoryName?: string;
+  categoryError?: string;
 }
 
 export const Route = createFileRoute("/create")({
@@ -52,7 +56,7 @@ function RouteComponent() {
     },
     onSuccess: () => {
       notifications.show({
-        title: "新しいクイズを作成しました",
+        title: "新しいクイズを追加しました",
         message: "",
       });
     },

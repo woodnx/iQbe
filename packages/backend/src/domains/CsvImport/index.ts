@@ -3,6 +3,8 @@ export default class CsvImport {
     private _question: string,
     private _answer: string,
     private _anotherAnswer: string | null,
+    readonly categoryName?: string,
+    readonly subCategoryName?: string,
   ) {}
 
   get question() {

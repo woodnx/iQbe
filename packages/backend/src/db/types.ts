@@ -17,6 +17,8 @@ export type favorites = {
     registered: Timestamp;
 };
 export type histories = {
+    id: Generated<number>;
+    client_attempt_id: string | null;
     user_id: number;
     quiz_id: number;
     practiced: Timestamp;

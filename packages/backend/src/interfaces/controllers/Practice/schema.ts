@@ -5,5 +5,6 @@ export const postPractice = {
     qid: z.string(),
     judgement: z.number().int().min(0).max(2),
     pressedWord: z.number().int().min(-1),
+    clientAttemptId: z.uuid(),
   }),
 };

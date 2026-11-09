@@ -1,7 +1,7 @@
 import IQuizRepository from "../Quiz/IQuizRepository.js";
 import IUserRepository from "../User/IUserRepository.js";
-import History from "./index.js";
 import IHistoryRepository from "./IHistoryRepository.js";
+import History from "./index.js";
 
 export default class HistoryService {
   constructor(
@@ -14,7 +14,8 @@ export default class HistoryService {
     uid: string,
     qid: string,
     judgement: number,
-    pressedWordPosition: number | null,
+    pressedWordPosition: number,
+    clientAttemptId: string,
   ) {
     const [user, quiz] = await Promise.all([
       this.userRepository.findByUid(uid),
@@ -26,12 +27,15 @@ export default class HistoryService {
     }
 
     const history = new History(
-      quiz,
-      user,
+      qid,
+      uid,
       pressedWordPosition,
       judgement,
       new Date(),
+      clientAttemptId,
     );
-    await this.historyRepository.add(history);
+    const savedHistory = await this.historyRepository.add(history);
+
+    return savedHistory.hasSameAnswer(history);
   }
 }
