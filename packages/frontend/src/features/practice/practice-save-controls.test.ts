@@ -32,7 +32,9 @@ vi.mock("@mantine/core", () => {
     );
   };
   return {
+    Affix: Container,
     Alert: Container,
+    Paper: Container,
     Group: Container,
     Loader: Container,
     Text: Container,

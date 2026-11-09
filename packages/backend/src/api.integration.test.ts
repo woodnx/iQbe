@@ -744,6 +744,94 @@ integration("MySQL API integration", () => {
     ).toBe(400);
   });
 
+  it("persists Japanese CSV alternate answers and category hierarchy", async () => {
+    const form = new FormData();
+    form.append(
+      "file",
+      new File(
+        [
+          "問題,答え,別解等,正誤判定基準,大ジャンル,小ジャンル\ncsv-child,A,別解,基準,root,child\ncsv-root,B,,,root,",
+        ],
+        "quiz.csv",
+      ),
+    );
+    const parsed = await app.request("/api/csv/parse", {
+      method: "POST",
+      body: form,
+    });
+    expect(parsed.status).toBe(200);
+    const response = await app.request("/api/quizzes/multiple", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ records: await parsed.json() }),
+    });
+    expect(response.status).toBe(201);
+    const rows = await db
+      .selectFrom("quizzes")
+      .select(["que", "ans", "anoans", "category_id"])
+      .where("que", "like", "csv-%")
+      .orderBy("que")
+      .execute();
+    expect(rows).toEqual([
+      { que: "csv-child", ans: "A", anoans: "別解\n基準", category_id: 2 },
+      { que: "csv-root", ans: "B", anoans: null, category_id: 1 },
+    ]);
+  });
+
+  it("returns unknown CSV genres for correction without saving until submitted", async () => {
+    const form = new FormData();
+    form.append(
+      "file",
+      new File(
+        ["問題,答え,大ジャンル,小ジャンル\ncsv-corrected,A,unknown,child"],
+        "quiz.csv",
+      ),
+    );
+    const parsed = await app.request("/api/csv/parse", {
+      method: "POST",
+      body: form,
+    });
+    expect(parsed.status).toBe(200);
+    const records = await parsed.json();
+    expect(records).toEqual([
+      expect.objectContaining({
+        question: "csv-corrected",
+        categoryName: "unknown",
+        subCategoryName: "child",
+        categoryError: expect.any(String),
+      }),
+    ]);
+    expect(records[0].category).toBeUndefined();
+    expect(
+      await db
+        .selectFrom("quizzes")
+        .select("id")
+        .where("que", "=", "csv-corrected")
+        .execute(),
+    ).toEqual([]);
+    const saved = await app.request("/api/quizzes/multiple", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        records: [
+          {
+            question: records[0].question,
+            answer: records[0].answer,
+            category: 2,
+          },
+        ],
+      }),
+    });
+    expect(saved.status).toBe(201);
+    expect(
+      await db
+        .selectFrom("quizzes")
+        .select("category_id")
+        .where("que", "=", "csv-corrected")
+        .executeTakeFirstOrThrow(),
+    ).toEqual({ category_id: 2 });
+  });
+
   it("bulk inserts quizzes and deduplicated tags, and validates references before saving", async () => {
     await bulk.execute("owner", [
       {

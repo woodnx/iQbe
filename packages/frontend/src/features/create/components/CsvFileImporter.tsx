@@ -5,7 +5,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { InferRequestType } from "hono/client";
 import { useRef, useState } from "react";
 import { Element } from "@/routes/create";
-import { readResponse, rpc } from "@/utils/client";
+import { ApiClientError, readResponse, rpc } from "@/utils/client";
 import {
   QUIZ_SIZES_QUERY_KEY,
   QUIZZES_QUERY_KEY,
@@ -17,7 +17,7 @@ import CsvDropzone from "./CsvDropzone";
 import CsvEditor from "./CsvEditor";
 
 export default function CsvFileImporter() {
-  const [parsedCsv, setPasedCsv] = useState<Element[]>([]);
+  const [parsedCsv, setParsedCsv] = useState<Element[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const queryClient = useQueryClient();
   const previousQuizSizesRef = useRef<QuerySnapshot<{ size: number }>>([]);
@@ -64,11 +64,14 @@ export default function CsvFileImporter() {
       const data = await rpc.api.csv.parse
         .$post({ form: { file } })
         .then(readResponse);
-      setPasedCsv(data);
-    } catch {
+      setParsedCsv(data);
+    } catch (error) {
       notifications.show({
         title: "CSV の読み込みに失敗しました",
-        message: "ファイルの形式を確認してください",
+        message:
+          error instanceof ApiClientError
+            ? error.detail
+            : "ファイルの形式を確認してください",
         color: "red",
       });
     } finally {
@@ -77,10 +80,14 @@ export default function CsvFileImporter() {
   };
 
   const saveQuizzes = async (quizzes: Element[], wid: string | null) => {
+    if (quizzes.some((quiz) => quiz.categoryError)) {
+      throw new Error("ジャンルを修正してから保存してください。");
+    }
     const _quizzes = quizzes.map((quiz) => ({
       question: quiz.question,
       answer: quiz.answer,
       anotherAnswer: quiz.anotherAnswer,
+      category: quiz.category,
       wid,
     }));
 
@@ -102,7 +109,8 @@ export default function CsvFileImporter() {
       {parsedCsv.length > 0 ? (
         <CsvEditor
           elements={parsedCsv}
-          onReload={() => setPasedCsv([])}
+          onChange={setParsedCsv}
+          onReload={() => setParsedCsv([])}
           onSave={saveQuizzes}
         />
       ) : (
@@ -112,8 +120,19 @@ export default function CsvFileImporter() {
             CSVファイルをインポートする手順
           </Title>
           <Text>
-            CSVファイルの一番上の行（カラム欄）の問題文の箇所を
-            <Code>question</Code>、答えの箇所を<Code>answer</Code>としてください
+            1行目に見出しを指定してください。問題文は<Code>question</Code>
+            ・「問題文」・「問題」、 答えは<Code>answer</Code>
+            ・「答え」・「解答」・「回答」・「正解」に対応しています。
+          </Text>
+          <Text mt="sm">
+            別解・判定基準は<Code>anotherAnswer</Code>・「別解」・「別解等」・
+            「別解・正誤判定基準」・「正誤判定基準」で指定できます。複数の列がある場合は改行でまとめます。
+          </Text>
+          <Text mt="sm">
+            「大ジャンル」「小ジャンル」には登録済みのジャンル名を入力してください。
+            大ジャンルのみの指定も可能です。小ジャンルのみの場合は名前から親を特定します。
+            同名の小ジャンルがある場合は大ジャンルも指定してください。
+            不明なジャンルは読み込み後のプレビューで選び直せます。
           </Text>
         </>
       )}
