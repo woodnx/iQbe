@@ -30,7 +30,8 @@
     "migrate:reset": "prisma migrate reset",
     "test:integration": "API_MYSQL_TESTS=1 vitest run src/api.integration.test.ts --no-file-parallelism",
     "indexes:check": "tsx src/scripts/checkApiIndexes.ts",
-    "test:benchmark": "API_BENCHMARK=1 pnpm run test:integration"
+    "test:benchmark": "API_BENCHMARK=1 pnpm run test:integration",
+    "migrate:deploy": "prisma migrate deploy"
   },
   "dependencies": {
     "@hapi/boom": "^10.0.1",
@@ -51,6 +52,7 @@
     "node-fetch": "^3.3.2",
     "nodemailer": "^9.0.1",
     "path": "^0.12.7",
+    "prisma": "^6.19.3",
     "reflect-metadata": "^0.2.2",
     "tsyringe": "^4.10.0",
     "uid": "^2.0.2",
@@ -62,7 +64,6 @@
     "@types/lodash": "^4.17.24",
     "@types/node": "^20.19.43",
     "@types/nodemailer": "^6.4.24",
-    "prisma": "^6.19.3",
     "prisma-kysely": "^1.8.0",
     "testcontainers": "^10.28.0",
     "tsc-alias": "^1.8.17",

@@ -12,4 +12,9 @@ else
   echo "[entrypoint] .env exists, reuse it"
 fi
 
+if [ "$#" -eq 3 ] && [ "$1" = "pnpm" ] && [ "$2" = "run" ] && [ "$3" = "start" ]; then
+  echo "[entrypoint] applying database migrations"
+  pnpm run migrate:deploy
+fi
+
 exec "$@"
