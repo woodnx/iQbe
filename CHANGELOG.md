@@ -1,5 +1,18 @@
 # Changelog
 
+## [4.3.0](https://github.com/woodnx/iQbe/compare/v4.2.0...v4.3.0) (2026-11-09)
+
+
+### Features
+
+* CSVインポートのカラム対応を拡張 ([9cd3098](https://github.com/woodnx/iQbe/commit/9cd30982408f3db995db92e08e40d1e79171e5a5))
+
+
+### Bug Fixes
+
+* pnpm スキルディレクトリ設定を修正 ([66d8e76](https://github.com/woodnx/iQbe/commit/66d8e76645ed8a6cec63c4e9fcda1a71eea975c9))
+* 回答記録の整合性を改善 ([1b8ca5d](https://github.com/woodnx/iQbe/commit/1b8ca5d193eca0ffb0659826a909ab6b135b557c))
+
 ## [4.2.0](https://github.com/woodnx/iQbe/compare/v4.1.9...v4.2.0) (2026-10-30)
 
 
