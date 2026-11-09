@@ -1,8 +1,8 @@
 import { ActionIcon, Button } from "@mantine/core";
 
-import classes from "./styles/MylistModal.module.css";
-import { Icon, IconPencil } from "@tabler/icons-react";
 import { useIsMobile } from "@/contexts/isMobile";
+import { Icon, IconPencil } from "@tabler/icons-react";
+import classes from "./styles/MylistModal.module.css";
 
 export interface MylistEditModalButtonProps {
   icon?: Icon;
@@ -22,6 +22,7 @@ const MylistEditModalButton = ({
     <Button
       className={classes.button}
       variant="outline"
+      color="dark"
       radius="xl"
       leftSection={<Icon />}
       onClick={onClick}
@@ -34,7 +35,7 @@ const MylistEditModalButton = ({
     <ActionIcon
       className={classes.mobileButton}
       size="lg"
-      color="blue"
+      color="dark"
       variant="subtle"
       onClick={onClick}
     >

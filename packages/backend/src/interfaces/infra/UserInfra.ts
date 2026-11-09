@@ -142,7 +142,7 @@ export default class UserInfra implements IUsersRepository {
     const data = await client
       .selectFrom("users")
       .select("id")
-      .orderBy("id desc")
+      .orderBy("id", "desc")
       .limit(1)
       .executeTakeFirst()
       .then((u) => u?.id);
@@ -159,7 +159,7 @@ export default class UserInfra implements IUsersRepository {
 
     const data = await client
       .selectFrom("users")
-      .select(({ fn, val, ref }) => [fn.count<number>("id").as("count")])
+      .select(({ fn }) => [fn.count<number>("id").as("count")])
       .executeTakeFirst()
       .then((d) => d?.count);
 
@@ -245,7 +245,11 @@ export default class UserInfra implements IUsersRepository {
       .where("user_id", "=", userId)
       .executeTakeFirst();
 
-    if (!!profile) {
+    if (profile) {
+      if (user.nickname === undefined && user.photoUrl === undefined) {
+        return;
+      }
+
       await client
         .updateTable("profile")
         .set({

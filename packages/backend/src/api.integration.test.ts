@@ -1,5 +1,5 @@
 import { execFileSync } from "node:child_process";
-import { createHash } from "node:crypto";
+import { createHash, randomUUID } from "node:crypto";
 import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
@@ -213,6 +213,195 @@ integration("MySQL API integration", () => {
       .execute();
   });
 
+  const postPractice = (body: {
+    qid: string;
+    judgement: number;
+    pressedWord: number;
+    clientAttemptId: string;
+  }) =>
+    app.request("/api/practice", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify(body),
+    });
+
+  it("acknowledges sequential and concurrent retries without changing the saved answer", async () => {
+    const body = {
+      qid: "q1",
+      judgement: 1,
+      pressedWord: 0,
+      clientAttemptId: randomUUID(),
+    };
+    const first = await postPractice(body);
+    expect(first.status).toBe(200);
+    expect(await first.text()).toBe("");
+    const saved = await db
+      .selectFrom("histories")
+      .selectAll()
+      .where("client_attempt_id", "=", body.clientAttemptId)
+      .executeTakeFirstOrThrow();
+    expect(saved.pressed_word).toBe(0);
+    // A retry must retain the original timestamp, even long after the answer.
+    await db
+      .updateTable("histories")
+      .set({ practiced: t(1) })
+      .where("id", "=", saved.id)
+      .execute();
+    expect((await postPractice(body)).status).toBe(200);
+    const responses = await Promise.all(
+      Array.from({ length: 5 }, () => postPractice(body)),
+    );
+    expect(responses.map((r) => r.status)).toEqual([200, 200, 200, 200, 200]);
+    expect(
+      await db
+        .selectFrom("histories")
+        .selectAll()
+        .where("client_attempt_id", "=", body.clientAttemptId)
+        .execute(),
+    ).toEqual([{ ...saved, practiced: t(1) }]);
+  });
+
+  it("inserts only one answer when the first submissions race", async () => {
+    const body = {
+      qid: "q1",
+      judgement: 1,
+      pressedWord: 0,
+      clientAttemptId: randomUUID(),
+    };
+    const responses = await Promise.all(
+      Array.from({ length: 5 }, () => postPractice(body)),
+    );
+    expect(responses.map((r) => r.status)).toEqual([200, 200, 200, 200, 200]);
+    expect(
+      await db
+        .selectFrom("histories")
+        .selectAll()
+        .where("client_attempt_id", "=", body.clientAttemptId)
+        .execute(),
+    ).toHaveLength(1);
+  });
+
+  it.each([{ qid: "q2" }, { judgement: 0 }, { pressedWord: 1 }])(
+    "rejects conflicting retries without modifying the saved answer: %j",
+    async (change) => {
+      const body = {
+        qid: "q1",
+        judgement: 1,
+        pressedWord: 0,
+        clientAttemptId: randomUUID(),
+      };
+      expect((await postPractice(body)).status).toBe(200);
+      const saved = await db
+        .selectFrom("histories")
+        .selectAll()
+        .where("client_attempt_id", "=", body.clientAttemptId)
+        .execute();
+      const response = await postPractice({ ...body, ...change });
+      expect(response.status).toBe(409);
+      expect(await response.json()).toMatchObject({
+        code: "CLIENT_ATTEMPT_ID_CONFLICT",
+      });
+      expect(
+        await db
+          .selectFrom("histories")
+          .selectAll()
+          .where("client_attempt_id", "=", body.clientAttemptId)
+          .execute(),
+      ).toEqual(saved);
+    },
+  );
+
+  it("accepts one of two conflicting concurrent answers and rejects the other", async () => {
+    const body = {
+      qid: "q1",
+      judgement: 1,
+      pressedWord: 0,
+      clientAttemptId: randomUUID(),
+    };
+    const responses = await Promise.all([
+      postPractice(body),
+      postPractice({ ...body, judgement: 0 }),
+    ]);
+    expect(responses.map((r) => r.status).sort()).toEqual([200, 409]);
+    const saved = await db
+      .selectFrom("histories")
+      .selectAll()
+      .where("client_attempt_id", "=", body.clientAttemptId)
+      .execute();
+    expect(saved).toHaveLength(1);
+    expect(saved[0].judgement).toBe(responses[0].status === 200 ? 1 : 0);
+  });
+
+  it("scopes attempt IDs and replay lookup to the authenticated user", async () => {
+    const body = {
+      qid: "q1",
+      judgement: 1,
+      pressedWord: 0,
+      clientAttemptId: randomUUID(),
+    };
+    await db
+      .insertInto("histories")
+      .values({
+        user_id: 2,
+        quiz_id: 2,
+        judgement: 0,
+        pressed_word: 5,
+        practiced: t(1),
+        client_attempt_id: body.clientAttemptId,
+      })
+      .execute();
+    expect((await postPractice(body)).status).toBe(200);
+    expect((await postPractice(body)).status).toBe(200);
+    const saved = await db
+      .selectFrom("histories")
+      .select(["user_id", "quiz_id", "judgement"])
+      .where("client_attempt_id", "=", body.clientAttemptId)
+      .orderBy("user_id")
+      .execute();
+    expect(saved).toEqual([
+      { user_id: 1, quiz_id: 1, judgement: 1 },
+      { user_id: 2, quiz_id: 2, judgement: 0 },
+    ]);
+  });
+
+  it("saves distinct attempts in the same second and selects the last inserted answer", async () => {
+    const body = {
+      qid: "q1",
+      judgement: 1,
+      pressedWord: 0,
+      clientAttemptId: randomUUID(),
+    };
+    const later = { ...body, judgement: 0, clientAttemptId: randomUUID() };
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(new Date("2026-11-07T12:00:00Z"));
+    try {
+      expect((await postPractice(body)).status).toBe(200);
+      expect((await postPractice(later)).status).toBe(200);
+    } finally {
+      vi.useRealTimers();
+    }
+    const saved = await db
+      .selectFrom("histories")
+      .selectAll()
+      .where("client_attempt_id", "in", [
+        body.clientAttemptId,
+        later.clientAttemptId,
+      ])
+      .orderBy("id")
+      .execute();
+    expect(saved).toHaveLength(2);
+    expect(saved[0].practiced).toEqual(saved[1].practiced);
+    expect(saved.map((row) => row.judgement)).toEqual([1, 0]);
+    expect(
+      (await quizzes.findMany("owner")).find((q) => q.qid === "q1")?.judgement,
+    ).toBe(0);
+    const history = await quizzes.findMany("owner", { history: true });
+    expect(history.slice(0, 2).map((q) => [q.qid, q.judgement])).toEqual([
+      ["q1", 0],
+      ["q1", 1],
+    ]);
+  });
+
   it("isolates interleaved transactions, reuses nested transactions, and restores context after failure", async () => {
     let entered!: () => void;
     let release!: () => void;
@@ -342,6 +531,26 @@ integration("MySQL API integration", () => {
     expect(await quizzes.count("owner", filtered)).toBe(1);
   });
 
+  it.each(["book", ["book"]])(
+    "lists workbook quizzes in registration order across pages: %j",
+    async (wids) => {
+      const expected = ["q1", "q2", "q3"];
+      expect(
+        (await quizzes.findMany("owner", { wids })).map((quiz) => quiz.qid),
+      ).toEqual(expected);
+      for (let page = 1; page <= expected.length; page++) {
+        expect(
+          (await quizzes.findMany("owner", { wids, maxView: 1, page })).map(
+            (quiz) => quiz.qid,
+          ),
+        ).toEqual([expected[page - 1]]);
+      }
+      expect(
+        (await quizzes.findMany("owner", { wids: [] })).map((quiz) => quiz.qid),
+      ).toEqual([...expected].reverse());
+    },
+  );
+
   it.each([0, 12345])(
     "keeps seeded quiz order stable across answers and pages (seed %s)",
     async (seed) => {
@@ -355,6 +564,7 @@ integration("MySQL API integration", () => {
           (q) => q.qid,
         );
       expect(await ids()).toEqual(expected);
+      expect(await ids({ wids: ["book"] })).toEqual(expected);
       await db
         .updateTable("quizzes")
         .set({ total_crct_ans: 10 })
@@ -532,6 +742,94 @@ integration("MySQL API integration", () => {
         })
       ).status,
     ).toBe(400);
+  });
+
+  it("persists Japanese CSV alternate answers and category hierarchy", async () => {
+    const form = new FormData();
+    form.append(
+      "file",
+      new File(
+        [
+          "問題,答え,別解等,正誤判定基準,大ジャンル,小ジャンル\ncsv-child,A,別解,基準,root,child\ncsv-root,B,,,root,",
+        ],
+        "quiz.csv",
+      ),
+    );
+    const parsed = await app.request("/api/csv/parse", {
+      method: "POST",
+      body: form,
+    });
+    expect(parsed.status).toBe(200);
+    const response = await app.request("/api/quizzes/multiple", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ records: await parsed.json() }),
+    });
+    expect(response.status).toBe(201);
+    const rows = await db
+      .selectFrom("quizzes")
+      .select(["que", "ans", "anoans", "category_id"])
+      .where("que", "like", "csv-%")
+      .orderBy("que")
+      .execute();
+    expect(rows).toEqual([
+      { que: "csv-child", ans: "A", anoans: "別解\n基準", category_id: 2 },
+      { que: "csv-root", ans: "B", anoans: null, category_id: 1 },
+    ]);
+  });
+
+  it("returns unknown CSV genres for correction without saving until submitted", async () => {
+    const form = new FormData();
+    form.append(
+      "file",
+      new File(
+        ["問題,答え,大ジャンル,小ジャンル\ncsv-corrected,A,unknown,child"],
+        "quiz.csv",
+      ),
+    );
+    const parsed = await app.request("/api/csv/parse", {
+      method: "POST",
+      body: form,
+    });
+    expect(parsed.status).toBe(200);
+    const records = await parsed.json();
+    expect(records).toEqual([
+      expect.objectContaining({
+        question: "csv-corrected",
+        categoryName: "unknown",
+        subCategoryName: "child",
+        categoryError: expect.any(String),
+      }),
+    ]);
+    expect(records[0].category).toBeUndefined();
+    expect(
+      await db
+        .selectFrom("quizzes")
+        .select("id")
+        .where("que", "=", "csv-corrected")
+        .execute(),
+    ).toEqual([]);
+    const saved = await app.request("/api/quizzes/multiple", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        records: [
+          {
+            question: records[0].question,
+            answer: records[0].answer,
+            category: 2,
+          },
+        ],
+      }),
+    });
+    expect(saved.status).toBe(201);
+    expect(
+      await db
+        .selectFrom("quizzes")
+        .select("category_id")
+        .where("que", "=", "csv-corrected")
+        .executeTakeFirstOrThrow(),
+    ).toEqual({ category_id: 2 });
   });
 
   it("bulk inserts quizzes and deduplicated tags, and validates references before saving", async () => {

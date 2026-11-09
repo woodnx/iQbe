@@ -1,21 +1,19 @@
-import Quiz from "../Quiz/index.js";
-import User from "../User/index.js";
-
 export default class History {
   constructor(
-    private _quiz: Quiz,
-    private _user: User,
+    private _qid: string,
+    private _uid: string,
     private _pressedWordPosiston: number | null,
     private _judgement: number,
     private _practicedAt: Date,
+    private _clientAttemptId: string | null,
   ) {}
 
-  get quiz(): Quiz {
-    return this._quiz;
+  get qid(): string {
+    return this._qid;
   }
 
-  get user(): User {
-    return this._user;
+  get uid(): string {
+    return this._uid;
   }
 
   get pressedWordPosition(): number | null {
@@ -28,5 +26,18 @@ export default class History {
 
   get practicedAt(): Date {
     return this._practicedAt;
+  }
+
+  get clientAttemptId(): string | null {
+    return this._clientAttemptId;
+  }
+
+  hasSameAnswer(other: History): boolean {
+    return (
+      this.uid === other.uid &&
+      this.qid === other.qid &&
+      this.judgement === other.judgement &&
+      this.pressedWordPosition === other.pressedWordPosition
+    );
   }
 }

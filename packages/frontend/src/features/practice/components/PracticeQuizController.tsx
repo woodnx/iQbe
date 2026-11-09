@@ -5,8 +5,7 @@ import {
   IconPlaystationCircle,
   IconX,
 } from "@tabler/icons-react";
-import { useEffect, useState } from "react";
-// import { useTimer, useTypewriter } from "@/hooks";
+import { useState } from "react";
 import { PracticeQuizButton } from "./PracticeQuizButton";
 import { PracticeQuizInfo } from "./PracticeQuizInfo";
 import { Scene } from "./PracticeSceneChanger";
@@ -26,6 +25,7 @@ interface Props extends BoxProps {
   ignoreLimit: number;
   countLimit: number;
   canTypewrite?: boolean;
+  disabled?: boolean;
   onJudge: (judgement: number, pressedWord: number) => void;
 }
 
@@ -34,32 +34,33 @@ export function PracticeQuizController({
   scene,
   ignoreLimit,
   countLimit,
-  canTypewrite,
   onJudge,
+  disabled = false,
   ...others
 }: Props) {
-  const [quizScene, setScene] = useState<QuizScene>("preparation");
+  const [quizScene, setScene] = useState<QuizScene>(
+    scene === "quizzing" ? "typewriting" : "preparation",
+  );
   const [pressedWord, setPressedWord] = useState(-1);
+  const [previousScene, setPreviousScene] = useState(scene);
 
-  useEffect(() => {
-    if (scene == "quizzing") {
+  if (scene !== previousScene) {
+    setPreviousScene(scene);
+    if (scene === "quizzing") {
       setScene("typewriting");
     }
-  }, [scene]);
-
-  useEffect(() => {
-    if (quizScene == "preparation") {
-      setPressedWord(-1);
-    }
-  }, [quizScene]);
+  }
 
   const pressed = () => {
+    if (disabled) return;
     setScene("pressed");
   };
 
   const judge = (judge: number) => {
+    if (disabled) return;
     onJudge(judge, pressedWord);
     setScene("preparation");
+    setPressedWord(-1);
   };
 
   return (
@@ -78,6 +79,7 @@ export function PracticeQuizController({
       <PracticeQuizInfo
         qid={quiz.qid}
         answer={quiz.answer}
+        anotherAnswer={quiz.anotherAnswer || undefined}
         workbook={quiz.workbook || undefined}
         isFavorite={quiz.isFavorite}
         registeredMylist={quiz?.registerdMylist || []}
@@ -90,7 +92,7 @@ export function PracticeQuizController({
           radius="md"
           color="red"
           onClick={() => judge(1)}
-          disabled={quizScene !== "judging" || pressedWord == -1}
+          disabled={disabled || quizScene !== "judging" || pressedWord == -1}
         >
           <IconPlaystationCircle />
         </Button>
@@ -100,7 +102,7 @@ export function PracticeQuizController({
           radius="md"
           color="gray"
           onClick={() => judge(2)}
-          disabled={quizScene !== "judging" || pressedWord >= 0}
+          disabled={disabled || quizScene !== "judging" || pressedWord >= 0}
         >
           <IconChevronsRight />
         </Button>
@@ -110,7 +112,7 @@ export function PracticeQuizController({
           radius="md"
           color="blue"
           onClick={() => judge(0)}
-          disabled={quizScene !== "judging" || pressedWord == -1}
+          disabled={disabled || quizScene !== "judging" || pressedWord == -1}
         >
           <IconX />
         </Button>
@@ -119,7 +121,9 @@ export function PracticeQuizController({
         <PracticeQuizButton
           w={280}
           onClick={pressed}
-          disabled={quizScene !== "typewriting" && quizScene !== "ignored"}
+          disabled={
+            disabled || (quizScene !== "typewriting" && quizScene !== "ignored")
+          }
         />
       </Center>
     </Card>

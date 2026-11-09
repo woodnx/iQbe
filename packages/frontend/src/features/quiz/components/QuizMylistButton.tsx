@@ -1,10 +1,3 @@
-import { ActionIcon, Button, Checkbox, Divider, Menu } from "@mantine/core";
-import { modals } from "@mantine/modals";
-import { notifications } from "@mantine/notifications";
-import { IconPlaylistAdd, IconPlus } from "@tabler/icons-react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import type { InferRequestType } from "hono/client";
-import { ComponentProps, useState } from "react";
 import { useIsMobile } from "@/contexts/isMobile";
 import type { Mylist as ApiMylist, Quiz as ApiQuiz } from "@/utils/api-types";
 import { readResponse, rpc } from "@/utils/client";
@@ -15,6 +8,13 @@ import {
   takeQuerySnapshot,
   updateRelatedQuizSize,
 } from "@/utils/queryCache";
+import { ActionIcon, Button, Checkbox, Divider, Menu } from "@mantine/core";
+import { modals } from "@mantine/modals";
+import { notifications } from "@mantine/notifications";
+import { IconPlaylistAdd, IconPlus } from "@tabler/icons-react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import type { InferRequestType } from "hono/client";
+import { ComponentProps, useState } from "react";
 
 import classes from "./styles/QuizMylistButton.module.css";
 
@@ -208,6 +208,7 @@ export default function QuizMylistButton({ qid, registerdMylists }: Props) {
       classNames={{ root: classes.button }}
       leftSection={<IconPlaylistAdd />}
       variant="outline"
+      color="dark"
       size="xs"
       bg="#fff"
     >
@@ -216,7 +217,7 @@ export default function QuizMylistButton({ qid, registerdMylists }: Props) {
   );
 
   const mobileButton = (
-    <ActionIcon size="md" color="blue" variant="light">
+    <ActionIcon size="md" color="dark" variant="light">
       <IconPlaylistAdd />
     </ActionIcon>
   );
@@ -235,6 +236,7 @@ export default function QuizMylistButton({ qid, registerdMylists }: Props) {
           {mylists?.map((m) => (
             <Menu.Item key={m.mid}>
               <Checkbox
+                color="dark"
                 label={m.name}
                 checked={selectedMids.includes(m.mid)}
                 onChange={() => saveToList(m.mid)}

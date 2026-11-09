@@ -25,6 +25,7 @@ export default function FilteringModalButton({
   const isMobile = useIsMobile();
 
   const click = () => {
+    if (others.disabled) return;
     modals.openContextModal({
       modal: "quizFiltering",
       size: "lg",
@@ -62,6 +63,7 @@ export default function FilteringModalButton({
 
   const MobileButton = () => (
     <ActionIcon
+      disabled={others.disabled}
       color="orange"
       size="lg"
       radius="xl"

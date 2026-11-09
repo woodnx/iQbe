@@ -1,14 +1,14 @@
+import { useIsMobile } from "@/contexts/isMobile";
 import {
   ActionIcon,
-  Button,
   BoxProps,
+  Button,
   Group,
   Modal,
   Text,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { IconTrash } from "@tabler/icons-react";
-import { useIsMobile } from "@/contexts/isMobile";
 import classes from "./styles/MylistModal.module.css";
 
 interface Props extends BoxProps {
@@ -29,6 +29,7 @@ export default function MylistDeleteModal({ onDelete }: Props) {
     <Button
       className={classes.button}
       variant="outline"
+      color="dark"
       radius="xl"
       leftSection={icon}
       onClick={open}
@@ -41,7 +42,7 @@ export default function MylistDeleteModal({ onDelete }: Props) {
     <ActionIcon
       className={classes.mobileButton}
       size="lg"
-      color="blue"
+      color="dark"
       variant="subtle"
       onClick={open}
     >

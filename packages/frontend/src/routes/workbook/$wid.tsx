@@ -1,4 +1,13 @@
-import { Card, Group, getGradient, Text, useMantineTheme } from "@mantine/core";
+import FilteringModalButton from "@/features/filtering/components/FilteringModalButton";
+import MylistEditModalButton from "@/features/mylist/components/MylistEditModalButton";
+import QuizControllBar from "@/features/quiz/components/QuizControllBar";
+import QuizHiddenAnswerButton from "@/features/quiz/components/QuizHiddenAnswerButton";
+import QuizList from "@/features/quiz/components/QuizList";
+import QuizShuffleButton from "@/features/quiz/components/QuizShuffleButton";
+import QuizTransfarButton from "@/features/quiz/components/QuizTransfarButton";
+import { useWorkbooks } from "@/hooks/useWorkbooks";
+import { cleanQuery, readResponse, rpc } from "@/utils/client";
+import { Card, getGradient, Group, Text, useMantineTheme } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { IconTrash } from "@tabler/icons-react";
 import { useQuery } from "@tanstack/react-query";
@@ -10,15 +19,6 @@ import {
 } from "@tanstack/react-router";
 import { ReactNode, useState } from "react";
 import { z } from "zod";
-import FilteringModalButton from "@/features/filtering/components/FilteringModalButton";
-import MylistEditModalButton from "@/features/mylist/components/MylistEditModalButton";
-import QuizControllBar from "@/features/quiz/components/QuizControllBar";
-import QuizHiddenAnswerButton from "@/features/quiz/components/QuizHiddenAnswerButton";
-import QuizList from "@/features/quiz/components/QuizList";
-import QuizShuffleButton from "@/features/quiz/components/QuizShuffleButton";
-import QuizTransfarButton from "@/features/quiz/components/QuizTransfarButton";
-import { useWorkbooks } from "@/hooks/useWorkbooks";
-import { cleanQuery, readResponse, rpc } from "@/utils/client";
 import { quizSearchSchema } from "../_schemas/quizSearch";
 
 export const Route = createFileRoute("/workbook/$wid")({
@@ -176,7 +176,7 @@ function RouteComponent() {
       withBorder
       style={{
         backgroundImage: getGradient(
-          { deg: 45, from: "indigo", to: "cyan" },
+          { deg: 45, from: "dark", to: "gray" },
           theme,
         ),
         color: `var(--mantine-color-white)`,

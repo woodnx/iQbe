@@ -408,8 +408,9 @@ describe("validation and Hono RPC", () => {
 
 describe("quiz lookup by IDs", () => {
   it("accepts typed RPC arrays and returns the existing quiz response shape", async () => {
-    const { default: QuizInfra } =
-      await import("./interfaces/infra/QuizInfra.js");
+    const { default: QuizInfra } = await import(
+      "./interfaces/infra/QuizInfra.js"
+    );
     const quizzes = ["second", "first"].map((qid) => ({
       qid,
       question: "Question",
@@ -437,8 +438,9 @@ describe("quiz lookup by IDs", () => {
   });
 
   it("accepts one or 100 IDs and returns an empty array when none are found", async () => {
-    const { default: QuizInfra } =
-      await import("./interfaces/infra/QuizInfra.js");
+    const { default: QuizInfra } = await import(
+      "./interfaces/infra/QuizInfra.js"
+    );
     const find = vi
       .spyOn(QuizInfra.prototype, "findByQids")
       .mockResolvedValue([]);
@@ -473,8 +475,9 @@ describe("quiz lookup by IDs", () => {
       "uid=another-user",
     ].map((filter) => `qids=q1&${filter}`),
   ])("rejects invalid IDs or mixed search conditions: %s", async (query) => {
-    const { default: QuizInfra } =
-      await import("./interfaces/infra/QuizInfra.js");
+    const { default: QuizInfra } = await import(
+      "./interfaces/infra/QuizInfra.js"
+    );
     const find = vi
       .spyOn(QuizInfra.prototype, "findByQids")
       .mockResolvedValue([]);
@@ -485,6 +488,66 @@ describe("quiz lookup by IDs", () => {
 });
 
 describe("file uploads and static delivery", () => {
+  it("passes Japanese CSV answers and genres through to bulk quiz records", async () => {
+    const { default: Category } = await import("./domains/Category/index.js");
+    const { default: CategoryInfra } =
+      await import("./interfaces/infra/CategoryInfra.js");
+    const { default: QuizBulkInfra } =
+      await import("./interfaces/infra/QuizBulkInfra.js");
+    const { default: Transactions } =
+      await import("./interfaces/infra/kysely/KyselyTransactionManager.js");
+    vi.spyOn(CategoryInfra.prototype, "getAll").mockResolvedValue([
+      new Category(1, "科学", null, -1),
+      new Category(2, "数学", null, 1),
+    ]);
+    vi.spyOn(Transactions.prototype, "begin").mockImplementation((callback) =>
+      callback(),
+    );
+    const save = vi
+      .spyOn(QuizBulkInfra.prototype, "saveMany")
+      .mockResolvedValue();
+    const form = new FormData();
+    form.append(
+      "file",
+      new File(
+        [
+          "問題文,解答,別解等,正誤判定基準,大ジャンル,小ジャンル\nQ,A,別解,基準,科学,数学\nQ2,A2,,,科学,",
+        ],
+        "quiz.csv",
+      ),
+    );
+    const response = await app.request("/api/csv/parse", {
+      method: "POST",
+      body: form,
+    });
+    expect(response.status).toBe(200);
+    const records = await response.json();
+    expect(records).toEqual([
+      {
+        question: "Q",
+        answer: "A",
+        anotherAnswer: "別解\n基準",
+        category: 2,
+        categoryName: "科学",
+        subCategoryName: "数学",
+      },
+      {
+        question: "Q2",
+        answer: "A2",
+        anotherAnswer: "",
+        category: 1,
+        categoryName: "科学",
+      },
+    ]);
+    const saved = await jsonRequest("/api/quizzes/multiple", { records });
+    expect(saved.status).toBe(201);
+    const [prepared, uid] = save.mock.calls[0];
+    expect(uid).toBe(user.uid);
+    expect(prepared[0].quiz.question).toBe("Q");
+    expect(prepared[0].quiz.answer).toBe("A");
+    expect(prepared[0].quiz.anotherAnswer).toBe("別解\n基準");
+    expect(prepared.map(({ quiz }) => quiz.categoryId)).toEqual([2, 1]);
+  });
   it("parses CSV multipart files and rejects missing files", async () => {
     const form = new FormData();
     form.append(
@@ -739,7 +802,7 @@ describe("successful API contracts", () => {
     );
     const practice = vi
       .spyOn(PracticeUseCase.prototype, "addPractice")
-      .mockResolvedValue(undefined);
+      .mockResolvedValue({ ok: true, data: undefined });
     vi.spyOn(FavoriteUseCase.prototype, "addFavorite").mockResolvedValue(
       undefined,
     );
@@ -755,7 +818,16 @@ describe("successful API contracts", () => {
       "unregisterQuizFromMylist",
     ).mockResolvedValue(undefined);
     for (const [url, body, status] of [
-      ["/api/practice", { qid: "q", judgement: 0, pressedWord: 0 }, 200],
+      [
+        "/api/practice",
+        {
+          qid: "q",
+          judgement: 0,
+          pressedWord: 0,
+          clientAttemptId: "c382ab80-f895-42a7-9c36-1bba967ef26f",
+        },
+        200,
+      ],
       ["/api/like", { qid: "q" }, 201],
       ["/api/unlike", { qid: "q" }, 201],
       ["/api/register", { qid: "q", mid: "m" }, 201],
@@ -765,6 +837,31 @@ describe("successful API contracts", () => {
       expect(response.status).toBe(status);
       expect(await response.text()).toBe("");
     }
-    expect(practice).toHaveBeenCalledWith(user.uid, "q", 0, 0);
+    expect(practice).toHaveBeenCalledWith(
+      user.uid,
+      "q",
+      0,
+      0,
+      "c382ab80-f895-42a7-9c36-1bba967ef26f",
+    );
   });
+});
+
+describe("practice attempt validation", () => {
+  it.each([undefined, "not-a-uuid"])(
+    "rejects invalid attempt ID %s before calling the use case",
+    async (clientAttemptId) => {
+      const { default: PracticeUseCase } =
+        await import("./applications/usecases/PracticeUseCase.js");
+      const practice = vi.spyOn(PracticeUseCase.prototype, "addPractice");
+      const response = await jsonRequest("/api/practice", {
+        qid: "q",
+        judgement: 1,
+        pressedWord: 0,
+        clientAttemptId,
+      });
+      expect(response.status).toBe(400);
+      expect(practice).not.toHaveBeenCalled();
+    },
+  );
 });
