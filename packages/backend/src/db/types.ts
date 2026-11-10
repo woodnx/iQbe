@@ -4,6 +4,12 @@ export type Generated<T> = T extends ColumnType<infer S, infer I, infer U>
   : ColumnType<T, T | undefined, T>;
 export type Timestamp = ColumnType<Date, Date | string, Date | string>;
 
+export const QuizLearningState = {
+    LEARNING: "LEARNING",
+    REVIEWING: "REVIEWING",
+    RETAINED: "RETAINED"
+} as const;
+export type QuizLearningState = (typeof QuizLearningState)[keyof typeof QuizLearningState];
 export type categories = {
     id: Generated<number>;
     name: string;
@@ -129,6 +135,17 @@ export type test_quizzes = {
     original_quiz_id: number;
     test_id: number;
 };
+export type user_quiz_states = {
+    user_id: number;
+    quiz_id: number;
+    state: QuizLearningState;
+    review_count: Generated<number>;
+    success_streak: Generated<number>;
+    interval_days: number;
+    last_reviewed_at: Timestamp | null;
+    next_review_at: Timestamp;
+    updated_at: Timestamp;
+};
 export type users = {
     id: Generated<number>;
     uid: Generated<string>;
@@ -169,6 +186,7 @@ export type DB = {
     tagging: tagging;
     tags: tags;
     test_quizzes: test_quizzes;
+    user_quiz_states: user_quiz_states;
     users: users;
     workbooks: workbooks;
 };

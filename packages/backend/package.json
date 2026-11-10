@@ -26,12 +26,13 @@
     "fmt:check": "oxfmt --check",
     "migrate:create": "prisma migrate dev --create-only",
     "migrate:exe": "prisma migrate dev",
+    "migrate:dev": "prisma migrate dev",
     "migrate:status": "prisma migrate status",
     "migrate:reset": "prisma migrate reset",
+    "migrate:deploy": "prisma migrate deploy",
     "test:integration": "API_MYSQL_TESTS=1 vitest run src/api.integration.test.ts --no-file-parallelism",
-    "indexes:check": "tsx src/scripts/checkApiIndexes.ts",
     "test:benchmark": "API_BENCHMARK=1 pnpm run test:integration",
-    "migrate:deploy": "prisma migrate deploy"
+    "indexes:check": "tsx src/scripts/checkApiIndexes.ts"
   },
   "dependencies": {
     "@hapi/boom": "^10.0.1",

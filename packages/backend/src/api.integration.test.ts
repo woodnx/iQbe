@@ -109,6 +109,7 @@ integration("MySQL API integration", () => {
     new Date(`2026-10-${String(day).padStart(2, "0")}T12:00:00Z`);
   beforeEach(async () => {
     for (const table of [
+      "user_quiz_states",
       "tagging",
       "favorites",
       "histories",
@@ -211,6 +212,140 @@ integration("MySQL API integration", () => {
         [1, 2].map((quiz_id) => ({ mylist_id: 1, quiz_id, registered: t(1) })),
       )
       .execute();
+  });
+
+  describe("user quiz state schema", () => {
+    const initialState = () => ({
+      user_id: 1,
+      quiz_id: 1,
+      state: "LEARNING" as const,
+      interval_days: 1,
+      next_review_at: t(23),
+      updated_at: t(22),
+    });
+
+    it("applies the migration without changing existing users, quizzes or histories", async () => {
+      const before = await Promise.all([
+        db.selectFrom("users").selectAll().orderBy("id").execute(),
+        db.selectFrom("quizzes").selectAll().orderBy("id").execute(),
+        db.selectFrom("histories").selectAll().orderBy("id").execute(),
+      ]);
+      // Only the new, empty table is removed from this disposable test database.
+      await db.schema.dropTable("user_quiz_states").execute();
+      const migration = await readFile(
+        new URL(
+          "../prisma/migrations/20261110000000_add_user_quiz_states/migration.sql",
+          import.meta.url,
+        ),
+        "utf8",
+      );
+      const { sql } = await import("kysely");
+      for (const statement of migration.split(";").filter((s) => s.trim())) {
+        await sql.raw(statement).execute(db);
+      }
+      expect(
+        await db.selectFrom("user_quiz_states").selectAll().execute(),
+      ).toEqual([]);
+      expect(
+        await Promise.all([
+          db.selectFrom("users").selectAll().orderBy("id").execute(),
+          db.selectFrom("quizzes").selectAll().orderBy("id").execute(),
+          db.selectFrom("histories").selectAll().orderBy("id").execute(),
+        ]),
+      ).toEqual(before);
+    });
+
+    it("stores one state per user and quiz, with zero counts and no previous review", async () => {
+      await db.insertInto("user_quiz_states").values(initialState()).execute();
+      await expect(
+        db.insertInto("user_quiz_states").values(initialState()).execute(),
+      ).rejects.toMatchObject({ code: "ER_DUP_ENTRY" });
+      await db
+        .insertInto("user_quiz_states")
+        .values({
+          ...initialState(),
+          user_id: 2,
+          state: "REVIEWING",
+          review_count: 2,
+          success_streak: 1,
+          last_reviewed_at: t(22),
+        })
+        .execute();
+      expect(
+        await db
+          .selectFrom("user_quiz_states")
+          .selectAll()
+          .orderBy("user_id")
+          .execute(),
+      ).toEqual([
+        {
+          ...initialState(),
+          review_count: 0,
+          success_streak: 0,
+          last_reviewed_at: null,
+        },
+        {
+          ...initialState(),
+          user_id: 2,
+          state: "REVIEWING",
+          review_count: 2,
+          success_streak: 1,
+          last_reviewed_at: t(22),
+        },
+      ]);
+    });
+
+    it.each(["review_count", "success_streak", "interval_days"] as const)(
+      "rejects negative %s",
+      async (field) => {
+        await expect(
+          db
+            .insertInto("user_quiz_states")
+            .values({ ...initialState(), [field]: -1 })
+            .execute(),
+        ).rejects.toMatchObject({ code: "ER_WARN_DATA_OUT_OF_RANGE" });
+      },
+    );
+
+    it.each(["user_id", "quiz_id"] as const)(
+      "rejects a missing reference for %s",
+      async (field) => {
+        await expect(
+          db
+            .insertInto("user_quiz_states")
+            .values({ ...initialState(), [field]: 999 })
+            .execute(),
+        ).rejects.toMatchObject({ code: "ER_NO_REFERENCED_ROW_2" });
+      },
+    );
+
+    it("removes only the states related to a deleted user or quiz", async () => {
+      await db
+        .insertInto("users")
+        .values({
+          id: 3,
+          uid: "state-only-user",
+          created: t(1),
+          modified: t(1),
+        })
+        .execute();
+      await db
+        .insertInto("user_quiz_states")
+        .values([
+          initialState(),
+          { ...initialState(), user_id: 3 },
+          { ...initialState(), quiz_id: 4, state: "RETAINED" },
+        ])
+        .execute();
+      await db.deleteFrom("users").where("id", "=", 3).execute();
+      await db.deleteFrom("quizzes").where("id", "=", 4).execute();
+      expect(
+        await db
+          .selectFrom("user_quiz_states")
+          .select(["user_id", "quiz_id"])
+          .execute(),
+      ).toEqual([{ user_id: 1, quiz_id: 1 }]);
+    });
   });
 
   const postPractice = (body: {

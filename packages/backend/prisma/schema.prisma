@@ -4,7 +4,8 @@ generator client {
 
   output = "../src/db"
   fileName = "types.ts"
-  enumFileName = "enums.ts"
+  // Keep enum types in the same file to avoid extensionless ESM imports.
+  enumFileName = "types.ts"
 }
 
 datasource db {
@@ -184,6 +185,7 @@ model quizzes {
   histories          histories[]
   mylists_quizzes    mylists_quizzes[]
   quiz_visible_users quiz_visible_users[]
+  user_quiz_states   user_quiz_states[]
   tagging            tagging[]
   categories         categories?          @relation(fields: [category_id], references: [id])
   sub_categories     sub_categories?      @relation(fields: [sub_category_id], references: [id])
@@ -304,6 +306,35 @@ model users {
   tests_results         tests_results[]  @ignore
   users_settings        users_settings[] @ignore
   workbooks             workbooks[]
+  user_quiz_states       user_quiz_states[]
+}
+
+enum QuizLearningState {
+  // 学習中：知識の獲得・再学習を進めている状態。
+  LEARNING
+  // 復習中：知識の定着に向けて、間隔を空けた復習を続けている状態。
+  REVIEWING
+  // 定着推定：復習の実績から定着したと推定される状態。永久的な習得を意味せず、引き続き復習対象となる。
+  RETAINED
+}
+
+model user_quiz_states {
+  user_id          BigInt            @db.UnsignedBigInt
+  quiz_id          BigInt            @db.UnsignedBigInt
+  state            QuizLearningState
+  review_count     Int               @default(0) @db.UnsignedInt
+  success_streak   Int               @default(0) @db.UnsignedInt
+  interval_days    Int               @db.UnsignedInt
+  last_reviewed_at DateTime?         @db.DateTime(0)
+  next_review_at   DateTime          @db.DateTime(0)
+  // Kysely writes this explicitly; Prisma Client's @updatedAt is not used.
+  updated_at       DateTime          @db.DateTime(0)
+  users            users            @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Restrict)
+  quizzes          quizzes          @relation(fields: [quiz_id], references: [id], onDelete: Cascade, onUpdate: Restrict)
+
+  @@id([user_id, quiz_id])
+  @@index([user_id, next_review_at])
+  @@index([quiz_id])
 }
 
 /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
