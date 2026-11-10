@@ -1,5 +1,4 @@
 generator client {
-  // provider = "prisma-client-js"
   provider = "prisma-kysely"
 
   output = "../src/db"
@@ -10,7 +9,6 @@ generator client {
 
 datasource db {
   provider = "mysql"
-  url      = env("DATABASE_URL")
 }
 
 model SequelizeMeta {
