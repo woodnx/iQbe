@@ -1,0 +1,6 @@
+interface:
+  display_name: "Explain Visually"
+  short_description: "長大な設計資料やPRを図で読み解く"
+  default_prompt: "$explain-visually を使って、指定した設計文書・Pull Request・Issueを図と短い文で読み解いてください。"
+policy:
+  allow_implicit_invocation: false
