@@ -1,15 +1,14 @@
 generator client {
-  // provider = "prisma-client-js"
   provider = "prisma-kysely"
 
   output = "../src/db"
   fileName = "types.ts"
-  enumFileName = "enums.ts"
+  // Keep enum types in the same file to avoid extensionless ESM imports.
+  enumFileName = "types.ts"
 }
 
 datasource db {
   provider = "mysql"
-  url      = env("DATABASE_URL")
 }
 
 model SequelizeMeta {
@@ -58,10 +57,23 @@ model histories {
   practiced         DateTime @db.DateTime(0)
   judgement         Int      @db.TinyInt
   pressed_word      Int?     @default(-1)
+  // NULL は FSRS 接続前に保存された履歴。接続後の行と区別するため、既定値で埋めない。
+  practice_mode        PracticeMode?
+  // 日本時間の学習日と、その日の同じ問題への何回目の解答か（1 が当日初回解答）。
+  study_date           DateTime?          @db.Date
+  daily_attempt_number Int?               @db.UnsignedInt
+  // 再送に同じ結果を返すための、解答確定時点の記録。現在値ではない。
+  previous_judgement   Int?               @db.TinyInt
+  review_state         QuizLearningState?
+  next_review_at       DateTime?          @db.DateTime(0)
+  // 解答確定時に使った FSRS 設定の版。版の値を持つテーブルは設定機能の Issue で作る。
+  review_settings_version Int?            @db.UnsignedInt
   users             users    @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Restrict, map: "histories_ibfk_1")
   quizzes           quizzes  @relation(fields: [quiz_id], references: [id], onDelete: Cascade, onUpdate: Restrict, map: "histories_ibfk_2")
+  growth_events     growth_events[]
 
   @@unique([user_id, client_attempt_id])
+  @@unique([user_id, quiz_id, study_date, daily_attempt_number])
   @@index([user_id, quiz_id, practiced])
   @@index([quiz_id], map: "quiz_id")
   @@index([user_id, practiced], map: "histories_user_practiced_idx")
@@ -182,8 +194,10 @@ model quizzes {
   sub_category_id    BigInt?
   favorites          favorites[]
   histories          histories[]
+  growth_events      growth_events[]
   mylists_quizzes    mylists_quizzes[]
   quiz_visible_users quiz_visible_users[]
+  user_quiz_states   user_quiz_states[]
   tagging            tagging[]
   categories         categories?          @relation(fields: [category_id], references: [id])
   sub_categories     sub_categories?      @relation(fields: [sub_category_id], references: [id])
@@ -294,6 +308,7 @@ model users {
   answer_logs           answer_logs[]    @ignore
   favorites             favorites[]
   histories             histories[]
+  growth_events      growth_events[]
   mylists               mylists[]
   password_reset_tokens password_reset_tokens[]
   profile               profile[]
@@ -304,6 +319,38 @@ model users {
   tests_results         tests_results[]  @ignore
   users_settings        users_settings[] @ignore
   workbooks             workbooks[]
+  user_quiz_states       user_quiz_states[]
+}
+
+enum QuizLearningState {
+  // 学習中：知識の獲得・再学習を進めている状態。
+  LEARNING
+  // 復習中：知識の定着に向けて、間隔を空けた復習を続けている状態。
+  REVIEWING
+  // 定着推定：復習の実績から定着したと推定される状態。永久的な習得を意味せず、引き続き復習対象となる。
+  RETAINED
+}
+
+model user_quiz_states {
+  user_id          BigInt            @db.UnsignedBigInt
+  quiz_id          BigInt            @db.UnsignedBigInt
+  state            QuizLearningState
+  review_count     Int               @default(0) @db.UnsignedInt
+  success_streak   Int               @default(0) @db.UnsignedInt
+  interval_days    Int               @db.UnsignedInt
+  last_reviewed_at DateTime?         @db.DateTime(0)
+  // NULL は未学習。一度も解答していない問題に復習期限は無く、作成時刻などで埋めない。
+  next_review_at   DateTime?         @db.DateTime(0)
+  // Versioned FSRS memory; due dates and counters remain in the columns above.
+  fsrs_memory      Json?
+  // Kysely writes this explicitly; Prisma Client's @updatedAt is not used.
+  updated_at       DateTime          @db.DateTime(0)
+  users            users            @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Restrict)
+  quizzes          quizzes          @relation(fields: [quiz_id], references: [id], onDelete: Cascade, onUpdate: Restrict)
+
+  @@id([user_id, quiz_id])
+  @@index([user_id, next_review_at])
+  @@index([quiz_id])
 }
 
 /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
@@ -335,4 +382,32 @@ model workbooks {
 
 model registration_lock {
   id Int @id
+}
+
+enum PracticeMode {
+  FREE
+  DAILY_SET
+  SMART_REVIEW
+}
+
+enum GrowthEventType {
+  FIRST_CORRECT
+  REVENGE_SUCCESS
+  REVIEW_SUCCESS
+}
+
+model growth_events {
+  id          BigInt          @id @default(autoincrement()) @db.UnsignedBigInt
+  user_id     BigInt          @db.UnsignedBigInt
+  quiz_id     BigInt          @db.UnsignedBigInt
+  history_id  BigInt          @db.UnsignedBigInt
+  type        GrowthEventType
+  occurred_at DateTime        @db.DateTime(0)
+  users       users           @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Restrict)
+  quizzes     quizzes         @relation(fields: [quiz_id], references: [id], onDelete: Cascade, onUpdate: Restrict)
+  histories   histories       @relation(fields: [history_id], references: [id], onDelete: Cascade, onUpdate: Restrict)
+
+  @@unique([history_id, type])
+  @@index([user_id, occurred_at])
+  @@index([quiz_id])
 }

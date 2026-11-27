@@ -800,9 +800,25 @@ describe("successful API contracts", () => {
     const { default: RegisterUseCase } = await import(
       "./applications/usecases/RegisterUseCase.js"
     );
+    const practiceResult = {
+      attemptId: "108",
+      qid: "q",
+      judgement: 0,
+      practicedAt: "2026-11-16T03:00:00.000Z",
+      outcome: {
+        previousJudgement: null,
+        review: {
+          state: "LEARNING" as const,
+          nextReviewAt: "2026-11-16T03:01:00.000Z",
+        },
+        growthEvents: [],
+        studyDate: "2026-11-16",
+        dailyAttemptNumber: 1,
+      },
+    };
     const practice = vi
       .spyOn(PracticeUseCase.prototype, "addPractice")
-      .mockResolvedValue({ ok: true, data: undefined });
+      .mockResolvedValue({ ok: true, data: practiceResult });
     vi.spyOn(FavoriteUseCase.prototype, "addFavorite").mockResolvedValue(
       undefined,
     );
@@ -817,17 +833,15 @@ describe("successful API contracts", () => {
       RegisterUseCase.prototype,
       "unregisterQuizFromMylist",
     ).mockResolvedValue(undefined);
+    const practiceResponse = await jsonRequest("/api/practice", {
+      qid: "q",
+      judgement: 0,
+      pressedWord: 0,
+      clientAttemptId: "c382ab80-f895-42a7-9c36-1bba967ef26f",
+    });
+    expect(practiceResponse.status).toBe(200);
+    expect(await practiceResponse.json()).toEqual(practiceResult);
     for (const [url, body, status] of [
-      [
-        "/api/practice",
-        {
-          qid: "q",
-          judgement: 0,
-          pressedWord: 0,
-          clientAttemptId: "c382ab80-f895-42a7-9c36-1bba967ef26f",
-        },
-        200,
-      ],
       ["/api/like", { qid: "q" }, 201],
       ["/api/unlike", { qid: "q" }, 201],
       ["/api/register", { qid: "q", mid: "m" }, 201],
@@ -845,6 +859,31 @@ describe("successful API contracts", () => {
       "c382ab80-f895-42a7-9c36-1bba967ef26f",
     );
   });
+});
+
+describe("practice attempt errors", () => {
+  it.each([
+    ["QUIZ_NOT_FOUND", 404],
+    ["CLIENT_ATTEMPT_ID_CONFLICT", 409],
+  ] as const)(
+    "responds to the %s use case error with status %i",
+    async (code, status) => {
+      const { default: PracticeUseCase } =
+        await import("./applications/usecases/PracticeUseCase.js");
+      vi.spyOn(PracticeUseCase.prototype, "addPractice").mockResolvedValue({
+        ok: false,
+        error: { code, message: "message" },
+      });
+      const response = await jsonRequest("/api/practice", {
+        qid: "q",
+        judgement: 1,
+        pressedWord: 0,
+        clientAttemptId: "c382ab80-f895-42a7-9c36-1bba967ef26f",
+      });
+      expect(response.status).toBe(status);
+      expect(await response.json()).toMatchObject({ code });
+    },
+  );
 });
 
 describe("practice attempt validation", () => {

@@ -26,4 +26,9 @@ export const format = (day: Date) => {
   return dayjs(day).format("YYYY-MM-DD HH:mm:ss");
 };
 
+// 学習日は日本時間の暦日。DATETIME 列の値から SQL で求めないのは、列の壁時計が
+// Node プロセスのタイムゾーンに依存するため（mysql2 が返した Date を必ず経由する）。
+export const toStudyDate = (instant: Date): string =>
+  dayjs(instant).tz("Asia/Tokyo").format("YYYY-MM-DD");
+
 export default dayjs;

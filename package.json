@@ -29,7 +29,9 @@
     "migrate:dev": "./node_modules/.bin/env-cmd -f .config/.env pnpm --filter ./packages/backend run migrate:exe",
     "migrate:status": "./node_modules/.bin/env-cmd -f .config/.env pnpm --filter ./packages/backend run migrate:status",
     "migrate:reset": "./node_modules/.bin/env-cmd -f .config/.env pnpm --filter ./packages/backend run migrate:reset",
-    "typecheck": "pnpm --filter backend run build && pnpm --filter frontend exec tsc --noEmit"
+    "typecheck": "pnpm --filter backend run build && pnpm --filter frontend exec tsc --noEmit",
+    "test:docker": "vitest run scripts/entrypoint.test.ts",
+    "migrate:deploy": "./node_modules/.bin/env-cmd -f .config/.env pnpm --filter ./packages/backend run migrate:deploy"
   },
   "dependencies": {
     "env-cmd": "^10.1.0",
@@ -37,8 +39,8 @@
   },
   "devDependencies": {
     "oxfmt": "^0.75.0",
-    "oxlint": "^1.90.0",
-    "vitest": "^5.0.5"
+    "oxlint": "^1.92.0",
+    "vitest": "^5.1.0"
   },
   "packageManager": "pnpm@12.15.0"
 }

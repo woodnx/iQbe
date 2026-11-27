@@ -7,13 +7,24 @@ import {
   Paper,
   Text,
 } from "@mantine/core";
+import {
+  REJECTION_MESSAGES,
+  type RejectedStatus,
+} from "../practiceSaveRejection";
 
 interface Props {
-  state: "idle" | "saving" | "failed";
+  state: "idle" | "saving" | "failed" | "rejected";
+  rejectedStatus?: RejectedStatus | null;
   onRetry: () => void;
+  onDiscard?: () => void;
 }
 
-export function PracticeSaveStatus({ state, onRetry }: Props) {
+export function PracticeSaveStatus({
+  state,
+  rejectedStatus = null,
+  onRetry,
+  onDiscard,
+}: Props) {
   if (state === "idle") return null;
   return (
     <Affix
@@ -30,6 +41,19 @@ export function PracticeSaveStatus({ state, onRetry }: Props) {
             <Text>保存しています…</Text>
           </Group>
         </Paper>
+      ) : state === "rejected" && rejectedStatus !== null ? (
+        <Alert
+          color="red"
+          title={REJECTION_MESSAGES[rejectedStatus].title}
+          role="alert"
+        >
+          <Text>{REJECTION_MESSAGES[rejectedStatus].message}</Text>
+          <Button mt="sm" onClick={onDiscard}>
+            {rejectedStatus === 401
+              ? "ログインし直す"
+              : "この解答を破棄して続ける"}
+          </Button>
+        </Alert>
       ) : (
         <Alert color="red" title="保存に失敗しました" role="alert">
           <Text>

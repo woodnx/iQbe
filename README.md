@@ -8,6 +8,7 @@
 </div>
 
 ## Features
+
 - INPUT
   - Search system organized by issues
   - Flexible refinement by genre, percentage of correct answers, and keywords
@@ -29,14 +30,12 @@
   - Ranking of study status in the same circle
 
 ## Credits
+
 This software uses following OSS.
+
 - Envionment: [Node.js](https://nodejs.org/en)
 - UI Library: [React](https://react.dev/)
-- Routing System: [React Router](https://reactrouter.com/en/main)
+- Routing System: [Tanstack Router](https://tanstack.com/router/latest)
 - UI Framework: [Mantine](https://v6.mantine.dev/)
 - Icons: [Tabler Icons](https://tablericons.com/)
 - Server: [Hono](https://hono.dev/)
-
-## API development
-
-The backend Hono routes define the API contract. The frontend uses `hc<AppType>` from `hono/client` and infers request and JSON response types from `backend/rpc`. Run `pnpm typecheck` to build backend declarations and check the frontend; `pnpm dev` builds them initially and updates them while watching. `pnpm build` builds the backend before the frontend and assembles the static site. No schema generation step is needed.

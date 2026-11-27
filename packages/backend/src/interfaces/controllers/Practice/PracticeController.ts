@@ -23,10 +23,13 @@ export default class PracticeController {
       );
 
       if (!result.ok) {
+        if (result.error.code === "QUIZ_NOT_FOUND") {
+          return c.json(result.error, 404);
+        }
         return c.json(result.error, 409);
       }
 
-      return c.body(null, 200);
+      return c.json(result.data, 200);
     };
   }
 }

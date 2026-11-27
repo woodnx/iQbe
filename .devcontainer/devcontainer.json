@@ -4,12 +4,10 @@
   "service": "app",
   "workspaceFolder": "/iQbe",
   "postCreateCommand": "sudo chmod 755 .devcontainer/init.sh && .devcontainer/init.sh",
-  "forwardPorts": [
-    5173,
-    9000
-  ],
+  "forwardPorts": [5173, 9000],
   "features": {
-    "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {}
+    "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {},
+    "ghcr.io/devcontainers/features/github-cli:1": {}
   },
   "containerEnv": {
     "TESTCONTAINERS_RYUK_DISABLED": "true"

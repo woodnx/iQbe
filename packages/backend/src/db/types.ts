@@ -4,6 +4,24 @@ export type Generated<T> = T extends ColumnType<infer S, infer I, infer U>
   : ColumnType<T, T | undefined, T>;
 export type Timestamp = ColumnType<Date, Date | string, Date | string>;
 
+export const QuizLearningState = {
+    LEARNING: "LEARNING",
+    REVIEWING: "REVIEWING",
+    RETAINED: "RETAINED"
+} as const;
+export type QuizLearningState = (typeof QuizLearningState)[keyof typeof QuizLearningState];
+export const PracticeMode = {
+    FREE: "FREE",
+    DAILY_SET: "DAILY_SET",
+    SMART_REVIEW: "SMART_REVIEW"
+} as const;
+export type PracticeMode = (typeof PracticeMode)[keyof typeof PracticeMode];
+export const GrowthEventType = {
+    FIRST_CORRECT: "FIRST_CORRECT",
+    REVENGE_SUCCESS: "REVENGE_SUCCESS",
+    REVIEW_SUCCESS: "REVIEW_SUCCESS"
+} as const;
+export type GrowthEventType = (typeof GrowthEventType)[keyof typeof GrowthEventType];
 export type categories = {
     id: Generated<number>;
     name: string;
@@ -16,6 +34,14 @@ export type favorites = {
     quiz_id: number;
     registered: Timestamp;
 };
+export type growth_events = {
+    id: Generated<number>;
+    user_id: number;
+    quiz_id: number;
+    history_id: number;
+    type: GrowthEventType;
+    occurred_at: Timestamp;
+};
 export type histories = {
     id: Generated<number>;
     client_attempt_id: string | null;
@@ -24,6 +50,13 @@ export type histories = {
     practiced: Timestamp;
     judgement: number;
     pressed_word: Generated<number | null>;
+    practice_mode: PracticeMode | null;
+    study_date: Timestamp | null;
+    daily_attempt_number: number | null;
+    previous_judgement: number | null;
+    review_state: QuizLearningState | null;
+    next_review_at: Timestamp | null;
+    review_settings_version: number | null;
 };
 export type invite_codes = {
     id: Generated<number>;
@@ -129,6 +162,18 @@ export type test_quizzes = {
     original_quiz_id: number;
     test_id: number;
 };
+export type user_quiz_states = {
+    user_id: number;
+    quiz_id: number;
+    state: QuizLearningState;
+    review_count: Generated<number>;
+    success_streak: Generated<number>;
+    interval_days: number;
+    last_reviewed_at: Timestamp | null;
+    next_review_at: Timestamp | null;
+    fsrs_memory: unknown | null;
+    updated_at: Timestamp;
+};
 export type users = {
     id: Generated<number>;
     uid: Generated<string>;
@@ -151,6 +196,7 @@ export type workbooks = {
 export type DB = {
     categories: categories;
     favorites: favorites;
+    growth_events: growth_events;
     histories: histories;
     invite_codes: invite_codes;
     levels: levels;
@@ -169,6 +215,7 @@ export type DB = {
     tagging: tagging;
     tags: tags;
     test_quizzes: test_quizzes;
+    user_quiz_states: user_quiz_states;
     users: users;
     workbooks: workbooks;
 };

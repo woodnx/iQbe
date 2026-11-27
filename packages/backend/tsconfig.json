@@ -1,19 +1,14 @@
 {
   "compilerOptions": {
     "target": "ES2022",
-    "module": "NodeNext",
-    "moduleResolution": "NodeNext",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
     "rootDir": "./src",
     "isolatedModules": true,
     "paths": {
-      "@/*": [
-        "./src/*"
-      ]
+      "@/*": ["./src/*"]
     },
-    "types": [
-      "node",
-      "vitest/globals"
-    ],
+    "types": ["node", "vitest/globals"],
     "resolveJsonModule": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
@@ -25,10 +20,7 @@
     "skipLibCheck": true,
     "declaration": true
   },
-  "include": [
-    "src",
-    "src/types"
-  ],
+  "include": ["src", "src/types"],
   "tsc-alias": {
     "resolveFullPaths": true,
     "resolveFullExtension": ".js"

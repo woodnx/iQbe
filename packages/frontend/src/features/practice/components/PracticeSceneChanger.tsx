@@ -5,6 +5,11 @@ import { PracticeQuizController } from "@/features/practice/components/PracticeQ
 import { PracticeQuizIntro } from "@/features/practice/components/PracticeQuizIntro";
 import PracticeResultModal from "@/features/practice/components/PracticeResultModal";
 import { PracticeSaveStatus } from "@/features/practice/components/PracticeSaveStatus";
+import {
+  REJECTION_MESSAGES,
+  type RejectedStatus,
+  toRejectedStatus,
+} from "@/features/practice/practiceSaveRejection";
 import { useTimer } from "@/hooks";
 import { db } from "@/plugins/db";
 import type { Quiz as ApiQuiz } from "@/utils/api-types";
@@ -71,9 +76,16 @@ export default function PracticeSceneChanger({
     recorded: boolean;
   } | null>(null);
   const saving = useRef(false);
-  const [saveState, setSaveState] = useState<"idle" | "saving" | "failed">(
-    "idle",
-  );
+  const [saveState, setSaveState] = useState<
+    "idle" | "saving" | "failed" | "rejected"
+  >("idle");
+  const rejectedStatus = useRef<RejectedStatus | null>(null);
+  const [shownRejectedStatus, setShownRejectedStatus] =
+    useState<RejectedStatus | null>(null);
+  // 「やめる」経路で送る押し位置。別の問題の位置を送らないよう、表示中の問題と組にする。
+  const pressedWord = useRef<{ qid: string; position: number } | null>(null);
+  // 同じ問題へ戻った場合も、子コンポーネントの押し位置と入力状態を作り直すための世代。
+  const [attemptGeneration, setAttemptGeneration] = useState(0);
   const queryClient = useQueryClient();
   const { mutateAsync } = useMutation({
     mutationKey: ["post", "/practice"],
@@ -130,6 +142,16 @@ export default function PracticeSceneChanger({
     if (!startImmediately) openFilter();
   }, [startImmediately, openFilter]);
 
+  const resetAttempt = () => {
+    pressedWord.current = null;
+    setAttemptGeneration((generation) => generation + 1);
+  };
+
+  const resolveQuitPressedWord = () =>
+    pressedWord.current !== null && pressedWord.current.qid === quiz?.qid
+      ? pressedWord.current.position
+      : -1;
+
   const toFilter = (
     wids?: string | string[],
     keyword?: string,
@@ -159,15 +181,42 @@ export default function PracticeSceneChanger({
     });
     filter.close();
     onFilter();
+    resetAttempt();
     setNowNumber(0);
     setStartTrigger(true);
     setScene("ready");
   };
 
+  const advanceTo = async (nextNumber: number) => {
+    if (resumeId !== undefined) {
+      await db.practiceSessions.update(resumeId, {
+        currentIndex: nextNumber,
+        updatedAt: new Date(),
+      });
+      await queryClient.invalidateQueries({
+        queryKey: ["practiceSession", resumeId],
+      });
+    }
+    resetAttempt();
+    if (nextNumber >= maxQuizSize) {
+      setScene("result");
+    } else {
+      setNowNumber(nextNumber);
+      setScene("ready");
+    }
+  };
+
+  const clearPendingAttempt = () => {
+    pendingAttempt.current = null;
+    rejectedStatus.current = null;
+    setShownRejectedStatus(null);
+    setSaveState("idle");
+  };
+
   const savePendingAttempt = async () => {
     const attempt = pendingAttempt.current;
     // Guard synchronously, including clicks before React renders disabled controls.
-    if (!attempt || saving.current) return;
+    if (!attempt || saving.current || rejectedStatus.current !== null) return;
     saving.current = true;
     setSaveState("saving");
 
@@ -183,31 +232,53 @@ export default function PracticeSceneChanger({
       if (attempt.action === "quit") {
         await router.navigate({ to: "/" });
       } else {
-        if (resumeId !== undefined) {
-          await db.practiceSessions.update(resumeId, {
-            currentIndex: attempt.nextNumber,
-            updatedAt: new Date(),
-          });
-          await queryClient.invalidateQueries({
-            queryKey: ["practiceSession", resumeId],
-          });
-        }
-        if (attempt.nextNumber >= maxQuizSize) {
-          setScene("result");
-        } else {
-          setNowNumber(attempt.nextNumber);
-          setScene("ready");
-        }
+        await advanceTo(attempt.nextNumber);
       }
-      pendingAttempt.current = null;
-      setSaveState("idle");
-    } catch {
+      clearPendingAttempt();
+    } catch (error) {
+      const rejection = attempt.recorded ? null : toRejectedStatus(error);
+      if (rejection !== null) {
+        rejectedStatus.current = rejection;
+        setShownRejectedStatus(rejection);
+        setSaveState("rejected");
+        notifications.show({ ...REJECTION_MESSAGES[rejection], color: "red" });
+        return;
+      }
       setSaveState("failed");
       notifications.show({
         title: "保存に失敗しました",
         message: attempt.recorded
           ? "解答は保存済みです。「もう一度保存する」で演習の進行を再開できます。"
           : "解答の保存を確認できませんでした。「もう一度保存する」で同じ解答を再送できます。",
+        color: "red",
+      });
+    } finally {
+      saving.current = false;
+    }
+  };
+
+  // 拒否された解答を新しい clientAttemptId で自動送信しないのは、409 の原因や削除済みの
+  // 問題を解決せず、利用者の意図しない別の解答を作り得るため。進めるかは利用者が選ぶ。
+  // 401 ではこの解答を保存せずにログイン画面へ移る（演習の進行は進めないので、
+  // 中断データから再開すると同じ問題から解き直せる）。
+  const discardRejectedAttempt = async () => {
+    const attempt = pendingAttempt.current;
+    const rejection = rejectedStatus.current;
+    if (!attempt || rejection === null || saving.current) return;
+    saving.current = true;
+    try {
+      if (rejection === 401) {
+        await router.navigate({ to: "/login" });
+      } else if (attempt.action === "quit") {
+        await router.navigate({ to: "/" });
+      } else {
+        await advanceTo(attempt.nextNumber);
+      }
+      clearPendingAttempt();
+    } catch {
+      notifications.show({
+        title: "演習の進行に失敗しました",
+        message: "もう一度お試しください。",
         color: "red",
       });
     } finally {
@@ -266,6 +337,7 @@ export default function PracticeSceneChanger({
         opened={scene == "result"}
         onClose={result.close}
         onRetry={() => {
+          resetAttempt();
           setScene("ready");
           setNowNumber(0);
         }}
@@ -278,13 +350,19 @@ export default function PracticeSceneChanger({
             }),
             replace: true,
           });
+          resetAttempt();
           setScene("ready");
           setNowNumber(0);
         }}
         onTry={filter.open}
         onQuit={() => router.navigate({ to: "/" })}
       />
-      <PracticeSaveStatus state={saveState} onRetry={savePendingAttempt} />
+      <PracticeSaveStatus
+        state={saveState}
+        rejectedStatus={shownRejectedStatus}
+        onRetry={savePendingAttempt}
+        onDiscard={discardRejectedAttempt}
+      />
       <Group justify="space-between">
         <FilteringModalButton
           disabled={saveState !== "idle"}
@@ -292,7 +370,7 @@ export default function PracticeSceneChanger({
         />
         <PracticeQuitModal
           disabled={saveState !== "idle"}
-          onJudge={(j) => record(j, -1, "quit")}
+          onJudge={(j) => record(j, resolveQuitPressedWord(), "quit")}
         />
       </Group>
       <Text ta="center">
@@ -306,12 +384,16 @@ export default function PracticeSceneChanger({
       </Text>
       {quiz && (
         <PracticeQuizController
+          key={`${quiz.qid}:${attemptGeneration}`}
           quiz={quiz}
           scene={scene}
           ignoreLimit={3000}
           countLimit={5000}
           disabled={saveState !== "idle"}
           onJudge={(j, w) => record(j, w, "next")}
+          onPressedWordChange={(position) => {
+            pressedWord.current = { qid: quiz.qid, position };
+          }}
         />
       )}
     </>

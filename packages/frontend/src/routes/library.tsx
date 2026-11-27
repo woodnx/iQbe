@@ -1,3 +1,5 @@
+import { LibraryItem } from "@/features/library/components/LibraryItem";
+import { readResponse, rpc } from "@/utils/client";
 import {
   Accordion,
   Button,
@@ -13,8 +15,6 @@ import { IconBook2, IconList, IconStar } from "@tabler/icons-react";
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { LibraryItem } from "@/features/library/components/LibraryItem";
-import { readResponse, rpc } from "@/utils/client";
 
 export const Route = createFileRoute("/library")({
   component: RouteComponent,
@@ -103,7 +103,7 @@ function RouteComponent() {
                                     page: 1,
                                     seed,
                                     maxView: 100,
-                                    wid: workbook.wid,
+                                    wids: workbook.wid,
                                     judgements: judgements,
                                     isTransfer: true,
                                   }),

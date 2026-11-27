@@ -12,6 +12,8 @@ services:
     volumes:
       - ../:/iQbe:cached
       - /var/run/docker.sock:/var/run/docker.sock
+      - codex-home:/home/node/.codex
+      - claude-home:/home/node/.claude
     env_file:
       - dev.env
     environment:
@@ -30,3 +32,7 @@ services:
 
 volumes:
   mysql-data:
+  codex-home:
+    name: iqbe-codex-home
+  claude-home:
+    name: iqbe-claude-home

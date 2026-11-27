@@ -97,6 +97,34 @@ it("shows a retry action after a failure, and no retry while saving", () => {
   expect(retry).toHaveBeenCalledOnce();
 });
 
+it.each([
+  [400, "解答の内容が不正なため", "この解答を破棄して続ける"],
+  [404, "この問題は削除されたため", "この解答を破棄して続ける"],
+  [409, "同じ解答 ID で異なる解答が保存済みのため", "この解答を破棄して続ける"],
+  [401, "ログインの有効期限が切れたため", "ログインし直す"],
+] as const)(
+  "shows the reason and only a discard action for an HTTP %i rejection",
+  (status, message, action) => {
+    const retry = vi.fn();
+    const discard = vi.fn();
+    const rejected = renderToString(
+      createElement(PracticeSaveStatus, {
+        state: "rejected",
+        rejectedStatus: status,
+        onRetry: retry,
+        onDiscard: discard,
+      }),
+    );
+    expect(rejected).toContain(message);
+    expect(rejected).not.toContain("もう一度保存する");
+    expect(mocks.buttons).toHaveLength(1);
+    expect(mocks.buttons[0].children).toBe(action);
+    mocks.buttons[0].onClick!();
+    expect(discard).toHaveBeenCalledOnce();
+    expect(retry).not.toHaveBeenCalled();
+  },
+);
+
 it("disables all quiz recording controls while a save is unresolved", () => {
   const judge = vi.fn();
   renderToString(

@@ -18,6 +18,11 @@ const mocks = vi.hoisted(() => ({
   notify: vi.fn(),
   navigate: vi.fn(),
   retry: undefined as undefined | (() => Promise<void>),
+  discard: undefined as undefined | (() => Promise<void>),
+  pressedWordChange: undefined as undefined | ((pressedWord: number) => void),
+  filter: undefined as undefined | (() => void),
+  resultRetry: undefined as undefined | (() => void),
+  resultNext: undefined as undefined | (() => void),
   quit: undefined as undefined | ((judgement: number) => Promise<void>),
   judge: undefined as
     | undefined
@@ -80,7 +85,10 @@ vi.mock("@mantine/hooks", () => ({
 vi.mock("@/contexts/isMobile", () => ({ useIsMobile: () => false }));
 vi.mock("@/hooks", () => ({ useTimer: () => ({ start: vi.fn() }) }));
 vi.mock("@/features/filtering/components/FilteringModal", () => ({
-  default: () => null,
+  default: ({ onSubmit }: { onSubmit: typeof mocks.filter }) => {
+    mocks.filter = onSubmit;
+    return null;
+  },
 }));
 vi.mock("@/features/filtering/components/FilteringModalButton", () => ({
   default: () => null,
@@ -92,18 +100,45 @@ vi.mock("./components/PracticeQuitModal", () => ({
   },
 }));
 vi.mock("./components/PracticeSaveStatus", () => ({
-  PracticeSaveStatus: ({ onRetry }: { onRetry: typeof mocks.retry }) => {
+  // renderToString never re-renders, so only the first render's actions are kept.
+  PracticeSaveStatus: ({
+    onRetry,
+    onDiscard,
+  }: {
+    onRetry: typeof mocks.retry;
+    onDiscard: typeof mocks.discard;
+  }) => {
     mocks.retry = onRetry;
+    mocks.discard = onDiscard;
     return null;
   },
 }));
-vi.mock("./components/PracticeResultModal", () => ({ default: () => null }));
+vi.mock("./components/PracticeResultModal", () => ({
+  default: ({
+    onRetry,
+    onNext,
+  }: {
+    onRetry: typeof mocks.resultRetry;
+    onNext: typeof mocks.resultNext;
+  }) => {
+    mocks.resultRetry = onRetry;
+    mocks.resultNext = onNext;
+    return null;
+  },
+}));
 vi.mock("./components/PracticeQuizIntro", () => ({
   PracticeQuizIntro: () => null,
 }));
 vi.mock("./components/PracticeQuizController", () => ({
-  PracticeQuizController: ({ onJudge }: { onJudge: typeof mocks.judge }) => {
+  PracticeQuizController: ({
+    onJudge,
+    onPressedWordChange,
+  }: {
+    onJudge: typeof mocks.judge;
+    onPressedWordChange: typeof mocks.pressedWordChange;
+  }) => {
     mocks.judge = onJudge;
+    mocks.pressedWordChange = onPressedWordChange;
     return null;
   },
 }));
@@ -224,6 +259,11 @@ const renderPractice = () => {
     judge: mocks.judge!,
     quit: mocks.quit!,
     retry: mocks.retry!,
+    discard: mocks.discard!,
+    pressWord: mocks.pressedWordChange!,
+    filter: mocks.filter!,
+    resultRetry: mocks.resultRetry!,
+    resultNext: mocks.resultNext!,
     queryKey,
   };
 };
@@ -338,3 +378,139 @@ it("uses a new ID when the same question is attempted in a new practice", async 
   const [first, second] = mocks.save.mock.calls.map(([input]) => input.json);
   expect(first.clientAttemptId).not.toBe(second.clientAttemptId);
 });
+
+const respondWith = (status: number, body: object) =>
+  mocks.save.mockImplementationOnce(async () =>
+    Response.json(body, { status }),
+  );
+
+it.each([
+  [
+    400,
+    { title: "INVAILD_PARAMS", type: "about:blank", status: 400, detail: "x" },
+  ],
+  [404, { code: "QUIZ_NOT_FOUND", message: "not found" }],
+  [409, { code: "CLIENT_ATTEMPT_ID_CONFLICT", message: "conflict" }],
+] as const)(
+  "rejects an HTTP %i answer without a resend, and moves to the next question only when discarded",
+  async (status, body) => {
+    respondWith(status, body);
+    const { judge, quit, retry, discard, filter, queryKey } = renderPractice();
+    await judge(1, 5);
+    expect(mocks.notify).toHaveBeenCalledExactlyOnceWith(
+      expect.objectContaining({ color: "red" }),
+    );
+    // Neither a retry nor other answers or filters replace the rejected answer.
+    await retry();
+    await judge(0, 9);
+    await quit(0);
+    filter();
+    expect(mocks.save).toHaveBeenCalledTimes(1);
+    expect(mocks.updateSession).not.toHaveBeenCalled();
+    expect(mocks.navigate).not.toHaveBeenCalled();
+
+    await discard();
+    expect(mocks.save).toHaveBeenCalledTimes(1);
+    expect(mocks.updateSession).toHaveBeenCalledExactlyOnceWith(42, {
+      currentIndex: 1,
+      updatedAt: expect.any(Date),
+    });
+    expect(client.getQueryData(queryKey)).toEqual([
+      { qid: "q1", total: 0, right: 0, judgement: null },
+    ]);
+    await discard();
+    expect(mocks.updateSession).toHaveBeenCalledTimes(1);
+  },
+);
+
+it("goes home without saving when a rejected quit answer is discarded", async () => {
+  respondWith(404, { code: "QUIZ_NOT_FOUND", message: "not found" });
+  const { quit, discard } = renderPractice();
+  await quit(1);
+  expect(mocks.navigate).not.toHaveBeenCalled();
+  await discard();
+  expect(mocks.save).toHaveBeenCalledTimes(1);
+  expect(mocks.navigate).toHaveBeenCalledExactlyOnceWith({ to: "/" });
+  expect(mocks.updateSession).not.toHaveBeenCalled();
+});
+
+it("sends a 401 rejection to the login page without a resend", async () => {
+  respondWith(401, {
+    title: "EXPIRED_TOKEN",
+    type: "about:blank",
+    status: 401,
+    detail: "expired",
+  });
+  const { judge, retry, discard } = renderPractice();
+  await judge(1, 5);
+  await retry();
+  expect(mocks.save).toHaveBeenCalledTimes(1);
+  await discard();
+  expect(mocks.save).toHaveBeenCalledTimes(1);
+  expect(mocks.navigate).toHaveBeenCalledExactlyOnceWith({ to: "/login" });
+  expect(mocks.updateSession).not.toHaveBeenCalled();
+});
+
+it("keeps a rejected answer when discarding cannot navigate, and allows trying again", async () => {
+  respondWith(404, { code: "QUIZ_NOT_FOUND", message: "not found" });
+  mocks.navigate.mockRejectedValueOnce(new Error("navigation failed"));
+  const { quit, discard } = renderPractice();
+  await quit(1);
+  await discard();
+  await discard();
+  expect(mocks.navigate).toHaveBeenCalledTimes(2);
+  await discard();
+  expect(mocks.navigate).toHaveBeenCalledTimes(2);
+  expect(mocks.save).toHaveBeenCalledTimes(1);
+});
+
+it("treats a 5xx response as a failure and resends the same input and attempt ID", async () => {
+  respondWith(500, {
+    title: "INTERNAL_PROBLEMS",
+    type: "about:blank",
+    status: 500,
+    detail: "lock wait timeout",
+  });
+  const { judge, retry, discard } = renderPractice();
+  await judge(1, 5);
+  const original = mocks.save.mock.calls[0][0];
+  await discard();
+  expect(mocks.save).toHaveBeenCalledTimes(1);
+  await retry();
+  expect(mocks.save).toHaveBeenCalledTimes(2);
+  expect(mocks.save.mock.calls[1][0]).toEqual(original);
+  expect(mocks.updateSession).toHaveBeenCalledTimes(1);
+});
+
+it("sends the pressed word position when quitting after pressing the answer button", async () => {
+  const { pressWord, quit } = renderPractice();
+  pressWord(12);
+  await quit(1);
+  expect(mocks.save.mock.calls[0][0].json).toMatchObject({
+    qid: "q1",
+    judgement: 1,
+    pressedWord: 12,
+  });
+});
+
+it("sends -1 when quitting after the position has been cleared by a judgement", async () => {
+  const { pressWord, quit } = renderPractice();
+  pressWord(12);
+  pressWord(-1);
+  await quit(2);
+  expect(mocks.save.mock.calls[0][0].json).toMatchObject({ pressedWord: -1 });
+});
+
+it.each(["filter", "resultRetry", "resultNext"] as const)(
+  "does not carry a pressed word position over a question switch by %s",
+  async (switchQuestion) => {
+    const practice = renderPractice();
+    practice.pressWord(12);
+    practice[switchQuestion]();
+    await practice.quit(2);
+    expect(mocks.save.mock.calls[0][0].json).toMatchObject({
+      qid: "q1",
+      pressedWord: -1,
+    });
+  },
+);

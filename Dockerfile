@@ -8,7 +8,7 @@ FROM node:22-slim AS deps
 WORKDIR /iQbe
 
 RUN apt-get update -y && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
-RUN corepack enable && corepack prepare pnpm@10.18.3 --activate
+RUN corepack enable && corepack prepare pnpm@12.15.0 --activate
 
 # 依存解決に必要なファイルだけ先にコピー
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
@@ -27,7 +27,7 @@ FROM node:22-slim AS build
 
 WORKDIR /iQbe
 
-RUN corepack enable && corepack prepare pnpm@10.18.3 --activate
+RUN corepack enable && corepack prepare pnpm@12.15.0 --activate
 COPY --from=deps /iQbe /iQbe
 COPY . .
 
@@ -49,7 +49,7 @@ ENV NODE_ENV=production
 
 RUN apt-get update -y && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
 
-RUN corepack enable && corepack prepare pnpm@10.18.3 --activate
+RUN corepack enable && corepack prepare pnpm@12.15.0 --activate
 
 COPY --from=build /iQbe /iQbe
 

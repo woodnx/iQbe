@@ -195,6 +195,26 @@ function RouteComponent() {
           <Group grow mt="lg">
             <Button
               disabled={!dates[0]}
+              color="blue"
+              mt="sm"
+              radius="md"
+              variant="outline"
+              onClick={() => {
+                const d = convertDates(dates);
+
+                navigate({
+                  to: "/history",
+                  search: () => ({
+                    since: d[0],
+                    until: d[1],
+                  }),
+                });
+              }}
+            >
+              履歴を見る
+            </Button>
+            <Button
+              disabled={!dates[0]}
               color="green"
               mt="sm"
               radius="md"
@@ -226,26 +246,6 @@ function RouteComponent() {
               }}
             >
               演習を開始
-            </Button>
-            <Button
-              disabled={!dates[0]}
-              color="blue"
-              mt="sm"
-              radius="md"
-              variant="outline"
-              onClick={() => {
-                const d = convertDates(dates);
-
-                navigate({
-                  to: "/history",
-                  search: () => ({
-                    since: d[0],
-                    until: d[1],
-                  }),
-                });
-              }}
-            >
-              履歴を見る
             </Button>
           </Group>
         </Card>
