@@ -5,6 +5,7 @@ import os from "node:os";
 import path from "node:path";
 import type { StartedMySqlContainer } from "@testcontainers/mysql";
 import { createMiddleware } from "hono/factory";
+import { sql } from "kysely";
 import type { AppEnv } from "./http/context.js";
 
 const integration =
@@ -47,7 +48,6 @@ integration("MySQL API integration", () => {
           "node_modules/prisma/build/index.js",
           "db",
           "push",
-          "--skip-generate",
           "--schema",
           path.join(dir, "schema.prisma"),
         ],
@@ -57,24 +57,18 @@ integration("MySQL API integration", () => {
       await rm(dir, { recursive: true, force: true });
     }
     ({ db } = await import("./database.js"));
-    const { default: Manager } = await import(
-      "./interfaces/infra/kysely/KyselyClientManager.js"
-    );
-    const { default: Transactions } = await import(
-      "./interfaces/infra/kysely/KyselyTransactionManager.js"
-    );
-    const { default: QuizInfra } = await import(
-      "./interfaces/infra/QuizInfra.js"
-    );
-    const { default: CategoryInfra } = await import(
-      "./interfaces/infra/CategoryInfra.js"
-    );
-    const { default: QuizBulkInfra } = await import(
-      "./interfaces/infra/QuizBulkInfra.js"
-    );
-    const { AddQuizzesUseCase } = await import(
-      "./applications/usecases/Quiz/AddQuizzesUseCase.js"
-    );
+    const { default: Manager } =
+      await import("./interfaces/infra/kysely/KyselyClientManager.js");
+    const { default: Transactions } =
+      await import("./interfaces/infra/kysely/KyselyTransactionManager.js");
+    const { default: QuizInfra } =
+      await import("./interfaces/infra/QuizInfra.js");
+    const { default: CategoryInfra } =
+      await import("./interfaces/infra/CategoryInfra.js");
+    const { default: QuizBulkInfra } =
+      await import("./interfaces/infra/QuizBulkInfra.js");
+    const { AddQuizzesUseCase } =
+      await import("./applications/usecases/Quiz/AddQuizzesUseCase.js");
     manager = new Manager();
     transactions = new Transactions(manager);
     quizzes = new QuizInfra(manager, new CategoryInfra(manager));
@@ -214,6 +208,21 @@ integration("MySQL API integration", () => {
       .execute();
   });
 
+  const applyMigration = async (name: string) => {
+    const migration = await readFile(
+      new URL(`../prisma/migrations/${name}/migration.sql`, import.meta.url),
+      "utf8",
+    );
+    // Comment lines may contain ";", so drop them before splitting statements.
+    const statements = migration
+      .replace(/^\s*--.*$/gm, "")
+      .split(";")
+      .filter((s) => s.trim());
+    for (const statement of statements) {
+      await sql.raw(statement).execute(db);
+    }
+  };
+
   describe("user quiz state schema", () => {
     const initialState = () => ({
       user_id: 1,
@@ -232,17 +241,10 @@ integration("MySQL API integration", () => {
       ]);
       // Only the new, empty table is removed from this disposable test database.
       await db.schema.dropTable("user_quiz_states").execute();
-      const migration = await readFile(
-        new URL(
-          "../prisma/migrations/20261110000000_add_user_quiz_states/migration.sql",
-          import.meta.url,
-        ),
-        "utf8",
-      );
-      const { sql } = await import("kysely");
-      for (const statement of migration.split(";").filter((s) => s.trim())) {
-        await sql.raw(statement).execute(db);
-      }
+      await applyMigration("20261110000000_add_user_quiz_states");
+      // Restore the later migrations so that the following tests use the current schema.
+      await applyMigration("20261113000000_add_fsrs_memory");
+      await applyMigration("20261124000000_allow_null_review_due");
       expect(
         await db.selectFrom("user_quiz_states").selectAll().execute(),
       ).toEqual([]);
@@ -283,6 +285,7 @@ integration("MySQL API integration", () => {
           review_count: 0,
           success_streak: 0,
           last_reviewed_at: null,
+          fsrs_memory: null,
         },
         {
           ...initialState(),
@@ -291,6 +294,7 @@ integration("MySQL API integration", () => {
           review_count: 2,
           success_streak: 1,
           last_reviewed_at: t(22),
+          fsrs_memory: null,
         },
       ]);
     });
@@ -369,13 +373,19 @@ integration("MySQL API integration", () => {
     };
     const first = await postPractice(body);
     expect(first.status).toBe(200);
-    expect(await first.text()).toBe("");
+    const firstBody = await first.json();
     const saved = await db
       .selectFrom("histories")
       .selectAll()
       .where("client_attempt_id", "=", body.clientAttemptId)
       .executeTakeFirstOrThrow();
     expect(saved.pressed_word).toBe(0);
+    expect(firstBody).toMatchObject({
+      attemptId: String(saved.id),
+      qid: "q1",
+      judgement: 1,
+      practicedAt: saved.practiced.toISOString(),
+    });
     // A retry must retain the original timestamp, even long after the answer.
     await db
       .updateTable("histories")
@@ -537,6 +547,772 @@ integration("MySQL API integration", () => {
     ]);
   });
 
+  describe("practice learning records", () => {
+    const CORRECT = 1;
+    const WRONG = 0;
+    const answer = (qid: string, judgement: number, pressedWord = 3) => ({
+      qid,
+      judgement,
+      pressedWord,
+      clientAttemptId: randomUUID(),
+    });
+    const ownerQuizId = async (qid: string) =>
+      (
+        await db
+          .selectFrom("quizzes")
+          .select("id")
+          .where("qid", "=", qid)
+          .executeTakeFirstOrThrow()
+      ).id;
+    const historiesOf = async (qid: string) =>
+      db
+        .selectFrom("histories")
+        .select([
+          "id",
+          "client_attempt_id",
+          "judgement",
+          "pressed_word",
+          "practice_mode",
+          sql<string | null>`DATE_FORMAT(histories.study_date, '%Y-%m-%d')`.as(
+            "study_date",
+          ),
+          "daily_attempt_number",
+          "previous_judgement",
+          "review_state",
+          "review_settings_version",
+        ])
+        .where("user_id", "=", 1)
+        .where("quiz_id", "=", await ownerQuizId(qid))
+        .orderBy("id")
+        .execute();
+    const stateOf = async (qid: string) =>
+      db
+        .selectFrom("user_quiz_states")
+        .selectAll()
+        .where("user_id", "=", 1)
+        .where("quiz_id", "=", await ownerQuizId(qid))
+        .executeTakeFirst();
+    const growthEventsOf = async (qid: string) =>
+      db
+        .selectFrom("growth_events")
+        .select(["history_id", "type"])
+        .where("user_id", "=", 1)
+        .where("quiz_id", "=", await ownerQuizId(qid))
+        .orderBy("history_id")
+        .orderBy("type")
+        .execute();
+    const snapshotTables = async () =>
+      Promise.all([
+        db.selectFrom("histories").selectAll().orderBy("id").execute(),
+        db
+          .selectFrom("user_quiz_states")
+          .selectAll()
+          .orderBy("user_id")
+          .orderBy("quiz_id")
+          .execute(),
+        db.selectFrom("growth_events").selectAll().orderBy("id").execute(),
+      ]);
+    const expectNoRowsOfQuiz = async (quizId: number) => {
+      for (const table of [
+        "histories",
+        "user_quiz_states",
+        "growth_events",
+      ] as const)
+        expect(
+          await db
+            .selectFrom(table)
+            .select("quiz_id")
+            .where("quiz_id", "=", quizId)
+            .execute(),
+        ).toEqual([]);
+    };
+    const deleteQuiz = (qid: string) =>
+      db.deleteFrom("quizzes").where("qid", "=", qid).execute();
+    const withFixedTime = async <T>(instant: Date, run: () => Promise<T>) => {
+      vi.useFakeTimers({ toFake: ["Date"] });
+      vi.setSystemTime(instant);
+      try {
+        return await run();
+      } finally {
+        vi.useRealTimers();
+      }
+    };
+
+    it("records one answer, one review and one set of events for five concurrent identical submissions", async () => {
+      const body = answer("q3", CORRECT);
+      const responses = await Promise.all(
+        Array.from({ length: 5 }, () => postPractice(body)),
+      );
+      expect(responses.map((r) => r.status)).toEqual([200, 200, 200, 200, 200]);
+      const bodies = await Promise.all(responses.map((r) => r.json()));
+      expect(new Set(bodies.map((b) => JSON.stringify(b))).size).toBe(1);
+      expect(await historiesOf("q3")).toHaveLength(1);
+      expect((await stateOf("q3"))?.review_count).toBe(1);
+      expect((await growthEventsOf("q3")).map((e) => e.type)).toEqual([
+        "FIRST_CORRECT",
+      ]);
+    });
+
+    it("saves two distinct attempts in the same second in processing order", async () => {
+      await withFixedTime(new Date("2026-11-16T03:00:00Z"), async () => {
+        expect((await postPractice(answer("q3", WRONG))).status).toBe(200);
+        expect((await postPractice(answer("q3", CORRECT))).status).toBe(200);
+      });
+      const saved = await historiesOf("q3");
+      expect(saved.map((h) => h.daily_attempt_number)).toEqual([1, 2]);
+      expect(saved.map((h) => h.previous_judgement)).toEqual([null, WRONG]);
+      expect((await stateOf("q3"))?.review_count).toBe(2);
+    });
+
+    it("serializes ten concurrent first answers to the same quiz without deadlocks", async () => {
+      const responses = await withFixedTime(
+        new Date("2026-11-16T03:00:00Z"),
+        () =>
+          Promise.all(
+            Array.from({ length: 10 }, () => postPractice(answer("q3", WRONG))),
+          ),
+      );
+      expect(responses.map((r) => r.status)).toEqual(Array(10).fill(200));
+      const numbers = (await historiesOf("q3")).map(
+        (h) => h.daily_attempt_number,
+      );
+      expect([...numbers].sort((a, b) => Number(a) - Number(b))).toEqual(
+        Array.from({ length: 10 }, (_, i) => i + 1),
+      );
+      expect((await stateOf("q3"))?.review_count).toBe(10);
+    });
+
+    it("leaves histories, states and growth events untouched on a 409 conflict", async () => {
+      const body = answer("q3", CORRECT);
+      expect((await postPractice(body)).status).toBe(200);
+      const before = await snapshotTables();
+      const response = await postPractice({ ...body, judgement: WRONG });
+      expect(response.status).toBe(409);
+      expect(await snapshotTables()).toEqual(before);
+    });
+
+    it("rolls back the history and the state when saving growth events fails, and a retry saves once", async () => {
+      const { default: GrowthEventInfra } =
+        await import("./interfaces/infra/GrowthEventInfra.js");
+      vi.spyOn(GrowthEventInfra.prototype, "insertAll").mockRejectedValueOnce(
+        new Error("growth events unavailable"),
+      );
+      const body = answer("q3", CORRECT);
+      expect((await postPractice(body)).status).toBe(500);
+      expect(await historiesOf("q3")).toEqual([]);
+      expect(await stateOf("q3")).toBeUndefined();
+
+      expect((await postPractice(body)).status).toBe(200);
+      expect(await historiesOf("q3")).toHaveLength(1);
+      expect((await stateOf("q3"))?.review_count).toBe(1);
+      expect(await growthEventsOf("q3")).toHaveLength(1);
+    });
+
+    it("records all three growth events for a correct answer one minute after a wrong one, once", async () => {
+      const correct = answer("q3", CORRECT);
+      const second = await withFixedTime(
+        new Date("2026-11-16T03:00:00Z"),
+        async () => {
+          await postPractice(answer("q3", WRONG));
+          vi.setSystemTime(new Date("2026-11-16T03:01:00Z"));
+          return postPractice(correct);
+        },
+      );
+      expect(await second.json()).toMatchObject({
+        outcome: {
+          previousJudgement: WRONG,
+          growthEvents: ["FIRST_CORRECT", "REVENGE_SUCCESS", "REVIEW_SUCCESS"],
+          dailyAttemptNumber: 2,
+        },
+      });
+      expect((await postPractice(correct)).status).toBe(200);
+      expect((await growthEventsOf("q3")).map((e) => e.type)).toEqual([
+        "FIRST_CORRECT",
+        "REVENGE_SUCCESS",
+        "REVIEW_SUCCESS",
+      ]);
+    });
+
+    it("does not count a correct answer as first correct after a legacy correct answer, and replays legacy history", async () => {
+      const response = await postPractice(answer("q1", CORRECT));
+      expect(response.status).toBe(200);
+      const body = await response.json();
+      expect(body.outcome.growthEvents).not.toContain("FIRST_CORRECT");
+      expect(body.outcome.previousJudgement).toBe(CORRECT);
+      expect((await stateOf("q1"))?.review_count).toBe(3);
+    });
+
+    it("removes growth events and histories with a deleted quiz and answers a retry with 404", async () => {
+      const body = answer("q3", CORRECT);
+      expect((await postPractice(body)).status).toBe(200);
+      const quizId = await ownerQuizId("q3");
+      await deleteQuiz("q3");
+      expect(
+        await db
+          .selectFrom("growth_events")
+          .select("id")
+          .where("quiz_id", "=", quizId)
+          .execute(),
+      ).toEqual([]);
+      expect(
+        await db
+          .selectFrom("histories")
+          .select("id")
+          .where("quiz_id", "=", quizId)
+          .execute(),
+      ).toEqual([]);
+      const retry = await postPractice(body);
+      expect(retry.status).toBe(404);
+      expect(await retry.json()).toMatchObject({ code: "QUIZ_NOT_FOUND" });
+    });
+
+    it("splits study dates at midnight in Japan time", async () => {
+      await withFixedTime(new Date("2026-11-16T14:59:59Z"), async () => {
+        expect((await postPractice(answer("q3", WRONG))).status).toBe(200);
+        vi.setSystemTime(new Date("2026-11-16T15:00:00Z"));
+        expect((await postPractice(answer("q3", WRONG))).status).toBe(200);
+      });
+      expect(
+        (await historiesOf("q3")).map((h) => [
+          h.study_date,
+          h.daily_attempt_number,
+        ]),
+      ).toEqual([
+        ["2026-11-16", 1],
+        ["2026-11-17", 1],
+      ]);
+    });
+
+    it("applies the learning record migration without changing existing histories", async () => {
+      const before = await db
+        .selectFrom("histories")
+        .selectAll()
+        .orderBy("id")
+        .execute();
+      // Only this disposable database loses the objects that the migration adds.
+      await db.schema.dropTable("growth_events").execute();
+      await sql
+        .raw(
+          "DROP INDEX histories_user_id_quiz_id_study_date_daily_attempt_number_key ON histories",
+        )
+        .execute(db);
+      await sql
+        .raw(
+          `ALTER TABLE histories DROP COLUMN daily_attempt_number, DROP COLUMN next_review_at,
+            DROP COLUMN practice_mode, DROP COLUMN previous_judgement,
+            DROP COLUMN review_settings_version, DROP COLUMN review_state, DROP COLUMN study_date`,
+        )
+        .execute(db);
+      await applyMigration("20261116000000_add_practice_learning_records");
+      expect(
+        await db.selectFrom("histories").selectAll().orderBy("id").execute(),
+      ).toEqual(before);
+      expect(
+        before.every(
+          (row) =>
+            row.practice_mode === null &&
+            row.study_date === null &&
+            row.daily_attempt_number === null &&
+            row.previous_judgement === null &&
+            row.review_state === null &&
+            row.next_review_at === null &&
+            row.review_settings_version === null,
+        ),
+      ).toBe(true);
+      expect(
+        await db.selectFrom("growth_events").selectAll().execute(),
+      ).toEqual([]);
+    });
+
+    it("records settings version 1 for new answers and leaves legacy histories NULL", async () => {
+      expect((await postPractice(answer("q1", CORRECT))).status).toBe(200);
+      expect(
+        (await historiesOf("q1")).map((h) => [
+          h.practice_mode,
+          h.review_settings_version,
+        ]),
+      ).toEqual([
+        [null, null],
+        [null, null],
+        ["FREE", 1],
+      ]);
+    });
+
+    it("answers 404 without saving when the quiz is deleted before the state lock", async () => {
+      const { default: UserQuizStateInfra } =
+        await import("./interfaces/infra/UserQuizStateInfra.js");
+      const original = UserQuizStateInfra.prototype.findOrCreateForUpdate;
+      vi.spyOn(
+        UserQuizStateInfra.prototype,
+        "findOrCreateForUpdate",
+      ).mockImplementationOnce(async function (
+        this: InstanceType<typeof UserQuizStateInfra>,
+        ...args
+      ) {
+        await deleteQuiz("q3");
+        return original.apply(this, args);
+      });
+      const quizId = await ownerQuizId("q3");
+      const response = await postPractice(answer("q3", CORRECT));
+      expect(response.status).toBe(404);
+      expect(await response.json()).toMatchObject({ code: "QUIZ_NOT_FOUND" });
+      await expectNoRowsOfQuiz(quizId);
+    });
+
+    it("answers 404 when the quiz is deleted between ID lookup and the placeholder insert", async () => {
+      const { default: UserQuizStateInfra } =
+        await import("./interfaces/infra/UserQuizStateInfra.js");
+      const prototype = UserQuizStateInfra.prototype as unknown as {
+        resolveIds: (uid: string, qid: string) => Promise<unknown>;
+      };
+      const original = prototype.resolveIds;
+      vi.spyOn(prototype, "resolveIds").mockImplementationOnce(async function (
+        this: unknown,
+        uid: string,
+        qid: string,
+      ) {
+        const ids = await original.call(this, uid, qid);
+        await deleteQuiz("q3");
+        return ids;
+      });
+      const quizId = await ownerQuizId("q3");
+      const response = await postPractice(answer("q3", CORRECT));
+      expect(response.status).toBe(404);
+      expect(await response.json()).toMatchObject({ code: "QUIZ_NOT_FOUND" });
+      await expectNoRowsOfQuiz(quizId);
+    });
+
+    it("returns the original body from one snapshot even if the quiz is deleted mid-replay", async () => {
+      const { default: GrowthEventInfra } =
+        await import("./interfaces/infra/GrowthEventInfra.js");
+      const body = answer("q3", CORRECT);
+      const first = await postPractice(body);
+      const firstBody = await first.json();
+      expect(firstBody.outcome.growthEvents).toEqual(["FIRST_CORRECT"]);
+
+      const original = GrowthEventInfra.prototype.listTypesByHistoryId;
+      vi.spyOn(
+        GrowthEventInfra.prototype,
+        "listTypesByHistoryId",
+      ).mockImplementationOnce(async function (
+        this: InstanceType<typeof GrowthEventInfra>,
+        historyId,
+      ) {
+        // The saved history has already been read; delete on another connection.
+        await deleteQuiz("q3");
+        return original.call(this, historyId);
+      });
+      const retried = await postPractice(body);
+      expect(retried.status).toBe(200);
+      expect(await retried.json()).toEqual(firstBody);
+
+      expect((await postPractice(body)).status).toBe(404);
+    });
+
+    it("answers 404 when the winner of a conflicting race is deleted before the loser re-reads it", async () => {
+      const { default: UserQuizStateInfra } =
+        await import("./interfaces/infra/UserQuizStateInfra.js");
+      const { default: HistoryInfra } =
+        await import("./interfaces/infra/HistoryInfra.js");
+      const { default: DuplicateClientAttemptError } =
+        await import("./domains/History/DuplicateClientAttemptError.js");
+      const winner = answer("q3", CORRECT);
+      const loser = { ...winner, judgement: WRONG };
+
+      // The loser waits before taking the lock until the winner has committed.
+      // The winner is sent from the test body, outside the loser's transaction context.
+      let onLoserWaiting!: () => void;
+      let releaseLoser!: () => void;
+      const isLoserWaiting = new Promise<void>((resolve) => {
+        onLoserWaiting = resolve;
+      });
+      const canLoserLock = new Promise<void>((resolve) => {
+        releaseLoser = resolve;
+      });
+      const originalLock = UserQuizStateInfra.prototype.findOrCreateForUpdate;
+      vi.spyOn(
+        UserQuizStateInfra.prototype,
+        "findOrCreateForUpdate",
+      ).mockImplementationOnce(async function (
+        this: InstanceType<typeof UserQuizStateInfra>,
+        ...args
+      ) {
+        onLoserWaiting();
+        await canLoserLock;
+        return originalLock.apply(this, args);
+      });
+      let isLoserRolledBack = false;
+      const originalAdd = HistoryInfra.prototype.add;
+      vi.spyOn(HistoryInfra.prototype, "add").mockImplementation(
+        async function (this: InstanceType<typeof HistoryInfra>, history) {
+          try {
+            return await originalAdd.call(this, history);
+          } catch (error) {
+            if (error instanceof DuplicateClientAttemptError) {
+              isLoserRolledBack = true;
+            }
+            throw error;
+          }
+        },
+      );
+      const originalFind = HistoryInfra.prototype.findByClientAttemptId;
+      vi.spyOn(
+        HistoryInfra.prototype,
+        "findByClientAttemptId",
+      ).mockImplementation(async function (
+        this: InstanceType<typeof HistoryInfra>,
+        ...args
+      ) {
+        // The loser's transaction has rolled back, so this delete does not wait on its lock.
+        if (isLoserRolledBack) {
+          isLoserRolledBack = false;
+          await deleteQuiz("q3");
+        }
+        return originalFind.apply(this, args);
+      });
+
+      const loserResponse = postPractice(loser);
+      await isLoserWaiting;
+      try {
+        expect((await postPractice(winner)).status).toBe(200);
+      } finally {
+        releaseLoser();
+      }
+      const response = await loserResponse;
+      expect(response.status).toBe(404);
+      expect(await response.json()).toMatchObject({ code: "QUIZ_NOT_FOUND" });
+    });
+
+    it("treats a collation-equal qid as the saved quiz for both the first answer and the retry", async () => {
+      await db
+        .insertInto("quizzes")
+        .values({
+          id: 5,
+          qid: "Ab",
+          creator_id: 1,
+          que: "question",
+          ans: "answer",
+          category_id: 2,
+          workbook_id: 1,
+          total_crct_ans: 0,
+          total_wrng_ans: 0,
+          total_through_ans: 0,
+        })
+        .execute();
+      const body = answer("ab", CORRECT);
+      const first = await postPractice(body);
+      const retried = await postPractice(body);
+      expect(first.status).toBe(200);
+      expect(retried.status).toBe(200);
+      const firstBody = await first.json();
+      expect(firstBody.qid).toBe("Ab");
+      expect(await retried.json()).toEqual(firstBody);
+    });
+  });
+
+  describe("learning record backfill", () => {
+    const createUseCase = async () => {
+      const { default: BackfillLearningRecordUseCase } =
+        await import("./applications/usecases/LearningRecord/BackfillLearningRecordUseCase.js");
+      const { default: HistoryInfra } =
+        await import("./interfaces/infra/HistoryInfra.js");
+      const { default: UserQuizStateInfra } =
+        await import("./interfaces/infra/UserQuizStateInfra.js");
+      const { createReviewService } =
+        await import("./interfaces/factories/createReviewService.js");
+      const historyRepository = new HistoryInfra(manager);
+      return {
+        historyRepository,
+        useCase: new BackfillLearningRecordUseCase(
+          transactions,
+          historyRepository,
+          new UserQuizStateInfra(manager),
+          createReviewService(),
+        ),
+      };
+    };
+    const snapshotTables = async () =>
+      Promise.all([
+        db.selectFrom("histories").selectAll().orderBy("id").execute(),
+        db
+          .selectFrom("user_quiz_states")
+          .selectAll()
+          .orderBy("user_id")
+          .orderBy("quiz_id")
+          .execute(),
+        db.selectFrom("growth_events").selectAll().orderBy("id").execute(),
+      ]);
+    const owner = (qid: string, shouldApply: boolean) => ({
+      uid: "owner",
+      qid,
+      shouldApply,
+    });
+    const historiesOf = async (quizId: number) =>
+      db
+        .selectFrom("histories")
+        .select([
+          "id",
+          "judgement",
+          "practice_mode",
+          "review_settings_version",
+          sql<string | null>`DATE_FORMAT(histories.study_date, '%Y-%m-%d')`.as(
+            "study_date",
+          ),
+          "daily_attempt_number",
+        ])
+        .where("user_id", "=", 1)
+        .where("quiz_id", "=", quizId)
+        .orderBy("id")
+        .execute();
+    const stateOf = (quizId: number) =>
+      db
+        .selectFrom("user_quiz_states")
+        .selectAll()
+        .where("user_id", "=", 1)
+        .where("quiz_id", "=", quizId)
+        .executeTakeFirst();
+    // tagging references quizzes with ON DELETE RESTRICT, so remove its rows first.
+    const deleteQuizWithTags = async (qid: string) => {
+      const quizId = (
+        await db
+          .selectFrom("quizzes")
+          .select("id")
+          .where("qid", "=", qid)
+          .executeTakeFirstOrThrow()
+      ).id;
+      await db.deleteFrom("tagging").where("quiz_id", "=", quizId).execute();
+      await db.deleteFrom("quizzes").where("id", "=", quizId).execute();
+    };
+    const insertLegacyHistory = (quizId: number, judgement: number, at: Date) =>
+      db
+        .insertInto("histories")
+        .values({ user_id: 1, quiz_id: quizId, practiced: at, judgement })
+        .execute();
+
+    it("reports planned work without writing anything when not applying", async () => {
+      const { useCase } = await createUseCase();
+      const before = await snapshotTables();
+      expect(await useCase.execute(owner("q1", false))).toEqual({
+        uid: "owner",
+        qid: "q1",
+        isStateRebuilt: true,
+        assignedStudyDayCount: 2,
+        isDeletedPair: false,
+      });
+      expect(await snapshotTables()).toEqual(before);
+    });
+
+    it("compares the state and histories from one snapshot in a read-only check", async () => {
+      const { useCase } = await createUseCase();
+      await useCase.execute(owner("q1", true));
+      const { default: UserQuizStateInfra } =
+        await import("./interfaces/infra/UserQuizStateInfra.js");
+      const original = UserQuizStateInfra.prototype.findByUidAndQid;
+      vi.spyOn(
+        UserQuizStateInfra.prototype,
+        "findByUidAndQid",
+      ).mockImplementationOnce(async function (
+        this: InstanceType<typeof UserQuizStateInfra>,
+        ...args
+      ) {
+        const state = await original.apply(this, args);
+        // Another connection updates both the state and the histories.
+        expect(
+          (
+            await postPractice({
+              qid: "q1",
+              judgement: 1,
+              pressedWord: 0,
+              clientAttemptId: randomUUID(),
+            })
+          ).status,
+        ).toBe(200);
+        return state;
+      });
+      expect((await useCase.execute(owner("q1", false))).isStateRebuilt).toBe(
+        false,
+      );
+      expect(await useCase.execute(owner("q1", false))).toMatchObject({
+        isStateRebuilt: false,
+        assignedStudyDayCount: 0,
+      });
+    });
+
+    it("detects an invalid judgement without a state row before applying, and reports it from the script", async () => {
+      const { useCase, historyRepository } = await createUseCase();
+      await insertLegacyHistory(3, 3, t(20));
+      await expect(useCase.execute(owner("q3", false))).rejects.toThrow(
+        RangeError,
+      );
+      const { runLearningRecordBackfill, listStatesWithoutHistory } =
+        await import("./scripts/backfillLearningRecords.js");
+      const summary = await runLearningRecordBackfill(false, {
+        historyRepository,
+        backfillPair: (command) => useCase.execute(command),
+        listStatesWithoutHistory: () => listStatesWithoutHistory(db),
+      });
+      expect(summary.unreplayablePairs).toEqual([
+        expect.objectContaining({ uid: "owner", qid: "q3" }),
+      ]);
+      expect(summary.failedPairs).toEqual([]);
+    });
+
+    it("treats pairs deleted after enumeration as deleted, not unreplayable", async () => {
+      const { useCase, historyRepository } = await createUseCase();
+      const pairs = await historyRepository.listAnsweredPairs(null, 200);
+      expect(pairs).toContainEqual({ uid: "owner", qid: "q2" });
+      await deleteQuizWithTags("q2");
+      const before = await snapshotTables();
+      for (const shouldApply of [false, true]) {
+        expect(await useCase.execute(owner("q2", shouldApply))).toMatchObject({
+          isDeletedPair: true,
+          isStateRebuilt: false,
+          assignedStudyDayCount: 0,
+        });
+      }
+      expect(await snapshotTables()).toEqual(before);
+    });
+
+    it("treats a pair deleted between ID lookup and the placeholder insert as deleted", async () => {
+      const { useCase, historyRepository } = await createUseCase();
+      const { default: UserQuizStateInfra } =
+        await import("./interfaces/infra/UserQuizStateInfra.js");
+      const prototype = UserQuizStateInfra.prototype as unknown as {
+        resolveIds: (uid: string, qid: string) => Promise<unknown>;
+      };
+      const original = prototype.resolveIds;
+      let hasDeleted = false;
+      vi.spyOn(prototype, "resolveIds").mockImplementation(async function (
+        this: unknown,
+        uid: string,
+        qid: string,
+      ) {
+        const ids = await original.call(this, uid, qid);
+        if (qid === "q2" && !hasDeleted) {
+          hasDeleted = true;
+          await deleteQuizWithTags(qid);
+        }
+        return ids;
+      });
+      const {
+        runLearningRecordBackfill,
+        listStatesWithoutHistory,
+        hasBackfillProblems,
+      } = await import("./scripts/backfillLearningRecords.js");
+      const summary = await runLearningRecordBackfill(true, {
+        historyRepository,
+        backfillPair: (command) => useCase.execute(command),
+        listStatesWithoutHistory: () => listStatesWithoutHistory(db),
+      });
+      expect(summary.deletedPairCount).toBe(1);
+      expect(summary.unreplayablePairs).toEqual([]);
+      expect(summary.failedPairs).toEqual([]);
+      expect(hasBackfillProblems(summary)).toBe(false);
+    });
+
+    it("rebuilds the state and study days from legacy histories without inventing outcomes or events", async () => {
+      const { useCase } = await createUseCase();
+      expect(await useCase.execute(owner("q1", true))).toMatchObject({
+        isStateRebuilt: true,
+        assignedStudyDayCount: 2,
+      });
+      const state = await stateOf(1);
+      expect(state?.review_count).toBe(2);
+      expect(state?.fsrs_memory).not.toBeNull();
+      expect(await historiesOf(1)).toEqual([
+        expect.objectContaining({
+          practice_mode: null,
+          review_settings_version: null,
+          study_date: "2026-10-20",
+          daily_attempt_number: 1,
+        }),
+        expect.objectContaining({
+          practice_mode: null,
+          review_settings_version: null,
+          study_date: "2026-10-21",
+          daily_attempt_number: 1,
+        }),
+      ]);
+      expect(
+        await db.selectFrom("growth_events").selectAll().execute(),
+      ).toEqual([]);
+
+      const before = await snapshotTables();
+      expect(await useCase.execute(owner("q1", true))).toMatchObject({
+        isStateRebuilt: false,
+        assignedStudyDayCount: 0,
+      });
+      expect(await snapshotTables()).toEqual(before);
+    });
+
+    it("keeps the state and daily numbers of answers saved through the API", async () => {
+      const response = await postPractice({
+        qid: "q3",
+        judgement: 1,
+        pressedWord: 0,
+        clientAttemptId: randomUUID(),
+      });
+      expect(response.status).toBe(200);
+      const beforeState = await stateOf(3);
+      const beforeHistories = await historiesOf(3);
+      const { useCase } = await createUseCase();
+      expect(await useCase.execute(owner("q3", true))).toMatchObject({
+        isStateRebuilt: false,
+        assignedStudyDayCount: 0,
+      });
+      const afterState = await stateOf(3);
+      expect(afterState?.review_count).toBe(beforeState?.review_count);
+      expect(afterState?.next_review_at).toEqual(beforeState?.next_review_at);
+      expect(await historiesOf(3)).toEqual(beforeHistories);
+    });
+
+    it("numbers two legacy histories in the same second by id", async () => {
+      await insertLegacyHistory(3, 0, t(20));
+      await insertLegacyHistory(3, 1, t(20));
+      const { useCase } = await createUseCase();
+      await useCase.execute(owner("q3", true));
+      expect((await historiesOf(3)).map((h) => h.daily_attempt_number)).toEqual(
+        [1, 2],
+      );
+    });
+
+    it("throws for an invalid judgement and leaves the pair unchanged when applying", async () => {
+      await insertLegacyHistory(3, 1, t(20));
+      await insertLegacyHistory(3, 3, t(21));
+      const { useCase } = await createUseCase();
+      const before = await snapshotTables();
+      await expect(useCase.execute(owner("q3", true))).rejects.toThrow(
+        RangeError,
+      );
+      expect(await snapshotTables()).toEqual(before);
+    });
+
+    it("finds answered states without histories, which pair enumeration cannot see", async () => {
+      await db
+        .insertInto("user_quiz_states")
+        .values({
+          user_id: 1,
+          quiz_id: 3,
+          state: "REVIEWING",
+          review_count: 1,
+          interval_days: 1,
+          last_reviewed_at: t(20),
+          next_review_at: t(21),
+          updated_at: t(20),
+        })
+        .execute();
+      const { historyRepository } = await createUseCase();
+      expect(
+        await historyRepository.listAnsweredPairs(null, 200),
+      ).not.toContainEqual({ uid: "owner", qid: "q3" });
+      const { listStatesWithoutHistory } =
+        await import("./scripts/backfillLearningRecords.js");
+      expect(await listStatesWithoutHistory(db)).toEqual([
+        { uid: "owner", qid: "q3" },
+      ]);
+    });
+  });
+
   it("isolates interleaved transactions, reuses nested transactions, and restores context after failure", async () => {
     let entered!: () => void;
     let release!: () => void;
@@ -583,6 +1359,49 @@ integration("MySQL API integration", () => {
         .where("id", "in", [10, 11])
         .execute(),
     ).toEqual([{ id: 11 }]);
+  });
+
+  it("joins an outer transaction only when the requested isolation level matches", async () => {
+    let ranWithMismatch = false;
+    await transactions.begin(
+      async () => {
+        const trx = manager.getClient();
+        await transactions.begin(
+          async () => {
+            expect(manager.getClient()).toBe(trx);
+          },
+          { isolationLevel: "read committed" },
+        );
+        // 分離レベルを指定しない内側は、従来どおり外側に相乗りする。
+        await transactions.begin(async () => {
+          expect(manager.getClient()).toBe(trx);
+        });
+        await expect(
+          transactions.begin(
+            async () => {
+              ranWithMismatch = true;
+            },
+            { isolationLevel: "repeatable read" },
+          ),
+        ).rejects.toThrow(
+          'A nested transaction requires "repeatable read", but the outer transaction uses "read committed"',
+        );
+      },
+      { isolationLevel: "read committed" },
+    );
+    // 外側が指定なしだと実際の分離レベルはサーバー設定次第なので、指定のある内側は拒否する。
+    await expect(
+      transactions.begin(() =>
+        transactions.begin(
+          async () => {
+            ranWithMismatch = true;
+          },
+          { isolationLevel: "read committed" },
+        ),
+      ),
+    ).rejects.toThrow("the server default");
+    expect(ranWithMismatch).toBe(false);
+    expect(manager.getClient()).toBe(db);
   });
 
   it("uses one row per owned quiz and the authenticated user's latest judgement", async () => {
@@ -1049,9 +1868,8 @@ integration("MySQL API integration", () => {
   });
 
   it("aggregates seven Japan-time periods in one SQL statement with exclusive end boundaries", async () => {
-    const { default: Analysis } = await import(
-      "./interfaces/infra/AnalysisQueryService.js"
-    );
+    const { default: Analysis } =
+      await import("./interfaces/infra/AnalysisQueryService.js");
     const midnight = new Date("2026-10-26T15:00:00Z");
     await db
       .insertInto("histories")
@@ -1211,9 +2029,8 @@ integration("MySQL API integration", () => {
     "benchmarks equivalent aggregation/count SQL and inspects history index plans",
     async () => {
       const { sql } = await import("kysely");
-      const { default: Analysis } = await import(
-        "./interfaces/infra/AnalysisQueryService.js"
-      );
+      const { default: Analysis } =
+        await import("./interfaces/infra/AnalysisQueryService.js");
       const { generateRange } = await import("./plugins/day.js");
       const ids = Array.from({ length: 2000 }, (_, index) => index + 100);
       for (let offset = 0; offset < ids.length; offset += 500)

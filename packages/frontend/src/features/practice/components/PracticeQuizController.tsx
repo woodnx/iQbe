@@ -27,6 +27,7 @@ interface Props extends BoxProps {
   canTypewrite?: boolean;
   disabled?: boolean;
   onJudge: (judgement: number, pressedWord: number) => void;
+  onPressedWordChange?: (pressedWord: number) => void;
 }
 
 export function PracticeQuizController({
@@ -35,6 +36,7 @@ export function PracticeQuizController({
   ignoreLimit,
   countLimit,
   onJudge,
+  onPressedWordChange,
   disabled = false,
   ...others
 }: Props) {
@@ -61,6 +63,7 @@ export function PracticeQuizController({
     onJudge(judge, pressedWord);
     setScene("preparation");
     setPressedWord(-1);
+    onPressedWordChange?.(-1);
   };
 
   return (
@@ -74,7 +77,10 @@ export function PracticeQuizController({
         onTypewrited={() => setScene("ignored")}
         onIgnored={() => setScene("judging")}
         onCounted={() => setScene("judging")}
-        onPressed={(pressedWord) => setPressedWord(pressedWord)}
+        onPressed={(pressedWord) => {
+          setPressedWord(pressedWord);
+          onPressedWordChange?.(pressedWord);
+        }}
       />
       <PracticeQuizInfo
         qid={quiz.qid}

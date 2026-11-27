@@ -32,7 +32,8 @@
     "migrate:deploy": "prisma migrate deploy",
     "test:integration": "API_MYSQL_TESTS=1 vitest run src/api.integration.test.ts --no-file-parallelism",
     "test:benchmark": "API_BENCHMARK=1 pnpm run test:integration",
-    "indexes:check": "tsx src/scripts/checkApiIndexes.ts"
+    "indexes:check": "tsx src/scripts/checkApiIndexes.ts",
+    "learning:backfill": "tsx src/scripts/backfillLearningRecords.ts"
   },
   "dependencies": {
     "@hapi/boom": "^10.0.1",
@@ -55,6 +56,7 @@
     "path": "^0.12.7",
     "prisma": "7",
     "reflect-metadata": "^0.2.2",
+    "ts-fsrs": "5.4.2",
     "tsyringe": "^4.10.0",
     "uid": "^2.0.2",
     "zod": "^4.6.7"

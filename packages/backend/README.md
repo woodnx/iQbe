@@ -1,36 +1,48 @@
 # iqbe-api
 
 ## 概要
+
 iQbeのコアAPI群．
 
 ## 構成
+
 Clean Architecter をベースとした軽量DDD．
+
 - 値オブジェクトを作成しない
-- 
+-
+
 ### Prisma
+
 - TypeScriptのORMである[Prisma](https://www.prisma.io/)のスキーマ定義ファイル`prisma/schema.prisma`とマイグレーションファイル群から成る
 - 本APIではORMとしてではなく，マイグレーション用でPrismaを用いている
 
 ### src/interfaces/controllers
+
 - controller ごとにディレクトリを分け、`Quiz/QuizController.ts` と `Quiz/schema.ts` のようにハンドラーと HTTP 入力スキーマを隣接させます。
 - routes と controller は同じ `schema.ts` を参照します。共通の HTTP パーサーは `src/http/parsers.ts`、ドメインの入力制約は `src/domains` に配置します。
 - controller を持たない分析 API の入力スキーマは `src/routes/analysis/schema.ts` に配置します。
 - DB 処理は controller へ直接記述せず、ユースケースやリポジトリに委譲します。
 
 ### src/db
+
 - クエリビルダーである[kysely](https://kysely.dev/)の型定義ファイル
 - [prisma-kysely](https://github.com/valtyr/prisma-kysely)によって，prismaスキーマ定義ファイル`prisma/schema.prisma`から自動生成される
 
 ### src/middleware
+
 - `src/app.ts` で登録する Hono ミドルウェアを定義
 
 ### src/models
+
 - データベースと通信して，データを取得する
 - それ単体でテストが可能なモジュールと定義
 
 ### src/plugins
+
 ### src/routes
+
 ### src/services
+
 - 適宜，`src/models`を用いたり，データベースと通信したりして，データを取得・加工する
 - `src/models`のテストが終わったらテスト可能なモジュールと定義
 - トランザクション処理もここで行う
@@ -38,9 +50,11 @@ Clean Architecter をベースとした軽量DDD．
 ### src/types
 
 ### src/utils
+
 - DB処理に依らない再利用可能な処理を記述
 
 ## Testing
+
 Jest を使ってユースケースと Hono HTTP API の回帰テストを実行します。HTTP テストは依存先を差し替え、実際の DB 接続を必要としません。
 
 ```
@@ -95,6 +109,10 @@ pnpm exec env-cmd -f .config/.env pnpm --filter backend exec prisma migrate depl
 ```
 
 移行SQL自身も全IDの検査を行い、不整合があればインデックスDDLを実行する前に停止します。この検査用プロシージャの作成・削除権限が必要です。失敗時は原因を修正してPrismaの失敗した移行を解消し、再適用してください。既存データへの移行適用は、実装・テストとは別の作業です。
+
+## FSRS・成長イベントの移行
+
+既存の解答履歴を FSRS・成長イベントの仕組みへ引き継ぐ手順（マイグレーション、`learning:backfill`、切替、復旧）は [LEARNING_RECORD_MIGRATION.md](LEARNING_RECORD_MIGRATION.md) を参照してください。
 
 ## 認証の運用
 

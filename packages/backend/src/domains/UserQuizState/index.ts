@@ -1,4 +1,4 @@
-import dayjs from "@/plugins/day";
+import type { ReviewMemory } from "./ReviewMemory.js";
 
 export type QuizLearningState =
   // 学習中：知識の獲得・再学習を進めている状態。
@@ -17,20 +17,19 @@ export default class UserQuizState {
     private _successStreak: number,
     private _intervalDays: number,
     private _lastReviewedAt: Date | null,
-    private _nextReviewAt: Date,
-  ) {}
+    /** 未学習（一度も解答していない）なら null。 */
+    private _nextReviewAt: Date | null,
+    private _memory: ReviewMemory | null = null,
+  ) {
+    if ((_lastReviewedAt === null) !== (_nextReviewAt === null)) {
+      throw new RangeError(
+        "A review due date exists only after the first review",
+      );
+    }
+  }
 
   static create(uid: string, qid: string) {
-    return new UserQuizState(
-      uid,
-      qid,
-      "LEARNING",
-      0,
-      0,
-      1,
-      null,
-      dayjs().add(1, "day").toDate(),
-    );
+    return new UserQuizState(uid, qid, "LEARNING", 0, 0, 0, null, null);
   }
 
   get uid() {
@@ -63,5 +62,16 @@ export default class UserQuizState {
 
   get nextReviewAt() {
     return this._nextReviewAt;
+  }
+
+  get memory(): ReviewMemory | null {
+    return this._memory === null ? null : { ...this._memory };
+  }
+
+  // 当日の再出題対象。外部ライブラリの数値状態は扱わない。
+  get needsRelearning() {
+    return (
+      this._memory?.phase === "learning" || this._memory?.phase === "relearning"
+    );
   }
 }
